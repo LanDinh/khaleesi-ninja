@@ -6,7 +6,7 @@ matrix:
     - language: python
       python: 3.8
       services: postgresql
-      env: BACKEND_PROJECT=common
+      env: BACKEND_PROJECT=base
       install: ./scripts/backend_install.sh
       script: ./scripts/backend_run.sh
       after_script: ./scripts/backend_after.sh
