@@ -1,4 +1,4 @@
-"""ASGI config for common project."""
+"""ASGI config for base project."""
 
 # Python.
 import os

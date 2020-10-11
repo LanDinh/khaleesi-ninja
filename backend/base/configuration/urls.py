@@ -1,0 +1,4 @@
+"""base URL Configuration"""
+
+
+urlpatterns = []

@@ -1,4 +1,4 @@
-"""WSGI config for common project."""
+"""WSGI config for base project."""
 
 # Python.
 import os

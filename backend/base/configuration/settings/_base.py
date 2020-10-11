@@ -2,6 +2,7 @@
 
 # Python.
 import os
+from datetime import timedelta
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,16 +21,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'rest_framework',
+    #'corsheaders',
+    # khaleesi.ninja
+    #'common',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',  # before session.
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # cors: before common.
+    #'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',  # after authentication.
+    # Custom middleware last.
+    #'apps.common.user.middleware.KhaleesiUserMiddleware',
 ]
 ROOT_URLCONF = 'configuration.urls'
 TEMPLATES = [
@@ -66,6 +74,7 @@ CACHES = {
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = []
+#AUTH_USER_MODEL = 'common.User'
 
 
 # Internationalization
@@ -85,4 +94,22 @@ SESSION_COOKIE_DOMAIN="khaleesi.ninja"
 # Django Rest Framework configuration.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
+    #'DEFAULT_PERMISSION_CLASSES': ['apps.common.misc.permissions.HasPermission'],
+    #'DEFAULT_RENDERER_CLASSES': ['common.common.json.JSONRenderer'],
+    #'EXCEPTION_HANDLER': 'apps.common.misc.exception_handler.exception_handler',
+}
+
+# khaleesi.ninja configuration.
+KHALEESI_NINJA = {
+    'COMMON': {
+        'ANONYMOUS_SUFFIX': 'anonymous',
+        'AUTHENTICATED_SUFFIX': 'authenticated',
+        'DRAGON_SUFFIX': 'dragon',
+        'PERMISSION_MODEL': 'khaleesi',
+        'ANONYMOUS_USERNAME': '',
+    },
+    'USER': {
+        'MAX_FAILED_LOGIN_ATTEMPTS': 5,
+        'SYSTEM_LOCK_TIME': timedelta(minutes = 3),
+    }
 }

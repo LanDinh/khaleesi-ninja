@@ -1,4 +1,0 @@
-"""common URL Configuration"""
-
-
-urlpatterns = []
