@@ -1,0 +1,3 @@
+ignore:
+  - "backend/*/manage.py"
+  - "backend/*/configuration"
