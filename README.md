@@ -39,3 +39,24 @@ You can find and example at `scripts/backend_run.sh`.
 * Static Type Checker: `mypy --strict <project>/`.
   Remember to add the backend package to your `PYTHONPATH`.
     * This needs to run from within `backend`.
+
+## Frontend
+
+![typescript version](https://img.shields.io/badge/Typescript-v3.7-informational)
+![reactjs version](https://img.shields.io/badge/ReactJS-v16.13-informational)
+
+### Setup
+
+1. Setup the code part.
+  * Install `node`. I'm using 12.16, but any somewhat recent version should be fine.
+  * Install the dependencies using `npm install`.
+
+### Testing & Co
+
+* Tests: `npm --prefix frontend test`
+* Linter: `npm --prefix frontend run lint`
+
+### Running the development server
+
+1. Make sure the backend is running.
+1. `npm start`

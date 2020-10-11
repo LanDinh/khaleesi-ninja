@@ -10,3 +10,8 @@ matrix:
       install: ./scripts/backend_install.sh
       script: ./scripts/backend_run.sh
       after_script: ./scripts/backend_after.sh
+    - language: node_js
+      node_js: 12
+      install: npm --prefix frontend install
+      script: ./scripts/frontend_run.sh
+      after_script: ./scripts/frontend_after.sh
