@@ -23,6 +23,7 @@ do
       mypy "${dir}/" --show-error-codes --strict --config-file "mypy_temp.ini"
     fi
 done
+rm "mypy_temp.ini"
 
 cd ..
 

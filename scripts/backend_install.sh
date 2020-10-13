@@ -23,5 +23,15 @@ psql -U postgres -c "CREATE DATABASE khaleesi_ninja OWNER khaleesi_ninja;"
 # Prepare Python.
 PYTHONPATH=${PYTHONPATH}:$(pwd)/backend
 export PYTHONPATH
+for dir in */
+do
+    dir=${dir%*/}  # remove the trailing "/"
+    dir=${dir##*/}  # print everything after the final "/"
+    if ! [[ " ${NO_SOURCE} " =~ .*\ ${dir}\ .* ]]
+    then
+      MYPYPATH=${MYPYPATH}:$(pwd)/backend/${dir}
+    fi
+done
+export MYPYPATH
 python backend/base/manage.py makemigrations
 python backend/base/manage.py migrate

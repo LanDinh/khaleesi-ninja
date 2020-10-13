@@ -23,7 +23,7 @@ INSTALLED_APPS = [
     'rest_framework',
     #'corsheaders',
     # khaleesi.ninja
-    #'common',
+    'common',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
