@@ -7,7 +7,7 @@ trap 'err=1' ERR
 coverage run "backend/${BACKEND_PROJECT}/manage.py" test
 
 cd "backend/${BACKEND_PROJECT}/"
-./manage.py test
+python -m manage test
 NO_SOURCE="__pycache__ .mypy_cache configuration"
 DIRS=""
 
