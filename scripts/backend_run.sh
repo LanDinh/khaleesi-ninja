@@ -15,7 +15,6 @@ cp .coverage ../../.coverage.${BACKEND_PROJECT}
 pylint "backend/${BACKEND_PROJECT}/" --rcfile "../pylintrc"
 
 # Perform the static type checker.
-sed -e "s/BACKEND_PROJECT/${BACKEND_PROJECT}/g" "../mypy.ini" > "mypy_temp.ini"
 for dir in */
 do
     dir=${dir%*/}  # remove the trailing "/"
@@ -25,8 +24,7 @@ do
       DIRS="${DIRS} ${dir}"
     fi
 done
-mypy --show-error-codes --strict --config-file "mypy_temp.ini" "${DIRS}"
-rm "mypy_temp.ini"
+mypy --show-error-codes --strict --config-file "../mypy.ini" "${DIRS}"
 
 cd ..
 

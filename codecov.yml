@@ -1,5 +1,6 @@
 ignore:
   - "backend/*/manage.py"
   - "backend/*/configuration"
+  - "backend/*/tests"
   - "frontend/src/serviceWorker.ts"
   - "frontend/src/index.tsx"
