@@ -7,7 +7,9 @@ trap 'err=1' ERR
 coverage run "backend/${BACKEND_PROJECT}/manage.py" test
 
 cd "backend/${BACKEND_PROJECT}/"
+manage.py test
 NO_SOURCE="__pycache__ .mypy_cache configuration"
+DIRS=""
 
 # Perform the linter.
 pylint "backend/${BACKEND_PROJECT}/" --rcfile "../pylintrc"
@@ -20,9 +22,10 @@ do
     dir=${dir##*/}  # print everything after the final "/"
     if ! [[ " ${NO_SOURCE} " =~ .*\ ${dir}\ .* ]]
     then
-      mypy "${dir}/" --show-error-codes --strict --config-file "mypy_temp.ini"
+      DIRS="${DIRS} ${dir}"
     fi
 done
+mypy --show-error-codes --strict --config-file "mypy_temp.ini" "${DIRS}"
 rm "mypy_temp.ini"
 
 cd ..
