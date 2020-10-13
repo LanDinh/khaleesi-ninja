@@ -29,6 +29,7 @@ do
     dir=${dir##*/}  # print everything after the final "/"
     if ! [[ " ${NO_SOURCE} " =~ .*\ ${dir}\ .* ]]
     then
+      PYTHONPATH=${PYTHONPATH}:$(pwd)/backend/${dir}
       MYPYPATH=${MYPYPATH}:$(pwd)/backend/${dir}
     fi
 done
