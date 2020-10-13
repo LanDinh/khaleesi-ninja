@@ -3,14 +3,27 @@
 err=0
 trap 'err=1' ERR
 
-# Perform the tests, linter, and static type checker.
+# Perform the tests.
 coverage run "backend/${BACKEND_PROJECT}/manage.py" test
-pylint --rcfile "backend/pylintrc" "backend/${BACKEND_PROJECT}/"
 
-# Mypy needs special treatment...
-cd backend/
-sed -i -e "s/BACKEND_PROJECT/${BACKEND_PROJECT}/g" "mypy.ini"
-mypy --strict --show-error-codes "${BACKEND_PROJECT}/"
+cd "backend/${BACKEND_PROJECT}/"
+NO_SOURCE="__pycache__ .mypy_cache configuration"
+
+# Perform the linter.
+pylint "backend/${BACKEND_PROJECT}/" --rcfile "../pylintrc"
+
+# Perform the static type checker.
+sed -e "s/BACKEND_PROJECT/${BACKEND_PROJECT}/g" "../mypy.ini" > "mypy_temp.ini"
+for dir in */
+do
+    dir=${dir%*/}  # remove the trailing "/"
+    dir=${dir##*/}  # print everything after the final "/"
+    if ! [[ " ${NO_SOURCE} " =~ .*\ ${dir}\ .* ]]
+    then
+      mypy "${dir}/" --show-error-codes --strict --config-file "mypy_temp.ini"
+    fi
+done
+
 cd ..
 
 test $err = 0
