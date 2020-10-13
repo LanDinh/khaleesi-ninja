@@ -24,7 +24,7 @@ do
       DIRS="${DIRS} ${dir}"
     fi
 done
-mypy --show-error-codes --strict --config-file "../mypy.ini" "${DIRS}"
+mypy --show-error-codes --strict --config-file "../mypy.ini" ${DIRS}
 
 cd ..
 
