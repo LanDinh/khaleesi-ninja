@@ -4,4 +4,6 @@
 
 
 # Application definition
-KHALEESI_INSTALLED_APPS = []
+KHALEESI_INSTALLED_APPS = [
+    'common',
+]

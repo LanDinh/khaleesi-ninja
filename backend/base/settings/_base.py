@@ -11,15 +11,12 @@ ALLOWED_HOSTS = []
 
 # Application definition
 BASE_INSTALLED_APPS = [
-    # Django.
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
     'rest_framework',
     #'corsheaders',
-    # khaleesi.ninja.
-    'common',
 ]
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
