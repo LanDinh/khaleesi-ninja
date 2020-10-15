@@ -9,7 +9,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 # khaleesi.ninja base.
 from common.json import JSONEncoder
-from test.test import SimpleTestCase, TestCase
+from test_util.test import SimpleTestCase, TestCase
 
 
 @dataclass

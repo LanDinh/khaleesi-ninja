@@ -12,7 +12,7 @@ coverage run "./manage.py" test
 cp .coverage ../../.coverage.${BACKEND_PROJECT}
 
 # Perform the linter.
-pylint "${BACKEND_PROJECT}/" --rcfile "../pylintrc"
+pylint "${BACKEND_PROJECT}" --rcfile "../pylintrc"
 
 # Perform the static type checker.
 for dir in */
