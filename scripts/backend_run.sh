@@ -4,6 +4,7 @@ err=0
 trap 'err=1' ERR
 
 PYTHONPATH=${PYTHONPATH}:$(pwd)/backend
+MYPYPATH=${MYPYPATH}::$(pwd)/backend
 cd "backend/${BACKEND_PROJECT}/"
 PYTHONPATH=${PYTHONPATH}:$(pwd)
 export PYTHONPATH
