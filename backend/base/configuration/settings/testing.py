@@ -3,7 +3,7 @@
 # pylint: disable=wildcard-import,unused-wildcard-import
 
 # khaleesi.ninja
-from configuration.settings.base.testing import *
 from configuration.settings._base import *
+from settings.testing import *
 
 INSTALLED_APPS = BASE_INSTALLED_APPS + KHALEESI_INSTALLED_APPS

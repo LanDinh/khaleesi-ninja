@@ -3,7 +3,7 @@
 # pylint: disable=wildcard-import,unused-wildcard-import
 
 # khaleesi.ninja
-from configuration.settings.base._base import *
+from settings._base import *
 
 
 # Debug settings.
