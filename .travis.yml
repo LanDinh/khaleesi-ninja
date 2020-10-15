@@ -10,6 +10,13 @@ matrix:
       install: ./scripts/backend_install.sh
       script: ./scripts/backend_run.sh
       after_script: ./scripts/backend_after.sh
+    - language: python
+      python: 3.8
+      services: postgresql
+      env: BACKEND_PROJECT=translation
+      install: ./scripts/backend_install.sh
+      script: ./scripts/backend_run.sh
+      after_script: ./scripts/backend_after.sh
     - language: node_js
       node_js: 12
       install: npm --prefix frontend install
