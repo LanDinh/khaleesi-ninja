@@ -1,7 +1,7 @@
 """Return the correct settings."""
 
 # khaleesi.ninja
-from ._server import get_server_type
+from .base._server import get_server_type
 
 
 # pylint: disable=exec-used
