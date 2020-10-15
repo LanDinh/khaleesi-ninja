@@ -1,0 +1,4 @@
+"""translation URL Configuration"""
+
+
+urlpatterns = []
