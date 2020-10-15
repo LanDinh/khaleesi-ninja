@@ -3,11 +3,9 @@
 err=0
 trap 'err=1' ERR
 
-PYTHONPATH=${PYTHONPATH}:$(pwd)/backend
 MYPYPATH=${MYPYPATH}::$(pwd)/backend
+export MYPYPATH
 cd "backend/${BACKEND_PROJECT}/"
-PYTHONPATH=${PYTHONPATH}:$(pwd)
-export PYTHONPATH
 NO_SOURCE="__pycache__ .mypy_cache configuration"
 DIRS=""
 
