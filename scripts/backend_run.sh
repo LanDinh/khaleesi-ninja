@@ -5,6 +5,7 @@ trap 'err=1' ERR
 
 MYPYPATH=${MYPYPATH}:$(pwd)/backend
 export MYPYPATH
+PYTHONPATH=${PYTHONPATH}:$(pwd)/backend
 cd "backend/${BACKEND_PROJECT}/"
 PYTHONPATH=${PYTHONPATH}:$(pwd)
 export PYTHONPATH
