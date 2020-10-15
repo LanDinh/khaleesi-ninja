@@ -1,6 +1,6 @@
 """Production settings for khaleesi.ninja."""
 
-# pylint: disable=unused-wildcard-import
+# pylint: disable=wildcard-import,unused-wildcard-import
 
 # khaleesi.ninja
 from base.settings.production import *
