@@ -54,7 +54,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
-  @patch('common.exception_handler.rest_exception_handler')
+  @patch('settings.exception_handler.rest_exception_handler')
   def test_django_rest_exception_handling(
       self,
       rest_exception_handler: MagicMock,
@@ -75,7 +75,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
         rest_exception_handler.call_count,
     )
 
-  @patch('common.exception_handler.rest_exception_handler')
+  @patch('settings.exception_handler.rest_exception_handler')
   def test_django_exception_handling(
       self,
       rest_exception_handler: MagicMock,
