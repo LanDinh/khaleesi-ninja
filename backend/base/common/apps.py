@@ -1,5 +1,8 @@
 """The common config."""
 
+# Django.
+from django.db.models.signals import post_migrate
+
 # khaleesi.ninja.
 from common.app_config import AppConfig, KhaleesiMeta
 
@@ -13,3 +16,10 @@ class CommonConfig(AppConfig):
       authenticated_group_permissions = ['user.views.csrf'],
       groups = [],
   )
+
+  def ready(self) -> None :
+    """Handle signals."""
+    # Disconnect unwanted signals.
+    post_migrate.disconnect(
+        dispatch_uid = 'django.contrib.auth.management.create_permissions',
+    )
