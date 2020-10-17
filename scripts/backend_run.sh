@@ -14,7 +14,7 @@ DIRS=""
 
 # Perform the tests.
 coverage run "./manage.py" test
-cp .coverage ../../.coverage.${BACKEND_PROJECT}
+cp .coverage "../../.coverage.${BACKEND_PROJECT}"
 
 # Perform the linter.
 pylint "${BACKEND_PROJECT}" --rcfile "../pylintrc"
@@ -29,6 +29,7 @@ do
       DIRS="${DIRS} ${dir}"
     fi
 done
+# shellcheck disable=SC2086
 mypy --show-error-codes --strict --config-file "../mypy.ini" ${DIRS}
 
 cd ..
