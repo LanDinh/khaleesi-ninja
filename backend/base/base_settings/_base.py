@@ -88,7 +88,7 @@ SESSION_COOKIE_DOMAIN="khaleesi.ninja"
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
     #'DEFAULT_PERMISSION_CLASSES': ['apps.common.misc.permissions.HasPermission'],
-    'DEFAULT_RENDERER_CLASSES': ['common.json.JSONRenderer'],
+    'DEFAULT_RENDERER_CLASSES': ['settings.json.JSONRenderer'],
     #'EXCEPTION_HANDLER': 'apps.common.misc.exception_handler.exception_handler',
 }
 
