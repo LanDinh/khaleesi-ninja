@@ -4,6 +4,6 @@
 
 # khaleesi.ninja
 from configuration.settings._base import *
-from settings.testing import *
+from base_settings.testing import *
 
 INSTALLED_APPS = BASE_INSTALLED_APPS + KHALEESI_INSTALLED_APPS
