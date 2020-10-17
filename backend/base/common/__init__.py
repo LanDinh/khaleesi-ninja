@@ -1,0 +1,1 @@
+"""Base common utility."""
