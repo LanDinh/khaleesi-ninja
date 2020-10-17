@@ -1,7 +1,7 @@
 """Test if settings can be read correctly."""
 
 # Django.
-from common.settings import Settings
+from settings.settings import Settings
 from test_util.test import CombinedTestCase
 
 

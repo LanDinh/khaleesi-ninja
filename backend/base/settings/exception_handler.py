@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler as rest_exception_handler
 
 # khaleesi.ninja.
-from common.exceptions import KhaleesiException
+from settings.exceptions import KhaleesiException
 
 
 def exception_handler(

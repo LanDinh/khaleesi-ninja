@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 from django.core.serializers.json import DjangoJSONEncoder
 
 # khaleesi.ninja base.
-from common.json import JSONEncoder
+from settings.json import JSONEncoder
 from test_util.test import SimpleTestCase, TestCase
 
 

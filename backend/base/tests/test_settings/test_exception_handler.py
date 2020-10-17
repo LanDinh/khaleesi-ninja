@@ -15,8 +15,8 @@ from rest_framework.exceptions import APIException, NotFound
 from rest_framework import status
 
 # khaleesi.ninja
-from common.exception_handler import exception_handler
-from common.exceptions import KhaleesiException, TeapotException
+from settings.exception_handler import exception_handler
+from settings.exceptions import KhaleesiException, TeapotException
 from test_util.test import SimpleTestCase, TestCase
 
 
