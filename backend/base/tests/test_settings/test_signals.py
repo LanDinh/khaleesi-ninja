@@ -36,11 +36,19 @@ class SignalIntegrationTests(TestCase):
 
   def test_full_clean_all_models(self) -> None :
     """Test if models enforce full clean."""
-    for sender in [s for s in apps.get_models() if s._meta.managed]:  # pylint: disable=protected-access
+    # noinspection PyUnresolvedReferences
+    for sender in [
+        s for s in apps.get_models()
+        if not hasattr(s, 'TestMeta') or not s.TestMeta.testing  # type: ignore[attr-defined]
+    ]:  # pylint: disable=protected-access
       with self.subTest(sender = sender):
         with self.assertRaises(ValidationError):
           # If full_clean gets called, validation is applied.
-          sender.objects.create()
+          if hasattr(sender.objects, '_get_queryset'):
+            # noinspection PyUnresolvedReferences
+            sender.objects._get_queryset().create() # type: ignore[attr-defined]
+          else:
+            sender.objects.get_queryset().create()
 
   def test_no_default_permissions(self) -> None :
     """Test if default permissions are prevented from being created."""
