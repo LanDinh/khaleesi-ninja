@@ -47,12 +47,6 @@ class SignalIntegrationTests(TestCase):
     for permission in Permission.objects.all():
       with self.subTest(permission = permission):
         for code in ['add', 'change', 'delete', 'view']:
-          self.assertNotRegex(
-              permission.codename,
-              '{code}_[a-zA-Z]*'.format(code = code),
-          )
-          self.assertNotRegex(
-              permission.name,
-              'Can {code} [a-zA-Z]*'.format(code = code)
-          )
+          self.assertNotRegex(permission.codename, f'{code}_[a-zA-Z]*')
+          self.assertNotRegex(permission.name, f'Can {code} [a-zA-Z]*')
         self.assertEqual(permission.codename, permission.name)
