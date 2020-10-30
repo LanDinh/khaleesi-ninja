@@ -17,6 +17,7 @@ class CommonConfig(AppConfig):
       groups = [],
   )
 
+  # noinspection PyUnresolvedReferences
   def ready(self) -> None :
     """Handle signals."""
     # Disconnect unwanted signals.
@@ -24,5 +25,5 @@ class CommonConfig(AppConfig):
         dispatch_uid = 'django.contrib.auth.management.create_permissions',
     )
     # Connect custom signals.
-    # pylint: disable=import-outside-toplevel, unused-import
+    # pylint: disable=import-outside-toplevel,unused-import
     from settings import signals
