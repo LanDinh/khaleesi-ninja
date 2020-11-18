@@ -3,4 +3,4 @@
 # pylint: disable=useless-import-alias
 
 # khaleesi.ninja.
-from .translation import translate as translate
+from .translation import translate_exception as translate_exception

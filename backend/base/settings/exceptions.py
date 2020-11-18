@@ -10,8 +10,7 @@ from rest_framework import status
 from rest_framework.utils.serializer_helpers import ReturnDict
 
 # khaleesi.ninja.
-# noinspection PyUnresolvedReferences,PyUnresolvedReferences
-from translation.translate import translate as _
+from translation.translate import translate_exception as _
 
 
 class KhaleesiException(Exception):

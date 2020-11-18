@@ -1,6 +1,6 @@
 """Handle translations."""
 
 
-def translate(string: str) -> str :
-  """Translate the given string."""
-  return string
+def translate_exception(key: str) -> str :
+  """Provide the correct translation for the exception."""
+  return key
