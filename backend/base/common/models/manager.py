@@ -10,6 +10,9 @@ from django.db import models
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager as DjangoBaseManager
 
+# khaleesi.ninja.
+from settings.exceptions import TwinException, ZeroTupletException
+
 
 _METHODS_FOR_COPYING = ['using']
 
@@ -51,6 +54,15 @@ class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
   def all(self) -> None :  # type: ignore[override]
     """Don't expose the QuerySet."""
     raise NotImplementedError()
+
+  def get(self, **kwargs: Any) -> _T :  # type: ignore[override]
+    """Get a single element."""
+    result: QuerySet[_T] = self._get_queryset().filter(**kwargs)
+    if len(result) > 1:
+      raise TwinException()
+    if len(result) < 1:
+      raise ZeroTupletException()
+    return result[0]
 
 
 # noinspection PyAbstractClass,PyUnresolvedReferences

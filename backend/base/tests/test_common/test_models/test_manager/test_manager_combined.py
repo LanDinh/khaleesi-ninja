@@ -2,10 +2,9 @@
 
 # Python.
 import inspect
-
-# khaleesi.ninja.
 from typing import Any, List, Tuple
 
+# khaleesi.ninja.
 from test_util.test import CombinedTestCase
 from .models import TestModel
 
@@ -16,10 +15,11 @@ _IGNORE_MANAGER_METHODS = [
     'db_manager',
     'deconstruct',
     'from_queryset',
+    'get',
     'using',
 ]
 
-_IGNORE_QUERYSET_METHODS = ['all', 'using']
+_IGNORE_QUERYSET_METHODS = ['all', 'get', 'using']
 
 
 class ManagerTestCase(CombinedTestCase):

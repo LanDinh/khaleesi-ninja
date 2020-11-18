@@ -16,10 +16,8 @@ from translation.translate import translate_exception as _
 class KhaleesiException(Exception):
   """Base class for custom exceptions."""
 
-  def __init__(self, code: int, data: Any) -> None :
-    super().__init__(
-        '{code}: {data}'.format(code = code, data = data.__str__()),
-    )
+  def __init__(self, *, code: int, data: Any) -> None :
+    super().__init__(f'{code}: {data.__str__()}')
     self.code = code
     self.data = data
 
@@ -31,15 +29,18 @@ class TeapotException(KhaleesiException):
     # noinspection PyUnresolvedReferences
     super().__init__(code = status.HTTP_418_IM_A_TEAPOT, data = data)  # type: ignore[attr-defined]
 
-
-class PermissionDeniedException(KhaleesiException):
-  """Permission denied."""
+class TwinException(TeapotException):
+  """Teapot - there should never be twins."""
 
   def __init__(self) -> None :
-    super().__init__(
-        code = status.HTTP_403_FORBIDDEN,
-        data = _('exception:user/authorization/denied'),
-    )
+    super().__init__(data = _('data/twins'))
+
+class ZeroTupletException(TeapotException):
+  """Teapot - there should always be an object."""
+
+  def __init__(self) -> None :
+    super().__init__(data = _('data/no_object'))
+
 
 class SerializerException(KhaleesiException):
   """Serializer exceptions."""
@@ -48,10 +49,19 @@ class SerializerException(KhaleesiException):
     data = {}
     for key, messages in errors:
       data[key] = [
-          _('exception:serializer/{code}'.format(code = message.code))
-          for message in messages
+          _(f'data/serializer/{message.code}') for message in messages
       ]
     super().__init__(
         code = status.HTTP_400_BAD_REQUEST,
         data = data,
+    )
+
+
+class PermissionDeniedException(KhaleesiException):
+  """Permission denied."""
+
+  def __init__(self) -> None :
+    super().__init__(
+        code = status.HTTP_403_FORBIDDEN,
+        data = _('authorization/denied'),
     )
