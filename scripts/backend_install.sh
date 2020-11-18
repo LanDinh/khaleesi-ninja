@@ -21,5 +21,7 @@ psql -U postgres -c "ALTER USER khaleesi_ninja CREATEDB;"
 psql -U postgres -c "CREATE DATABASE khaleesi_ninja OWNER khaleesi_ninja;"
 
 # Prepare Python.
+PYTHONPATH=${PYTHONPATH}:$(pwd)/backend
+export PYTHONPATH
 python backend/base/manage.py makemigrations
 python backend/base/manage.py migrate
