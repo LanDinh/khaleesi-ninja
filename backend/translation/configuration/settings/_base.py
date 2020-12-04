@@ -5,5 +5,5 @@
 
 # Application definition
 KHALEESI_INSTALLED_APPS = [
-    'base.common'
+    'common'
 ]
