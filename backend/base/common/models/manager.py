@@ -16,7 +16,7 @@ from settings.exceptions import TwinException, ZeroTupletException
 
 _METHODS_FOR_COPYING = ['using']
 
-_T = TypeVar("_T", bound = models.Model, covariant=True)
+T = TypeVar("T", bound = models.Model, covariant=True)  # pylint: disable=invalid-name
 
 
 # noinspection SyntaxError,PyTypeChecker,PyTypeHints,PyUnresolvedReferences
@@ -44,10 +44,10 @@ class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
         if name in _METHODS_FOR_COPYING
     }
 
-  def _get_queryset(self) -> QuerySet[_T] :
+  def _get_queryset(self) -> QuerySet[T] :
     return super().get_queryset()
 
-  def get_queryset(self) -> QuerySet[_T] :
+  def get_queryset(self) -> QuerySet[T] :
     """Don't expose the QuerySet."""
     raise NotImplementedError()
 
@@ -55,9 +55,9 @@ class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
     """Don't expose the QuerySet."""
     raise NotImplementedError()
 
-  def get(self, **kwargs: Any) -> _T :  # type: ignore[override]
+  def get(self, **kwargs: Any) -> T :  # type: ignore[override]
     """Get a single element."""
-    result: QuerySet[_T] = self._get_queryset().filter(**kwargs)
+    result: QuerySet[T] = self._get_queryset().filter(**kwargs)
     if len(result) > 1:
       raise TwinException()
     if len(result) < 1:
