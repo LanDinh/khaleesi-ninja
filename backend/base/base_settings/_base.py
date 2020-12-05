@@ -100,9 +100,7 @@ KHALEESI_NINJA = {
         'DRAGON_SUFFIX': 'dragon',
         'PERMISSION_MODEL': 'khaleesi',
         'ANONYMOUS_USERNAME': '',
-    },
-    'USER': {
         'MAX_FAILED_LOGIN_ATTEMPTS': 5,
         'SYSTEM_LOCK_TIME': timedelta(minutes = 3),
-    }
+    },
 }

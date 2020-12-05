@@ -1,6 +1,7 @@
 """Gracefully import settings."""
 
 # Python.
+from datetime import timedelta
 from typing import cast
 
 # Django.
@@ -36,3 +37,13 @@ class Settings:
   def anonymous_username(cls) -> str :
     """The username used for the anonymous user."""
     return cast(str, cls.settings['ANONYMOUS_USERNAME'])
+
+  @classmethod
+  def system_lock_time(cls) -> timedelta :
+    """The time in minutes that a system lock lasts."""
+    return cast(timedelta, cls.settings['SYSTEM_LOCK_TIME'])
+
+  @classmethod
+  def max_failed_attempts(cls) -> int :
+    """The number of failed login attempts before a user gets system locked."""
+    return cast(int, cls.settings['MAX_FAILED_LOGIN_ATTEMPTS'])

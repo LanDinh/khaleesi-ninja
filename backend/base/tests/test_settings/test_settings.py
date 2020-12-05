@@ -1,6 +1,8 @@
 """Test if settings can be read correctly."""
 
 # Django.
+from datetime import timedelta
+
 from settings.settings import Settings
 from test_util.test import CombinedTestCase
 
@@ -32,3 +34,13 @@ class SettingsTests(CombinedTestCase):
     """Make sure the anonymous username gets read correctly."""
     anonymous_username = Settings.anonymous_username()
     self.assertTrue(isinstance(anonymous_username, str))
+
+  def test_system_lock_time(self) -> None :
+    """Make sure the system lock time gets read correctly."""
+    system_lock_time = Settings.system_lock_time()
+    self.assertTrue(isinstance(system_lock_time, timedelta))
+
+  def test_max_failed_attempts(self) -> None :
+    """Make sure the max failed attempts get read correctly."""
+    max_failed_attempt = Settings.max_failed_attempts()
+    self.assertTrue(isinstance(max_failed_attempt, int))
