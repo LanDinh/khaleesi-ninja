@@ -126,6 +126,7 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
   @classmethod
   def setUpClass(cls) -> None :
     """Prepare permissions for testing."""
+    super().setUpClass()
     content_type, _ = ContentType.objects.get_or_create(
         model = Settings.permission_model(),
         app_label = cls.label,
