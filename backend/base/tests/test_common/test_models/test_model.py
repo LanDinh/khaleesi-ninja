@@ -23,6 +23,7 @@ class ModelTestCase(CombinedTestCase):
           if '_' not in name:  # Don't check related models.
             with self.subTest(model = name):
               # Check if the original manager is correctly registered.
+              # noinspection PyUnresolvedReferences
               self.assertTrue(isinstance(model._objects, models.Manager))  # type: ignore[attr-defined]
               self.assertEqual('_objects', model._meta.default_manager_name)
               self.assertTrue(isinstance(model._meta.default_manager, models.Manager))

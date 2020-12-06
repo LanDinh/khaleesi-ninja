@@ -4,7 +4,7 @@
 from django.db import models
 
 # khaleesi.ninja.
-from common.models import Manager
+from common.models.manager import Manager
 
 
 class Model(models.Model):
