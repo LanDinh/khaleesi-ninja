@@ -20,7 +20,7 @@ def setup_test_app(package: Any, label: str) -> None :
   app_config = AppConfig.create(package)
   app_config.apps = apps
   if label in apps.app_configs:
-    return
+    raise ValueError(f'There is already an app registered with the label "{label}"')
   app_config.label = label
   apps.app_configs[app_config.label] = app_config
   app_config.import_models()

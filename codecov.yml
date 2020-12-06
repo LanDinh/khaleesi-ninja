@@ -3,6 +3,6 @@ ignore:
   - "backend/*/configuration"
   - "backend/*/migrations"
   - "backend/*/tests"
-  - "backend/base/settings"
+  - "backend/base/base_settings"
   - "frontend/src/serviceWorker.ts"
   - "frontend/src/index.tsx"
