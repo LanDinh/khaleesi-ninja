@@ -311,15 +311,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
     mock = cast(MagicMock, self._attach_common_properties(user = cast(User, mock), params = params))
     return self._attach_mocks_to_user(mock = mock, params = params)
 
-  def create_mock_anonymous_user(self) -> Tuple[MagicMock, MagicMock] :
-    """Create a unit user according to requirements, mock super methods."""
-    params = Parameters()
-    params.creates.username = ''
-    mock, _ = self.create_mock_user(params = params)
-    # noinspection PyPropertyAccess
-    mock.is_authenticated = False
-    return mock, deepcopy(mock)
-
   def assert_user(
       self, *,
       expected_user: User,
