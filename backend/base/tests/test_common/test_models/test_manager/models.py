@@ -1,16 +1,11 @@
 """Test models."""
 
-# Django.
-from django.db import models
-
 # khaleesi.ninja
-from common.models import Manager
+from common.models import Model
 
 
-class TestModel(models.Model):
+class TestModel(Model):
   """Test model holding the custom manager."""
-
-  objects = Manager()
 
   class TestMeta:
     """Detect test metadata."""
