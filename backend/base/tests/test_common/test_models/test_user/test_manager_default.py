@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 
 # khaleesi.ninja.
 from common.models import User, Manager
-from settings.exceptions import ZeroTupletException
+from common.exceptions import ZeroTupletException
 from settings.settings import Settings
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import (

@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from common.models import Manager
 from common.models.group import Group
-from settings.exceptions import ZeroTupletException
+from common.exceptions import ZeroTupletException
 from test_util.test import SimpleTestCase, TestCase
 
 

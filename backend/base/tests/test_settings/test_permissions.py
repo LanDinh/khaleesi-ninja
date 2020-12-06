@@ -12,12 +12,12 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
 # khaleesi.ninja.
-from settings.exceptions import PermissionDeniedException
+from common.exceptions import PermissionDeniedException
+from common.models import User
 from settings.permissions import HasPermission
 from settings.settings import Settings
 from test_util.models.user import TestUserIntegrationMixin, TestUserUnitMixin, Parameters
 from test_util.test import SimpleTestCase, TestCase
-from common.models import User
 
 
 class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):

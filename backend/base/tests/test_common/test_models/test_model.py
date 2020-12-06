@@ -8,7 +8,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from common.models import Manager
-from settings.app_config import AppConfig
+from common.app_config import AppConfig
 from test_util.test import CombinedTestCase
 
 

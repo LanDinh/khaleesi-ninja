@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from common.models.manager import BaseManager
-from settings.exceptions import ZeroTupletException, TwinException
+from common.exceptions import ZeroTupletException, TwinException
 from test_util.test import SimpleTestCase
 from .models import TestModel
 

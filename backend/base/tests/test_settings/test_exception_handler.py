@@ -16,7 +16,7 @@ from rest_framework import status
 
 # khaleesi.ninja
 from settings.exception_handler import exception_handler
-from settings.exceptions import KhaleesiException, TeapotException
+from common.exceptions import KhaleesiException, TeapotException
 from test_util.test import SimpleTestCase, TestCase
 
 

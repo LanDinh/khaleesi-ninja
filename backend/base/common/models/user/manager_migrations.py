@@ -6,7 +6,7 @@ from typing import cast
 
 # khaleesi.ninja.
 from common.models.manager import Manager, T
-from settings.exceptions import TwinException
+from common.exceptions import TwinException
 from settings.settings import Settings
 
 

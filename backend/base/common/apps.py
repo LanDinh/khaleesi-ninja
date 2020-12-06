@@ -4,7 +4,7 @@
 from django.db.models.signals import post_migrate
 
 # khaleesi.ninja.
-from settings.app_config import AppConfig, KhaleesiMeta
+from common.app_config import AppConfig, KhaleesiMeta
 
 
 class CommonConfig(AppConfig):
@@ -25,5 +25,5 @@ class CommonConfig(AppConfig):
         dispatch_uid = 'django.contrib.auth.management.create_permissions',
     )
     # Connect custom signals.
-    # pylint: disable=import-outside-toplevel,unused-import
-    from settings import signals
+    # pylint: disable=unused-import,import-outside-toplevel
+    from common import signals

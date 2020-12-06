@@ -4,10 +4,10 @@
 from unittest.mock import call, MagicMock, patch
 
 # khaleesi.ninja.
-from settings.exceptions import TwinException
+from common.exceptions import TwinException
+from common.models import User
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
-from common.models import User
 
 
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):

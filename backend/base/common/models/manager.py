@@ -11,7 +11,7 @@ from django.db.models import QuerySet
 from django.db.models.manager import BaseManager as DjangoBaseManager
 
 # khaleesi.ninja.
-from settings.exceptions import TwinException, ZeroTupletException
+from common.exceptions import TwinException, ZeroTupletException
 
 
 _METHODS_FOR_COPYING = ['using']

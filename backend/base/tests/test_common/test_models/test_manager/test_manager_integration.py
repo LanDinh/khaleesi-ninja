@@ -1,7 +1,7 @@
 """Test the custom base manager."""
 
 # khaleesi.ninja.
-from settings.exceptions import ZeroTupletException, TwinException
+from common.exceptions import ZeroTupletException, TwinException
 from test_util.test import TestCase
 from .models import TestModel
 

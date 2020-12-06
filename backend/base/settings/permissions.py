@@ -6,7 +6,7 @@ from rest_framework.permissions import BasePermission
 from rest_framework.request import Request
 
 # khaleesi.ninja.
-from settings.exceptions import PermissionDeniedException
+from common.exceptions import PermissionDeniedException
 from common.models import User
 
 

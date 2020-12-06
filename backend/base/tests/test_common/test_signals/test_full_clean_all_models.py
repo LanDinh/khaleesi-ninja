@@ -9,7 +9,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
 
 # khaleesi.ninja.
-from settings.signals import full_clean_all_models
+from common.signals.full_clean_all_models import full_clean_all_models
 from test_util.test import SimpleTestCase, TestCase
 
 # pylint: disable=line-too-long
