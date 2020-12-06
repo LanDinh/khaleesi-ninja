@@ -15,6 +15,7 @@ from django.utils import timezone
 
 # khaleesi.ninja.
 from common.models import User
+from settings.settings import Settings
 
 
 @dataclass
@@ -262,6 +263,22 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     )
     # Clean the database for other sub tests.
     user.delete()
+
+  # noinspection PyUnresolvedReferences
+  def assert_anonymous_user(self, *, user: User) -> None :
+    """Assert user all attributes are correct."""
+    # Assert the common attributes.
+    self.assertEqual(Settings.anonymous_username(), user.username)  # type: ignore[attr-defined]
+    self.assertFalse(user.has_usable_password())  # type: ignore[attr-defined]
+    self.assertFalse(user.is_superuser)  # type: ignore[attr-defined]
+    self.assertFalse(user.is_authenticated)  # type: ignore[attr-defined]
+    self.assertTrue(user.is_active)  # type: ignore[attr-defined]
+    self.assertEqual(datetime.min, user.date_joined)  # type: ignore[attr-defined]
+    self.assertEqual(datetime.min, user.last_activity)  # type: ignore[attr-defined]
+    # Assert the locked state attributes.
+    self.assertEqual(None, user.original)  # type: ignore[attr-defined]
+    self.assertFalse(user.admin_locked)  # type: ignore[attr-defined]
+    self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
 
 
 # noinspection PyTypeHints
