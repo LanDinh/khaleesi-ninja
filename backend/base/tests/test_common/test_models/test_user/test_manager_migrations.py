@@ -1,11 +1,10 @@
 """The tests for the custom User."""
 
 # Python.
-from datetime import datetime
 from unittest.mock import call, MagicMock, patch
 
 # khaleesi.ninja.
-from settings.settings import Settings
+from settings.exceptions import TwinException
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 from common.models import User
@@ -46,6 +45,16 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # noinspection PyUnresolvedReferences
     user.save.assert_not_called()  # type: ignore[attr-defined]
 
+  @patch.object(User.migrations, '_get_queryset')
+  def test_get_or_create_anonymous_twins(self, queryset: MagicMock) -> None :
+    """Test if the anonymous user gets detected correctly."""
+    # Prepare data.
+    _, expected_user = self.create_anonymous_user()
+    queryset.return_value.filter = MagicMock(return_value = [expected_user, expected_user])
+    # Perform test.
+    with self.assertRaises(TwinException):
+      User.migrations.get_or_create_anonymous_user()
+
   @staticmethod
   def setup_mocks(*, user: User) -> MagicMock :
     """Correctly prepare the mocks for mock assertion."""
@@ -79,18 +88,3 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     # Assert that no new user has been added.
     self.assertEqual(1, len(User._objects.all()))  # pylint: disable=protected-access
     self.assert_anonymous_user(user = user)
-
-  def assert_anonymous_user(self, *, user: User) -> None :
-    """Assert user all attributes are correct."""
-    # Assert the common attributes.
-    self.assertEqual(Settings.anonymous_username(), user.username)
-    self.assertFalse(user.has_usable_password())
-    self.assertFalse(user.is_superuser)
-    self.assertFalse(user.is_authenticated)
-    self.assertTrue(user.is_active)
-    self.assertEqual(datetime.min, user.date_joined)
-    self.assertEqual(datetime.min, user.last_activity)
-    # Assert the locked state attributes.
-    self.assertEqual(None, user.original)
-    self.assertFalse(user.admin_locked)
-    self.assertEqual(datetime.min, user.system_locked)

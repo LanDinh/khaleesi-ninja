@@ -6,6 +6,7 @@ from typing import cast
 
 # khaleesi.ninja.
 from common.models.manager import Manager, T
+from settings.exceptions import TwinException
 from settings.settings import Settings
 
 
@@ -16,7 +17,9 @@ class MigrationManager(Manager):
     """Create the one and only anonymous user."""
     users = self._get_queryset().filter(username = Settings.anonymous_username())
     if users:
-      return cast(T, users[0])
+      if len(users) == 1:
+        return cast(T, users[0])
+      raise TwinException()
     user = self.model(username = Settings.anonymous_username())
     user.set_unusable_password()
     user.date_joined = datetime.min
