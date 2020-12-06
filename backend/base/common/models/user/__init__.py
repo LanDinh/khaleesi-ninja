@@ -2,4 +2,4 @@
 
 # pylint: disable=useless-import-alias
 
-from .model import User as User
+from common.models.user.model import User as User
