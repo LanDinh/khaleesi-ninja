@@ -4,6 +4,7 @@
 from typing import cast, Optional
 
 # khaleesi.ninja.
+from settings.settings import Settings
 from ..manager import Manager, T
 
 
@@ -13,6 +14,10 @@ class DefaultManager(Manager):
   def get(self, *, username: str) -> T :
     """Get a single user by name."""
     return cast(T, super().get(username = username))
+
+  def get_anonymous_user(self) -> T :
+    """Get the single anonymous user."""
+    return self.get(username = Settings.anonymous_username())
 
   def create_user(
       self, *,

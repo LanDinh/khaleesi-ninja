@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 # khaleesi.ninja.
 from common.models import User, Manager
 from settings.exceptions import ZeroTupletException
+from settings.settings import Settings
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import (
     CreateParameters,
@@ -29,6 +30,14 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     User.objects.get(username = 'whatever')
     # Assert result.
     get.assert_called_once_with(username = 'whatever')
+
+  @patch.object(Manager, 'get')
+  def test_get_anonymous_user(self, get: MagicMock) -> None :  # pylint: disable=no-self-use
+    """Test if gets behaves correctly."""
+    # Perform test.
+    User.objects.get_anonymous_user()
+    # Assert result.
+    get.assert_called_once_with(username = Settings.anonymous_username())
 
   def test_create_user_and_superuser(self) -> None :
     """Test if user creation succeeds."""
@@ -85,6 +94,15 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     # Perform test.
     with self.assertRaises(ZeroTupletException):
       User.objects.get(username = 'impossible username')
+
+  def test_get_anonymous_user(self) -> None :
+    """Test if gets behaves correctly."""
+    # Prepare data.
+    User.migrations.get_or_create_anonymous_user()
+    # Perform test.
+    user: User = User.objects.get(username = Settings.anonymous_username())
+    # Assert result.
+    self.assert_anonymous_user(user = user)
 
   def test_create_user_and_superuser(self) -> None :
     """Test if user creation succeeds."""
