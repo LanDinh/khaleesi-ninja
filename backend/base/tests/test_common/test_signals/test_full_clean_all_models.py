@@ -15,7 +15,7 @@ from test_util.test import SimpleTestCase, TestCase
 # pylint: disable=line-too-long
 
 
-class SignalUnitTests(SimpleTestCase):
+class FullCleanAllModelsUnitTests(SimpleTestCase):
   """The unit tests for signal handling."""
 
   def test_full_clean_all_models(self) -> None :
@@ -31,7 +31,7 @@ class SignalUnitTests(SimpleTestCase):
         instance.full_clean.assert_called_once_with(validate_unique = False)
 
 
-class SignalIntegrationTests(TestCase):
+class FullCleanAllModelsIntegrationTests(TestCase):
   """The integration tests for signal handling."""
 
   def test_full_clean_all_models(self) -> None :

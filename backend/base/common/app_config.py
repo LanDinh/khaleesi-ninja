@@ -2,7 +2,7 @@
 
 # Python.
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 # Django.
@@ -19,14 +19,12 @@ class GroupMeta:
 @dataclass
 class KhaleesiMeta:
   """Contains meta information of that model specific to this website."""
-  # Used as prefix for all groups and permissions for this app.
-  label: str
   # Automatically added to the anonymous user. Name: label.anonymous.
-  anonymous_group_permissions: List[str]
+  anonymous_group_permissions: List[str] = field(default_factory = lambda: [])
   # Automatically added to all authenticated users. Name: label.authenticated.
-  authenticated_group_permissions: List[str]
+  authenticated_group_permissions: List[str] =  field(default_factory = lambda: [])
   # All remaining groups. Should have a dragon baby as administrator.
-  groups: List[GroupMeta]
+  groups: List[GroupMeta] =  field(default_factory = lambda: [])
 
 
 class AppConfig(DjangoAppConfig, ABC):
