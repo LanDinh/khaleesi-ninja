@@ -4,7 +4,7 @@
 from datetime import datetime
 
 # khaleesi.ninja.
-from common.models.manager import Manager, T
+from common.models.manager import Manager
 from common.exceptions import TwinException
 from settings.settings import Settings
 

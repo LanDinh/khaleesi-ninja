@@ -66,10 +66,9 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
   """The integration tests for the custom UserManager."""
 
   # noinspection PyMethodMayBeStatic
-  def test_create_anonymous_user(self) -> None :
+  def test_create_anonymous_user(self) -> None :  # pylint: disable=no-self-use
     """Test if the anonymous user gets detected correctly."""
     # Assert that the user has been created beforehand.
-    User.objects.get_anonymous_user()
     # Assert there is no error when trying to create it again.
     User.migrations.create_anonymous_user()
     # Assert that no new anonymous user has been added.
