@@ -2,10 +2,11 @@
 
 # Python.
 from datetime import datetime
+from typing import Optional, cast
 
 # khaleesi.ninja.
-from common.models.manager import Manager
-from common.exceptions import TwinException
+from common.models.manager import Manager, T
+from common.exceptions import ZeroTupletException
 from settings.settings import Settings
 
 
@@ -14,15 +15,29 @@ class MigrationManager(Manager):
 
   def create_anonymous_user(self) -> None :
     """Create the one and only anonymous user."""
-    users = self._get_queryset().filter(username = Settings.anonymous_username())
-    if users:
-      if len(users) == 1:
-        return
-      raise TwinException()
-    user = self.model(username = Settings.anonymous_username())
-    user.set_unusable_password()
-    user.date_joined = datetime.min
-    user.last_activity = datetime.min
-    user.full_clean()
-    user.save()
-    return
+    user = self._create_base_user(username = Settings.anonymous_username())
+    if user:
+      user.set_unusable_password()
+      user.full_clean()
+      user.save()
+
+  def create_superuser(self) -> None :
+    """Create a new superuser."""
+    user = self._create_base_user(username = Settings.khaleesi_username())
+    if user:
+      user.is_superuser = True
+      user.set_password(raw_password = Settings.initial_superuser_password())
+      user.full_clean()
+      user.save()
+
+  def _create_base_user(self, *, username: str) -> Optional[T] :
+    username = self.model.normalize_username(username = username)
+    try:
+      self.get(username = username)
+    except ZeroTupletException:
+      #Only if the user doesn't exist yet, create it.
+      user = self.model(username = username)
+      user.date_joined = datetime.min
+      user.last_activity = datetime.min
+      return cast(T, user)
+    return None

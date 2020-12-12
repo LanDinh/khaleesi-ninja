@@ -26,7 +26,6 @@ class CreateParameters:
   wrong_username: str = 'wrong_username'
   wrong_password: str = 'wrong password'
   oauth: bool = False
-  superuser: bool = False
 
 @dataclass
 class LockParameters:
@@ -48,7 +47,6 @@ class TestUserBaseMixin:
 
   # Possible raw parameter values.
   _params_oauth = [True, False]
-  _params_superuser = [True, False]
   _params_alias = [True, False]
   _params_admin_lock = [True, False]
   _params_system_lock = [True, False]
@@ -75,16 +73,15 @@ class TestUserBaseMixin:
       return not oauth
     return self._params_filtered(filter_function = filter_function)
 
-  def params_no_active_superuser(self) -> List[Parameters] :
+  def params_only_locked_user(self) -> List[Parameters] :
     """Return parameter combinations for iteration in tests."""
     def filter_function(
         *,
-        superuser: bool,
         admin_lock: bool,
         system_lock: bool,
         **_: bool,
     ) -> bool :
-      return admin_lock or system_lock or not superuser
+      return admin_lock or system_lock
     return self._params_filtered(filter_function = filter_function)
 
   def params_only_active_users(self) -> List[Parameters] :
@@ -159,7 +156,6 @@ class TestUserBaseMixin:
         Parameters(
             creates = CreateParameters(
                 oauth = oauth,
-                superuser = superuser,
                 password = None if oauth else 'password',
             ),
             locks = LockParameters(
@@ -167,29 +163,20 @@ class TestUserBaseMixin:
                 admin_locked = admin_locked,
                 system_locked = system_locked,
             ),
-        ) for oauth, superuser, alias, admin_locked, system_locked
+        ) for oauth, alias, admin_locked, system_locked
         in itertools.product(
             self._params_oauth,
-            self._params_superuser,
             self._params_alias,
             self._params_admin_lock,
             self._params_system_lock,
         )
         if filter_function(
             oauth = oauth,
-            superuser = superuser,
             alias = alias,
             admin_lock = admin_locked,
             system_lock = system_locked,
         )
     ]
-
-  @staticmethod
-  def creation(*, superuser: bool) -> Callable :  # type: ignore[type-arg]
-    """Return the correct creation method."""
-    if superuser:
-      return User.objects.create_superuser
-    return User.objects.create_user
 
   @staticmethod
   def _add_properties_to_user(*, user: User, params: LockParameters) -> User:
@@ -213,7 +200,7 @@ class TestUserBaseMixin:
     # Assert the common attributes of that user.
     self.assertEqual(expected_user.username, user.username)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.password, user.password)  # type: ignore[attr-defined]
-    self.assertEqual(expected_user.is_superuser, user.is_superuser)  # type: ignore[attr-defined]
+    self.assertFalse(user.is_superuser)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_authenticated, user.is_authenticated)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_active, user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.date_joined, user.date_joined)  # type: ignore[attr-defined]
@@ -239,7 +226,7 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
 
   def create_user(self, *, params: Parameters) -> Tuple[User, User] :
     """Create a test user according to requirements."""
-    user = self.creation(superuser = params.creates.superuser)(
+    user: User = User.objects.create(
         username = params.creates.username,
         password = params.creates.password,
     )
@@ -280,6 +267,22 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertFalse(user.admin_locked)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
 
+  # noinspection PyUnresolvedReferences
+  def assert_superuser(self, *, user: User) -> None :
+    """Assert user all attributes are correct."""
+    # Assert the common attributes.
+    self.assertEqual(Settings.khaleesi_username(), user.username)  # type: ignore[attr-defined]
+    self.assertTrue(user.has_usable_password())  # type: ignore[attr-defined]
+    self.assertTrue(user.is_superuser)  # type: ignore[attr-defined]
+    self.assertTrue(user.is_authenticated)  # type: ignore[attr-defined]
+    self.assertTrue(user.is_active)  # type: ignore[attr-defined]
+    self.assertEqual(datetime.min, user.date_joined)  # type: ignore[attr-defined]
+    self.assertEqual(datetime.min, user.last_activity)  # type: ignore[attr-defined]
+    # Assert the locked state attributes.
+    self.assertIsNone(user.original)  # type: ignore[attr-defined]
+    self.assertFalse(user.admin_locked)  # type: ignore[attr-defined]
+    self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
+
 
 # noinspection PyTypeHints
 class TestUserUnitMixin(TestUserBaseMixin):
@@ -291,23 +294,33 @@ class TestUserUnitMixin(TestUserBaseMixin):
     user = User(
         username = params.creates.username,
         password = params.creates.password,  # type: ignore[misc]
-        is_superuser = params.creates.superuser,
     )
     user = self._attach_common_properties(user = user, params = params)
     return user, deepcopy(user)
 
   def create_anonymous_user(self) -> Tuple[User, User] :
     """Create a unit user according to requirements, mock super methods."""
-    params = Parameters()
-    params.creates.username = ''
-    return self.create_user(params = params)
+    user, _ = self.create_user(params = Parameters(creates = CreateParameters(
+        username = Settings.anonymous_username()
+    )))
+    user.password = None  # type: ignore[assignment]
+    return user, deepcopy(user)
+
+  def create_superuser(self) -> Tuple[User, User] :
+    """Create a superuser according to requirements, mock super methods."""
+    user, _ = self.create_user(params = Parameters(creates = CreateParameters(
+        username = Settings.khaleesi_username(), password = Settings.initial_superuser_password()
+    )))
+    user.is_superuser = True
+    return user, deepcopy(user)
+
 
   def create_mock_user(self, *, params: Parameters) -> Tuple[MagicMock, MagicMock] :
     """Create a test user according to requirements, mock super methods."""
     mock = MagicMock()
     mock.username = params.creates.username
     mock.password = params.creates.password
-    mock.is_superuser = params.creates.superuser
+    mock.is_superuser = False
     mock = cast(MagicMock, self._attach_common_properties(user = cast(User, mock), params = params))
     return self._attach_mocks_to_user(mock = mock, params = params)
 

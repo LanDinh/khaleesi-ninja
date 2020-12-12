@@ -11,7 +11,6 @@ from django.core.exceptions import ValidationError
 # khaleesi.ninja.
 from common.models import User, Manager
 from common.exceptions import ZeroTupletException
-from settings.settings import Settings
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import (
     CreateParameters,
@@ -26,64 +25,47 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   @patch.object(Manager, 'get')
   def test_get(self, get: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test if gets behaves correctly."""
+    # Prepare data.
+    username = 'first of her name'
     # Perform test.
-    User.objects.get(username = 'whatever')
+    User.objects.get(username = username)
     # Assert result.
-    get.assert_called_once_with(username = 'whatever')
+    get.assert_called_once_with(username = username)
 
-  @patch.object(Manager, 'get')
-  def test_get_anonymous_user(self, get: MagicMock) -> None :  # pylint: disable=no-self-use
-    """Test if gets behaves correctly."""
-    # Perform test.
-    User.objects.get_anonymous_user()
-    # Assert result.
-    get.assert_called_once_with(username = Settings.anonymous_username())
-
-  def test_create_user_and_superuser(self) -> None :
+  def test_create(self) -> None :
     """Test if user creation succeeds."""
     for params in self.params_create():
       with self.subTest(**asdict(params)):
         # Prepare data.
         _, expected_user = self.create_user(params = params)
         User.objects.model = MagicMock(return_value = expected_user)
-        mock = self.setup_mocks(user = expected_user)
+        mock = MagicMock()
+        mock.set_password = expected_user.set_password
+        mock.set_unusable_password = expected_user.set_unusable_password
+        mock.full_clean = expected_user.full_clean
+        mock.save = expected_user.save
         # Perform test.
-        user = self.creation(superuser = params.creates.superuser)(
+        user: User = User.objects.create(
             username = params.creates.username,
             password = params.creates.password,
         )
         # Assert result.
         # noinspection PyTypeChecker
-        self.assert_mocks(mock = mock, params = params.creates)
         self.assert_user(expected_user = expected_user, user = user)
-
-  @staticmethod
-  def setup_mocks(*, user: User) -> MagicMock :
-    """Correctly prepare the mocks for mock assertion."""
-    mock = MagicMock()
-    mock.set_password = user.set_password
-    mock.set_unusable_password = user.set_unusable_password
-    mock.full_clean = user.full_clean
-    mock.save = user.save
-    return mock
-
-  @staticmethod
-  def assert_mocks(*, mock: MagicMock, params: CreateParameters) -> None :
-    """Assert that the mocks get called the way they should."""
-    if params.oauth:
-      mock.assert_has_calls([
-          call.set_unusable_password(),
-          call.full_clean(),
-          call.save(),
-      ])
-      mock.set_password.assert_not_called()
-    else:
-      mock.assert_has_calls([
-          call.set_password(raw_password = params.password),
-          call.full_clean(),
-          call.save(),
-      ])
-      mock.set_unusable_password.assert_not_called()
+        if params.creates.oauth:
+          mock.assert_has_calls([
+              call.set_unusable_password(),
+              call.full_clean(),
+              call.save(),
+          ])
+          mock.set_password.assert_not_called()  # type: ignore[attr-defined]
+        else:
+          mock.assert_has_calls([
+              call.set_password(raw_password = params.creates.password),
+              call.full_clean(),
+              call.save(),
+          ])
+          mock.set_unusable_password.assert_not_called()  # type: ignore[attr-defined]
 
 
 class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
@@ -93,23 +75,14 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     """Test if gets behaves correctly."""
     # Perform test.
     with self.assertRaises(ZeroTupletException):
-      User.objects.get(username = 'impossible username')
+      User.objects.get(username = 'first of her name')
 
-  def test_get_anonymous_user(self) -> None :
-    """Test if gets behaves correctly."""
-    # Prepare data.
-    User.migrations.create_anonymous_user()
-    # Perform test.
-    user: User = User.objects.get(username = Settings.anonymous_username())
-    # Assert result.
-    self.assert_anonymous_user(user = user)
-
-  def test_create_user_and_superuser(self) -> None :
+  def test_create(self) -> None :
     """Test if user creation succeeds."""
     for params in self.params_create():
       with self.subTest(**asdict(params)):
         # Perform test.
-        self.creation(superuser = params.creates.superuser)(
+        User.objects.create(
             username = params.creates.username,
             password = params.creates.password,
         )
@@ -128,7 +101,7 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
         with self.subTest(**asdict(params)):
           # Perform test.
           with self.assertRaisesRegex(ValidationError, error):
-            self.creation(superuser = params.creates.superuser)(
+            User.objects.create(
                 username = params.creates.username,
                 password = params.creates.password,
             )
@@ -142,19 +115,14 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
       for twin_params in self.params_create():
         with self.subTest(params = params, twin_params = params):
           # Prepare data.
-          self.creation(superuser = params.creates.superuser)(
+          User.objects.create(
               username = params.creates.username,
               password = params.creates.password,
           )
           twin_params.creates.username = params.creates.username.title()
           # Perform test.
           with self.assertRaisesRegex(ValidationError, error):
-            User.objects.create_user(
-                username = twin_params.creates.username,
-                password = twin_params.creates.password,
-            )
-          with self.assertRaisesRegex(ValidationError, error):
-            User.objects.create_superuser(
+            User.objects.create(
                 username = twin_params.creates.username,
                 password = twin_params.creates.password,
             )
@@ -171,7 +139,7 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     self.assertTrue(user.is_active)
     self.assertNotEqual(datetime.min, user.date_joined)
     self.assertNotEqual(datetime.min, user.last_activity)
-    self.assertEqual(params.superuser, user.is_superuser)
+    self.assertFalse(user.is_superuser)
     # Assert the locked state attributes.
     self.assertEqual(None, user.original)
     self.assertFalse(user.admin_locked)
