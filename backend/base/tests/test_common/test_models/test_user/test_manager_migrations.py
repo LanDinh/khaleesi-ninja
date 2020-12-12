@@ -38,7 +38,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
         call.full_clean(),
         call.save(),
     ])
-    mock.set_password.assert_not_called()
+    mock.set_password.assert_not_called()  # type: ignore[attr-defined]
 
   @patch.object(User.migrations, '_get_queryset')
   def test_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
@@ -49,7 +49,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Perform test.
     User.migrations.create_anonymous_user()
     # Assert result.
-    expected_user.save.assert_not_called()
+    expected_user.save.assert_not_called()  # type: ignore[attr-defined]
 
   @patch.object(User.migrations, '_get_queryset')
   def test_create_anonymous_twins(self, queryset: MagicMock) -> None :
