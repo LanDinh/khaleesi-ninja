@@ -98,7 +98,7 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_get_anonymous_user(self) -> None :
     """Test if gets behaves correctly."""
     # Prepare data.
-    User.migrations.get_or_create_anonymous_user()
+    User.migrations.create_anonymous_user()
     # Perform test.
     user: User = User.objects.get(username = Settings.anonymous_username())
     # Assert result.

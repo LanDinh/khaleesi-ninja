@@ -1,7 +1,5 @@
 """The tests for the custom User."""
 
-# pylint: disable=line-too-long
-
 # Python.
 from dataclasses import asdict
 from datetime import timedelta
@@ -63,7 +61,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_is_state_anonymous(self) -> None :
     """Test the state information getters."""
     # Prepare data & perform test.
-    user: User = User.migrations.get_or_create_anonymous_user()
+    user: User = User.migrations.create_anonymous_user()
     # Assert result.
     self.assertFalse(user.is_authenticated)
     self.assertFalse(user.is_alias())

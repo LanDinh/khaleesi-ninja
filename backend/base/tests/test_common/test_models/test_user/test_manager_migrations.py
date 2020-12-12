@@ -15,7 +15,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
 
   @patch.object(User.migrations, '_get_queryset')
   @patch.object(User.migrations, 'model')
-  def test_get_or_create_anonymous_user_creation(
+  def test_create_anonymous_user_creation(
       self,
       model: MagicMock,
       queryset: MagicMock,
@@ -25,49 +25,14 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     _, expected_user = self.create_anonymous_user()
     queryset.return_value.filter = MagicMock(return_value = [])
     model.return_value = expected_user
-    mock = self.setup_mocks(user = expected_user)
-    # Perform test.
-    user: User = User.migrations.get_or_create_anonymous_user()
-    # Assert result.
-    self.assert_mocks(mock = mock)
-    self.assert_user(expected_user = expected_user, user = user)
-
-  @patch.object(User.migrations, '_get_queryset')
-  def test_get_or_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
-    """Test if the anonymous user gets detected correctly."""
-    # Prepare data.
-    _, expected_user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [expected_user])
-    # Perform test.
-    user: User = User.migrations.get_or_create_anonymous_user()
-    # Assert result.
-    self.assert_user(expected_user = expected_user, user = user)
-    # noinspection PyUnresolvedReferences
-    user.save.assert_not_called()  # type: ignore[attr-defined]
-
-  @patch.object(User.migrations, '_get_queryset')
-  def test_get_or_create_anonymous_twins(self, queryset: MagicMock) -> None :
-    """Test if the anonymous user gets detected correctly."""
-    # Prepare data.
-    _, expected_user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [expected_user, expected_user])
-    # Perform test.
-    with self.assertRaises(TwinException):
-      User.migrations.get_or_create_anonymous_user()
-
-  @staticmethod
-  def setup_mocks(*, user: User) -> MagicMock :
-    """Correctly prepare the mocks for mock assertion."""
     mock = MagicMock()
-    mock.set_password = user.set_password
-    mock.set_unusable_password = user.set_unusable_password
-    mock.full_clean = user.full_clean
-    mock.save = user.save
-    return mock
-
-  @staticmethod
-  def assert_mocks(*, mock: MagicMock) -> None :
-    """Assert that the mocks get called the way they should."""
+    mock.set_password = expected_user.set_password
+    mock.set_unusable_password = expected_user.set_unusable_password
+    mock.full_clean = expected_user.full_clean
+    mock.save = expected_user.save
+    # Perform test.
+    User.migrations.create_anonymous_user()
+    # Assert result.
     mock.assert_has_calls([
         call.set_unusable_password(),
         call.full_clean(),
@@ -75,16 +40,37 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     ])
     mock.set_password.assert_not_called()
 
+  @patch.object(User.migrations, '_get_queryset')
+  def test_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
+    """Test if the anonymous user gets detected correctly."""
+    # Prepare data.
+    _, expected_user = self.create_anonymous_user()
+    queryset.return_value.filter = MagicMock(return_value = [expected_user])
+    # Perform test.
+    User.migrations.create_anonymous_user()
+    # Assert result.
+    expected_user.save.assert_not_called()
+
+  @patch.object(User.migrations, '_get_queryset')
+  def test_create_anonymous_twins(self, queryset: MagicMock) -> None :
+    """Test if the anonymous user gets detected correctly."""
+    # Prepare data.
+    _, expected_user = self.create_anonymous_user()
+    queryset.return_value.filter = MagicMock(return_value = [expected_user, expected_user])
+    # Perform test.
+    with self.assertRaises(TwinException):
+      User.migrations.create_anonymous_user()
+
 
 class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
   """The integration tests for the custom UserManager."""
 
-  def test_get_or_create_anonymous_user(self) -> None :
+  # noinspection PyMethodMayBeStatic
+  def test_create_anonymous_user(self) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Assert that the user has been created beforehand.
-    self.assertEqual(0, len(User._objects.all()))  # pylint: disable=protected-access
+    User.objects.get_anonymous_user()
     # Assert there is no error when trying to create it again.
-    user: User = User.migrations.get_or_create_anonymous_user()
-    # Assert that no new user has been added.
-    self.assertEqual(1, len(User._objects.all()))  # pylint: disable=protected-access
-    self.assert_anonymous_user(user = user)
+    User.migrations.create_anonymous_user()
+    # Assert that no new anonymous user has been added.
+    User.objects.get_anonymous_user()
