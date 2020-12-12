@@ -5,7 +5,7 @@ from typing import cast
 from unittest.mock import MagicMock
 
 # khaleesi.ninja.
-from common.models.group import Group
+from common.models import Group
 
 
 class TestGroupUnitMixin:
