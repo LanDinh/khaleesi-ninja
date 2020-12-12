@@ -4,16 +4,12 @@
 from django.db.models.signals import post_migrate
 
 # khaleesi.ninja.
-from common.app_config import AppConfig, KhaleesiMeta
+from common.app_config import AppConfig
 
 
 class CommonConfig(AppConfig):
   """The common config."""
-  name = 'common'
-  khaleesi_meta = KhaleesiMeta(
-      anonymous_group_permissions = ['user.views.csrf'],
-      authenticated_group_permissions = ['user.views.csrf'],
-  )
+  service_name = 'common'
 
   # noinspection PyUnresolvedReferences
   def ready(self) -> None :
