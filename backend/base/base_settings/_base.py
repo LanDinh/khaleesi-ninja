@@ -95,9 +95,6 @@ REST_FRAMEWORK = {
 # khaleesi.ninja configuration.
 KHALEESI_NINJA = {
     'BASE': {
-        'ANONYMOUS_SUFFIX': 'anonymous',
-        'AUTHENTICATED_SUFFIX': 'authenticated',
-        'DRAGON_SUFFIX': 'dragon',
         'PERMISSION_MODEL': 'khaleesi',
         'ANONYMOUS_USERNAME': '',
         'MAX_FAILED_LOGIN_ATTEMPTS': 5,
