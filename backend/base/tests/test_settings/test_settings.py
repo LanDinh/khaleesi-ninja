@@ -35,6 +35,11 @@ class SettingsTests(CombinedTestCase):
     anonymous_username = Settings.anonymous_username()
     self.assertTrue(isinstance(anonymous_username, str))
 
+  def test_khaleesi_username(self) -> None :
+    """Make sure the khaleesi username gets read correctly."""
+    khaleesi_username = Settings.khaleesi_username()
+    self.assertTrue(isinstance(khaleesi_username, str))
+
   def test_system_lock_time(self) -> None :
     """Make sure the system lock time gets read correctly."""
     system_lock_time = Settings.system_lock_time()

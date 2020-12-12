@@ -13,6 +13,7 @@ class Settings:
 
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
   groupnames = settings['GROUPNAMES']  # type: ignore[index]
+  usernames = settings['USERNAMES']  # type: ignore[index]
 
   @classmethod
   def dragon_groupname(cls) -> str :
@@ -37,7 +38,12 @@ class Settings:
   @classmethod
   def anonymous_username(cls) -> str :
     """The username used for the anonymous user."""
-    return cast(str, cls.settings['ANONYMOUS_USERNAME'])
+    return cast(str, cls.usernames['ANONYMOUS'])
+
+  @classmethod
+  def khaleesi_username(cls) -> str :
+    """The username used for the superadmin."""
+    return cast(str, cls.usernames['KHALEESI'])
 
   @classmethod
   def system_lock_time(cls) -> timedelta :

@@ -100,8 +100,11 @@ KHALEESI_NINJA = {
             'MISSANDEI': 'missandei',
             'WARG': 'warg',
         },
+        'USERNAMES': {
+            'ANONYMOUS': '',
+            'KHALEESI': 'khaleesi',
+        },
         'PERMISSION_MODEL': 'khaleesi',
-        'ANONYMOUS_USERNAME': '',
         'MAX_FAILED_LOGIN_ATTEMPTS': 5,
         'SYSTEM_LOCK_TIME': timedelta(minutes = 3),
     },
