@@ -95,7 +95,7 @@ REST_FRAMEWORK = {
 # khaleesi.ninja configuration.
 KHALEESI_NINJA = {
     'BASE': {
-        'GROUPS': {
+        'GROUPNAMES': {
             'DRAGON': 'dragon',
             'MISSANDEI': 'missandei',
             'WARG': 'warg',
