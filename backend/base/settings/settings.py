@@ -12,6 +12,19 @@ class Settings:
   """Group the auth settings."""
 
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
+  groupnames = settings['GROUP']
+
+  @classmethod
+  def dragon_groupname(cls) -> str :
+    return cast(str, cls.groupnames['DRAGON'])
+
+  @classmethod
+  def missandei_groupname(cls) -> str :
+    return cast(str, cls.groupnames['MISSANDEI'])
+
+  @classmethod
+  def warg_groupname(cls) -> str :
+    return cast(str, cls.groupnames['WARG'])
 
   @classmethod
   def permission_model(cls) -> str :

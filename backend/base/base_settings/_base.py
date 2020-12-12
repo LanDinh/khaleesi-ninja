@@ -95,6 +95,11 @@ REST_FRAMEWORK = {
 # khaleesi.ninja configuration.
 KHALEESI_NINJA = {
     'BASE': {
+        'GROUPS': {
+            'DRAGON': 'dragon',
+            'MISSANDEI': 'missandei',
+            'WARG': 'warg',
+        },
         'PERMISSION_MODEL': 'khaleesi',
         'ANONYMOUS_USERNAME': '',
         'MAX_FAILED_LOGIN_ATTEMPTS': 5,

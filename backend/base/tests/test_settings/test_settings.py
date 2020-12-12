@@ -10,6 +10,21 @@ from test_util.test import CombinedTestCase
 class SettingsTests(CombinedTestCase):
   """The combined tests for the Settings."""
 
+  def test_dragon_groupname(self) -> None :
+    """Make sure the admin group name gets read correctly."""
+    dragon_groupname = Settings.dragon_groupname()
+    self.assertTrue(isinstance(dragon_groupname, str))
+
+  def test_missandei_groupname(self) -> None :
+    """Make sure the translator group name gets read correctly."""
+    missandei_groupname = Settings.missandei_groupname()
+    self.assertTrue(isinstance(missandei_groupname, str))
+
+  def test_warg_groupname(self) -> None :
+    """Make sure the beta group name gets read correctly."""
+    warg_groupname = Settings.warg_groupname()
+    self.assertTrue(isinstance(warg_groupname, str))
+
   def test_permission_model(self) -> None :
     """Make sure the permission model gets read correctly."""
     permission_model = Settings.permission_model()
