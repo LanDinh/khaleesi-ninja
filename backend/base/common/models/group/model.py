@@ -6,7 +6,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from common.models.group.manager_default import DefaultManager
-from common.models.group.manager_base import BaseManager
+from common.models.group.manager_migrations import MigrationManager
 from common.models.model import Model
 
 
@@ -20,4 +20,4 @@ class Group(Model, DjangoGroup):
   translator = models.BooleanField(default = False)
 
   objects = DefaultManager()
-  base = BaseManager()
+  migrations = MigrationManager()
