@@ -12,7 +12,7 @@ class Settings:
   """Group the auth settings."""
 
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
-  groupnames = settings['GROUPNAMES']
+  groupnames = settings['GROUPNAMES']  # type: ignore[index]
 
   @classmethod
   def dragon_groupname(cls) -> str :

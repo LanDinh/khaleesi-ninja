@@ -9,7 +9,8 @@ from common.app_config import AppConfig
 
 class CommonConfig(AppConfig):
   """The common config."""
-  service_name = 'common'
+  service_name = 'base'
+  name = 'common'
 
   # noinspection PyUnresolvedReferences
   def ready(self) -> None :
