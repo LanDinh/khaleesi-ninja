@@ -36,7 +36,7 @@ class GroupDefaultManagerIntegrationTests(TestCase):
     # Prepare data.
     label = 'test'
     name = 'name'
-    Group.base.create_group(label = label, name = name)
+    Group.migrations.create(label = label, name = name)
     # Perform test.
     result: Group = Group.objects.get(label = label, name = name)
     # Assert result.

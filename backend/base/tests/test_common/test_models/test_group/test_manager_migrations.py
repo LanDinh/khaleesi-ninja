@@ -21,7 +21,7 @@ class GroupMigrationManagerUnitTests(SimpleTestCase, TestGroupUnitMixin):
     base_queryset.return_value.update_or_create = MagicMock()
     name = 'test'
     # Perform test.
-    Group.migrations.create_group(name = name)
+    Group.migrations.create(name = name)
     # Assert result.
     base_queryset.return_value.update_or_create.assert_called_once_with(name = name)
 
@@ -36,7 +36,7 @@ class GroupMigrationManagerIntegrationTests(TestCase):
     with self.assertRaises(ZeroTupletException):
       Group.objects.get(name = name)
     # Perform test.
-    Group.migrations.create_group(name = name)
+    Group.migrations.create(name = name)
     # Assert result.
     group: Group = Group.objects.get(name = name)
     self.assertFalse(group.authenticated)
@@ -48,10 +48,10 @@ class GroupMigrationManagerIntegrationTests(TestCase):
     """Test group creation."""
     # Prepare data.
     name = 'test'
-    Group.migrations.create_group(name = name)
+    Group.migrations.create(name = name)
     Group.objects.get(name = name)
     # Perform test.
-    Group.migrations.create_group(name = name)
+    Group.migrations.create(name = name)
     # Assert result.
     group: Group = Group.objects.get(name = name)
     self.assertFalse(group.authenticated)
