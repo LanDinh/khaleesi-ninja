@@ -12,8 +12,8 @@ class Settings:
   """Group the auth settings."""
 
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
-  groupnames = settings['GROUPNAMES']  # type: ignore[index]
-  usernames = settings['USERNAMES']  # type: ignore[index]
+  groupnames = settings['GROUPS']  # type: ignore[index]
+  usernames = settings['USERS']  # type: ignore[index]
 
   @classmethod
   def dragon_groupname(cls) -> str :
@@ -44,6 +44,11 @@ class Settings:
   def khaleesi_username(cls) -> str :
     """The username used for the superadmin."""
     return cast(str, cls.usernames['KHALEESI'])
+
+  @classmethod
+  def initial_superuser_password(cls) -> str :
+    """The initial password used for the superadmin."""
+    return cast(str, cls.usernames['INITIAL_SUPERUSER_PASSWORD'])
 
   @classmethod
   def system_lock_time(cls) -> timedelta :

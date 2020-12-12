@@ -40,6 +40,11 @@ class SettingsTests(CombinedTestCase):
     khaleesi_username = Settings.khaleesi_username()
     self.assertTrue(isinstance(khaleesi_username, str))
 
+  def test_initial_superuser_password(self) -> None :
+    """Make sure the initial superuser password gets read correctly."""
+    initial_superuser_password = Settings.initial_superuser_password()
+    self.assertTrue(isinstance(initial_superuser_password, str))
+
   def test_system_lock_time(self) -> None :
     """Make sure the system lock time gets read correctly."""
     system_lock_time = Settings.system_lock_time()
