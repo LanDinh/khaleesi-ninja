@@ -1,7 +1,7 @@
 """Default Manager."""
 
 # Python.
-from typing import cast
+from typing import cast, Optional
 
 # khaleesi.ninja.
 from ..manager import Manager, T
@@ -10,6 +10,8 @@ from ..manager import Manager, T
 class DefaultManager(Manager):
   """Default Manager."""
 
-  def get(self, *, label: str, name: str) -> T :
+  def get(self, *, name: str, label: Optional[str]) -> T :
     """Get a single group."""
-    return cast(T, super().get(name = f'{label}.{name}'))
+    if label:
+      return cast(T, super().get(name = f'{label}.{name}'))
+    return cast(T, super().get(name = name))

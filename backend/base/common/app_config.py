@@ -2,8 +2,6 @@
 
 # Python.
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import List
 
 # Django.
 from django.apps import AppConfig as DjangoAppConfig
@@ -12,8 +10,7 @@ from django.apps import AppConfig as DjangoAppConfig
 class AppConfig(DjangoAppConfig, ABC):
   """Custom AppConfig."""
 
-  # noinspection SyntaxError,PyTypeHints
   @property
   @abstractmethod
-  def service_name(self) -> str :  # type: ignore[override]
+  def service_name(self) -> str :
     """Force setting of the name."""

@@ -16,14 +16,17 @@ class Settings:
 
   @classmethod
   def dragon_groupname(cls) -> str :
+    """The group name used for admins."""
     return cast(str, cls.groupnames['DRAGON'])
 
   @classmethod
   def missandei_groupname(cls) -> str :
+    """The group name used for translators."""
     return cast(str, cls.groupnames['MISSANDEI'])
 
   @classmethod
   def warg_groupname(cls) -> str :
+    """The group name used for beta testers."""
     return cast(str, cls.groupnames['WARG'])
 
   @classmethod
