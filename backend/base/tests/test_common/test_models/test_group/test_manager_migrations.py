@@ -7,6 +7,7 @@ from unittest.mock import patch, MagicMock
 from common.exceptions import ZeroTupletException
 from common.models import Group
 from common.models.manager import BaseManager
+from settings.settings import Settings
 from test_util.models.group import TestGroupUnitMixin
 from test_util.test import  SimpleTestCase, TestCase
 
@@ -47,14 +48,12 @@ class GroupMigrationManagerIntegrationTests(TestCase):
   def test_create_again(self) -> None :
     """Test group creation."""
     # Prepare data.
-    name = 'test'
-    Group.migrations.create(name = name)
-    Group.objects.get(name = name)
+    Group.objects.get(name = Settings.dragon_groupname())
     # Perform test.
-    Group.migrations.create(name = name)
+    Group.migrations.create(name = Settings.dragon_groupname())
     # Assert result.
-    group: Group = Group.objects.get(name = name)
+    group: Group = Group.objects.get(name = Settings.dragon_groupname())
     self.assertFalse(group.authenticated)
     self.assertFalse(group.beta)
     self.assertFalse(group.translator)
-    self.assertEqual(name, group.name)
+    self.assertEqual(Settings.dragon_groupname(), group.name)

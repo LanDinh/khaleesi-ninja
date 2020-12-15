@@ -303,6 +303,7 @@ class TestUserUnitMixin(TestUserBaseMixin):
     user, _ = self.create_user(params = Parameters(creates = CreateParameters(
         username = Settings.anonymous_username()
     )))
+    # noinspection PyUnresolvedReferences
     user.password = None  # type: ignore[assignment]
     return user, deepcopy(user)
 

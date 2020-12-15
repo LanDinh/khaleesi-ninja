@@ -58,6 +58,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
               call.full_clean(),
               call.save(),
           ])
+          # noinspection PyUnresolvedReferences
           mock.set_password.assert_not_called()  # type: ignore[attr-defined]
         else:
           mock.assert_has_calls([
@@ -65,6 +66,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
               call.full_clean(),
               call.save(),
           ])
+          # noinspection PyUnresolvedReferences
           mock.set_unusable_password.assert_not_called()  # type: ignore[attr-defined]
 
 
@@ -153,4 +155,4 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
 
   def assert_no_save(self) -> None :
     """Assert that no object was saved to the database."""
-    self.assertEqual(0, len(User._objects.all()))  # pylint: disable=protected-access
+    self.assertEqual(2, len(User._objects.all()))  # pylint: disable=protected-access

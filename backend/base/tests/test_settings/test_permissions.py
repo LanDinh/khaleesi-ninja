@@ -141,7 +141,6 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
         name = cls.denied_name,
         content_type = content_type,
     )
-    User.migrations.create_anonymous_user()
     # noinspection PyUnresolvedReferences
     User.objects.get(username = Settings.anonymous_username()).user_permissions.add(cls.granted)  # type: ignore[attr-defined]
 

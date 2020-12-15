@@ -61,7 +61,6 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_is_state_anonymous(self) -> None :
     """Test the state information getters."""
     # Prepare data & perform test.
-    User.migrations.create_anonymous_user()
     user: User = User.objects.get(username = Settings.anonymous_username())
     # Assert result.
     self.assertFalse(user.is_authenticated)

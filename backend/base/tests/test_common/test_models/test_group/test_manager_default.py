@@ -40,8 +40,6 @@ class GroupDefaultManagerIntegrationTests(TestCase):
 
   def test_get(self) -> None :
     """Test if single object fetching works."""
-    # Prepare data.
-    Group.migrations.create(name = Settings.dragon_groupname())
     # Perform test.
     result: Group = Group.objects.get(name = Settings.dragon_groupname())
     # Assert result.
