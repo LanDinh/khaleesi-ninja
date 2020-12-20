@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from common.exceptions import PermissionDeniedException
 from common.models import User
 from settings.permissions import HasPermission
-from settings.settings import Settings
+from settings.settings import UserNames, Settings
 from test_util.models.user import TestUserIntegrationMixin, TestUserUnitMixin, Parameters
 from test_util.test import SimpleTestCase, TestCase
 
@@ -28,13 +28,12 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
 
   def test_permission_denied(self) -> None :
     """Test if PermissionDenied is raised correctly."""
-    for username in ['username', Settings.anonymous_username()]:
+    for username in ['username', UserNames.anonymous()]:
       for params in self.params():
         with self.subTest(username = username, **asdict(params)):
           # Prepare data.
           params.creates.username = username
           request, view, user, expected = self.create_mocks(params = params)
-          # noinspection PyTypeHints
           user.has_perm.return_value = False
           with self.assertRaises(PermissionDeniedException):
             # Perform test.
@@ -51,7 +50,6 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
       with self.subTest(**asdict(params)):
         # Prepare data.
         request, view, user, expected_user = self.create_mocks(params = params)
-        # noinspection PyTypeHints
         user.has_perm.return_value = True
         # Perform test.
         check = self.permission.has_permission(request = request, view = view)
@@ -71,7 +69,7 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
     for params in self.params():
       with self.subTest(**asdict(params)):
         # Prepare data.
-        params.creates.username = Settings.anonymous_username()
+        params.creates.username = UserNames.anonymous()
         request, view, user, expected_user = self.create_mocks(params = params)
         user.is_authenticated = False
         expected_user.is_authenticated = False
@@ -84,7 +82,7 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
         user.has_perm.assert_called_once_with(self.permission_name)
         user.save.assert_not_called()
         self.assert_user(user = user, expected_user = expected_user)
-        anonymous.assert_called_once_with(username = Settings.anonymous_username())
+        anonymous.assert_called_once_with(username = UserNames.anonymous())
         anonymous.reset_mock()
 
   def create_mocks(
@@ -111,6 +109,7 @@ class View:
   permission: str
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
   """Integration tests for the custom permissions."""
 
@@ -141,8 +140,7 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
         name = cls.denied_name,
         content_type = content_type,
     )
-    # noinspection PyUnresolvedReferences
-    User.objects.get(username = Settings.anonymous_username()).user_permissions.add(cls.granted)  # type: ignore[attr-defined]
+    User.objects.get(username = UserNames.anonymous()).user_permissions.add(cls.granted)  # type: ignore[attr-defined]
 
   @classmethod
   def tearDownClass(cls) -> None :
@@ -153,22 +151,18 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_anonymous_permission_denied(self) -> None :
     """Test if PermissionDenied is raised correctly."""
     # Prepare data.
-    # noinspection PyTypeChecker
-    request = Request(user = User.objects.get(username = Settings.anonymous_username()))
+    request = Request(user = User.objects.get(username = UserNames.anonymous()))
     view = View(self.denied_fullname)
     with self.assertRaises(PermissionDeniedException):
       # Perform test.
-      # noinspection PyUnresolvedReferences
       self.permission.has_permission(request = request, view = view)  # type: ignore[arg-type]
 
   def test_anonymous_permission_granted(self) -> None :
     """Test if permission is granted correctly."""
     # Prepare data.
-    # noinspection PyTypeChecker
-    request = Request(user = User.objects.get(username = Settings.anonymous_username()))
+    request = Request(user = User.objects.get(username = UserNames.anonymous()))
     view = View(self.granted_fullname)
     # Perform test.
-    # noinspection PyUnresolvedReferences
     check = self.permission.has_permission(request = request, view = view)  # type: ignore[arg-type]
     # Assert result.
     self.assertTrue(check)
@@ -184,7 +178,6 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
         view = View(self.denied_fullname)
         with self.assertRaises(PermissionDeniedException):
           # Perform test.
-          # noinspection PyUnresolvedReferences
           self.permission.has_permission(request = request, view = view)  # type: ignore[arg-type]
         # Assert result.
         self.assert_user(expected_user = expected_user)
@@ -200,7 +193,6 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
         request = Request(user = user)
         view = View(self.granted_fullname)
         # Perform test.
-        # noinspection PyUnresolvedReferences
         check = self.permission.has_permission(request = request, view = view)  # type: ignore[arg-type]
         # Assert result.
         self.assertTrue(check)

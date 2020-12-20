@@ -24,6 +24,5 @@ def exception_handler(
   response = rest_exception_handler(exception, context)
   if not response or response.status_code == status.HTTP_404_NOT_FOUND:
     return response
-  # noinspection PyTypeHints,PyUnresolvedReferences
   response.status_code = status.HTTP_418_IM_A_TEAPOT  # type: ignore[attr-defined]
   return response

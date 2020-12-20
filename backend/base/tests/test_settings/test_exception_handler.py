@@ -34,6 +34,7 @@ class ExceptionHandlerMixin:
     return [cls]
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
   """The unit tests for exception handling."""
 
@@ -47,9 +48,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
               exception = exception,
               context = {},
           )
-          # noinspection PyUnresolvedReferences
           self.assertEqual(exception.data, response.data)  # type: ignore[union-attr]
-          # noinspection PyUnresolvedReferences
           self.assertEqual(exception.code, response.status_code)  # type: ignore[union-attr]
         except TypeError:  # Some exceptions have no empty constructor.
           pass
@@ -66,7 +65,6 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
         try:
           exception = exception_type()
           response = exception_handler(exception = exception, context = {})
-          # noinspection PyUnresolvedReferences
           self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
         except TypeError:  # Some exceptions have no empty constructor.
           counter += 1
@@ -82,11 +80,11 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
   ) -> None :
     """Test if exception responses get built correctly."""
     response = exception_handler(exception = PermissionDenied(), context = {})
-    # noinspection PyUnresolvedReferences
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
     self.assertEqual(1, rest_exception_handler.call_count)
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
   """The integration tests for exception handling."""
 
@@ -100,15 +98,11 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
               exception = exception,
               context = {},
           )
-          # noinspection PyUnresolvedReferences
           self.assertEqual(exception.data, response.data)  # type: ignore[union-attr]
-          # noinspection PyUnresolvedReferences
           self.assertEqual(exception.code, response.status_code)  # type: ignore[union-attr]
           if isinstance(exception, TeapotException):
-            # noinspection PyUnresolvedReferences
             self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code) # type: ignore[attr-defined,union-attr]
           else:
-            # noinspection PyUnresolvedReferences
             self.assertNotEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code) # type: ignore[attr-defined,union-attr]
         except TypeError:  # Some exceptions have no empty constructor.
           pass
@@ -124,19 +118,15 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
               context = {},
           )
           self.assertIsNotNone(response)
-          # noinspection PyUnresolvedReferences
           self.assertIsNotNone(response.data)  # type: ignore[union-attr]
-          # noinspection PyUnresolvedReferences
           self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
-  # noinspection PyUnresolvedReferences
   def test_django_exception_handling(self) -> None :
     """Test if exception responses get built correctly."""
     response = exception_handler(exception = PermissionDenied(), context = {})
     self.assertIsNotNone(response)
-    # noinspection PyUnresolvedReferences
     self.assertIsNotNone(response.data)  # type: ignore[union-attr]
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
 
@@ -147,7 +137,5 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
         exception = exception_type()
         response = exception_handler(exception = exception, context = {})
         self.assertIsNotNone(response)
-        # noinspection PyUnresolvedReferences
         self.assertIsNotNone(response.data)  # type: ignore[union-attr]
-        # noinspection PyUnresolvedReferences
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)  # type: ignore[union-attr,attr-defined]

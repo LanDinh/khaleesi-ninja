@@ -1,15 +1,12 @@
 """The common config."""
 
 # Django.
+from django.apps import AppConfig
 from django.db.models.signals import post_migrate
-
-# khaleesi.ninja.
-from common.app_config import AppConfig
 
 
 class CommonConfig(AppConfig):
   """The common config."""
-  service_name = 'base'
   name = 'common'
 
   # noinspection PyUnresolvedReferences

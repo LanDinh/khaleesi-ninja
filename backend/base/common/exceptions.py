@@ -22,11 +22,11 @@ class KhaleesiException(Exception):
     self.data = data
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class TeapotException(KhaleesiException):
   """Teapot - this should never have happened."""
 
   def __init__(self, *, data: Any) -> None :
-    # noinspection PyUnresolvedReferences
     super().__init__(code = status.HTTP_418_IM_A_TEAPOT, data = data)  # type: ignore[attr-defined]
 
 class TwinException(TeapotException):

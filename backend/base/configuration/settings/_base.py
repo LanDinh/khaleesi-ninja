@@ -6,4 +6,5 @@
 # Application definition
 KHALEESI_INSTALLED_APPS = [
     'common.apps.CommonConfig',
+    'translation.translate.apps.CommonConfig'
 ]

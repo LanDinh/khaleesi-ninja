@@ -6,11 +6,12 @@ from unittest.mock import call, MagicMock, patch
 # khaleesi.ninja.
 from common.exceptions import TwinException
 from common.models import User
-from settings.settings import Settings
+from settings.settings import UserNames
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom UserManager."""
 
@@ -46,7 +47,6 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Perform test.
     User.migrations.create_anonymous_user()
     # Assert result.
-    # noinspection PyUnresolvedReferences
     expected_user.save.assert_not_called()  # type: ignore[attr-defined]
 
   @patch.object(User.migrations, '_get_queryset')
@@ -76,7 +76,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     User.migrations.create_superuser()
     # Assert result.
     mock.assert_has_calls([
-        call.set_password(raw_password = Settings.initial_superuser_password()),
+        call.set_password(raw_password = UserNames.initial_superuser_password()),
         call.full_clean(),
         call.save(),
     ])
@@ -91,7 +91,6 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Perform test.
     User.migrations.create_superuser()
     # Assert result.
-    # noinspection PyUnresolvedReferences
     expected_user.save.assert_not_called()  # type: ignore[attr-defined]
 
   @patch.object(User.migrations, '_get_queryset')
@@ -115,26 +114,24 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     return mock
 
 
-
+# noinspection PyMethodMayBeStatic
 class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
   """The integration tests for the custom UserManager."""
 
-  # noinspection PyMethodMayBeStatic
   def test_create_anonymous_user(self) -> None :  # pylint: disable=no-self-use
     """Test if the anonymous user gets detected correctly."""
     # Assert that the user has been created beforehand.
-    User.objects.get(username = Settings.anonymous_username())
+    User.objects.get(username = UserNames.anonymous())
     # Assert there is no error when trying to create it again.
     User.migrations.create_anonymous_user()
     # Assert that no new anonymous user has been added.
-    User.objects.get(username = Settings.anonymous_username())
+    User.objects.get(username = UserNames.anonymous())
 
-  # noinspection PyMethodMayBeStatic
   def test_create_superuser(self) -> None :  # pylint: disable=no-self-use
     """Test if the superuser gets detected correctly."""
     # Assert that the user has been created beforehand.
-    User.objects.get(username = Settings.khaleesi_username())
+    User.objects.get(username = UserNames.superuser())
     # Assert there is no error when trying to create it again.
     User.migrations.create_superuser()
     # Assert that no new superuser has been added.
-    User.objects.get(username = Settings.khaleesi_username())
+    User.objects.get(username = UserNames.superuser())

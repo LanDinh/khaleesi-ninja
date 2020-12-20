@@ -31,12 +31,12 @@ class FullCleanAllModelsUnitTests(SimpleTestCase):
         instance.full_clean.assert_called_once_with(validate_unique = False)
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class FullCleanAllModelsIntegrationTests(TestCase):
   """The integration tests for signal handling."""
 
   def test_full_clean_all_models(self) -> None :
     """Test if models enforce full clean."""
-    # noinspection PyUnresolvedReferences
     for sender in [
         s for s in apps.get_models()
         if not hasattr(s, 'TestMeta') or not s.TestMeta.testing  # type: ignore[attr-defined]
@@ -45,7 +45,6 @@ class FullCleanAllModelsIntegrationTests(TestCase):
         with self.assertRaises(ValidationError):
           # If full_clean gets called, validation is applied.
           if hasattr(sender.objects, '_get_queryset'):
-            # noinspection PyUnresolvedReferences
             sender.objects._get_queryset().create() # type: ignore[attr-defined]
           else:
             sender.objects.get_queryset().create()

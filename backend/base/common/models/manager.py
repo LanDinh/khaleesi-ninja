@@ -19,7 +19,7 @@ _METHODS_FOR_COPYING = ['using']
 T = TypeVar("T", bound = models.Model, covariant=True)  # pylint: disable=invalid-name
 
 
-# noinspection SyntaxError,PyTypeChecker,PyTypeHints,PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyTypeHints,SyntaxError,PyTypeChecker,PyMissingOrEmptyDocstring
 class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
   """Custom base manager to restrict access."""
 
@@ -65,6 +65,6 @@ class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
     return result[0]
 
 
-# noinspection PyAbstractClass,PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyClassHasNoInit,PyMissingOrEmptyDocstring
 class Manager(BaseManager.from_queryset(QuerySet)):  # type: ignore[misc]
   """Custom manager to restrict access."""

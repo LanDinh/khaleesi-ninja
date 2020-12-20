@@ -19,6 +19,7 @@ from test_util.models.user import (
 )
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom UserManager."""
 
@@ -50,7 +51,6 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
             password = params.creates.password,
         )
         # Assert result.
-        # noinspection PyTypeChecker
         self.assert_user(expected_user = expected_user, user = user)
         if params.creates.oauth:
           mock.assert_has_calls([
@@ -58,7 +58,6 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
               call.full_clean(),
               call.save(),
           ])
-          # noinspection PyUnresolvedReferences
           mock.set_password.assert_not_called()  # type: ignore[attr-defined]
         else:
           mock.assert_has_calls([
@@ -66,7 +65,6 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
               call.full_clean(),
               call.save(),
           ])
-          # noinspection PyUnresolvedReferences
           mock.set_unusable_password.assert_not_called()  # type: ignore[attr-defined]
 
 

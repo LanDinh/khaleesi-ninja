@@ -5,7 +5,7 @@ from test_util.test import CombinedTestCase
 from common.views import View, GenericView
 
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class ViewTest(CombinedTestCase) :
   """Make sure that views override the required attributes."""
 

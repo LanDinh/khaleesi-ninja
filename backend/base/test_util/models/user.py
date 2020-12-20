@@ -15,7 +15,7 @@ from django.utils import timezone
 
 # khaleesi.ninja.
 from common.models import User
-from settings.settings import Settings
+from settings.settings import UserNames
 
 
 @dataclass
@@ -41,7 +41,7 @@ class Parameters:
   locks: LockParameters = LockParameters()
 
 
-# noinspection SyntaxError,PyMissingOrEmptyDocstring,PyTypeHints
+# noinspection PyTypeHints,PyUnresolvedReferences,SyntaxError,PyMissingOrEmptyDocstring
 class TestUserBaseMixin:
   """Test utils for the User model."""
 
@@ -188,7 +188,6 @@ class TestUserBaseMixin:
       user.system_locked = timezone.now() - timedelta(microseconds = 1)
     return user
 
-  # noinspection PyUnresolvedReferences
   def _assert_user(
       self, *,
       expected_user: User,
@@ -221,6 +220,7 @@ class TestUserBaseMixin:
       self.assertEqual(expected_user.system_locked, user.system_locked)  # type: ignore[attr-defined]
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class TestUserIntegrationMixin(TestUserBaseMixin):
   """Integration test specific test utils for the User model."""
 
@@ -251,11 +251,10 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     # Clean the database for other sub tests.
     user.delete()
 
-  # noinspection PyUnresolvedReferences
   def assert_anonymous_user(self, *, user: User) -> None :
     """Assert user all attributes are correct."""
     # Assert the common attributes.
-    self.assertEqual(Settings.anonymous_username(), user.username)  # type: ignore[attr-defined]
+    self.assertEqual(UserNames.anonymous(), user.username)  # type: ignore[attr-defined]
     self.assertFalse(user.has_usable_password())  # type: ignore[attr-defined]
     self.assertFalse(user.is_superuser)  # type: ignore[attr-defined]
     self.assertFalse(user.is_authenticated)  # type: ignore[attr-defined]
@@ -267,11 +266,10 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertFalse(user.admin_locked)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
 
-  # noinspection PyUnresolvedReferences
   def assert_superuser(self, *, user: User) -> None :
     """Assert user all attributes are correct."""
     # Assert the common attributes.
-    self.assertEqual(Settings.khaleesi_username(), user.username)  # type: ignore[attr-defined]
+    self.assertEqual(UserNames.superuser(), user.username)  # type: ignore[attr-defined]
     self.assertTrue(user.has_usable_password())  # type: ignore[attr-defined]
     self.assertTrue(user.is_superuser)  # type: ignore[attr-defined]
     self.assertTrue(user.is_authenticated)  # type: ignore[attr-defined]
@@ -284,13 +282,12 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
 
 
-# noinspection PyTypeHints
+# noinspection PyUnresolvedReferences,PyTypeHints,PyMissingOrEmptyDocstring
 class TestUserUnitMixin(TestUserBaseMixin):
   """Unit test specific test utils for the User model."""
 
   def create_user(self, *, params: Parameters) -> Tuple[User, User] :
     """Create a unit test user according to requirements, mock super methods."""
-    # noinspection PyUnresolvedReferences
     user = User(
         username = params.creates.username,
         password = params.creates.password,  # type: ignore[misc]
@@ -301,16 +298,15 @@ class TestUserUnitMixin(TestUserBaseMixin):
   def create_anonymous_user(self) -> Tuple[User, User] :
     """Create a unit user according to requirements, mock super methods."""
     user, _ = self.create_user(params = Parameters(creates = CreateParameters(
-        username = Settings.anonymous_username()
+        username = UserNames.anonymous()
     )))
-    # noinspection PyUnresolvedReferences
     user.password = None  # type: ignore[assignment]
     return user, deepcopy(user)
 
   def create_superuser(self) -> Tuple[User, User] :
     """Create a superuser according to requirements, mock super methods."""
     user, _ = self.create_user(params = Parameters(creates = CreateParameters(
-        username = Settings.khaleesi_username(), password = Settings.initial_superuser_password()
+        username = UserNames.superuser(), password = UserNames.initial_superuser_password()
     )))
     user.is_superuser = True
     return user, deepcopy(user)
@@ -340,7 +336,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
         new_activity = new_activity,
     )
 
-  # noinspection PyUnresolvedReferences
   def _attach_common_properties(
       self, *,
       user: User,

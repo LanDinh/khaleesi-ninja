@@ -1,0 +1,1 @@
+"""Empty modules model to ensure sending post_migrate signal."""

@@ -7,11 +7,12 @@ from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
 from common.models import User
-from settings.settings import Settings
+from settings.settings import UserNames, Settings
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 from test_util.test import SimpleTestCase, TestCase
 
 
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class UserUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom User."""
 
@@ -19,9 +20,9 @@ class UserUnitTests(TestUserUnitMixin, SimpleTestCase):
   def test_is_state(self, system_lock_time: MagicMock) -> None :
     """Test the state information getters."""
     system_lock_time.return_value = timedelta(minutes = 3)
-    for username in ['username', Settings.anonymous_username()]:
+    for username in ['username', UserNames.anonymous()]:
       for params in self.params():
-        is_authenticated = not username is Settings.anonymous_username()
+        is_authenticated = not username is UserNames.anonymous()
         is_active = not params.locks.system_locked and not params.locks.admin_locked
         with self.subTest(authenticated = is_authenticated, **asdict(params)):
           # Prepare data.
@@ -35,7 +36,6 @@ class UserUnitTests(TestUserUnitMixin, SimpleTestCase):
           self.assertEqual(params.creates.oauth, user.is_oauth_only())
           self.assertEqual(params.locks.admin_locked, user.is_admin_locked())
           self.assertEqual(params.locks.system_locked, user.is_system_locked())
-          # noinspection PyUnresolvedReferences
           user.save.assert_not_called()  # type: ignore[attr-defined]
 
 
@@ -61,7 +61,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_is_state_anonymous(self) -> None :
     """Test the state information getters."""
     # Prepare data & perform test.
-    user: User = User.objects.get(username = Settings.anonymous_username())
+    user: User = User.objects.get(username = UserNames.anonymous())
     # Assert result.
     self.assertFalse(user.is_authenticated)
     self.assertFalse(user.is_alias())

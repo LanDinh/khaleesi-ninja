@@ -12,7 +12,7 @@ from django.db import models
 from django.utils import timezone
 
 # khaleesi.ninja.
-from settings.settings import Settings
+from settings.settings import Settings, UserNames
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
 from common.models.model import Model
@@ -25,7 +25,6 @@ class User(Model, AbstractBaseUser, PermissionsMixin):
       max_length = 150,
       blank = True,  # The blank username is reserved for the anonymous user.
       unique = True,
-      db_index = True,
       validators = [UnicodeUsernameValidator()],
   )
   # Lock a certain username to avoid impersonation by pointing to the real user.
@@ -58,7 +57,7 @@ class User(Model, AbstractBaseUser, PermissionsMixin):
   @property
   def is_authenticated(self) -> bool :  # type: ignore[override]
     """Check if the user is authenticated."""
-    return not self.username is Settings.anonymous_username()
+    return not self.username is UserNames.anonymous()
 
   USERNAME_FIELD = 'username'  # pylint: disable=invalid-name
 

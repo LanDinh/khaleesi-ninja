@@ -7,7 +7,7 @@ from typing import Optional, cast
 # khaleesi.ninja.
 from common.models.manager import Manager, T
 from common.exceptions import ZeroTupletException
-from settings.settings import Settings
+from settings.settings import UserNames
 
 
 class MigrationManager(Manager):
@@ -15,7 +15,7 @@ class MigrationManager(Manager):
 
   def create_anonymous_user(self) -> None :
     """Create the one and only anonymous user."""
-    user = self._create_base_user(username = Settings.anonymous_username())
+    user = self._create_base_user(username = UserNames.anonymous())
     if user:
       user.set_unusable_password()
       user.full_clean()
@@ -23,10 +23,10 @@ class MigrationManager(Manager):
 
   def create_superuser(self) -> None :
     """Create a new superuser."""
-    user = self._create_base_user(username = Settings.khaleesi_username())
+    user = self._create_base_user(username = UserNames.superuser())
     if user:
       user.is_superuser = True
-      user.set_password(raw_password = Settings.initial_superuser_password())
+      user.set_password(raw_password = UserNames.initial_superuser_password())
       user.full_clean()
       user.save()
 

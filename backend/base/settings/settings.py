@@ -12,43 +12,11 @@ class Settings:
   """Group the auth settings."""
 
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
-  groupnames = settings['GROUPS']  # type: ignore[index]
-  usernames = settings['USERS']  # type: ignore[index]
-
-  @classmethod
-  def dragon_groupname(cls) -> str :
-    """The group name used for admins."""
-    return cast(str, cls.groupnames['DRAGON'])
-
-  @classmethod
-  def missandei_groupname(cls) -> str :
-    """The group name used for translators."""
-    return cast(str, cls.groupnames['MISSANDEI'])
-
-  @classmethod
-  def warg_groupname(cls) -> str :
-    """The group name used for beta testers."""
-    return cast(str, cls.groupnames['WARG'])
 
   @classmethod
   def permission_model(cls) -> str :
     """The model name used for permission content types."""
     return cast(str, cls.settings['PERMISSION_MODEL'])
-
-  @classmethod
-  def anonymous_username(cls) -> str :
-    """The username used for the anonymous user."""
-    return cast(str, cls.usernames['ANONYMOUS'])
-
-  @classmethod
-  def khaleesi_username(cls) -> str :
-    """The username used for the superadmin."""
-    return cast(str, cls.usernames['KHALEESI'])
-
-  @classmethod
-  def initial_superuser_password(cls) -> str :
-    """The initial password used for the superadmin."""
-    return cast(str, cls.usernames['INITIAL_SUPERUSER_PASSWORD'])
 
   @classmethod
   def system_lock_time(cls) -> timedelta :
@@ -59,3 +27,24 @@ class Settings:
   def max_failed_attempts(cls) -> int :
     """The number of failed login attempts before a user gets system locked."""
     return cast(int, cls.settings['MAX_FAILED_LOGIN_ATTEMPTS'])
+
+
+class UserNames:
+  """Group the auth user name settings."""
+
+  names = settings.KHALEESI_NINJA['BASE']['USERS']  # type: ignore[index]
+
+  @classmethod
+  def anonymous(cls) -> str :
+    """The username used for the anonymous user."""
+    return cast(str, cls.names['ANONYMOUS'])
+
+  @classmethod
+  def superuser(cls) -> str :
+    """The username used for the superuser."""
+    return cast(str, cls.names['SUPERUSER'])
+
+  @classmethod
+  def initial_superuser_password(cls) -> str :
+    """The initial password used for the superadmin."""
+    return cast(str, cls.names['INITIAL_SUPERUSER_PASSWORD'])
