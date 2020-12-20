@@ -1,6 +1,6 @@
 """Custom model managers to restrict access."""
 
-# pylint: disable=protected-access
+# pylint: disable=protected-access,line-too-long
 
 # Python.
 from typing import Any, Dict, TypeVar, Callable
