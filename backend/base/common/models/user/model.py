@@ -5,19 +5,19 @@ from __future__ import annotations
 from datetime import datetime
 
 # Django.
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.contrib.postgres.fields import CICharField
 from django.db import models
 from django.utils import timezone
 
 # khaleesi.ninja.
-from settings.settings import Settings, UserNames
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
 from common.models.model import Model
+from settings.settings import Settings, UserNames
 
-class User(Model, AbstractBaseUser, PermissionsMixin):
+class User(Model, AbstractBaseUser):
   """Custom User."""
   # The username. Enforcement: non-blank, unique, length, case insensitive.
   # Allowed characters: unicode plus # @.+-_
@@ -70,7 +70,7 @@ class User(Model, AbstractBaseUser, PermissionsMixin):
       return True
     return False
 
-  def is_oauth_only(self) -> bool :
+  def has_password(self) -> bool :
     """Return the oauth state of the User."""
     return not self.has_usable_password()
 

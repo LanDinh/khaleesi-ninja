@@ -139,7 +139,6 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     self.assertTrue(user.is_active)
     self.assertNotEqual(datetime.min, user.date_joined)
     self.assertNotEqual(datetime.min, user.last_activity)
-    self.assertFalse(user.is_superuser)
     # Assert the locked state attributes.
     self.assertEqual(None, user.original)
     self.assertFalse(user.admin_locked)

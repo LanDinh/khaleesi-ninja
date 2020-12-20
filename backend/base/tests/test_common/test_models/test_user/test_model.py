@@ -33,7 +33,7 @@ class UserUnitTests(TestUserUnitMixin, SimpleTestCase):
           self.assertEqual(is_authenticated, user.is_authenticated)
           self.assertEqual(is_active, user.is_active)
           self.assertEqual(params.locks.alias, user.is_alias())
-          self.assertEqual(params.creates.oauth, user.is_oauth_only())
+          self.assertEqual(params.creates.oauth, user.has_password())
           self.assertEqual(params.locks.admin_locked, user.is_admin_locked())
           self.assertEqual(params.locks.system_locked, user.is_system_locked())
           user.save.assert_not_called()  # type: ignore[attr-defined]
@@ -53,7 +53,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
         self.assertTrue(user.is_authenticated)
         self.assertEqual(is_active, user.is_active)
         self.assertEqual(params.locks.alias, user.is_alias())
-        self.assertEqual(params.creates.oauth, user.is_oauth_only())
+        self.assertEqual(params.creates.oauth, user.has_password())
         self.assertEqual(params.locks.admin_locked, user.is_admin_locked())
         self.assertEqual(params.locks.system_locked, user.is_system_locked())
         user.delete()
@@ -65,6 +65,6 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
     # Assert result.
     self.assertFalse(user.is_authenticated)
     self.assertFalse(user.is_alias())
-    self.assertTrue(user.is_oauth_only())
+    self.assertTrue(user.has_password())
     self.assertFalse(user.is_admin_locked())
     self.assertFalse(user.is_system_locked())

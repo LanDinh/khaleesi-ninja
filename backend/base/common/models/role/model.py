@@ -15,6 +15,7 @@ class Role(Model):
 
   service = models.CharField(max_length = 50, choices = choices(ServiceType))
   name = models.CharField(max_length = 50, blank = True)
+  authenticated = models.BooleanField(default = False)
 
   objects = DefaultManager()
   migrations = MigrationManager()

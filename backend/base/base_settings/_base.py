@@ -87,7 +87,6 @@ SESSION_COOKIE_DOMAIN="khaleesi.ninja"
 # Django Rest Framework configuration.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.SessionAuthentication'],
-    'DEFAULT_PERMISSION_CLASSES': ['settings.permissions.HasPermission'],
     'DEFAULT_RENDERER_CLASSES': ['settings.json.JSONRenderer'],
     'EXCEPTION_HANDLER': 'settings.exception_handler.exception_handler',
 }

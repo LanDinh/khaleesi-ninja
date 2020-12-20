@@ -63,17 +63,7 @@ class TestUserBaseMixin:
       return not alias and not admin_lock and not system_lock
     return self._params_filtered(filter_function = filter_function)
 
-  def params_no_oauth(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        oauth: bool,
-        **_: bool,
-    ) -> bool :
-      return not oauth
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_only_locked_user(self) -> List[Parameters] :
+  def params_only_inactive_user(self) -> List[Parameters] :
     """Return parameter combinations for iteration in tests."""
     def filter_function(
         *,
@@ -93,55 +83,6 @@ class TestUserBaseMixin:
         **_: bool,
     ) -> bool :
       return not admin_lock and not system_lock
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_only_inactive_users(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        admin_lock: bool,
-        system_lock: bool,
-        **_: bool,
-    ) -> bool :
-      return admin_lock or system_lock
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_no_regular_login_user(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        oauth: bool,
-        alias: bool,
-        admin_lock: bool,
-        system_lock: bool,
-        **_: bool,
-    ) -> bool :
-      return alias or admin_lock or system_lock or oauth
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_regular_login_user(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        oauth: bool,
-        alias: bool,
-        admin_lock: bool,
-        system_lock: bool,
-        **_: bool,
-    ) -> bool :
-      return not alias and not admin_lock and not system_lock and not oauth
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_can_be_system_locked(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        oauth: bool,
-        alias: bool,
-        system_lock: bool,
-        **_: bool,
-    ) -> bool :
-      return not oauth and not alias and not system_lock
     return self._params_filtered(filter_function = filter_function)
 
   def params(self) -> List[Parameters] :
@@ -199,7 +140,6 @@ class TestUserBaseMixin:
     # Assert the common attributes of that user.
     self.assertEqual(expected_user.username, user.username)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.password, user.password)  # type: ignore[attr-defined]
-    self.assertFalse(user.is_superuser)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_authenticated, user.is_authenticated)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_active, user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.date_joined, user.date_joined)  # type: ignore[attr-defined]
@@ -256,7 +196,6 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     # Assert the common attributes.
     self.assertEqual(UserNames.anonymous(), user.username)  # type: ignore[attr-defined]
     self.assertFalse(user.has_usable_password())  # type: ignore[attr-defined]
-    self.assertFalse(user.is_superuser)  # type: ignore[attr-defined]
     self.assertFalse(user.is_authenticated)  # type: ignore[attr-defined]
     self.assertTrue(user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.date_joined)  # type: ignore[attr-defined]
@@ -271,7 +210,6 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     # Assert the common attributes.
     self.assertEqual(UserNames.superuser(), user.username)  # type: ignore[attr-defined]
     self.assertTrue(user.has_usable_password())  # type: ignore[attr-defined]
-    self.assertTrue(user.is_superuser)  # type: ignore[attr-defined]
     self.assertTrue(user.is_authenticated)  # type: ignore[attr-defined]
     self.assertTrue(user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.date_joined)  # type: ignore[attr-defined]
@@ -308,7 +246,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
     user, _ = self.create_user(params = Parameters(creates = CreateParameters(
         username = UserNames.superuser(), password = UserNames.initial_superuser_password()
     )))
-    user.is_superuser = True
     return user, deepcopy(user)
 
 
@@ -317,7 +254,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
     mock = MagicMock()
     mock.username = params.creates.username
     mock.password = params.creates.password
-    mock.is_superuser = False
     mock = cast(MagicMock, self._attach_common_properties(user = cast(User, mock), params = params))
     return self._attach_mocks_to_user(mock = mock, params = params)
 
@@ -349,7 +285,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
     user.has_usable_password = MagicMock(  # type: ignore[assignment]
         return_value = not params.creates.oauth,
     )
-    user.has_perm = MagicMock()  # type: ignore[assignment]
     return user
 
   @staticmethod
@@ -372,6 +307,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
     mock.is_oauth_only = MagicMock(return_value = params.creates.oauth)
     mock.is_admin_locked = MagicMock(return_value = params.locks.admin_locked)
     mock.is_system_locked = MagicMock(return_value = params.locks.system_locked)
-    mock.groups = MagicMock()
-    mock.groups.set = MagicMock()
+    mock.roles = MagicMock()
+    mock.roles.set = MagicMock()
     return mock, deepcopy(mock)
