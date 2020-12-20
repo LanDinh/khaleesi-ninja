@@ -25,7 +25,7 @@ class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
             # Prepare data.
             base_queryset.return_value.create = MagicMock()
             user, _ = self.create_user(params = user_params)
-            role = Role(service = service)
+            role = Role(service = service.name)
             # Perform test.
             RoleAssignment.objects.create(user = user, role = role, beta = beta)
             # Assert result.
@@ -49,7 +49,7 @@ class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegration
               # Prepare data.
               user, _ = self.create_user(params = user_params)
               Role.migrations.create(service = service, name = role_name)
-              role = Role.objects.get(service = service, name = role_name)
+              role: Role = Role.objects.get(service = service, name = role_name)
               # Perform test.
               RoleAssignment.objects.create(user = user, role = role, beta = beta)
               # Assert result.
