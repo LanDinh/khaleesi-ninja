@@ -1,0 +1,58 @@
+"""The tests for the custom role assignment DefaultManager."""
+
+# Python.
+from dataclasses import asdict
+from unittest.mock import patch, MagicMock
+
+# khaleesi.ninja.
+from common.models import Role, RoleAssignment
+from common.models.manager import BaseManager
+from common.service_type import ServiceType
+from test_util.test import SimpleTestCase, TestCase
+from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
+
+
+class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
+  """The unit tests for the custom role assignment DefaultManager."""
+
+  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  def test_create(self, base_queryset: MagicMock) -> None :
+    """Test role assignment creation."""
+    for user_params in self.params():
+      for service in ServiceType:
+        for beta in [True, False]:
+          with self.subTest(service = service, beta = beta, **asdict(user_params)):
+            # Prepare data.
+            base_queryset.return_value.create = MagicMock()
+            user, _ = self.create_user(params = user_params)
+            role = Role(service = service)
+            # Perform test.
+            RoleAssignment.objects.create(user = user, role = role, beta = beta)
+            # Assert result.
+            base_queryset.return_value.create.assert_called_once_with(
+                user = user,
+                role = role,
+                beta = beta,
+            )
+
+
+class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegrationMixin):
+  """The integration tests for the custom role assignment DefaultManager."""
+
+  def test_create(self) -> None :
+    """Test role assignment creation."""
+    for user_params in self.params():
+      for service in ServiceType:
+        for beta in [True, False]:
+          for role_name in ['', 'test']:
+            with self.subTest(service = service, beta = beta, **asdict(user_params)):
+              # Prepare data.
+              user, _ = self.create_user(params = user_params)
+              Role.migrations.create(service = service, name = role_name)
+              role = Role.objects.get(service = service, name = role_name)
+              # Perform test.
+              RoleAssignment.objects.create(user = user, role = role, beta = beta)
+              # Assert result.
+              user.roles.get(service = service, name = role_name)
+              user.delete()
+              role.delete()

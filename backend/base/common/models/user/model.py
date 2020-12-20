@@ -12,6 +12,7 @@ from django.db import models
 from django.utils import timezone
 
 # khaleesi.ninja.
+from common.models.role.model import Role
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
 from common.models.model import Model
@@ -35,6 +36,9 @@ class User(Model, AbstractBaseUser):
       blank = True,
       related_name = 'alias',
   )
+
+  # Roles granting access to services and features.
+  roles = models.ManyToManyField(Role, through = 'RoleAssignment')
 
   # Admin lock an account.
   admin_locked = models.BooleanField(default = False)
