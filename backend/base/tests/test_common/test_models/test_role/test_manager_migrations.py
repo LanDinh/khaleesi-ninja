@@ -5,8 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja
 from common.exceptions import ZeroTupletException
-from common.models import Role
-from common.models.manager import BaseManager
+from common.models import Role, Manager
 from common.service_type import ServiceType
 from test_util.test import  SimpleTestCase, TestCase
 
@@ -14,7 +13,7 @@ from test_util.test import  SimpleTestCase, TestCase
 class RoleMigrationManagerUnitTests(SimpleTestCase):
   """The unit tests for the MigrationManager."""
 
-  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
   def create(self, base_queryset: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test role creation."""
     for service in ServiceType:

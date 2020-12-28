@@ -7,7 +7,6 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from common.models import Manager, Role
 from common.exceptions import ZeroTupletException
-from common.models.manager import BaseManager
 from common.service_type import ServiceType
 from test_util.test import SimpleTestCase, TestCase
 
@@ -28,7 +27,7 @@ class RoleDefaultManagerUnitTests(SimpleTestCase):
         get.assert_called_once_with(service = service.name, name = name)
         get.reset_mock()
 
-  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
   def test_authenticated(self, base_queryset: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test if fetching authenticated roles work."""
     # Prepare data.

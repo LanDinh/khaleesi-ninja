@@ -5,8 +5,7 @@ from dataclasses import asdict
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from common.models import Role, RoleAssignment
-from common.models.manager import BaseManager
+from common.models import Role, RoleAssignment, Manager
 from common.service_type import ServiceType
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
@@ -15,7 +14,7 @@ from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
   """The unit tests for the custom role assignment DefaultManager."""
 
-  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
   def test_create(self, base_queryset: MagicMock) -> None :
     """Test role assignment creation."""
     for user_params in self.params():

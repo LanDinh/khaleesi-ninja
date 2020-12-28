@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from django.db.models.manager import BaseManager as DjangoBaseManager
 
 # khaleesi.ninja.
-from common.models.manager import BaseManager
+from common.models import Manager
 from common.exceptions import ZeroTupletException, TwinException
 from test_util.test import SimpleTestCase
 from .models import TestModel
@@ -17,7 +17,7 @@ from .models import TestModel
 class ManagerTestCase(SimpleTestCase):
   """Unit tests for the custom base manager."""
 
-  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
   def test_get_zerotuplet(self, get_queryset: MagicMock) -> None :
     """Test if the correct exception gets thrown if no object is found."""
     # Prepare data.
@@ -26,7 +26,7 @@ class ManagerTestCase(SimpleTestCase):
     with self.assertRaises(ZeroTupletException):
       TestModel.objects.get()
 
-  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
   def test_get_twins(self, get_queryset: MagicMock) -> None :
     """Test if the correct exception gets thrown if two objects are found."""
     # Prepare data.
@@ -35,7 +35,7 @@ class ManagerTestCase(SimpleTestCase):
     with self.assertRaises(TwinException):
       TestModel.objects.get()
 
-  @patch.object(BaseManager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
   def test_get(self, get_queryset: MagicMock) -> None :
     """Test if the correct exception gets thrown if no object is found."""
     # Prepare data.

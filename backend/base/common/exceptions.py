@@ -39,7 +39,7 @@ class ZeroTupletException(TeapotException):
   """Teapot - there should always be an object."""
 
   def __init__(self) -> None :
-    super().__init__(data = _('data/no_object'))
+    super().__init__(data = _('data/zerotuplet'))
 
 
 class SerializerException(KhaleesiException):

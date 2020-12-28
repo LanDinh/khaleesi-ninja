@@ -12,7 +12,6 @@ from django.core.exceptions import ValidationError
 # khaleesi.ninja.
 from common.models import User, Manager, Role, RoleAssignment
 from common.exceptions import ZeroTupletException
-from common.models.manager import BaseManager
 from common.service_type import ServiceType
 from settings.settings import UserNames
 from test_util.test import SimpleTestCase, TestCase
@@ -37,7 +36,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Assert result.
     get.assert_called_once_with(username = username)
 
-  @patch.object(BaseManager, '_get_queryset')
+  @patch.object(Manager, '_get_queryset')
   def test_without_role_assignment(self, base_queryset: MagicMock) -> None :
     """Test if the users that are not assigned to a role get fetched correctly."""
     for service in ServiceType:
