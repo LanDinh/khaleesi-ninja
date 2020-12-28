@@ -18,3 +18,7 @@ class RoleAssignment(Model):
   beta = models.BooleanField(default = False)
 
   objects = DefaultManager()
+
+  class Meta:
+    """Role meta attributes."""
+    unique_together = ('user', 'role')
