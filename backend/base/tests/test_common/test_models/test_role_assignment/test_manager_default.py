@@ -19,20 +19,15 @@ class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
     """Test role assignment creation."""
     for user_params in self.params():
       for service in ServiceType:
-        for beta in [True, False]:
-          with self.subTest(service = service, beta = beta, **asdict(user_params)):
-            # Prepare data.
-            base_queryset.return_value.create = MagicMock()
-            user, _ = self.create_user(params = user_params)
-            role = Role(service = service.name)
-            # Perform test.
-            RoleAssignment.objects.create(user = user, role = role, beta = beta)
-            # Assert result.
-            base_queryset.return_value.create.assert_called_once_with(
-                user = user,
-                role = role,
-                beta = beta,
-            )
+        with self.subTest(service = service, **asdict(user_params)):
+          # Prepare data.
+          base_queryset.return_value.create = MagicMock()
+          user, _ = self.create_user(params = user_params)
+          role = Role(service = service.name)
+          # Perform test.
+          RoleAssignment.objects.create(user = user, role = role)
+          # Assert result.
+          base_queryset.return_value.create.assert_called_once_with(user = user, role = role)
 
 
 class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegrationMixin):
@@ -42,16 +37,18 @@ class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegration
     """Test role assignment creation."""
     for user_params in self.params():
       for service in ServiceType:
-        for beta in [True, False]:
-          for role_name in ['', 'test']:
-            with self.subTest(service = service, beta = beta, **asdict(user_params)):
-              # Prepare data.
-              user, _ = self.create_user(params = user_params)
-              Role.migrations.create(service = service, name = role_name)
-              role: Role = Role.objects.get(service = service, name = role_name)
-              # Perform test.
-              RoleAssignment.objects.create(user = user, role = role, beta = beta)
-              # Assert result.
-              user.roles.get(service = service, name = role_name)
-              user.delete()
-              role.delete()
+        for role_name in ['', 'test']:
+          with self.subTest(service = service, **asdict(user_params)):
+            # Prepare data.
+            user, _ = self.create_user(params = user_params)
+            Role.migrations.create(service = service, name = role_name)
+            role: Role = Role.objects.get(service = service, name = role_name)
+            # Perform test.
+            RoleAssignment.objects.create(user = user, role = role)
+            # Assert result.
+            result: RoleAssignment = user.roles.get(service = service, name = role_name)
+            self.assertEqual(user, result.user)
+            self.assertEqual(role, result.role)
+            self.assertFalse(result.beta)
+            user.delete()
+            role.delete()
