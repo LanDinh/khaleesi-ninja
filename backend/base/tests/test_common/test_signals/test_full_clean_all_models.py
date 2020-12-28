@@ -44,8 +44,8 @@ class FullCleanAllModelsIntegrationTests(TestCase):
       with self.subTest(sender = sender):
         with self.assertRaises(ValidationError):
           # If full_clean gets called, validation is applied.
-          if hasattr(sender.objects, '_get_queryset'):
-            sender.objects._get_queryset().create() # type: ignore[attr-defined]
+          if hasattr(sender.objects, 'get_queryset'):
+            sender.objects.get_queryset().create()
           else:
             sender.objects.get_queryset().create()
 

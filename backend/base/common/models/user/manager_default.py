@@ -19,7 +19,7 @@ class DefaultManager(Manager):
   def without_role_assignment(self, *, role: Role) -> List[T] :
     """Get all users without this role."""
     return list(
-        self._get_queryset().exclude(roles = role).exclude(username = UserNames.anonymous()),
+        self.get_queryset().exclude(roles = role).exclude(username = UserNames.anonymous()),
     )
 
   def create(self, *, username: str, password: Optional[str] = None) -> T :

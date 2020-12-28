@@ -15,7 +15,7 @@ from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom UserManager."""
 
-  @patch.object(User.migrations, '_get_queryset')
+  @patch.object(User.migrations, 'get_queryset')
   @patch.object(User.migrations, 'model')
   def test_create_anonymous_user_creation(
       self,
@@ -38,7 +38,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     ])
     mock.set_password.assert_not_called()
 
-  @patch.object(User.migrations, '_get_queryset')
+  @patch.object(User.migrations, 'get_queryset')
   def test_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
@@ -49,7 +49,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Assert result.
     expected_user.save.assert_not_called()  # type: ignore[attr-defined]
 
-  @patch.object(User.migrations, '_get_queryset')
+  @patch.object(User.migrations, 'get_queryset')
   def test_create_anonymous_twins(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
@@ -59,7 +59,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     with self.assertRaises(TwinException):
       User.migrations.create_anonymous_user()
 
-  @patch.object(User.migrations, '_get_queryset')
+  @patch.object(User.migrations, 'get_queryset')
   @patch.object(User.migrations, 'model')
   def test_create_superuser_creation(
       self,
@@ -82,7 +82,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     ])
     mock.set_unusable_password.assert_not_called()
 
-  @patch.object(User.migrations, '_get_queryset')
+  @patch.object(User.migrations, 'get_queryset')
   def test_create_superuser_fetching(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
@@ -93,7 +93,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Assert result.
     expected_user.save.assert_not_called()  # type: ignore[attr-defined]
 
-  @patch.object(User.migrations, '_get_queryset')
+  @patch.object(User.migrations, 'get_queryset')
   def test_create_superuser_twins(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.

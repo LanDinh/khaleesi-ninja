@@ -21,4 +21,4 @@ class DefaultManager(Manager):
     try:
       self.get(service = service, name = name)
     except ZeroTupletException:
-      self._get_queryset().create(service = service.name, name = name)
+      self.get_queryset().create(service = service.name, name = name)

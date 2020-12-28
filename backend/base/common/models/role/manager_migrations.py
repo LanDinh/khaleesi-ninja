@@ -13,4 +13,4 @@ class MigrationManager(Manager):
 
   def create(self, *, service: ServiceType, name: Optional[str] = '') -> None:
     """Create a role."""
-    self._get_queryset().update_or_create(service = service.name, name = name)
+    self.get_queryset().update_or_create(service = service.name, name = name)

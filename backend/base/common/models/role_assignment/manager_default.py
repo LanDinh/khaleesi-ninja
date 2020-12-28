@@ -11,4 +11,4 @@ class DefaultManager(Manager):
 
   def create(self, *, user: User, role: Role) -> None:
     """Assign a role to a user."""
-    self._get_queryset().create(user = user, role = role)
+    self.get_queryset().create(user = user, role = role)

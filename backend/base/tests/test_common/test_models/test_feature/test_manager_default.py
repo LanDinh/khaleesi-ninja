@@ -29,7 +29,7 @@ class FeatureDefaultManagerUnitTests(SimpleTestCase):
         get.reset_mock()
 
   @patch.object(Manager, 'get')
-  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, 'get_queryset', return_value = MagicMock())
   def test_create_exists(self, base_queryset: MagicMock, get: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test if single object creation works."""
     for service in ServiceType:
@@ -44,7 +44,7 @@ class FeatureDefaultManagerUnitTests(SimpleTestCase):
         get.reset_mock()
 
   @patch.object(Manager, 'get', side_effect = ZeroTupletException())
-  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, 'get_queryset', return_value = MagicMock())
   def test_create_create(self, base_queryset: MagicMock, get: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test if single object creation works."""
     for service in ServiceType:

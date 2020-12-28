@@ -17,4 +17,4 @@ class DefaultManager(Manager):
 
   def authenticated(self) -> List[T] :
     """Get all roles that all authenticated users should get assigned."""
-    return list(self._get_queryset().filter(authenticated = True))
+    return list(self.get_queryset().filter(authenticated = True))

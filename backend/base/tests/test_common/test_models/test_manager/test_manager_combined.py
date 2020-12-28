@@ -10,10 +10,12 @@ from .models import TestModel
 
 
 _IGNORE_MANAGER_METHODS = [
+    'all',
     'check',
     'contribute_to_class',
     'db_manager',
     'deconstruct',
+    'get_queryset',
     'from_queryset',
     'get',
     'using',
@@ -47,7 +49,7 @@ class ManagerTestCase(CombinedTestCase):
   def get_queryset_methods(self) -> List[Tuple[str, Any]] :
     """Return all public methods of the queryset that have not been manually permitted."""
     return self._get_public_methods(
-        obj = TestModel.objects._get_queryset(),  # pylint: disable=protected-access
+        obj = TestModel.objects.get_queryset(),
         filtered = _IGNORE_QUERYSET_METHODS,
     )
 

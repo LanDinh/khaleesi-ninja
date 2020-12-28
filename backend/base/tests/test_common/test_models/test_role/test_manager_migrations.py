@@ -13,7 +13,7 @@ from test_util.test import  SimpleTestCase, TestCase
 class RoleMigrationManagerUnitTests(SimpleTestCase):
   """The unit tests for the MigrationManager."""
 
-  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, 'get_queryset', return_value = MagicMock())
   def create(self, base_queryset: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test role creation."""
     for service in ServiceType:

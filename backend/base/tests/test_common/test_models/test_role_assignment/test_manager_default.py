@@ -1,5 +1,7 @@
 """The tests for the custom role assignment DefaultManager."""
 
+# pylint: disable=line-too-long
+
 # Python.
 from dataclasses import asdict
 from unittest.mock import patch, MagicMock
@@ -14,7 +16,7 @@ from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
   """The unit tests for the custom role assignment DefaultManager."""
 
-  @patch.object(Manager, '_get_queryset', return_value = MagicMock())
+  @patch.object(Manager, 'get_queryset', return_value = MagicMock())
   def test_create(self, base_queryset: MagicMock) -> None :
     """Test role assignment creation."""
     for user_params in self.params():
@@ -30,6 +32,7 @@ class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
           base_queryset.return_value.create.assert_called_once_with(user = user, role = role)
 
 
+# noinspection PyUnresolvedReferences
 class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegrationMixin):
   """The integration tests for the custom role assignment DefaultManager."""
 
@@ -46,7 +49,10 @@ class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegration
             # Perform test.
             RoleAssignment.objects.create(user = user, role = role)
             # Assert result.
-            result: RoleAssignment = user.roles.get(service = service, name = role_name)
+            result: RoleAssignment = user.roleassignment_set.get(
+                role__service = service.name,
+                role__name = role_name,
+            )
             self.assertEqual(user, result.user)
             self.assertEqual(role, result.role)
             self.assertFalse(result.beta)

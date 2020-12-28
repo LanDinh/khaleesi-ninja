@@ -36,7 +36,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Assert result.
     get.assert_called_once_with(username = username)
 
-  @patch.object(Manager, '_get_queryset')
+  @patch.object(Manager, 'get_queryset')
   def test_without_role_assignment(self, base_queryset: MagicMock) -> None :
     """Test if the users that are not assigned to a role get fetched correctly."""
     for service in ServiceType:
