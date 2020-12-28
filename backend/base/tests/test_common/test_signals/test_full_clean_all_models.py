@@ -1,4 +1,4 @@
-"""The tests for the custom signals."""
+"""The tests for the signals full cleaning all models."""
 
 # Python.
 from unittest.mock import MagicMock

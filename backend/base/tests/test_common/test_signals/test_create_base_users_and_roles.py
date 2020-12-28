@@ -1,4 +1,4 @@
-"""The tests for the post_migrate signals."""
+"""The tests for the signals creating the base users and roles."""
 
 # Python.
 from unittest.mock import patch, MagicMock

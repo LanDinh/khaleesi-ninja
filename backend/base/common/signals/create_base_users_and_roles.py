@@ -13,7 +13,7 @@ from common.app_config import ServiceConfig
 from common.models import User, Role
 
 
-@receiver(post_migrate)
+@receiver(post_migrate, dispatch_uid = 'common.signals.create_base_users_and_roles')
 def create_base_users_and_roles(sender: DjangoAppConfig, **_: Any) -> None :
   """Create base users and roles."""
   if sender.name == 'common' and not isinstance(sender, ServiceConfig):
