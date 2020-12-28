@@ -38,7 +38,7 @@ class User(Model, AbstractBaseUser):
   )
 
   # Roles granting access to services and features.
-  roles = models.ManyToManyField(Role, through = 'RoleAssignment')
+  roles = models.ManyToManyField(Role, through = 'RoleAssignment', related_name = 'users')
 
   # Admin lock an account.
   admin_locked = models.BooleanField(default = False)

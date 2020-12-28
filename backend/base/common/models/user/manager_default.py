@@ -1,10 +1,12 @@
 """Default Manager."""
 
 # Python.
-from typing import cast, Optional
+from typing import cast, Optional, List
 
 # khaleesi.ninja.
-from ..manager import Manager, T
+from common.models.role.model import Role
+from common.models.manager import  Manager, T
+from settings.settings import UserNames
 
 
 class DefaultManager(Manager):
@@ -13,6 +15,12 @@ class DefaultManager(Manager):
   def get(self, *, username: str) -> T :
     """Get a single user by name."""
     return cast(T, super().get(username = username))
+
+  def without_role_assignment(self, *, role: Role) -> List[T] :
+    """Get all users without this role."""
+    return list(
+        self._get_queryset().exclude(roles = role).exclude(username = UserNames.anonymous()),
+    )
 
   def create(self, *, username: str, password: Optional[str] = None) -> T :
     """Create a new user."""
