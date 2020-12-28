@@ -27,3 +27,4 @@ class Model(models.Model):
     """Define the default manager."""
     abstract = True
     default_manager_name = '_objects'
+    base_manager_name = 'objects'

@@ -3,7 +3,7 @@
 # pylint: disable=protected-access,line-too-long
 
 # Python.
-from typing import Any, Dict, TypeVar, Callable
+from typing import Any, Dict, TypeVar, Callable, cast, Optional
 
 # Django.
 from django.db import models
@@ -14,7 +14,7 @@ from django.db.models.manager import BaseManager as DjangoBaseManager
 from common.exceptions import TwinException, ZeroTupletException
 
 
-_METHODS_FOR_COPYING = ['using']
+_METHODS_FOR_COPYING = ['using', '_insert']
 
 T = TypeVar("T", bound = models.Model, covariant=True)  # pylint: disable=invalid-name
 
@@ -22,6 +22,10 @@ T = TypeVar("T", bound = models.Model, covariant=True)  # pylint: disable=invali
 # noinspection PyUnresolvedReferences,PyTypeHints,SyntaxError,PyTypeChecker,PyMissingOrEmptyDocstring
 class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
   """Custom base manager to restrict access."""
+
+  instance: Optional[Any]
+  prefetch_cache_name: Optional[str]
+  _apply_rel_filters: Callable  # type: ignore[type-arg]
 
   @classmethod
   def _get_queryset_methods(cls, queryset_class: type) -> Dict[str, Any] :
@@ -44,7 +48,21 @@ class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
         if name in _METHODS_FOR_COPYING
     }
 
-  def _get_queryset(self) -> QuerySet[T] :
+  # noinspection PyProtectedMember
+  def _get_queryset(self, **hints: Any) -> QuerySet[T] :
+    """Correctly build the queryset, even when used as related manager."""
+    # ForwardManyToOneDescriptor and ForwardOneToOneDescriptor.
+    if hasattr(self, 'field'):
+      return cast(QuerySet[T], self.field.remote_field.model._base_manager.db_manager(hints = hints).all())  # type: ignore[attr-defined]  # pylint: disable=no-member
+    # ReverseOneToOneDescriptor
+    if hasattr(self, 'related'):
+      return cast(QuerySet[T], self.related.related_model._base_manager.db_manager(hints = hints).all())  # type: ignore[attr-defined]  # pylint: disable=no-member
+    # ReverseManyToOneDescriptor and ManyToManyDescriptor.
+    if hasattr(self, 'instance') and hasattr(self.instance, '_prefetched_objects_cache'):
+      return cast(QuerySet[T], self.instance._prefetched_objects_cache[self.prefetch_cache_name])  # type: ignore[union-attr]
+    if hasattr(self, '_apply_rel_filters'):
+      return cast(QuerySet[T], self._apply_rel_filters(super().get_queryset()))
+    # Regular manager.
     return super().get_queryset()
 
   def get_queryset(self) -> QuerySet[T] :
