@@ -4,6 +4,7 @@
 from django.db import models
 
 # khaleesi.ninja.
+from common.models import Feature
 from common.models.role.manager_default import DefaultManager
 from common.models.role.manager_migrations import MigrationManager
 from common.models.model import choices, Model
@@ -16,6 +17,7 @@ class Role(Model):
   service = models.CharField(max_length = 50, choices = choices(ServiceType))
   name = models.CharField(max_length = 50, blank = True)
   authenticated = models.BooleanField(default = False)
+  features = models.ManyToManyField(Feature, through = 'FeatureAssignment', related_name = 'roles')
 
   objects = DefaultManager()
   migrations = MigrationManager()
