@@ -4,7 +4,7 @@
 from django.db import models
 
 # khaleesi.ninja.
-from common.models import Feature
+from common.models.feature.model import Feature
 from common.models.role.manager_default import DefaultManager
 from common.models.role.manager_migrations import MigrationManager
 from common.models.model import choices, Model
