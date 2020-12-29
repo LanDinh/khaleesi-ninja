@@ -48,7 +48,10 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_is_state_authenticated(self) -> None :
     """Test the state information getters."""
     for params in self.params():
-      is_active = not params.locks.deleted and not params.locks.admin_locked and not params.locks.system_locked
+      is_active =\
+        not params.locks.deleted\
+        and not params.locks.admin_locked\
+        and not params.locks.system_locked
       with self.subTest(**asdict(params)):
         # Prepare data & perform test.
         user, _ = self.create_user(params = params)
