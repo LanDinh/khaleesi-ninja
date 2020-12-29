@@ -31,6 +31,7 @@ class CreateParameters:
 class LockParameters:
   """Parameters that will be adjusted after initial creation."""
   alias: bool = False
+  deleted: bool = False
   admin_locked: bool = False
   system_locked: bool = False
 
@@ -41,13 +42,14 @@ class Parameters:
   locks: LockParameters = LockParameters()
 
 
-# noinspection PyTypeHints,PyUnresolvedReferences,SyntaxError,PyMissingOrEmptyDocstring
+# noinspection PyTypeHints,PyUnresolvedReferences,SyntaxError,PyMissingOrEmptyDocstring,DuplicatedCode
 class TestUserBaseMixin:
   """Test utils for the User model."""
 
   # Possible raw parameter values.
   _params_oauth = [True, False]
   _params_alias = [True, False]
+  _params_deleted = [True, False]
   _params_admin_lock = [True, False]
   _params_system_lock = [True, False]
 
@@ -56,33 +58,12 @@ class TestUserBaseMixin:
     def filter_function(
         *,
         alias: bool,
+        deleted: bool,
         admin_lock: bool,
         system_lock: bool,
         **_: bool,
     ) -> bool :
-      return not alias and not admin_lock and not system_lock
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_only_inactive_user(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        admin_lock: bool,
-        system_lock: bool,
-        **_: bool,
-    ) -> bool :
-      return admin_lock or system_lock
-    return self._params_filtered(filter_function = filter_function)
-
-  def params_only_active_users(self) -> List[Parameters] :
-    """Return parameter combinations for iteration in tests."""
-    def filter_function(
-        *,
-        admin_lock: bool,
-        system_lock: bool,
-        **_: bool,
-    ) -> bool :
-      return not admin_lock and not system_lock
+      return not alias and not deleted and not admin_lock and not system_lock
     return self._params_filtered(filter_function = filter_function)
 
   def params(self) -> List[Parameters] :
@@ -101,19 +82,22 @@ class TestUserBaseMixin:
             ),
             locks = LockParameters(
                 alias = alias,
+                deleted = deleted,
                 admin_locked = admin_locked,
                 system_locked = system_locked,
             ),
-        ) for oauth, alias, admin_locked, system_locked
+        ) for oauth, alias, deleted, admin_locked, system_locked
         in itertools.product(
             self._params_oauth,
             self._params_alias,
+            self._params_deleted,
             self._params_admin_lock,
             self._params_system_lock,
         )
         if filter_function(
             oauth = oauth,
             alias = alias,
+            deleted = deleted,
             admin_lock = admin_locked,
             system_lock = system_locked,
         )
@@ -123,6 +107,7 @@ class TestUserBaseMixin:
   def _add_properties_to_user(*, user: User, params: LockParameters) -> User:
     """Add lock properties to user."""
     user.original = user if params.alias else None
+    user.deleted = params.deleted
     user.admin_locked = params.admin_locked
     user.failed_attempts = 1
     if params.system_locked:
@@ -152,6 +137,7 @@ class TestUserBaseMixin:
       self.assertEqual(expected_user.original.username, user.original.username)  # type: ignore[attr-defined,union-attr]
     else:
       self.assertEqual(expected_user.original, user.original)  # type: ignore[attr-defined]
+    self.assertEqual(expected_user.deleted, user.deleted)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.admin_locked, user.admin_locked)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.failed_attempts, user.failed_attempts)  # type: ignore[attr-defined]
     if new_system_lock:
@@ -202,6 +188,7 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertEqual(datetime.min, user.last_activity)  # type: ignore[attr-defined]
     # Assert the locked state attributes.
     self.assertEqual(None, user.original)  # type: ignore[attr-defined]
+    self.assertFalse(user.deleted)  # type: ignore[attr-defined]
     self.assertFalse(user.admin_locked)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
 
@@ -216,6 +203,7 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertEqual(datetime.min, user.last_activity)  # type: ignore[attr-defined]
     # Assert the locked state attributes.
     self.assertIsNone(user.original)  # type: ignore[attr-defined]
+    self.assertFalse(user.deleted)  # type: ignore[attr-defined]
     self.assertFalse(user.admin_locked)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.system_locked)  # type: ignore[attr-defined]
 
@@ -297,14 +285,16 @@ class TestUserUnitMixin(TestUserBaseMixin):
     mock.date_joined = datetime.min
     mock.last_activity = datetime.min
     mock.system_locked = datetime.min
-    mock.authenticate = MagicMock()
     mock.is_authenticated = MagicMock(bool(params.creates.username))
     mock.is_active = MagicMock(
         return_value =
-            not params.locks.admin_locked and not params.locks.system_locked,
+            not params.locks.deleted
+            and not params.locks.admin_locked
+            and not params.locks.system_locked,
     )
     mock.is_alias = MagicMock(return_value = params.locks.alias)
     mock.is_oauth_only = MagicMock(return_value = params.creates.oauth)
+    mock.is_deleted = MagicMock(return_value = params.locks.deleted)
     mock.is_admin_locked = MagicMock(return_value = params.locks.admin_locked)
     mock.is_system_locked = MagicMock(return_value = params.locks.system_locked)
     mock.roles = MagicMock()

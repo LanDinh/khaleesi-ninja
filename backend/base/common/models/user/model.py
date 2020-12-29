@@ -40,6 +40,8 @@ class User(Model, AbstractBaseUser):
   # Roles granting access to services and features.
   roles = models.ManyToManyField(Role, through = 'RoleAssignment', related_name = 'users')
 
+  # Mark an account as deleted.
+  deleted = models.BooleanField(default = False)
   # Admin lock an account.
   admin_locked = models.BooleanField(default = False)
   # Automatically lock an account for a some time upon too many failed logins.
@@ -55,7 +57,7 @@ class User(Model, AbstractBaseUser):
   @property
   def is_active(self) -> bool :
     """Locked users should count as inactive."""
-    return not self.is_admin_locked() and not self.is_system_locked()
+    return not self.is_deleted() and not self.is_admin_locked() and not self.is_system_locked()
 
   # noinspection PyTypeHints,SyntaxError
   @property
@@ -77,6 +79,10 @@ class User(Model, AbstractBaseUser):
   def has_password(self) -> bool :
     """Return the oauth state of the User."""
     return not self.has_usable_password()
+
+  def is_deleted(self) -> bool :
+    """Return if the User has been marked as deleted."""
+    return self.deleted
 
   def is_admin_locked(self) -> bool :
     """Return the admin lock state of the User."""

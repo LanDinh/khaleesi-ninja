@@ -23,7 +23,10 @@ class UserUnitTests(TestUserUnitMixin, SimpleTestCase):
     for username in ['username', UserNames.anonymous()]:
       for params in self.params():
         is_authenticated = not username is UserNames.anonymous()
-        is_active = not params.locks.system_locked and not params.locks.admin_locked
+        is_active =\
+          not params.locks.deleted\
+          and not params.locks.admin_locked\
+          and not params.locks.system_locked
         with self.subTest(authenticated = is_authenticated, **asdict(params)):
           # Prepare data.
           params.creates.username = username
@@ -45,7 +48,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_is_state_authenticated(self) -> None :
     """Test the state information getters."""
     for params in self.params():
-      is_active = not params.locks.system_locked and not params.locks.admin_locked
+      is_active = not params.locks.deleted and not params.locks.admin_locked and not params.locks.system_locked
       with self.subTest(**asdict(params)):
         # Prepare data & perform test.
         user, _ = self.create_user(params = params)
@@ -54,6 +57,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
         self.assertEqual(is_active, user.is_active)
         self.assertEqual(params.locks.alias, user.is_alias())
         self.assertEqual(params.creates.oauth, user.has_password())
+        self.assertEqual(params.locks.deleted, user.is_deleted())
         self.assertEqual(params.locks.admin_locked, user.is_admin_locked())
         self.assertEqual(params.locks.system_locked, user.is_system_locked())
         user.delete()
@@ -66,5 +70,6 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
     self.assertFalse(user.is_authenticated)
     self.assertFalse(user.is_alias())
     self.assertTrue(user.has_password())
+    self.assertFalse(user.is_deleted())
     self.assertFalse(user.is_admin_locked())
     self.assertFalse(user.is_system_locked())
