@@ -76,10 +76,6 @@ class User(Model, AbstractBaseUser):
       return True
     return False
 
-  def has_password(self) -> bool :
-    """Return the oauth state of the User."""
-    return not self.has_usable_password()
-
   def is_deleted(self) -> bool :
     """Return if the User has been marked as deleted."""
     return self.deleted

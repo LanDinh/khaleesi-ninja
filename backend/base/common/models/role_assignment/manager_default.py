@@ -9,6 +9,6 @@ from common.models.manager import Manager
 class DefaultManager(Manager):
   """Default Manager."""
 
-  def create(self, *, user: User, role: Role) -> None:
+  def get_or_create(self, *, user: User, role: Role) -> None:
     """Assign a role to a user."""
-    self.get_queryset().create(user = user, role = role)
+    self.get_queryset().get_or_create(user = user, role = role)

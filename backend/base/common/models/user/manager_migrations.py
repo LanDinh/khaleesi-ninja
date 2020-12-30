@@ -2,7 +2,6 @@
 
 # Python.
 from datetime import datetime
-from typing import Optional
 
 # khaleesi.ninja.
 from common.models.manager import Manager
@@ -19,12 +18,9 @@ class MigrationManager(Manager):
 
   def create_superuser(self) -> None :
     """Create a new superuser."""
-    self._create(
-        raw_username = UserNames.superuser(),
-        password = UserNames.initial_superuser_password()
-    )
+    self._create(raw_username = UserNames.superuser())
 
-  def _create(self, *, raw_username: str, password: Optional[str] = None) -> None :
+  def _create(self, *, raw_username: str) -> None :
     username = self.model.normalize_username(username = raw_username)
     try:
       self.get(username = username)
@@ -33,9 +29,6 @@ class MigrationManager(Manager):
       user = self.model(username = username)
       user.date_joined = datetime.min
       user.last_activity = datetime.min
-      if password:
-        user.set_password(raw_password = password)
-      else:
-        user.set_unusable_password()
+      user.set_unusable_password()
       user.full_clean()
       user.save()

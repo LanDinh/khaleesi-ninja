@@ -1,18 +1,17 @@
 """The tests for the signals full cleaning all models."""
 
+# pylint: disable=line-too-long
+
 # Python.
 from unittest.mock import MagicMock
 
 # Django.
 from django.apps import apps
-from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
 
 # khaleesi.ninja.
 from common.signals.full_clean_all_models import full_clean_all_models
 from test_util.test import SimpleTestCase, TestCase
-
-# pylint: disable=line-too-long
 
 
 class FullCleanAllModelsUnitTests(SimpleTestCase):
@@ -44,16 +43,4 @@ class FullCleanAllModelsIntegrationTests(TestCase):
       with self.subTest(sender = sender):
         with self.assertRaises(ValidationError):
           # If full_clean gets called, validation is applied.
-          if hasattr(sender.objects, 'get_queryset'):
-            sender.objects.get_queryset().create()
-          else:
-            sender.objects.get_queryset().create()
-
-  def test_no_default_permissions(self) -> None :
-    """Test if default permissions are prevented from being created."""
-    for permission in Permission.objects.all():
-      with self.subTest(permission = permission):
-        for code in ['add', 'change', 'delete', 'view']:
-          self.assertNotRegex(permission.codename, f'{code}_[a-zA-Z]*')
-          self.assertNotRegex(permission.name, f'Can {code} [a-zA-Z]*')
-        self.assertEqual(permission.codename, permission.name)
+          sender.objects.get_queryset().create()

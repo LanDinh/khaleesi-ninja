@@ -21,7 +21,7 @@ from test_util.test import SimpleTestCase, TestCase
 class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
   """The unit tests for the signals assigning roles."""
 
-  @patch.object(RoleAssignment.objects, 'create')
+  @patch.object(RoleAssignment.objects, 'get_or_create')
   @patch.object(Role.objects, 'authenticated', return_value = ['test'])
   def test_assign_roles_when_creating_user(self, _: MagicMock, create: MagicMock) -> None :
     """Test if roles get assigned upon user save."""
@@ -34,7 +34,7 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
         create.assert_called_once_with(user = user, role = 'test')
         create.reset_mock()
 
-  @patch.object(RoleAssignment.objects, 'create')
+  @patch.object(RoleAssignment.objects, 'get_or_create')
   @patch.object(Role.objects, 'authenticated', return_value = ['test'])
   def test_assign_roles_when_creating_anonymous_user(
       self,
@@ -51,7 +51,7 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
         assign_roles_when_creating_user(instance = user, created = True)
         create.assert_not_called()
 
-  @patch.object(RoleAssignment.objects, 'create')
+  @patch.object(RoleAssignment.objects, 'get_or_create')
   @patch.object(Role.objects, 'authenticated', return_value = ['test'])
   def test_assign_roles_when_not_creating_user(self, _: MagicMock, create: MagicMock) -> None :
     """Test if roles get assigned upon user save."""
@@ -63,7 +63,7 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
         assign_roles_when_creating_user(instance = user, created = False)
         create  .assert_not_called()
 
-  @patch.object(RoleAssignment.objects, 'create')
+  @patch.object(RoleAssignment.objects, 'get_or_create')
   @patch.object(User.objects, 'without_role_assignment', return_value = ['test'])
   def test_assign_roles_when_saving_authenticated_role(
       self,

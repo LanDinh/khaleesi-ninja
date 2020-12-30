@@ -39,12 +39,12 @@ class FeatureAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegrat
     """Test role assignment creation."""
     for service in ServiceType:
       for role_name in ['', 'test']:
-        with self.subTest(service = service):
+        with self.subTest(service = service, role_name = role_name):
           # Prepare data.
           feature_name = 'test'
           Role.migrations.create(service = service, name = role_name)
           role: Role = Role.objects.get(service = service, name = role_name)
-          Feature.objects.create(service = service, name = feature_name)
+          Feature.objects.get_or_create(service = service, name = feature_name)
           feature: Feature = Feature.objects.get(service = service, name = feature_name)
           # Perform test.
           FeatureAssignment.objects.create(role = role, feature = feature)

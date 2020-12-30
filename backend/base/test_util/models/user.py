@@ -7,7 +7,7 @@ import itertools
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import timedelta, datetime
-from typing import List, Tuple, Callable, Optional, cast
+from typing import List, Tuple, Callable, cast
 from unittest.mock import MagicMock
 
 # Django.
@@ -22,10 +22,6 @@ from settings.settings import UserNames
 class CreateParameters:
   """Parameters that need to be known at creation time."""
   username: str = 'username'
-  password: Optional[str] = 'password'
-  wrong_username: str = 'wrong_username'
-  wrong_password: str = 'wrong password'
-  oauth: bool = False
 
 @dataclass
 class LockParameters:
@@ -47,7 +43,6 @@ class TestUserBaseMixin:
   """Test utils for the User model."""
 
   # Possible raw parameter values.
-  _params_oauth = [True, False]
   _params_alias = [True, False]
   _params_deleted = [True, False]
   _params_admin_lock = [True, False]
@@ -76,26 +71,21 @@ class TestUserBaseMixin:
     """Return parameter combinations for iteration in tests."""
     return [
         Parameters(
-            creates = CreateParameters(
-                oauth = oauth,
-                password = None if oauth else 'password',
-            ),
+            creates = CreateParameters(),
             locks = LockParameters(
                 alias = alias,
                 deleted = deleted,
                 admin_locked = admin_locked,
                 system_locked = system_locked,
             ),
-        ) for oauth, alias, deleted, admin_locked, system_locked
+        ) for alias, deleted, admin_locked, system_locked
         in itertools.product(
-            self._params_oauth,
             self._params_alias,
             self._params_deleted,
             self._params_admin_lock,
             self._params_system_lock,
         )
         if filter_function(
-            oauth = oauth,
             alias = alias,
             deleted = deleted,
             admin_lock = admin_locked,
@@ -124,7 +114,6 @@ class TestUserBaseMixin:
     """Assert that all User attributes are correct."""
     # Assert the common attributes of that user.
     self.assertEqual(expected_user.username, user.username)  # type: ignore[attr-defined]
-    self.assertEqual(expected_user.password, user.password)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_authenticated, user.is_authenticated)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_active, user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.date_joined, user.date_joined)  # type: ignore[attr-defined]
@@ -152,10 +141,7 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
 
   def create_user(self, *, params: Parameters) -> Tuple[User, User] :
     """Create a test user according to requirements."""
-    user: User = User.objects.create(
-        username = params.creates.username,
-        password = params.creates.password,
-    )
+    user: User = User.objects.create(username = params.creates.username)
     user = self._add_properties_to_user(user = user, params = params.locks)
     user.save()
     return user, deepcopy(user)
@@ -214,26 +200,22 @@ class TestUserUnitMixin(TestUserBaseMixin):
 
   def create_user(self, *, params: Parameters) -> Tuple[User, User] :
     """Create a unit test user according to requirements, mock super methods."""
-    user = User(
-        username = params.creates.username,
-        password = params.creates.password,  # type: ignore[misc]
-    )
+    user = User(username = params.creates.username)
     user = self._attach_common_properties(user = user, params = params)
     return user, deepcopy(user)
 
   def create_anonymous_user(self) -> Tuple[User, User] :
     """Create a unit user according to requirements, mock super methods."""
-    user, _ = self.create_user(params = Parameters(creates = CreateParameters(
-        username = UserNames.anonymous()
-    )))
-    user.password = None  # type: ignore[assignment]
+    params = Parameters()
+    params.creates.username = UserNames.anonymous()
+    user, _ = self.create_user(params = params)
     return user, deepcopy(user)
 
   def create_superuser(self) -> Tuple[User, User] :
     """Create a superuser according to requirements, mock super methods."""
-    user, _ = self.create_user(params = Parameters(creates = CreateParameters(
-        username = UserNames.superuser(), password = UserNames.initial_superuser_password()
-    )))
+    params = Parameters()
+    params.creates.username = UserNames.superuser()
+    user, _ = self.create_user(params = params)
     return user, deepcopy(user)
 
 
@@ -241,7 +223,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
     """Create a test user according to requirements, mock super methods."""
     mock = MagicMock()
     mock.username = params.creates.username
-    mock.password = params.creates.password
     mock = cast(MagicMock, self._attach_common_properties(user = cast(User, mock), params = params))
     return self._attach_mocks_to_user(mock = mock, params = params)
 
@@ -268,11 +249,8 @@ class TestUserUnitMixin(TestUserBaseMixin):
     user = self._add_properties_to_user(user = user, params = params.locks)
     user.save = MagicMock()  # type: ignore[assignment]
     user.full_clean = MagicMock()  # type: ignore[assignment]
-    user.set_password = MagicMock()  # type: ignore[assignment]
     user.set_unusable_password = MagicMock()  # type: ignore[assignment]
-    user.has_usable_password = MagicMock(  # type: ignore[assignment]
-        return_value = not params.creates.oauth,
-    )
+    user.has_usable_password = MagicMock(return_value = False)  # type: ignore[assignment]
     return user
 
   @staticmethod
@@ -293,7 +271,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
             and not params.locks.system_locked,
     )
     mock.is_alias = MagicMock(return_value = params.locks.alias)
-    mock.is_oauth_only = MagicMock(return_value = params.creates.oauth)
     mock.is_deleted = MagicMock(return_value = params.locks.deleted)
     mock.is_admin_locked = MagicMock(return_value = params.locks.admin_locked)
     mock.is_system_locked = MagicMock(return_value = params.locks.system_locked)

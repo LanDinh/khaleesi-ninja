@@ -23,13 +23,13 @@ class RoleAssignmentDefaultManagerUnitTests(SimpleTestCase, TestUserUnitMixin):
       for service in ServiceType:
         with self.subTest(service = service, **asdict(user_params)):
           # Prepare data.
-          base_queryset.return_value.create = MagicMock()
+          base_queryset.return_value.get_or_create = MagicMock()
           user, _ = self.create_user(params = user_params)
           role = Role(service = service.name)
           # Perform test.
-          RoleAssignment.objects.create(user = user, role = role)
+          RoleAssignment.objects.get_or_create(user = user, role = role)
           # Assert result.
-          base_queryset.return_value.create.assert_called_once_with(user = user, role = role)
+          base_queryset.return_value.get_or_create.assert_called_once_with(user = user, role = role)
 
 
 # noinspection PyUnresolvedReferences
@@ -47,7 +47,7 @@ class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegration
             Role.migrations.create(service = service, name = role_name)
             role: Role = Role.objects.get(service = service, name = role_name)
             # Perform test.
-            RoleAssignment.objects.create(user = user, role = role)
+            RoleAssignment.objects.get_or_create(user = user, role = role)
             # Assert result.
             result: RoleAssignment = user.roleassignment_set.get(
                 role__service = service.name,

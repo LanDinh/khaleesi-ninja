@@ -1,7 +1,7 @@
 """Default Manager."""
 
 # Python.
-from typing import cast, Optional, List
+from typing import cast, List
 
 # khaleesi.ninja.
 from common.models.role.model import Role
@@ -22,13 +22,10 @@ class DefaultManager(Manager):
         self.get_queryset().exclude(roles = role).exclude(username = UserNames.anonymous()),
     )
 
-  def create(self, *, username: str, password: Optional[str] = None) -> T :
+  def create(self, *, username: str) -> T :
     """Create a new user."""
     user = self.model(username = self.model.normalize_username(username))
-    if password is None:
-      user.set_unusable_password()
-    else:
-      user.set_password(raw_password = password)
+    user.set_unusable_password()
     user.full_clean()
     user.save()
     return cast(T, user)

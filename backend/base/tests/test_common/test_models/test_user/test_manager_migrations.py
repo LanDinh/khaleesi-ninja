@@ -31,12 +31,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Perform test.
     User.migrations.create_anonymous_user()
     # Assert result.
-    mock.assert_has_calls([
-        call.set_unusable_password(),
-        call.full_clean(),
-        call.save(),
-    ])
-    mock.set_password.assert_not_called()
+    self.assert_mocks(mock = mock)
 
   @patch.object(User.migrations, 'get_queryset')
   def test_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
@@ -75,12 +70,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     # Perform test.
     User.migrations.create_superuser()
     # Assert result.
-    mock.assert_has_calls([
-        call.set_password(raw_password = UserNames.initial_superuser_password()),
-        call.full_clean(),
-        call.save(),
-    ])
-    mock.set_unusable_password.assert_not_called()
+    self.assert_mocks(mock = mock)
 
   @patch.object(User.migrations, 'get_queryset')
   def test_create_superuser_fetching(self, queryset: MagicMock) -> None :
@@ -107,11 +97,19 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   def setup_mocks(*, user: User) -> MagicMock :
     """Correctly prepare the mocks for mock assertion."""
     mock = MagicMock()
-    mock.set_password = user.set_password
     mock.set_unusable_password = user.set_unusable_password
     mock.full_clean = user.full_clean
     mock.save = user.save
     return mock
+
+  @staticmethod
+  def assert_mocks(*, mock: MagicMock) -> None :
+    """Correctly assert mock behavior."""
+    mock.assert_has_calls([
+        call.set_unusable_password(),
+        call.full_clean(),
+        call.save(),
+    ])
 
 
 # noinspection PyMethodMayBeStatic

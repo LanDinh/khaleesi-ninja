@@ -28,35 +28,17 @@ class FeatureDefaultManagerUnitTests(SimpleTestCase):
         get.assert_called_once_with(service = service.name, name = name)
         get.reset_mock()
 
-  @patch.object(Manager, 'get')
   @patch.object(Manager, 'get_queryset', return_value = MagicMock())
-  def test_create_exists(self, base_queryset: MagicMock, get: MagicMock) -> None :  # pylint: disable=no-self-use
+  def test_create(self, base_queryset: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test if single object creation works."""
     for service in ServiceType:
       with self.subTest(service = service):
         # Prepare data.
         name = 'test'
         # Perform test.
-        Feature.objects.create(service = service, name = name)
+        Feature.objects.get_or_create(service = service, name = name)
         # Assert result.
-        get.assert_called_once_with(service = service.name, name = name)
-        base_queryset.assert_not_called()
-        get.reset_mock()
-
-  @patch.object(Manager, 'get', side_effect = ZeroTupletException())
-  @patch.object(Manager, 'get_queryset', return_value = MagicMock())
-  def test_create_create(self, base_queryset: MagicMock, get: MagicMock) -> None :  # pylint: disable=no-self-use
-    """Test if single object creation works."""
-    for service in ServiceType:
-      with self.subTest(service = service):
-        # Prepare data.
-        name = 'test'
-        # Perform test.
-        Feature.objects.create(service = service, name = name)
-        # Assert result.
-        get.assert_called_once_with(service = service.name, name = name)
-        base_queryset.return_value.create.assert_called_once_with(service = service.name, name = name)
-        get.reset_mock()
+        base_queryset.return_value.get_or_create.assert_called_once_with(service = service.name, name = name)
         base_queryset.reset_mock()
 
 
@@ -77,7 +59,7 @@ class FeatureDefaultManagerIntegrationTests(TestCase):
       with self.subTest(service = service):
         # Prepare data.
         name = 'test'
-        Feature.objects.create(service = service, name = name)
+        Feature.objects.get_or_create(service = service, name = name)
         # Perform test.
         result: Feature = Feature.objects.get(service = service, name = name)
         # Assert result.
@@ -91,7 +73,7 @@ class FeatureDefaultManagerIntegrationTests(TestCase):
         # Prepare data.
         name = 'test'
         # Perform test.
-        Feature.objects.create(service = service, name = name)
+        Feature.objects.get_or_create(service = service, name = name)
         # Assert result.
         result: Feature = Feature.objects.get(service = service, name = name)
         self.assertEqual(result.service, service.name)
