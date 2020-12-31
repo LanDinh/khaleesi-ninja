@@ -1,12 +1,17 @@
 """The tests for the custom User."""
 
+# pylint: disable=line-too-long
+
 # Python.
 from dataclasses import asdict
 from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
-from common.models import User
+from common.models import User, Role, Feature, FeatureAssignment, RoleAssignment
+from common.models.feature_assignment.feature_assignment_state import \
+  FeatureAssignmentState
+from common.service_type import ServiceType
 from settings.settings import UserNames, Settings
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 from test_util.test import SimpleTestCase, TestCase
@@ -74,3 +79,59 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
     self.assertFalse(user.is_deleted())
     self.assertFalse(user.is_admin_locked())
     self.assertFalse(user.is_system_locked())
+
+  def test_has_permission(self) -> None :
+    """Test if permission handling works correctly."""
+    for params in self.params():
+      # Create user.
+      user, _ = self.create_user(params = params)
+      for service in ServiceType:
+        # Prepare common data.
+        modes = ['not', 'regular', 'beta']
+        roles = []
+        for mode in modes:
+          roles.append(self.setup_role_and_features(service = service, name = mode))
+        RoleAssignment.objects.get_or_create(user = user, role = roles[1])
+        ass: RoleAssignment = RoleAssignment.objects.get(user = user, role = roles[2])
+        ass.beta = True
+        ass.save()
+        for mode, state, expected in [
+            (modes[0], FeatureAssignmentState.ALPHA, False),
+            (modes[0], FeatureAssignmentState.BETA, False),
+            (modes[0], FeatureAssignmentState.RELEASED, False),
+            (modes[1], FeatureAssignmentState.ALPHA, True),
+            (modes[1], FeatureAssignmentState.BETA, False),
+            (modes[1], FeatureAssignmentState.RELEASED, True),
+            (modes[2], FeatureAssignmentState.ALPHA, True),
+            (modes[2], FeatureAssignmentState.BETA, True),
+            (modes[2], FeatureAssignmentState.RELEASED, True),
+        ]:
+          with self.subTest(mode = mode, feature = state, service = service, user = params):
+            # Perform test.
+            result = user.has_permission(service = service, name = f'{mode}_{state.name}')
+            # Assert result.
+            self.assertEqual(expected, result)
+        # Cleanup common data.
+        for role in roles:
+          self.cleanup_role_and_features(role = role)
+      # Cleanup common data.
+      user.delete()
+
+  @staticmethod
+  def setup_role_and_features(*, service: ServiceType, name: str) -> Role :
+    """Setup the roles and features for the permission test."""
+    Role.migrations.create(service = service, name = name)
+    role: Role = Role.objects.get(service = service.name, name = name)
+    for state in FeatureAssignmentState:
+      feature: Feature = Feature.objects.get_or_create(service = service, name = f'{name}_{state.name}')
+      FeatureAssignment.objects.create(role = role, feature = feature)
+      ass: FeatureAssignment = FeatureAssignment.objects.get(role = role, feature = feature)
+      ass.state = state.name
+      ass.save()
+    return role
+
+  @staticmethod
+  def cleanup_role_and_features(*, role: Role) -> None:
+    """Delete the role including all associated features."""
+    Feature.objects.get_queryset().filter(roles = role).delete()
+    role.delete()

@@ -12,10 +12,15 @@ from django.db import models
 from django.utils import timezone
 
 # khaleesi.ninja.
+from common.models.feature.model import Feature
+from common.models.feature_assignment.model import FeatureAssignment
+from common.models.feature_assignment.feature_assignment_state import \
+  FeatureAssignmentState
 from common.models.role.model import Role
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
 from common.models.model import Model
+from common.service_type import ServiceType
 from settings.settings import Settings, UserNames
 
 class User(Model, AbstractBaseUser):
@@ -88,3 +93,19 @@ class User(Model, AbstractBaseUser):
     """Return the system lock state of the User."""
     system_lock_time = Settings.system_lock_time()
     return timezone.now() < self.system_locked + system_lock_time
+
+  def has_permission(self, service: ServiceType, name: str) -> bool :
+    """Check if a user has access to a certain feature."""
+    feature: Feature = Feature.objects.get_or_create(service = service, name = name)
+    role_assignments = self.roleassignment_set.get_queryset().filter(  # pylint: disable=no-member
+        role__featureassignment__feature = feature
+    )
+    for role in role_assignments:
+      feature_assignment: FeatureAssignment = role.role.featureassignment_set.get(feature = feature)
+      if feature_assignment.state == FeatureAssignmentState.ALPHA.name:
+        return True
+      if feature_assignment.state == FeatureAssignmentState.BETA.name and role.beta:
+        return True
+      if feature_assignment.state == FeatureAssignmentState.RELEASED.name:
+        return True
+    return False
