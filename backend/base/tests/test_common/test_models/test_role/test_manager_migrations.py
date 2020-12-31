@@ -38,11 +38,11 @@ class RoleMigrationManagerIntegrationTests(TestCase):
     for service in ServiceType:
       with self.subTest(service = service):
         # Prepare data.
-        Role.objects.get(service = service)
+        Role.objects.get(service = service.name)
         # Perform test.
         Role.migrations.create(service = service)
         # Assert result.
-        Role.objects.get(service = service)
+        Role.objects.get(service = service.name)
 
   def test_create_new(self) -> None :
     """Test role creation."""
@@ -51,9 +51,9 @@ class RoleMigrationManagerIntegrationTests(TestCase):
         # Prepare data.
         name = 'test'
         with self.assertRaises(ZeroTupletException):
-          Role.objects.get(service = service, name = name)
+          Role.objects.get(service = service.name, name = name)
         # Perform test.
         Role.migrations.create(service = service, name = name)
         # Assert result.
-        role: Role = Role.objects.get(service = service, name = name)
+        role: Role = Role.objects.get(service = service.name, name = name)
         self.assertFalse(role.authenticated)

@@ -24,16 +24,6 @@ from test_util.models.user import (
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom UserManager."""
 
-  @patch.object(Manager, 'get')
-  def test_get(self, get: MagicMock) -> None :  # pylint: disable=no-self-use
-    """Test if gets behaves correctly."""
-    # Prepare data.
-    username = 'first of her name'
-    # Perform test.
-    User.objects.get(username = username)
-    # Assert result.
-    get.assert_called_once_with(username = username)
-
   @patch.object(Manager, 'get_queryset')
   def test_without_role_assignment(self, base_queryset: MagicMock) -> None :
     """Test if the users that are not assigned to a role get fetched correctly."""
@@ -77,11 +67,6 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     with self.assertRaises(ZeroTupletException):
       User.objects.get(username = 'first of her name')
 
-  def test_get(self) -> None :  # pylint: disable=no-self-use
-    """Test if gets behaves correctly."""
-    # Perform test.
-    User.objects.get(username = UserNames.superuser())
-
   def test_without_role_assignment(self) -> None :
     """Test if the users that are not assigned to a role get fetched correctly."""
     user_name1 = 'user1'
@@ -96,7 +81,7 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
           user1, _ = self.create_user(params = params1)
           user2, _ = self.create_user(params = params2)
           Role.migrations.create(service = service, name = role_name)
-          role: Role = Role.objects.get(service = service, name = role_name)
+          role: Role = Role.objects.get(service = service.name, name = role_name)
           with self.subTest(case = '0 users', service = service, user1 = params1, user2 = params2):
             # Perform test.
             result_no_user: List[User] = User.objects.without_role_assignment(role = role)

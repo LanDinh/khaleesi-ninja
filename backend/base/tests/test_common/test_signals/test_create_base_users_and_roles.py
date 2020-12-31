@@ -87,4 +87,4 @@ class PostMigrateIntegrationTests(TestCase):
     User.objects.get(username = UserNames.anonymous())
     User.objects.get(username = UserNames.superuser())
     for service in ServiceType:
-      Role.objects.get(service = service)
+      Role.objects.get(service = service.name)

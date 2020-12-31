@@ -12,10 +12,6 @@ from settings.settings import UserNames
 class DefaultManager(Manager):
   """Default Manager."""
 
-  def get(self, *, username: str) -> T :
-    """Get a single user by name."""
-    return cast(T, super().get(username = username))
-
   def without_role_assignment(self, *, role: Role) -> List[T] :
     """Get all users without this role."""
     return list(

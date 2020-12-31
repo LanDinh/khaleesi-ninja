@@ -43,9 +43,9 @@ class FeatureAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegrat
           # Prepare data.
           feature_name = 'test'
           Role.migrations.create(service = service, name = role_name)
-          role: Role = Role.objects.get(service = service, name = role_name)
+          role: Role = Role.objects.get(service = service.name, name = role_name)
           Feature.objects.get_or_create(service = service, name = feature_name)
-          feature: Feature = Feature.objects.get(service = service, name = feature_name)
+          feature: Feature = Feature.objects.get(service = service.name, name = feature_name)
           # Perform test.
           FeatureAssignment.objects.create(role = role, feature = feature)
           # Assert result.

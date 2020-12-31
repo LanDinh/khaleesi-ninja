@@ -15,22 +15,10 @@ from test_util.test import SimpleTestCase, TestCase
 class FeatureDefaultManagerUnitTests(SimpleTestCase):
   """The unit tests for the custom role DefaultManager."""
 
-  @patch.object(Manager, 'get', return_value = MagicMock())
-  def test_get(self, get: MagicMock) -> None :  # pylint: disable=no-self-use
-    """Test if single object fetching works."""
-    for service in ServiceType:
-      with self.subTest(service = service):
-        # Prepare data.
-        name = 'test'
-        # Perform test.
-        Feature.objects.get(service = service, name = name)
-        # Assert result.
-        get.assert_called_once_with(service = service.name, name = name)
-        get.reset_mock()
-
   @patch.object(Manager, 'get_queryset', return_value = MagicMock())
   def test_create(self, base_queryset: MagicMock) -> None :  # pylint: disable=no-self-use
     """Test if single object creation works."""
+    base_queryset.return_value.get_or_create.return_value = (MagicMock(), True)
     for service in ServiceType:
       with self.subTest(service = service):
         # Prepare data.
@@ -51,20 +39,7 @@ class FeatureDefaultManagerIntegrationTests(TestCase):
       with self.subTest(service = service):
         # Perform test.
         with self.assertRaises(ZeroTupletException):
-          Feature.objects.get(service = service, name = 'The cake is a lie!')
-
-  def test_get(self) -> None :
-    """Test if single object fetching works."""
-    for service in ServiceType:
-      with self.subTest(service = service):
-        # Prepare data.
-        name = 'test'
-        Feature.objects.get_or_create(service = service, name = name)
-        # Perform test.
-        result: Feature = Feature.objects.get(service = service, name = name)
-        # Assert result.
-        self.assertEqual(result.service, service.name)
-        self.assertEqual(result.name, name)
+          Feature.objects.get(service = service.name, name = 'The cake is a lie!')
 
   def test_create(self) -> None :
     """Test if single object fetching works."""
@@ -75,6 +50,6 @@ class FeatureDefaultManagerIntegrationTests(TestCase):
         # Perform test.
         Feature.objects.get_or_create(service = service, name = name)
         # Assert result.
-        result: Feature = Feature.objects.get(service = service, name = name)
+        result: Feature = Feature.objects.get(service = service.name, name = name)
         self.assertEqual(result.service, service.name)
         self.assertEqual(result.name, name)
