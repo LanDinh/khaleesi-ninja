@@ -92,7 +92,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
         for mode in modes:
           roles.append(self.setup_role_and_features(service = service, name = mode))
         RoleAssignment.objects.get_or_create(user = user, role = roles[1])
-        ass: RoleAssignment = RoleAssignment.objects.get(user = user, role = roles[2])
+        ass: RoleAssignment = RoleAssignment.objects.get_or_create(user = user, role = roles[2])
         ass.beta = True
         ass.save()
         for mode, state, expected in [
