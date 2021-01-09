@@ -5,8 +5,9 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from common.models import Feature, FeatureAssignment, Manager, Role
-from common.models.auth.feature_assignment.feature_assignment_state import \
-  FeatureAssignmentState
+from common.models.auth.feature_assignment.feature_assignment_state import (
+    FeatureAssignmentState
+)
 from common.service_type import ServiceType
 from test_util.test import SimpleTestCase, TestCase
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
