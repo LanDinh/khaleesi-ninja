@@ -4,7 +4,7 @@
 from typing import cast
 
 # khaleesi.ninja.
-from common.models.role.model import Role
+from common.models.auth.role.model import Role
 from common.models.user.model import User
 from common.models.manager import Manager, T
 

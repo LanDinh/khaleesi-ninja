@@ -4,9 +4,9 @@
 from django.db import models
 
 # khaleesi.ninja.
-from common.models.role.model import Role
+from common.models.auth.role.model import Role
 from common.models.model import Model
-from common.models.role_assignment.manager_default import DefaultManager
+from common.models.auth.role_assignment.manager_default import DefaultManager
 from common.models.user.model import User
 
 

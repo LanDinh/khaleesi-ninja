@@ -12,11 +12,11 @@ from django.db import models
 from django.utils import timezone
 
 # khaleesi.ninja.
-from common.models.feature.model import Feature
-from common.models.feature_assignment.model import FeatureAssignment
-from common.models.feature_assignment.feature_assignment_state import \
+from common.models.auth.feature.model import Feature
+from common.models.auth.feature_assignment.model import FeatureAssignment
+from common.models.auth.feature_assignment.feature_assignment_state import \
   FeatureAssignmentState
-from common.models.role.model import Role
+from common.models.auth.role.model import Role
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
 from common.models.model import Model

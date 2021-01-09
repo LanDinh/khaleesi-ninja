@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
 from common.models import User, Role, Feature, FeatureAssignment, RoleAssignment
-from common.models.feature_assignment.feature_assignment_state import \
+from common.models.auth.feature_assignment.feature_assignment_state import \
   FeatureAssignmentState
 from common.service_type import ServiceType
 from settings.settings import UserNames, Settings

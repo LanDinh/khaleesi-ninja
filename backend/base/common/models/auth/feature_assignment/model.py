@@ -4,13 +4,13 @@
 from django.db import models
 
 # khaleesi.ninja.
-from common.models.feature.model import Feature
-from common.models.feature_assignment.feature_assignment_state import (
+from common.models.auth.feature.model import Feature
+from common.models.auth.feature_assignment.feature_assignment_state import (
   FeatureAssignmentState
 )
-from common.models.role.model import Role
+from common.models.auth.role.model import Role
 from common.models.model import choices, Model
-from common.models.feature_assignment.manager_default import DefaultManager
+from common.models.auth.feature_assignment.manager_default import DefaultManager
 
 
 class FeatureAssignment(Model):

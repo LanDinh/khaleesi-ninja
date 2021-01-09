@@ -4,7 +4,7 @@
 from django.db import models
 
 # khaleesi.ninja.
-from common.models.feature.manager_default import DefaultManager
+from common.models.auth.feature.manager_default import DefaultManager
 from common.models.model import choices, Model
 from common.service_type import ServiceType
 

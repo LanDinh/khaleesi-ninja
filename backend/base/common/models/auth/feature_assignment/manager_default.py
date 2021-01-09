@@ -1,8 +1,8 @@
 """Default Manager."""
 
 # khaleesi.ninja.
-from common.models.feature.model import Feature
-from common.models.role.model import Role
+from common.models.auth.feature.model import Feature
+from common.models.auth.role.model import Role
 from common.models.manager import Manager
 
 

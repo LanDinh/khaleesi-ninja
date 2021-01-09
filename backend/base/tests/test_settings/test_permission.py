@@ -10,7 +10,7 @@ from rest_framework.request import Request
 
 from common.exceptions import PermissionDeniedException, TeapotException
 from common.models import User, Role, RoleAssignment, Feature, FeatureAssignment
-from common.models.feature_assignment.feature_assignment_state import (
+from common.models.auth.feature_assignment.feature_assignment_state import (
     FeatureAssignmentState
 )
 from common.service_type import ServiceType
