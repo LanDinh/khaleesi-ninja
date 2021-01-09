@@ -5,7 +5,7 @@
 # Python.
 import itertools
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timedelta, datetime
 from typing import List, Tuple, Callable, cast
 from unittest.mock import MagicMock
@@ -34,8 +34,8 @@ class LockParameters:
 @dataclass
 class Parameters:
   """All parameters identifying a user."""
-  creates: CreateParameters = CreateParameters()
-  locks: LockParameters = LockParameters()
+  creates: CreateParameters = field(default_factory = CreateParameters)
+  locks: LockParameters = field(default_factory = LockParameters)
 
 
 # noinspection PyTypeHints,PyUnresolvedReferences,SyntaxError,PyMissingOrEmptyDocstring,DuplicatedCode
