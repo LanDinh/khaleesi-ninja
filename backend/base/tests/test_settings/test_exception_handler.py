@@ -83,6 +83,22 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
     self.assertEqual(1, rest_exception_handler.call_count)
 
+  @patch('settings.exception_handler.rest_exception_handler')
+  def test_not_found_exception_handling(
+      self,
+      rest_exception_handler: MagicMock,
+  ) -> None :
+    """Test if exception responses get built correctly."""
+    for exception_type in [Http404, NotFound]:
+      with self.subTest(exception = exception_type):
+        response = MagicMock()
+        response.status_code = status.HTTP_404_NOT_FOUND
+        rest_exception_handler.return_value = response
+        exception = exception_type()
+        result = exception_handler(exception = exception, context = {})
+        self.assertEqual(status.HTTP_404_NOT_FOUND, result.status_code)  # type: ignore[union-attr,attr-defined]
+    self.assertEqual(2, rest_exception_handler.call_count)
+
 
 # noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
 class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):

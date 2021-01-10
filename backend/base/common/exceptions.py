@@ -17,7 +17,7 @@ class KhaleesiException(Exception):
   """Base class for custom exceptions."""
 
   def __init__(self, *, code: int, data: Any) -> None :
-    super().__init__(f'{code}: {data.__str__()}')
+    super().__init__(f'{code}: {str(data)}')
     self.code = code
     self.data = data
 
