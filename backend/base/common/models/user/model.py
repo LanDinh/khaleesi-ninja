@@ -55,7 +55,7 @@ class User(Model, AbstractBaseUser):
   system_locked = models.DateTimeField(default = datetime.min)
 
   # The timestamp of when the account was created.
-  date_joined = models.DateTimeField(default = timezone.now)
+  date_joined = models.DateTimeField(auto_now_add = True)
   # The date of the last request that had this user attached.
   last_activity = models.DateTimeField(default = timezone.now)
 

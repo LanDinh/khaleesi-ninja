@@ -1,0 +1,1 @@
+"""The log related models."""
