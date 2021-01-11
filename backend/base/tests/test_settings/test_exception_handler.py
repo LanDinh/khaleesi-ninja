@@ -48,10 +48,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
           # Prepare data.
           exception = exception_type()
           # Perform test.
-          response = exception_handler(
-              exception = exception,
-              context = {},
-          )
+          response = exception_handler(exception = exception, context = {})
           # Assert result.
           self.assertEqual(exception.data, response.data)  # type: ignore[union-attr]
           self.assertEqual(exception.code, response.status_code)  # type: ignore[union-attr]
@@ -73,7 +70,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
         try:
           # Prepare data.
           exception = exception_type()
-          context = {}
+          context = {}  # type: ignore[var-annotated]
           # Perform test.
           response = exception_handler(exception = exception, context = context)
           # Assert result.
@@ -95,7 +92,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
     """Test if exception responses get built correctly."""
     # Prepare data.
     exception = PermissionDenied()
-    context = {}
+    context = {}  # type: ignore[var-annotated]
     # Perform test.
     response = exception_handler(exception = exception, context = context)
     # Assert result.
@@ -118,7 +115,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
         response.status_code = status.HTTP_404_NOT_FOUND
         rest_exception_handler.return_value = response
         exception = exception_type()
-        context = {}
+        context = {}  # type: ignore[var-annotated]
         # Perform test.
         result = exception_handler(exception = exception, context = context)
         # Assert result.
@@ -141,10 +138,7 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
           # Prepare data.
           exception = exception_type()
           # Perform test.
-          response = exception_handler(
-              exception = exception,
-              context = {},
-          )
+          response = exception_handler(exception = exception, context = {})
           # Assert result.
           self.assertEqual(exception.data, response.data)  # type: ignore[union-attr]
           self.assertEqual(exception.code, response.status_code)  # type: ignore[union-attr]
@@ -166,10 +160,7 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
           # Prepare data.
           exception = exception_type()
           # Perform test.
-          response = exception_handler(
-              exception = exception,
-              context = {},
-          )
+          response = exception_handler(exception = exception, context = {})
           # Assert result.
           self.assertIsNotNone(response)
           self.assertIsNotNone(response.data)  # type: ignore[union-attr]
