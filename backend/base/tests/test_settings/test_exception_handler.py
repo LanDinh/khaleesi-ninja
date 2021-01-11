@@ -15,8 +15,9 @@ from rest_framework.exceptions import APIException, NotFound
 from rest_framework import status
 
 # khaleesi.ninja
-from settings.exception_handler import exception_handler
 from common.exceptions import KhaleesiException, TeapotException
+from common.models import LogException
+from settings.exception_handler import exception_handler
 from test_util.test import SimpleTestCase, TestCase
 
 
@@ -38,66 +39,94 @@ class ExceptionHandlerMixin:
 class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
   """The unit tests for exception handling."""
 
-  def test_khaleesi_exception_handling(self) -> None :
+  @patch.object(LogException.objects, 'create_khaleesi')
+  def test_khaleesi_exception_handling(self, log: MagicMock) -> None :
     """Test if exception responses get built correctly."""
     for exception_type in self.get_all_exceptions(KhaleesiException):
       with self.subTest(exception = exception_type):
         try:
+          # Prepare data.
           exception = exception_type()
+          # Perform test.
           response = exception_handler(
               exception = exception,
               context = {},
           )
+          # Assert result.
           self.assertEqual(exception.data, response.data)  # type: ignore[union-attr]
           self.assertEqual(exception.code, response.status_code)  # type: ignore[union-attr]
+          log.assert_called_once_with(exception = exception)
+          log.reset_mock()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
+  @patch.object(LogException.objects, 'create_extern')
   @patch('settings.exception_handler.rest_exception_handler')
   def test_django_rest_exception_handling(
       self,
       rest_exception_handler: MagicMock,
+      log: MagicMock
   ) -> None :
     """Test if exception responses get built correctly."""
-    counter = 0
     for exception_type in self.get_all_exceptions(APIException):
       with self.subTest(exception = exception_type):
         try:
+          # Prepare data.
           exception = exception_type()
-          response = exception_handler(exception = exception, context = {})
+          context = {}
+          # Perform test.
+          response = exception_handler(exception = exception, context = context)
+          # Assert result.
           self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
+          rest_exception_handler.assert_called_once_with(exception, context)
+          rest_exception_handler.reset_mock()
+          log.assert_called_once_with(exception = exception)
+          log.reset_mock()
         except TypeError:  # Some exceptions have no empty constructor.
-          counter += 1
-    self.assertEqual(
-        len(self.get_all_exceptions(APIException)) - counter,
-        rest_exception_handler.call_count,
-    )
+          pass
 
+  @patch.object(LogException.objects, 'create_extern')
   @patch('settings.exception_handler.rest_exception_handler')
   def test_django_exception_handling(
       self,
       rest_exception_handler: MagicMock,
+      log: MagicMock
   ) -> None :
     """Test if exception responses get built correctly."""
-    response = exception_handler(exception = PermissionDenied(), context = {})
+    # Prepare data.
+    exception = PermissionDenied()
+    context = {}
+    # Perform test.
+    response = exception_handler(exception = exception, context = context)
+    # Assert result.
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
-    self.assertEqual(1, rest_exception_handler.call_count)
+    rest_exception_handler.assert_called_once_with(exception, context)
+    log.assert_called_once_with(exception = exception)
 
+  @patch.object(LogException.objects, 'create_extern')
   @patch('settings.exception_handler.rest_exception_handler')
   def test_not_found_exception_handling(
       self,
       rest_exception_handler: MagicMock,
+      log: MagicMock
   ) -> None :
     """Test if exception responses get built correctly."""
     for exception_type in [Http404, NotFound]:
       with self.subTest(exception = exception_type):
+        # Prepare data.
         response = MagicMock()
         response.status_code = status.HTTP_404_NOT_FOUND
         rest_exception_handler.return_value = response
         exception = exception_type()
-        result = exception_handler(exception = exception, context = {})
+        context = {}
+        # Perform test.
+        result = exception_handler(exception = exception, context = context)
+        # Assert result.
         self.assertEqual(status.HTTP_404_NOT_FOUND, result.status_code)  # type: ignore[union-attr,attr-defined]
-    self.assertEqual(2, rest_exception_handler.call_count)
+        rest_exception_handler.assert_called_once_with(exception, context)
+        rest_exception_handler.reset_mock()
+        log.assert_called_once_with(exception = exception)
+        log.reset_mock()
 
 
 # noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
@@ -109,17 +138,23 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
     for exception_type in self.get_all_exceptions(KhaleesiException):
       with self.subTest(exception = exception_type):
         try:
+          # Prepare data.
           exception = exception_type()
+          # Perform test.
           response = exception_handler(
               exception = exception,
               context = {},
           )
+          # Assert result.
           self.assertEqual(exception.data, response.data)  # type: ignore[union-attr]
           self.assertEqual(exception.code, response.status_code)  # type: ignore[union-attr]
           if isinstance(exception, TeapotException):
             self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code) # type: ignore[attr-defined,union-attr]
           else:
             self.assertNotEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code) # type: ignore[attr-defined,union-attr]
+          log = LogException.objects.get(exception = exception.__class__.__name__)
+          self.assertEqual(exception.code, log.http_code)
+          log.delete()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
@@ -128,30 +163,49 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestCase):
     for exception_type in self.get_all_exceptions(APIException):
       with self.subTest(exception = exception_type):
         try:
+          # Prepare data.
           exception = exception_type()
+          # Perform test.
           response = exception_handler(
               exception = exception,
               context = {},
           )
+          # Assert result.
           self.assertIsNotNone(response)
           self.assertIsNotNone(response.data)  # type: ignore[union-attr]
           self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
+          log = LogException.objects.get(exception = exception.__class__.__name__)
+          self.assertIsNone(log.http_code)
+          log.delete()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
   def test_django_exception_handling(self) -> None :
     """Test if exception responses get built correctly."""
-    response = exception_handler(exception = PermissionDenied(), context = {})
+    # Prepare data.
+    exception = PermissionDenied()
+    # Perform test.
+    response = exception_handler(exception = exception, context = {})
+    # Assert result.
     self.assertIsNotNone(response)
     self.assertIsNotNone(response.data)  # type: ignore[union-attr]
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
+    log = LogException.objects.get(exception = exception.__class__.__name__)
+    self.assertIsNone(log.http_code)
+    log.delete()
 
   def test_not_found_exception_handling(self) -> None :
     """Test if built-in 404s are handled correctly."""
     for exception_type in [Http404, NotFound]:
       with self.subTest(exception = exception_type):
+        # Prepare data.
         exception = exception_type()
+        # Perform test.
         response = exception_handler(exception = exception, context = {})
+        # Assert result.
         self.assertIsNotNone(response)
         self.assertIsNotNone(response.data)  # type: ignore[union-attr]
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)  # type: ignore[union-attr,attr-defined]
+        log = LogException.objects.get(exception = exception.__class__.__name__)
+        self.assertIsNone(log.http_code)
+        log.delete()

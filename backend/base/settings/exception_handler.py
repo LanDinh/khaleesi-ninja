@@ -12,6 +12,7 @@ from rest_framework.views import exception_handler as rest_exception_handler
 
 # khaleesi.ninja.
 from common.exceptions import KhaleesiException
+from common.models import LogException
 
 
 def exception_handler(
@@ -20,9 +21,14 @@ def exception_handler(
 ) -> Optional[Response] :
   """Handle custom exceptions."""
   if isinstance(exception, KhaleesiException):
+    LogException.objects.create_khaleesi(exception = exception)
     return Response(data = exception.data, status = exception.code)
+
+  LogException.objects.create_extern(exception = exception)
   response = rest_exception_handler(exception, context)
+
   if not response or response.status_code == status.HTTP_404_NOT_FOUND:
     return response
+
   response.status_code = status.HTTP_418_IM_A_TEAPOT  # type: ignore[attr-defined]
   return response
