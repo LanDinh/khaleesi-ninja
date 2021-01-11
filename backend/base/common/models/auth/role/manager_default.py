@@ -7,7 +7,7 @@ from typing import List
 from common.models.manager import Manager, T
 
 
-class DefaultManager(Manager):
+class DefaultManager(Manager[T]):
   """Default Manager."""
 
   def authenticated(self) -> List[T] :

@@ -1,16 +1,19 @@
 """Manager specific for migrations."""
 
+# pylint: disable=line-too-long
+
 # Python.
 from typing import Optional
 
 # khaleesi.ninja.
-from common.models.manager import Manager
+from common.models.manager import Manager, T
 from common.service_type import ServiceType
 
 
-class MigrationManager(Manager):
+# noinspection PyTypeHints,SyntaxError
+class MigrationManager(Manager[T]):
   """Provide the creation methods necessary for migrations."""
 
-  def create(self, *, service: ServiceType, name: Optional[str] = '') -> None:
+  def create(self, *, service: ServiceType, name: Optional[str] = '') -> None:  # type: ignore[override]
     """Create a role."""
     self.get_queryset().update_or_create(service = service.name, name = name)

@@ -109,7 +109,6 @@ class TestUserBaseMixin:
       expected_user: User,
       user: User,
       new_system_lock: bool = False,
-      new_activity: bool = False,
   ) -> None :
     """Assert that all User attributes are correct."""
     # Assert the common attributes of that user.
@@ -117,10 +116,6 @@ class TestUserBaseMixin:
     self.assertEqual(expected_user.is_authenticated, user.is_authenticated)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.is_active, user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(expected_user.date_joined, user.date_joined)  # type: ignore[attr-defined]
-    if new_activity:
-      self.assertNotEqual(expected_user.last_activity, user.last_activity)  # type: ignore[attr-defined]
-    else:
-      self.assertEqual(expected_user.last_activity, user.last_activity)  # type: ignore[attr-defined]
     # Assert the locked state attributes.
     if expected_user.original:
       self.assertEqual(expected_user.original.username, user.original.username)  # type: ignore[attr-defined,union-attr]
@@ -141,7 +136,7 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
 
   def create_user(self, *, params: Parameters) -> Tuple[User, User] :
     """Create a test user according to requirements."""
-    user: User = User.objects.create(username = params.creates.username)
+    user = User.objects.create(username = params.creates.username)
     user = self._add_properties_to_user(user = user, params = params.locks)
     user.save()
     return user, deepcopy(user)
@@ -150,15 +145,13 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
       self, *,
       expected_user: User,
       new_system_lock: bool = False,
-      new_activity: bool = False,
   ) -> None :
     """Assert User properties of the only User, then delete the User."""
-    user: User = User.objects.get(username = expected_user.username)
+    user = User.objects.get(username = expected_user.username)
     self._assert_user(
         expected_user = expected_user,
         user = user,
         new_system_lock = new_system_lock,
-        new_activity = new_activity,
     )
     # Clean the database for other sub tests.
     user.delete()
@@ -171,7 +164,6 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertFalse(user.is_authenticated)  # type: ignore[attr-defined]
     self.assertTrue(user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.date_joined)  # type: ignore[attr-defined]
-    self.assertEqual(datetime.min, user.last_activity)  # type: ignore[attr-defined]
     # Assert the locked state attributes.
     self.assertEqual(None, user.original)  # type: ignore[attr-defined]
     self.assertFalse(user.deleted)  # type: ignore[attr-defined]
@@ -186,7 +178,6 @@ class TestUserIntegrationMixin(TestUserBaseMixin):
     self.assertTrue(user.is_authenticated)  # type: ignore[attr-defined]
     self.assertTrue(user.is_active)  # type: ignore[attr-defined]
     self.assertEqual(datetime.min, user.date_joined)  # type: ignore[attr-defined]
-    self.assertEqual(datetime.min, user.last_activity)  # type: ignore[attr-defined]
     # Assert the locked state attributes.
     self.assertIsNone(user.original)  # type: ignore[attr-defined]
     self.assertFalse(user.deleted)  # type: ignore[attr-defined]
@@ -231,14 +222,12 @@ class TestUserUnitMixin(TestUserBaseMixin):
       expected_user: User,
       user: User,
       new_system_lock: bool = False,
-      new_activity: bool = False,
   ) -> None :
     """Assert that all User attributes are correct."""
     self._assert_user(
         expected_user = expected_user,
         user = user,
         new_system_lock = new_system_lock,
-        new_activity = new_activity,
     )
 
   def _attach_common_properties(
@@ -261,7 +250,6 @@ class TestUserUnitMixin(TestUserBaseMixin):
   ) -> Tuple[MagicMock, MagicMock] :
     """Create a unit test user according to requirements, mock all methods."""
     mock.date_joined = datetime.min
-    mock.last_activity = datetime.min
     mock.system_locked = datetime.min
     mock.is_authenticated = MagicMock(bool(params.creates.username))
     mock.is_active = MagicMock(

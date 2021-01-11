@@ -1,5 +1,8 @@
 """User roles for authorization."""
 
+# Python.
+from __future__ import annotations
+
 # Django.
 from django.db import models
 
@@ -19,8 +22,8 @@ class Role(Model):
   authenticated = models.BooleanField(default = False)
   features = models.ManyToManyField(Feature, through = 'FeatureAssignment', related_name = 'roles')
 
-  objects = DefaultManager()
-  migrations = MigrationManager()
+  objects: DefaultManager[Role] = DefaultManager()
+  migrations: MigrationManager[Role] = MigrationManager()
 
   class Meta:
     """Role meta attributes."""

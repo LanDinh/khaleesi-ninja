@@ -55,5 +55,5 @@ class RoleMigrationManagerIntegrationTests(TestCase):
         # Perform test.
         Role.migrations.create(service = service, name = name)
         # Assert result.
-        role: Role = Role.objects.get(service = service.name, name = name)
+        role = Role.objects.get(service = service.name, name = name)
         self.assertFalse(role.authenticated)

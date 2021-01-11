@@ -71,7 +71,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def test_is_state_anonymous(self) -> None :
     """Test the state information getters."""
     # Prepare data & perform test.
-    user: User = User.objects.get(username = UserNames.anonymous())
+    user = User.objects.get(username = UserNames.anonymous())
     # Assert result.
     self.assertFalse(user.is_authenticated)
     self.assertFalse(user.is_alias())
@@ -92,7 +92,7 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
         for mode in modes:
           roles.append(self.setup_role_and_features(service = service, name = mode))
         RoleAssignment.objects.get_or_create(user = user, role = roles[1])
-        ass: RoleAssignment = RoleAssignment.objects.get_or_create(user = user, role = roles[2])
+        ass = RoleAssignment.objects.get_or_create(user = user, role = roles[2])
         ass.beta = True
         ass.save()
         for mode, state, expected in [
@@ -121,11 +121,11 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
   def setup_role_and_features(*, service: ServiceType, name: str) -> Role :
     """Setup the roles and features for the permission test."""
     Role.migrations.create(service = service, name = name)
-    role: Role = Role.objects.get(service = service.name, name = name)
+    role = Role.objects.get(service = service.name, name = name)
     for state in FeatureAssignmentState:
-      feature: Feature = Feature.objects.get_or_create(service = service, name = f'{name}_{state.name}')
+      feature = Feature.objects.get_or_create(service = service, name = f'{name}_{state.name}')
       FeatureAssignment.objects.create(role = role, feature = feature)
-      ass: FeatureAssignment = FeatureAssignment.objects.get(role = role, feature = feature)
+      ass = FeatureAssignment.objects.get(role = role, feature = feature)
       ass.state = state.name
       ass.save()
     return role

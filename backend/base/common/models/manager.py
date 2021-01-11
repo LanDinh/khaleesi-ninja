@@ -3,7 +3,7 @@
 # pylint: disable=protected-access,line-too-long
 
 # Python.
-from typing import Any, Dict, TypeVar, Callable
+from typing import Any, Dict, TypeVar, Callable, TYPE_CHECKING
 
 # Django.
 from django.db import models
@@ -20,7 +20,7 @@ T = TypeVar("T", bound = models.Model, covariant=True)  # pylint: disable=invali
 
 
 # noinspection PyUnresolvedReferences,PyTypeHints,SyntaxError,PyTypeChecker,PyMissingOrEmptyDocstring
-class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
+class BaseManager(DjangoBaseManager[T]):
   """Custom base manager to restrict access."""
 
   @classmethod
@@ -54,6 +54,12 @@ class BaseManager(DjangoBaseManager):  # type: ignore[type-arg]
     return result[0]
 
 
-# noinspection PyUnresolvedReferences,PyClassHasNoInit,PyMissingOrEmptyDocstring
-class Manager(BaseManager.from_queryset(QuerySet)):  # type: ignore[misc]
+if TYPE_CHECKING:
+  # noinspection PyTypeChecker
+  Base = BaseManager[T]
+else:
+  # noinspection PyTypeChecker
+  Base = BaseManager.from_queryset(QuerySet)
+
+class Manager(Base[T]):
   """Custom manager to restrict access."""

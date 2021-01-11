@@ -43,7 +43,7 @@ class RoleDefaultManagerIntegrationTests(TestCase):
         # Prepare test.
         name = 'test'
         Role.migrations.create(service = service, name = name)
-        role: Role = Role.objects.get(service = service.name, name = name)
+        role = Role.objects.get(service = service.name, name = name)
         role.authenticated = True
         role.save()
         # Perform test.

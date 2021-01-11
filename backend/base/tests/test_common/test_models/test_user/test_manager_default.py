@@ -48,7 +48,7 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     mock.full_clean = expected_user.full_clean
     mock.save = expected_user.save
     # Perform test.
-    user: User = User.objects.create(username = params.creates.username)
+    user = User.objects.create(username = params.creates.username)
     # Assert result.
     self.assert_user(expected_user = expected_user, user = user)
     mock.assert_has_calls([
@@ -81,7 +81,7 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
           user1, _ = self.create_user(params = params1)
           user2, _ = self.create_user(params = params2)
           Role.migrations.create(service = service, name = role_name)
-          role: Role = Role.objects.get(service = service.name, name = role_name)
+          role = Role.objects.get(service = service.name, name = role_name)
           with self.subTest(case = '0 users', service = service, user1 = params1, user2 = params2):
             # Perform test.
             result_no_user: List[User] = User.objects.without_role_assignment(role = role)
@@ -162,13 +162,12 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
   def assert_single_user_created(self, *, username: str) -> None :
     """Assert user all attributes are correct, then clean up the database."""
     # Assert there is only one user.
-    user: User = User.objects.get(username = username)
+    user = User.objects.get(username = username)
     # Assert the common attributes of that user.
     self.assertEqual(username, user.username)
     self.assertTrue(user.is_authenticated)
     self.assertTrue(user.is_active)
     self.assertNotEqual(datetime.min, user.date_joined)
-    self.assertNotEqual(datetime.min, user.last_activity)
     # Assert the locked state attributes.
     self.assertEqual(None, user.original)
     self.assertFalse(user.admin_locked)

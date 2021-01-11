@@ -13,9 +13,9 @@ from django.utils import timezone
 
 # khaleesi.ninja.
 from common.models.auth.feature.model import Feature
-from common.models.auth.feature_assignment.model import FeatureAssignment
-from common.models.auth.feature_assignment.feature_assignment_state import \
-  FeatureAssignmentState
+from common.models.auth.feature_assignment.feature_assignment_state import (
+    FeatureAssignmentState
+)
 from common.models.auth.role.model import Role
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
@@ -56,8 +56,6 @@ class User(Model, AbstractBaseUser):
 
   # The timestamp of when the account was created.
   date_joined = models.DateTimeField(auto_now_add = True)
-  # The date of the last request that had this user attached.
-  last_activity = models.DateTimeField(default = timezone.now)
 
   @property
   def is_active(self) -> bool :
@@ -72,8 +70,8 @@ class User(Model, AbstractBaseUser):
 
   USERNAME_FIELD = 'username'  # pylint: disable=invalid-name
 
-  objects = DefaultManager()
-  migrations = MigrationManager()
+  objects: DefaultManager[User] = DefaultManager()
+  migrations: MigrationManager[User] = MigrationManager()
 
   def is_alias(self) -> bool :
     """Return the alias state of the User."""
@@ -96,12 +94,12 @@ class User(Model, AbstractBaseUser):
 
   def has_permission(self, service: ServiceType, name: str) -> bool :
     """Check if a user has access to a certain feature."""
-    feature: Feature = Feature.objects.get_or_create(service = service, name = name)
+    feature = Feature.objects.get_or_create(service = service, name = name)
     role_assignments = self.roleassignment_set.get_queryset().filter(  # pylint: disable=no-member
         role__featureassignment__feature = feature
     )
     for role in role_assignments:
-      feature_assignment: FeatureAssignment = role.role.featureassignment_set.get(feature = feature)
+      feature_assignment = role.role.featureassignment_set.get(feature = feature)
       if feature_assignment.state == FeatureAssignmentState.ALPHA.name:
         return True
       if feature_assignment.state == FeatureAssignmentState.BETA.name and role.beta:

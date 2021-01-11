@@ -14,7 +14,7 @@ from django.http import Http404
 from rest_framework.exceptions import APIException, NotFound
 
 # khaleesi.ninja
-from common.models.log.exception.model import LogException
+from common.models import LogException
 from common.exceptions import KhaleesiException
 from test_util.test import SimpleTestCase, TestCase
 
@@ -46,7 +46,7 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           exception = exception_type()
           log = self.setup_model()
           # Perform test.
-          LogException.objects.create(exception = exception)
+          LogException.objects.create_khaleesi(exception = exception)
           # Assert result.
           self.assertEqual(exception.code, log.http_code)
           log.save.assert_called_once_with()
@@ -63,7 +63,7 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           exception = exception_type()
           log = self.setup_model()
           # Perform test.
-          LogException.objects.create(exception = exception)
+          LogException.objects.create_extern(exception = exception)
           # Assert result.
           log.save.assert_called_once_with()
         except TypeError:  # Some exceptions have no empty constructor.
@@ -90,7 +90,7 @@ class LogExceptionDefaultManagerIntegrationTests(LogExceptionDefaultManagerMixin
           # Prepare data.
           exception = exception_type()
           # Perform test.
-          LogException.objects.create(exception = exception)
+          LogException.objects.create_khaleesi(exception = exception)
           # Assert result.
           log = LogException.objects.get()
           self.assertEqual(exception.code, log.http_code)
@@ -106,7 +106,7 @@ class LogExceptionDefaultManagerIntegrationTests(LogExceptionDefaultManagerMixin
           # Prepare data.
           exception = exception_type()
           # Perform test.
-          LogException.objects.create(exception = exception)
+          LogException.objects.create_extern(exception = exception)
           # Assert result.
           log = LogException.objects.get()
           self.assertIsNone(log.http_code)

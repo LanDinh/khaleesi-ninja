@@ -1,5 +1,8 @@
 """Exception information."""
 
+# Python.
+from __future__ import annotations
+
 # Django.
 from django.db import models
 
@@ -21,4 +24,4 @@ class LogException(Model):
   http_code = models.IntegerField(blank = True, null = True)
   data = models.TextField(blank = True)
 
-  objects = DefaultManager()
+  objects: DefaultManager[LogException] = DefaultManager()

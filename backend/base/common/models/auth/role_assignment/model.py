@@ -1,5 +1,8 @@
 """Role assignment attributes."""
 
+# Python.
+from __future__ import annotations
+
 # Django.
 from django.db import models
 
@@ -17,7 +20,7 @@ class RoleAssignment(Model):
   role = models.ForeignKey(Role, on_delete = models.CASCADE)
   beta = models.BooleanField(default = False)
 
-  objects = DefaultManager()
+  objects: DefaultManager[RoleAssignment] = DefaultManager()
 
   class Meta:
     """Role meta attributes."""

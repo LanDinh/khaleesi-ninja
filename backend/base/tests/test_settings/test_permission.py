@@ -194,9 +194,9 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
     Role.migrations.create(service = service, name = self.feature_name)
     role = Role.objects.get(service = service.name, name = self.feature_name)
     RoleAssignment.objects.get_or_create(user = user, role = role)
-    feature: Feature = Feature.objects.get_or_create(service = service, name = self.feature_name)
+    feature = Feature.objects.get_or_create(service = service, name = self.feature_name)
     FeatureAssignment.objects.create(role = role, feature = feature)
-    assignment: FeatureAssignment = FeatureAssignment.objects.get(role = role, feature = feature)
+    assignment = FeatureAssignment.objects.get(role = role, feature = feature)
     assignment.state = FeatureAssignmentState.RELEASED.name
     assignment.save()
 

@@ -1,15 +1,13 @@
 """Manager specific for migrations."""
 
-# Python.
-from datetime import datetime
-
 # khaleesi.ninja.
-from common.models.manager import Manager
+from common.models.manager import Manager, T
 from common.exceptions import ZeroTupletException
 from settings.settings import UserNames
 
 
-class MigrationManager(Manager):
+# noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
+class MigrationManager(Manager[T]):
   """Manager specific for migrations."""
 
   def create_anonymous_user(self) -> None :
@@ -21,14 +19,12 @@ class MigrationManager(Manager):
     self._create(raw_username = UserNames.superuser())
 
   def _create(self, *, raw_username: str) -> None :
-    username = self.model.normalize_username(username = raw_username)
+    username = self.model.normalize_username(username = raw_username)  # type: ignore[attr-defined]
     try:
       self.get(username = username)
     except ZeroTupletException:
       #Only if the user doesn't exist yet, create it.
       user = self.model(username = username)
-      user.date_joined = datetime.min
-      user.last_activity = datetime.min
-      user.set_unusable_password()
+      user.set_unusable_password()  # type: ignore[attr-defined]
       user.full_clean()
       user.save()

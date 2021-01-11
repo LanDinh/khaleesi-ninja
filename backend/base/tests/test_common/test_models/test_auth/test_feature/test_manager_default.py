@@ -50,6 +50,6 @@ class FeatureDefaultManagerIntegrationTests(TestCase):
         # Perform test.
         Feature.objects.get_or_create(service = service, name = name)
         # Assert result.
-        result: Feature = Feature.objects.get(service = service.name, name = name)
+        result = Feature.objects.get(service = service.name, name = name)
         self.assertEqual(result.service, service.name)
         self.assertEqual(result.name, name)

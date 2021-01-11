@@ -1,5 +1,8 @@
 """Features group views."""
 
+# Python.
+from __future__ import annotations
+
 # Django.
 from django.db import models
 
@@ -15,4 +18,4 @@ class Feature(Model):
   service = models.CharField(max_length = 50, choices = choices(ServiceType))
   name = models.CharField(max_length = 50, blank = True)
 
-  objects = DefaultManager()
+  objects: DefaultManager[Feature] = DefaultManager()

@@ -1,5 +1,8 @@
 """Role assignment attributes."""
 
+# Python.
+from __future__ import annotations
+
 # Django.
 from django.db import models
 
@@ -24,7 +27,7 @@ class FeatureAssignment(Model):
       default = FeatureAssignmentState.ALPHA.name,
   )
 
-  objects = DefaultManager()
+  objects: DefaultManager[FeatureAssignment] = DefaultManager()
 
   class Meta:
     """Role meta attributes."""

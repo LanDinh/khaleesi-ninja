@@ -1,6 +1,7 @@
 """Custom base model to configure default managers."""
 
 # Python.
+from __future__ import annotations
 from enum import EnumMeta, Enum
 from typing import List, Tuple
 
@@ -21,7 +22,7 @@ class Model(models.Model):
   """Custom base model to configure default managers."""
 
   _objects = models.Manager()
-  objects = Manager()
+  objects: Manager[Model] = Manager()
 
   class Meta:
     """Define the default manager."""

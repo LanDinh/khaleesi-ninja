@@ -15,7 +15,6 @@ from common.models import User, Role, RoleAssignment
 def assign_roles_when_creating_user(instance: User, created: bool, **_: Any) -> None :
   """Make sure that all users get assigned the authenticated roles."""
   if created and instance.is_authenticated:
-    role: Role
     for role in Role.objects.authenticated():
       RoleAssignment.objects.get_or_create(user = instance, role = role)
 
@@ -24,7 +23,6 @@ def assign_roles_when_creating_user(instance: User, created: bool, **_: Any) -> 
 def assign_roles_when_saving_role(instance: Role, **_: Any) -> None :
   """Make sure that if a role gets saved, the role assignments get adjusted."""
   if instance.authenticated:
-    user: User
     for user in User.objects.without_role_assignment(role = instance):
       RoleAssignment.objects.get_or_create(user = user, role = instance)
   else:

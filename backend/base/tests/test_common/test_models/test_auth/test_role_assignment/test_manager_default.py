@@ -46,11 +46,11 @@ class RoleAssignmentDefaultManagerIntegrationTests(TestCase, TestUserIntegration
             # Prepare data.
             user, _ = self.create_user(params = user_params)
             Role.migrations.create(service = service, name = role_name)
-            role: Role = Role.objects.get(service = service.name, name = role_name)
+            role = Role.objects.get(service = service.name, name = role_name)
             # Perform test.
             RoleAssignment.objects.get_or_create(user = user, role = role)
             # Assert result.
-            result: RoleAssignment = user.roleassignment_set.get(
+            result = user.roleassignment_set.get(
                 role__service = service.name,
                 role__name = role_name,
             )

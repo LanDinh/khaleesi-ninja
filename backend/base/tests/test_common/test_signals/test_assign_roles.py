@@ -92,7 +92,7 @@ class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):
           # Prepare data.
           name = 'test'
           Role.migrations.create(service = service, name = name)
-          role: Role = Role.objects.get(service = service.name, name = name)
+          role = Role.objects.get(service = service.name, name = name)
           role.authenticated = True
           role.save()
           # Perform test.
@@ -111,7 +111,7 @@ class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):
           name = 'test'
           user, _ = self.create_user(params = params)
           Role.migrations.create(service = service, name = name)
-          role: Role = Role.objects.get(service = service.name, name = name)
+          role = Role.objects.get(service = service.name, name = name)
           with self.assertRaises(ZeroTupletException):
             user.roles.get(service = service, name = name)
           # Perform test.
@@ -131,7 +131,7 @@ class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):
           name = 'test'
           user, _ = self.create_user(params = params)
           Role.migrations.create(service = service, name = name)
-          role: Role = Role.objects.get(service = service.name, name = name)
+          role = Role.objects.get(service = service.name, name = name)
           role.authenticated = True
           role.save()
           user.roles.get(service = service.name, name = name)
