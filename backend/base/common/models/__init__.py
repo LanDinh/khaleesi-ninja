@@ -13,3 +13,4 @@ from common.models.auth.role.model import Role as Role
 from common.models.auth.role_assignment.model import RoleAssignment as RoleAssignment
 
 from common.models.log.exception.model import LogException as LogException
+from common.models.log.request.model import LogRequest as LogRequest
