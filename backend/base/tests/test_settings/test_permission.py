@@ -9,10 +9,8 @@ from django.http import HttpRequest
 from rest_framework.request import Request
 
 from common.exceptions import PermissionDeniedException, TeapotException
-from common.models import User, Role, RoleAssignment, Feature, FeatureAssignment
-from common.models.auth.feature_assignment.feature_assignment_state import (
-    FeatureAssignmentState
-)
+from common.models import User, Role, RoleAssignment
+from common.models.auth.feature.feature_state import FeatureState
 from common.service_type import ServiceType
 from common.views import View
 from settings.permission import Permission
@@ -194,20 +192,16 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
     Role.migrations.create(service = service, name = self.feature_name)
     role = Role.objects.get(service = service.name, name = self.feature_name)
     RoleAssignment.objects.get_or_create(user = user, role = role)
-    feature = Feature.objects.get_or_create(service = service, name = self.feature_name)
-    FeatureAssignment.objects.create(role = role, feature = feature)
-    assignment = FeatureAssignment.objects.get(role = role, feature = feature)
-    assignment.state = FeatureAssignmentState.RELEASED.name
-    assignment.save()
+    feature, _ = role.features.get_or_create(service = service, name = self.feature_name)
+    feature.state = FeatureState.RELEASED.name
+    feature.save()
 
   @staticmethod
   def cleanup_user_roles(*, user: User) -> None :
     """Delete all roles and associated features."""
     for role_assignment in user.roleassignment_set.all():
       role = role_assignment.role
-      for feature_assignment in role.featureassignment_set.all():
-        feature = feature_assignment.feature
-        feature_assignment.delete()
+      for feature in role.features.all():
         feature.delete()
       role_assignment.delete()
       role.delete()

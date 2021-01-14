@@ -13,9 +13,7 @@ from django.utils import timezone
 
 # khaleesi.ninja.
 from common.models.auth.feature.model import Feature
-from common.models.auth.feature_assignment.feature_assignment_state import (
-    FeatureAssignmentState
-)
+from common.models.auth.feature.feature_state import FeatureState
 from common.models.auth.role.model import Role
 from common.models.user.manager_default import DefaultManager
 from common.models.user.manager_migrations import MigrationManager
@@ -94,16 +92,13 @@ class User(Model, AbstractBaseUser):
 
   def has_permission(self, service: ServiceType, name: str) -> bool :
     """Check if a user has access to a certain feature."""
-    feature = Feature.objects.get_or_create(service = service, name = name)
+    feature, _ = Feature.objects.get_or_create(service = service, name = name)
     role_assignments = self.roleassignment_set.get_queryset().filter(  # pylint: disable=no-member
-        role__featureassignment__feature = feature
+        role__features = feature
     )
     for role in role_assignments:
-      feature_assignment = role.role.featureassignment_set.get(feature = feature)
-      if feature_assignment.state == FeatureAssignmentState.ALPHA.name:
+      if feature.state == FeatureState.BETA.name and role.beta:
         return True
-      if feature_assignment.state == FeatureAssignmentState.BETA.name and role.beta:
-        return True
-      if feature_assignment.state == FeatureAssignmentState.RELEASED.name:
+      if feature.state == FeatureState.RELEASED.name:
         return True
     return False

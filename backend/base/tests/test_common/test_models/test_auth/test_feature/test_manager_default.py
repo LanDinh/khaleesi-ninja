@@ -8,6 +8,7 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from common.models import Manager, Feature
 from common.exceptions import ZeroTupletException
+from common.models.auth.feature.feature_state import FeatureState
 from common.service_type import ServiceType
 from test_util.test import SimpleTestCase, TestCase
 
@@ -48,8 +49,8 @@ class FeatureDefaultManagerIntegrationTests(TestCase):
         # Prepare data.
         name = 'test'
         # Perform test.
-        Feature.objects.get_or_create(service = service, name = name)
+        result, _ = Feature.objects.get_or_create(service = service, name = name)
         # Assert result.
-        result = Feature.objects.get(service = service.name, name = name)
-        self.assertEqual(result.service, service.name)
-        self.assertEqual(result.name, name)
+        self.assertEqual(service.name, result.service)
+        self.assertEqual(name, result.name)
+        self.assertEqual(FeatureState.BETA.name, result.state)

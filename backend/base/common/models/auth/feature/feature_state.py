@@ -6,8 +6,8 @@
 from enum import Enum
 
 
-class FeatureAssignmentState(Enum):
+class FeatureState(Enum):
   """The different kinds of services."""
-  ALPHA = 'alpha'  # only superadmins have access.
   BETA = 'beta'  # only beta testers have access.
   RELEASED = 'released'  # everyone has access.
+  LOCKED = 'locked'  # only superadmins have access.

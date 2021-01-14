@@ -18,10 +18,11 @@ _IGNORE_MANAGER_METHODS = [
     'get_queryset',
     'from_queryset',
     'get',
+    'iterator',
     'using',
 ]
 
-_IGNORE_QUERYSET_METHODS = ['all', 'get', 'using']
+_IGNORE_QUERYSET_METHODS = ['all', 'get', 'iterator', 'using']
 
 
 class ManagerTestCase(CombinedTestCase):

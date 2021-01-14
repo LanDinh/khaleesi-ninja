@@ -20,7 +20,7 @@ class Role(Model):
   service = models.CharField(max_length = 50, choices = choices(ServiceType))
   name = models.CharField(max_length = 50, blank = True)
   authenticated = models.BooleanField(default = False)
-  features = models.ManyToManyField(Feature, through = 'FeatureAssignment', related_name = 'roles')
+  features = models.ManyToManyField(Feature, related_name = 'roles')
 
   objects: DefaultManager[Role] = DefaultManager()
   migrations: MigrationManager[Role] = MigrationManager()

@@ -1,5 +1,8 @@
 """Default Manager."""
 
+# Python.
+from typing import Tuple
+
 # khaleesi.ninja.
 from common.models.auth.role.model import Role
 from common.models.user.model import User
@@ -10,7 +13,6 @@ from common.models.manager import Manager, T
 class DefaultManager(Manager[T]):
   """Default Manager."""
 
-  def get_or_create(self, *, user: User, role: Role) -> T:  # type: ignore[override]
+  def get_or_create(self, *, user: User, role: Role) -> Tuple[T, bool]:  # type: ignore[override]
     """Assign a role to a user."""
-    assignment, _ = self.get_queryset().get_or_create(user = user, role = role)
-    return assignment
+    return self.get_queryset().get_or_create(user = user, role = role)

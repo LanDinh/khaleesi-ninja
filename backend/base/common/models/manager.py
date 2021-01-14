@@ -14,7 +14,7 @@ from django.db.models.manager import BaseManager as DjangoBaseManager
 from common.exceptions import TwinException, ZeroTupletException
 
 
-_METHODS_FOR_COPYING = ['using', '_insert']
+_METHODS_FOR_COPYING = ['iterator', 'using', '_insert']
 
 T = TypeVar("T", bound = models.Model, covariant=True)  # pylint: disable=invalid-name
 

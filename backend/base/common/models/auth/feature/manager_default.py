@@ -1,5 +1,10 @@
 """Default Manager."""
 
+# pylint: disable=line-too-long
+
+# Python.
+from typing import Tuple
+
 # khaleesi.ninja.
 from common.models.manager import Manager, T
 from common.service_type import ServiceType
@@ -9,7 +14,6 @@ from common.service_type import ServiceType
 class DefaultManager(Manager[T]):
   """Default Manager."""
 
-  def get_or_create(self, *, service: ServiceType, name: str) -> T :  # type: ignore[override]
+  def get_or_create(self, *, service: ServiceType, name: str) -> Tuple[T, bool] :  # type: ignore[override]
     """Create a feature."""
-    feature, _ = self.get_queryset().get_or_create(service = service.name, name = name)
-    return feature
+    return self.get_queryset().get_or_create(service = service.name, name = name)

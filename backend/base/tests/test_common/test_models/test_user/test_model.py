@@ -8,9 +8,8 @@ from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
-from common.models import User, Role, Feature, FeatureAssignment, RoleAssignment
-from common.models.auth.feature_assignment.feature_assignment_state import \
-  FeatureAssignmentState
+from common.models import User, Role, RoleAssignment
+from common.models.auth.feature.feature_state import FeatureState
 from common.service_type import ServiceType
 from settings.settings import UserNames, Settings
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
@@ -92,19 +91,19 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
         for mode in modes:
           roles.append(self.setup_role_and_features(service = service, name = mode))
         RoleAssignment.objects.get_or_create(user = user, role = roles[1])
-        ass = RoleAssignment.objects.get_or_create(user = user, role = roles[2])
-        ass.beta = True
-        ass.save()
+        beta_assignment, _ = RoleAssignment.objects.get_or_create(user = user, role = roles[2])
+        beta_assignment.beta = True
+        beta_assignment.save()
         for mode, state, expected in [
-            (modes[0], FeatureAssignmentState.ALPHA, False),
-            (modes[0], FeatureAssignmentState.BETA, False),
-            (modes[0], FeatureAssignmentState.RELEASED, False),
-            (modes[1], FeatureAssignmentState.ALPHA, True),
-            (modes[1], FeatureAssignmentState.BETA, False),
-            (modes[1], FeatureAssignmentState.RELEASED, True),
-            (modes[2], FeatureAssignmentState.ALPHA, True),
-            (modes[2], FeatureAssignmentState.BETA, True),
-            (modes[2], FeatureAssignmentState.RELEASED, True),
+            (modes[0], FeatureState.BETA, False),
+            (modes[0], FeatureState.RELEASED, False),
+            (modes[0], FeatureState.LOCKED, False),
+            (modes[1], FeatureState.BETA, False),
+            (modes[1], FeatureState.RELEASED, True),
+            (modes[1], FeatureState.LOCKED, False),
+            (modes[2], FeatureState.BETA, True),
+            (modes[2], FeatureState.RELEASED, True),
+            (modes[2], FeatureState.LOCKED, False),
         ]:
           with self.subTest(mode = mode, feature = state, service = service, user = params):
             # Perform test.
@@ -122,16 +121,15 @@ class UserIntegrationTests(TestUserIntegrationMixin, TestCase):
     """Setup the roles and features for the permission test."""
     Role.migrations.create(service = service, name = name)
     role = Role.objects.get(service = service.name, name = name)
-    for state in FeatureAssignmentState:
-      feature = Feature.objects.get_or_create(service = service, name = f'{name}_{state.name}')
-      FeatureAssignment.objects.create(role = role, feature = feature)
-      ass = FeatureAssignment.objects.get(role = role, feature = feature)
-      ass.state = state.name
-      ass.save()
+    for state in FeatureState:
+      feature, _ = role.features.get_or_create(service = service, name = f'{name}_{state.name}')
+      feature.state = state.name
+      feature.save()
     return role
 
   @staticmethod
   def cleanup_role_and_features(*, role: Role) -> None:
     """Delete the role including all associated features."""
-    Feature.objects.get_queryset().filter(roles = role).delete()
+    for feature in role.features.all():
+      feature.delete()
     role.delete()
