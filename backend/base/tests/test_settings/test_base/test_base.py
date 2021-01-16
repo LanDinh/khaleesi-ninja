@@ -44,7 +44,7 @@ class CursorDebugWrapperUnitTests(SimpleTestCase):
     queries.assert_called_once()
     args, kwargs = queries.call_args
     self.assertEqual({}, kwargs)
-    self.assertGreater(1000000000, args[0]['time'])
+    self.assertGreater(1000000, args[0]['time'])  # 1 second in microseconds.
     self.assertLessEqual(0, args[0]['time'])
     self.assertEqual(operation, args[0]['operation'])
     # noinspection SpellCheckingInspection
@@ -69,7 +69,7 @@ class CursorDebugWrapperUnitTests(SimpleTestCase):
     queries.assert_called_once()
     args, kwargs = queries.call_args
     self.assertEqual({}, kwargs)
-    self.assertGreater(1000000000, args[0]['time'])
+    self.assertGreater(1000000, args[0]['time'])  # 1 second in microseconds.
     self.assertLessEqual(0, args[0]['time'])
     self.assertEqual(operation, args[0]['operation'])
     # noinspection SpellCheckingInspection
@@ -87,7 +87,7 @@ class CursorDebugWrapperIntegrationTests(TestCase):
     TestModel.objects.get_queryset().create()
     # Assert result.
     self.assertEqual(1, len(connection.queries))
-    self.assertGreater(1000000000, connection.queries[0]['time'])
+    self.assertGreater(1000000, connection.queries[0]['time'])  # 1 second in microseconds.
     self.assertLessEqual(0, connection.queries[0]['time'])
     self.assertEqual('INSERT', connection.queries[0]['operation'])
     # noinspection SpellCheckingInspection

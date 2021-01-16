@@ -30,7 +30,7 @@ class CursorDebugWrapper(base.CursorDebugWrapper):  # type: ignore[name-defined,
       yield
     finally:
       stop = time.monotonic_ns()
-      duration = stop - start
+      duration_in_nanoseconds = stop - start
       if use_last_executed_query:
         sql = self.db.ops.last_executed_query(self.cursor, sql, params)
       try:
@@ -41,7 +41,7 @@ class CursorDebugWrapper(base.CursorDebugWrapper):  # type: ignore[name-defined,
       if 'SAVEPOINT' not in sql:  # type: ignore[operator]
         tables = sql_metadata.get_query_tables(sql)
         self.db.queries_log.append({
-            'time': duration,  # type: ignore[dict-item]
+            'time': duration_in_nanoseconds // 1000,  # type: ignore[dict-item]
             'operation': sql.split(maxsplit = 1)[0],  # type: ignore[union-attr]
             'main_table': tables[0] if len(tables) > 0 else None,
             'join_tables': ', '.join(tables[1:]) if len(tables) > 1 else None,
