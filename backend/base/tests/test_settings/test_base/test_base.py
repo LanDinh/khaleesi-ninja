@@ -31,8 +31,9 @@ class CursorDebugWrapperUnitTests(SimpleTestCase):
   def test_debug_sql_no_join(self) -> None :
     """Test debug_sql."""
     # Prepare data.
+    queries = MagicMock()
     self.cursor.db.queries_log = MagicMock()
-    self.cursor.db.queries_log.append = MagicMock()
+    self.cursor.db.queries_log.append = queries
     operation = 'SELECT'
     main_table = 'test_table'
     sql = f'{operation} * FROM {main_table}'
@@ -40,21 +41,23 @@ class CursorDebugWrapperUnitTests(SimpleTestCase):
     with self.cursor.debug_sql(sql = sql):
       pass
     # Assert result.
-    self.cursor.db.queries_log.append.assert_called_once_with(
-        {
-            'time': 0,
-            'operation': operation,
-            'main_table': main_table,
-            'join_tables': None,
-            'sql': sql,
-        }
-    )
+    queries.assert_called_once()
+    args, kwargs = queries.call_args
+    self.assertEqual({}, kwargs)
+    self.assertGreater(1000000000, args[0]['time'])
+    self.assertLessEqual(0, args[0]['time'])
+    self.assertEqual(operation, args[0]['operation'])
+    # noinspection SpellCheckingInspection
+    self.assertEqual(main_table, args[0]['main_table'])
+    self.assertIsNone(args[0]['join_tables'])
+    self.assertEqual(sql, args[0]['sql'])
 
   def test_debug_sql_with_join(self) -> None :
     """Test debug_sql."""
     # Prepare data.
+    queries = MagicMock()
     self.cursor.db.queries_log = MagicMock()
-    self.cursor.db.queries_log.append = MagicMock()
+    self.cursor.db.queries_log.append = queries
     operation = 'DELETE'
     main_table = 'main_table'
     join_table = 'join_table'
@@ -63,15 +66,16 @@ class CursorDebugWrapperUnitTests(SimpleTestCase):
     with self.cursor.debug_sql(sql = sql):
       pass
     # Assert result.
-    self.cursor.db.queries_log.append.assert_called_once_with(
-        {
-            'time': 0,
-            'operation': operation,
-            'main_table': main_table,
-            'join_tables': join_table,
-            'sql': sql,
-        }
-    )
+    queries.assert_called_once()
+    args, kwargs = queries.call_args
+    self.assertEqual({}, kwargs)
+    self.assertGreater(1000000000, args[0]['time'])
+    self.assertLessEqual(0, args[0]['time'])
+    self.assertEqual(operation, args[0]['operation'])
+    # noinspection SpellCheckingInspection
+    self.assertEqual(main_table, args[0]['main_table'])
+    self.assertEqual(join_table, args[0]['join_tables'])
+    self.assertEqual(sql, args[0]['sql'])
 
 
 class CursorDebugWrapperIntegrationTests(TestCase):
