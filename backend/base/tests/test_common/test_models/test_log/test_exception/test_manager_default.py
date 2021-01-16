@@ -6,7 +6,7 @@
 from functools import reduce
 from operator import add
 from typing import List
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # Django.
 from django.core.exceptions import PermissionDenied
@@ -45,11 +45,12 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           # Prepare data.
           exception = exception_type()
           log = self.setup_model()
-          # Perform test.
-          LogException.objects.create_khaleesi(exception = exception)
-          # Assert result.
-          self.assertEqual(exception.code, log.http_code)
-          log.save.assert_called_once_with()
+          with patch.object(LogException.objects, 'model', return_value = log):
+            # Perform test.
+            LogException.objects.create_khaleesi(exception = exception)
+            # Assert result.
+            self.assertEqual(exception.code, log.http_code)
+            log.save.assert_called_once_with()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
@@ -62,10 +63,11 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           # Prepare data.
           exception = exception_type()
           log = self.setup_model()
-          # Perform test.
-          LogException.objects.create_extern(exception = exception)
-          # Assert result.
-          log.save.assert_called_once_with()
+          with patch.object(LogException.objects, 'model', return_value = log):
+            # Perform test.
+            LogException.objects.create_extern(exception = exception)
+            # Assert result.
+            log.save.assert_called_once_with()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
 
@@ -74,7 +76,6 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
     """Setup the model mocks"""
     log = MagicMock()
     log.save = MagicMock()
-    LogException.objects.model = MagicMock(return_value = log)
     return log
 
 

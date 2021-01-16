@@ -1,8 +1,5 @@
 """The base configuration for khaleesi.ninja."""
 
-# Python.
-from datetime import timedelta
-
 
 # General settings.
 DEBUG = False
@@ -98,10 +95,7 @@ KHALEESI_NINJA = {
         'USERS': {
             'ANONYMOUS': '',
             'SUPERUSER': 'khaleesi',
-            'INITIAL_SUPERUSER_PASSWORD': 'changeme',
         },
-        'PERMISSION_MODEL': 'khaleesi',
         'MAX_FAILED_LOGIN_ATTEMPTS': 5,
-        'SYSTEM_LOCK_TIME': timedelta(minutes = 3),
     },
 }

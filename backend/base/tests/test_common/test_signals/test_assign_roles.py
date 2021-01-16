@@ -12,7 +12,6 @@ from common.signals.assign_roles import (
   assign_roles_when_creating_user,
   assign_roles_when_saving_role,
 )
-from settings.settings import UserNames
 from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 from test_util.test import SimpleTestCase, TestCase
 
@@ -28,7 +27,7 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
     for params in self.params():
       with self.subTest(**asdict(params)):
         # Prepare data.
-        user, _ = self.create_user(params = params)  # type: ignore[assignment]
+        user = self.create_user(params = params)
         # Perform test.
         assign_roles_when_creating_user(instance = user, created = True)
         create.assert_called_once_with(user = user, role = 'test')
@@ -42,14 +41,11 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
       create: MagicMock,
   ) -> None :
     """Test if roles get assigned upon user save."""
-    for params in self.params():
-      params.creates.username = UserNames.anonymous()
-      with self.subTest(**asdict(params)):
-        # Prepare data.
-        user, _ = self.create_user(params = params)  # type: ignore[assignment]
-        # Perform test.
-        assign_roles_when_creating_user(instance = user, created = True)
-        create.assert_not_called()
+    # Prepare data.
+    user = self.create_anonymous_user()
+    # Perform test.
+    assign_roles_when_creating_user(instance = user, created = True)
+    create.assert_not_called()
 
   @patch.object(RoleAssignment.objects, 'get_or_create')
   @patch.object(Role.objects, 'authenticated', return_value = ['test'])
@@ -58,7 +54,7 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
     for params in self.params():
       with self.subTest(**asdict(params)):
         # Prepare data.
-        user, _ = self.create_user(params = params)  # type: ignore[assignment]
+        user = self.create_user(params = params)
         # Perform test.
         assign_roles_when_creating_user(instance = user, created = False)
         create  .assert_not_called()
@@ -96,7 +92,7 @@ class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):
           role.authenticated = True
           role.save()
           # Perform test.
-          user, _ = self.create_user(params = params)
+          user = self.create_user(params = params)
           # Assert result.
           user.roles.get(service = service.name, name = name)
           user.delete()
@@ -109,7 +105,7 @@ class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):
         with self.subTest(service = service, **asdict(params)):
           # Prepare data.
           name = 'test'
-          user, _ = self.create_user(params = params)
+          user = self.create_user(params = params)
           Role.migrations.create(service = service, name = name)
           role = Role.objects.get(service = service.name, name = name)
           with self.assertRaises(ZeroTupletException):
@@ -129,7 +125,7 @@ class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):
         with self.subTest(service = service, **asdict(params)):
           # Prepare data.
           name = 'test'
-          user, _ = self.create_user(params = params)
+          user = self.create_user(params = params)
           Role.migrations.create(service = service, name = name)
           role = Role.objects.get(service = service.name, name = name)
           role.authenticated = True

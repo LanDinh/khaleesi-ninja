@@ -1,7 +1,6 @@
 """Gracefully import settings."""
 
 # Python.
-from datetime import timedelta
 from typing import cast
 
 # Django.
@@ -12,16 +11,6 @@ class Settings:
   """Group the auth settings."""
 
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
-
-  @classmethod
-  def permission_model(cls) -> str :
-    """The model name used for permission content types."""
-    return cast(str, cls.settings['PERMISSION_MODEL'])
-
-  @classmethod
-  def system_lock_time(cls) -> timedelta :
-    """The time in minutes that a system lock lasts."""
-    return cast(timedelta, cls.settings['SYSTEM_LOCK_TIME'])
 
   @classmethod
   def max_failed_attempts(cls) -> int :
@@ -43,8 +32,3 @@ class UserNames:
   def superuser(cls) -> str :
     """The username used for the superuser."""
     return cast(str, cls.names['SUPERUSER'])
-
-  @classmethod
-  def initial_superuser_password(cls) -> str :
-    """The initial password used for the superadmin."""
-    return cast(str, cls.names['INITIAL_SUPERUSER_PASSWORD'])

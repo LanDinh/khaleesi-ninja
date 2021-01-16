@@ -2,7 +2,7 @@
 
 # Python.
 from datetime import datetime
-from typing import List
+from typing import List, cast
 from unittest.mock import call, MagicMock, patch
 
 # Django.
@@ -41,21 +41,16 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
     """Test if user creation succeeds."""
     # Prepare data.
     params = Parameters()
-    _, expected_user = self.create_user(params = params)
-    User.objects.model = MagicMock(return_value = expected_user)
-    mock = MagicMock()
-    mock.set_unusable_password = expected_user.set_unusable_password
-    mock.full_clean = expected_user.full_clean
-    mock.save = expected_user.save
-    # Perform test.
-    user = User.objects.create(username = params.creates.username)
-    # Assert result.
-    self.assert_user(expected_user = expected_user, user = user)
-    mock.assert_has_calls([
-        call.set_unusable_password(),
-        call.full_clean(),
-        call.save(),
-    ])
+    user = self.create_user(params = params)
+    with patch.object(User.objects, 'model', return_value = user):
+      # Perform test.
+      User.objects.create(username = params.creates.username)
+      # Assert result.
+      cast(MagicMock, user).assert_has_calls([
+          call.set_unusable_password(),
+          call.full_clean(),
+          call.save(),
+      ])
 
 
 class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
@@ -78,8 +73,8 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
         params2.creates.username = user_name2
         for service in ServiceType:
           # Prepare common data.
-          user1, _ = self.create_user(params = params1)
-          user2, _ = self.create_user(params = params2)
+          user1 = self.create_user(params = params1)
+          user2 = self.create_user(params = params2)
           Role.migrations.create(service = service, name = role_name)
           role = Role.objects.get(service = service.name, name = role_name)
           with self.subTest(case = '0 users', service = service, user1 = params1, user2 = params2):
@@ -169,10 +164,10 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     self.assertTrue(user.is_active)
     self.assertNotEqual(datetime.min, user.date_joined)
     # Assert the locked state attributes.
-    self.assertEqual(None, user.original)
+    self.assertFalse(user.deleted)
     self.assertFalse(user.admin_locked)
+    self.assertFalse(user.system_locked)
     self.assertEqual(0, user.failed_attempts)
-    self.assertEqual(datetime.min, user.system_locked)
     # Assert the password behavior.
     self.assertFalse(user.has_usable_password())
 

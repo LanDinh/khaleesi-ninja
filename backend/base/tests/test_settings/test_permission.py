@@ -53,7 +53,7 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
     self.setup_anon(user_get = user_get)
     for params in self.params():
       with self.subTest(params = params):
-        user, _ = self.create_user(params = params)
+        user = self.create_user(params = params)
         user.has_permission = MagicMock(return_value = True)  # type: ignore[assignment]
         request = MagicMock()
         request.user = user
@@ -69,7 +69,7 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
     self.setup_anon(user_get = user_get)
     for params in self.params():
       with self.subTest(params = params):
-        user, _ = self.create_user(params = params)
+        user = self.create_user(params = params)
         user.has_permission = MagicMock(return_value = False)  # type: ignore[assignment]
         request = MagicMock()
         request.user = user
@@ -84,7 +84,7 @@ class PermissionUnitTests(TestUserUnitMixin, SimpleTestCase):
 
   def setup_anon(self, *, user_get: MagicMock, permission: Optional[bool] = None) -> User :
     """Setup the anonymous user."""
-    anon, _ =  self.create_anonymous_user()
+    anon =  self.create_anonymous_user()
     anon.has_permission = MagicMock(return_value = permission)  # type: ignore[assignment]
     user_get.return_value = anon
     return anon
@@ -148,10 +148,10 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
           self.permission.has_permission(request = request, view = view)
         self.cleanup_user_roles(user = user)
 
-  def test_user_has_permission(self) -> None :
+  def test_active_user_has_permission(self) -> None :
     """Test if permission is checked correctly."""
-    for params in self.params():
-      user, _ = self.create_user(params = params)
+    for params in self.params_active_only():
+      user = self.create_user(params = params)
       for service in ServiceType:
         with self.subTest(user = params, service = service):
           # Prepare data.
@@ -166,13 +166,30 @@ class PermissionIntegrationTests(TestUserIntegrationMixin, TestCase):
           self.cleanup_user_roles(user = user)
       user.delete()
 
-  def test_user_has_no_permission(self) -> None :
+  def test_active_user_has_no_permission(self) -> None :
     """Test if permission is checked correctly."""
     for params in self.params():
-      user, _ = self.create_user(params = params)
+      user = self.create_user(params = params)
       for service in ServiceType:
         with self.subTest(user = params, service = service):
           # Prepare data.
+          view = TestView(service = service, feature = self.feature_name)
+          request = Request(request = HttpRequest())
+          request.user = user
+          # Perform test.
+          with self.assertRaises(PermissionDeniedException):
+            self.permission.has_permission(request = request, view = view)
+          self.cleanup_user_roles(user = user)
+      user.delete()
+
+  def test_inactive_user_has_no_permission(self) -> None :
+    """Test if permission is checked correctly."""
+    for params in self.params_inactive_only():
+      user = self.create_user(params = params)
+      for service in ServiceType:
+        with self.subTest(user = params, service = service):
+          # Prepare data.
+          self.grant_permission(user = user, service = service)
           view = TestView(service = service, feature = self.feature_name)
           request = Request(request = HttpRequest())
           request.user = user

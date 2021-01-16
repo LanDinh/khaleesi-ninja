@@ -1,6 +1,7 @@
 """The tests for the custom User."""
 
 # Python.
+from typing import cast
 from unittest.mock import call, MagicMock, patch
 
 # khaleesi.ninja.
@@ -15,7 +16,7 @@ from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom UserManager."""
 
-  @patch.object(User.migrations, 'get_queryset')
+  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
   @patch.object(User.migrations, 'model')
   def test_create_anonymous_user_creation(
       self,
@@ -24,37 +25,36 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   ) -> None :
     """Test if the anonymous user gets created correctly."""
     # Prepare data.
-    _, expected_user = self.create_anonymous_user()
+    user = self.create_anonymous_user()
     queryset.return_value.filter = MagicMock(return_value = [])
-    model.return_value = expected_user
-    mock = self.setup_mocks(user = expected_user)
+    model.return_value = user
     # Perform test.
     User.migrations.create_anonymous_user()
     # Assert result.
-    self.assert_mocks(mock = mock)
+    self.assert_mocks(user = user)
 
-  @patch.object(User.migrations, 'get_queryset')
+  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
   def test_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
-    _, expected_user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [expected_user])
+    user = self.create_anonymous_user()
+    queryset.return_value.filter = MagicMock(return_value = [user])
     # Perform test.
     User.migrations.create_anonymous_user()
     # Assert result.
-    expected_user.save.assert_not_called()  # type: ignore[attr-defined]
+    user.save.assert_not_called()  # type: ignore[attr-defined]
 
-  @patch.object(User.migrations, 'get_queryset')
+  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
   def test_create_anonymous_twins(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
-    _, expected_user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [expected_user, expected_user])
+    user = self.create_anonymous_user()
+    queryset.return_value.filter = MagicMock(return_value = [user, user])
     # Perform test.
     with self.assertRaises(TwinException):
       User.migrations.create_anonymous_user()
 
-  @patch.object(User.migrations, 'get_queryset')
+  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
   @patch.object(User.migrations, 'model')
   def test_create_superuser_creation(
       self,
@@ -63,49 +63,39 @@ class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   ) -> None :
     """Test if the anonymous user gets created correctly."""
     # Prepare data.
-    _, expected_user = self.create_superuser()
+    user = self.create_superuser()
     queryset.return_value.filter = MagicMock(return_value = [])
-    model.return_value = expected_user
-    mock = self.setup_mocks(user = expected_user)
+    model.return_value = user
     # Perform test.
     User.migrations.create_superuser()
     # Assert result.
-    self.assert_mocks(mock = mock)
+    self.assert_mocks(user = user)
 
-  @patch.object(User.migrations, 'get_queryset')
+  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
   def test_create_superuser_fetching(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
-    _, expected_user = self.create_superuser()
-    queryset.return_value.filter = MagicMock(return_value = [expected_user])
+    user = self.create_superuser()
+    queryset.return_value.filter = MagicMock(return_value = [user])
     # Perform test.
     User.migrations.create_superuser()
     # Assert result.
-    expected_user.save.assert_not_called()  # type: ignore[attr-defined]
+    user.save.assert_not_called()  # type: ignore[attr-defined]
 
-  @patch.object(User.migrations, 'get_queryset')
+  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
   def test_create_superuser_twins(self, queryset: MagicMock) -> None :
     """Test if the anonymous user gets detected correctly."""
     # Prepare data.
-    _, expected_user = self.create_superuser()
-    queryset.return_value.filter = MagicMock(return_value = [expected_user, expected_user])
+    user = self.create_superuser()
+    queryset.return_value.filter = MagicMock(return_value = [user, user])
     # Perform test.
     with self.assertRaises(TwinException):
       User.migrations.create_superuser()
 
   @staticmethod
-  def setup_mocks(*, user: User) -> MagicMock :
-    """Correctly prepare the mocks for mock assertion."""
-    mock = MagicMock()
-    mock.set_unusable_password = user.set_unusable_password
-    mock.full_clean = user.full_clean
-    mock.save = user.save
-    return mock
-
-  @staticmethod
-  def assert_mocks(*, mock: MagicMock) -> None :
+  def assert_mocks(*, user: User) -> None :
     """Correctly assert mock behavior."""
-    mock.assert_has_calls([
+    cast(MagicMock, user).assert_has_calls([
         call.set_unusable_password(),
         call.full_clean(),
         call.save(),

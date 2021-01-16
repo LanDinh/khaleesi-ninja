@@ -24,3 +24,5 @@ def setup_test_app(package: Any, label: str) -> None :
   app_config.label = label
   apps.app_configs[app_config.label] = app_config
   app_config.import_models()
+  app_config.ready()
+  apps.clear_cache()
