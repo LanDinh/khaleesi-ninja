@@ -51,7 +51,7 @@ WSGI_APPLICATION = 'configuration.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'settings',
         'NAME': 'khaleesi_ninja',
     }
 }

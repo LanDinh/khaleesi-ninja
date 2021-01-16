@@ -15,6 +15,7 @@ psycopg2==2.8.6
 pylint==2.6.0
 pytz==2020.1
 six==1.15.0
+sql-metadata==1.10.0
 sqlparse==0.4.1
 toml==0.10.1
 typed-ast==1.4.1
