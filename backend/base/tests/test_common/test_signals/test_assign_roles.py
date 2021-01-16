@@ -20,18 +20,18 @@ from test_util.test import SimpleTestCase, TestCase
 class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
   """The unit tests for the signals assigning roles."""
 
-  @patch.object(RoleAssignment.objects, 'get_or_create')
-  @patch.object(Role.objects, 'authenticated', return_value = ['test'])
-  def test_assign_roles_when_creating_user(self, _: MagicMock, create: MagicMock) -> None :
+  def test_assign_roles_when_creating_user(self) -> None :
     """Test if roles get assigned upon user save."""
-    for params in self.params():
-      with self.subTest(**asdict(params)):
-        # Prepare data.
-        user = self.create_user(params = params)
-        # Perform test.
-        assign_roles_when_creating_user(instance = user, created = True)
-        create.assert_called_once_with(user = user, role = 'test')
-        create.reset_mock()
+    with patch.object(RoleAssignment.objects, 'get_or_create') as create:
+      with patch.object(Role.objects, 'authenticated', return_value = ['test']):
+        for params in self.params():
+          with self.subTest(**asdict(params)):
+            # Prepare data.
+            user = self.create_user(params = params)
+            # Perform test.
+            assign_roles_when_creating_user(instance = user, created = True)
+            create.assert_called_once_with(user = user, role = 'test')
+            create.reset_mock()
 
   @patch.object(RoleAssignment.objects, 'get_or_create')
   @patch.object(Role.objects, 'authenticated', return_value = ['test'])
@@ -59,22 +59,18 @@ class AssignRolesUnitTests(SimpleTestCase, TestUserUnitMixin):
         assign_roles_when_creating_user(instance = user, created = False)
         create  .assert_not_called()
 
-  @patch.object(RoleAssignment.objects, 'get_or_create')
-  @patch.object(User.objects, 'without_role_assignment', return_value = ['test'])
-  def test_assign_roles_when_saving_authenticated_role(
-      self,
-      _: MagicMock,
-      create: MagicMock,
-  ) -> None :
+  def test_assign_roles_when_saving_authenticated_role(self) -> None :
     """Test if roles get assigned upon role save."""
-    for service in ServiceType:
-      with self.subTest(service = service):
-        # Prepare data.
-        role = Role(service = service.name, authenticated = True)
-        # Perform test.
-        assign_roles_when_saving_role(instance = role)
-        # Assert result.
-        create.assert_called_once_with(user = 'test', role = role)
+    with patch.object(RoleAssignment.objects, 'get_or_create') as create:
+      with patch.object(User.objects, 'without_role_assignment', return_value = ['test']):
+        for service in ServiceType:
+          with self.subTest(service = service):
+            # Prepare data.
+            role = Role(service = service.name, authenticated = True)
+            # Perform test.
+            assign_roles_when_saving_role(instance = role)
+            # Assert result.
+            create.assert_called_once_with(user = 'test', role = role)
 
 
 class AssignRolesIntegrationTests(TestCase, TestUserIntegrationMixin):

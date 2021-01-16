@@ -8,8 +8,8 @@ from django.db import connection
 
 # khaleesi.ninja.
 from settings.base import CursorDebugWrapper
-from .models import TestModel
 from test_util.test import SimpleTestCase, TestCase
+from .models import TestModel
 
 
 class CursorDebugWrapperUnitTests(SimpleTestCase):

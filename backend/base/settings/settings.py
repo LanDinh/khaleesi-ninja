@@ -10,6 +10,7 @@ from django.conf import settings
 class Settings:
   """Group the auth settings."""
 
+  # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
   settings = settings.KHALEESI_NINJA['BASE']  # type: ignore[index]
 
   @classmethod
@@ -21,6 +22,7 @@ class Settings:
 class UserNames:
   """Group the auth user name settings."""
 
+  # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
   names = settings.KHALEESI_NINJA['BASE']['USERS']  # type: ignore[index]
 
   @classmethod

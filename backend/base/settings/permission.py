@@ -24,6 +24,7 @@ class Permission(BasePermission):
     if request.user.is_authenticated:
       user = request.user
 
+    # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
     if not user.has_permission(service = view.service, name = view.feature):  # type: ignore[attr-defined]
       raise PermissionDeniedException()
 

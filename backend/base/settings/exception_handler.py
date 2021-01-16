@@ -30,5 +30,6 @@ def exception_handler(
   if not response or response.status_code == status.HTTP_404_NOT_FOUND:
     return response
 
+  # noinspection PyMissingOrEmptyDocstring,PyTypeHints,PyUnresolvedReferences
   response.status_code = status.HTTP_418_IM_A_TEAPOT  # type: ignore[attr-defined]
   return response

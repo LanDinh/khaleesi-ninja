@@ -16,81 +16,73 @@ from test_util.models.user import TestUserUnitMixin, TestUserIntegrationMixin
 class UserManagerUnitTests(TestUserUnitMixin, SimpleTestCase):
   """The unit tests for the custom UserManager."""
 
-  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
-  @patch.object(User.migrations, 'model')
-  def test_create_anonymous_user_creation(
-      self,
-      model: MagicMock,
-      queryset: MagicMock,
-  ) -> None :
+  def test_create_anonymous_user_creation(self) -> None :
     """Test if the anonymous user gets created correctly."""
-    # Prepare data.
-    user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [])
-    model.return_value = user
-    # Perform test.
-    User.migrations.create_anonymous_user()
-    # Assert result.
-    self.assert_mocks(user = user)
+    with patch.object(User.migrations, 'get_queryset', return_value = MagicMock()) as queryset:
+      with patch.object(User.migrations, 'model') as model:
+        # Prepare data.
+        user = self.create_anonymous_user()
+        queryset.return_value.filter = MagicMock(return_value = [])
+        model.return_value = user
+        # Perform test.
+        User.migrations.create_anonymous_user()
+        # Assert result.
+        self.assert_mocks(user = user)
 
-  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
-  def test_create_anonymous_user_fetching(self, queryset: MagicMock) -> None :
+  def test_create_anonymous_user_fetching(self) -> None :
     """Test if the anonymous user gets detected correctly."""
-    # Prepare data.
-    user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [user])
-    # Perform test.
-    User.migrations.create_anonymous_user()
-    # Assert result.
-    user.save.assert_not_called()  # type: ignore[attr-defined]
-
-  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
-  def test_create_anonymous_twins(self, queryset: MagicMock) -> None :
-    """Test if the anonymous user gets detected correctly."""
-    # Prepare data.
-    user = self.create_anonymous_user()
-    queryset.return_value.filter = MagicMock(return_value = [user, user])
-    # Perform test.
-    with self.assertRaises(TwinException):
+    with patch.object(User.migrations, 'get_queryset', return_value = MagicMock()) as queryset:
+      # Prepare data.
+      user = self.create_anonymous_user()
+      queryset.return_value.filter = MagicMock(return_value = [user])
+      # Perform test.
       User.migrations.create_anonymous_user()
+      # Assert result.
+      user.save.assert_not_called()  # type: ignore[attr-defined]
 
-  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
-  @patch.object(User.migrations, 'model')
-  def test_create_superuser_creation(
-      self,
-      model: MagicMock,
-      queryset: MagicMock,
-  ) -> None :
+  def test_create_anonymous_twins(self) -> None :
+    """Test if the anonymous user gets detected correctly."""
+    with patch.object(User.migrations, 'get_queryset', return_value = MagicMock()) as queryset:
+      # Prepare data.
+      user = self.create_anonymous_user()
+      queryset.return_value.filter = MagicMock(return_value = [user, user])
+      # Perform test.
+      with self.assertRaises(TwinException):
+        User.migrations.create_anonymous_user()
+
+  def test_create_superuser_creation(self) -> None :
     """Test if the anonymous user gets created correctly."""
-    # Prepare data.
-    user = self.create_superuser()
-    queryset.return_value.filter = MagicMock(return_value = [])
-    model.return_value = user
-    # Perform test.
-    User.migrations.create_superuser()
-    # Assert result.
-    self.assert_mocks(user = user)
+    with patch.object(User.migrations, 'get_queryset', return_value = MagicMock()) as queryset:
+      with patch.object(User.migrations, 'model') as model:
+        # Prepare data.
+        user = self.create_superuser()
+        queryset.return_value.filter = MagicMock(return_value = [])
+        model.return_value = user
+        # Perform test.
+        User.migrations.create_superuser()
+        # Assert result.
+        self.assert_mocks(user = user)
 
-  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
-  def test_create_superuser_fetching(self, queryset: MagicMock) -> None :
+  def test_create_superuser_fetching(self) -> None :
     """Test if the anonymous user gets detected correctly."""
-    # Prepare data.
-    user = self.create_superuser()
-    queryset.return_value.filter = MagicMock(return_value = [user])
-    # Perform test.
-    User.migrations.create_superuser()
-    # Assert result.
-    user.save.assert_not_called()  # type: ignore[attr-defined]
-
-  @patch.object(User.migrations, 'get_queryset', return_value = MagicMock())
-  def test_create_superuser_twins(self, queryset: MagicMock) -> None :
-    """Test if the anonymous user gets detected correctly."""
-    # Prepare data.
-    user = self.create_superuser()
-    queryset.return_value.filter = MagicMock(return_value = [user, user])
-    # Perform test.
-    with self.assertRaises(TwinException):
+    with patch.object(User.migrations, 'get_queryset', return_value = MagicMock()) as queryset:
+      # Prepare data.
+      user = self.create_superuser()
+      queryset.return_value.filter = MagicMock(return_value = [user])
+      # Perform test.
       User.migrations.create_superuser()
+      # Assert result.
+      user.save.assert_not_called()  # type: ignore[attr-defined]
+
+  def test_create_superuser_twins(self) -> None :
+    """Test if the anonymous user gets detected correctly."""
+    with patch.object(User.migrations, 'get_queryset', return_value = MagicMock()) as queryset:
+      # Prepare data.
+      user = self.create_superuser()
+      queryset.return_value.filter = MagicMock(return_value = [user, user])
+      # Perform test.
+      with self.assertRaises(TwinException):
+        User.migrations.create_superuser()
 
   @staticmethod
   def assert_mocks(*, user: User) -> None :

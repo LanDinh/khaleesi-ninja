@@ -1,26 +1,28 @@
 """Custom database backend. THE FILE NAME IS ESSENTIAL!"""
 
 # Python.
-import sql_metadata
 import time
 from contextlib import contextmanager
-from typing import Any
+from typing import Any, Optional, Sized
+# noinspection SyntaxError,PyMissingOrEmptyDocstring,PyUnresolvedReferences
+import sql_metadata  # type: ignore[import]
 
 # Django.
 from django.db.backends.postgresql import base
 from django.db.backends.utils import CursorWrapper
 
 
-class CursorDebugWrapper(base.CursorDebugWrapper):
+# noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
+class CursorDebugWrapper(base.CursorDebugWrapper):  # type: ignore[name-defined,misc]
   """Custom debug wrapper."""
 
-  @contextmanager
-  def debug_sql(
+  @contextmanager  # type: ignore[arg-type]
+  def debug_sql(  # type: ignore[misc]
       self,
-      sql = None,
-      params = None,
-      use_last_executed_query = False,
-      many = False,
+      sql: Optional[str] = None,
+      params: Optional[Sized] = None,
+      use_last_executed_query: bool = False,
+      many: bool = False,
   ) -> None :
     """Customize SQL logging."""
     start = time.monotonic_ns()
@@ -32,15 +34,15 @@ class CursorDebugWrapper(base.CursorDebugWrapper):
       if use_last_executed_query:
         sql = self.db.ops.last_executed_query(self.cursor, sql, params)
       try:
-        times = len(params) if many else ''
+        times = len(params) if many else ''  # type: ignore[arg-type]
       except TypeError:
         # params could be an iterator.
         times = '?'
-      if 'SAVEPOINT' not in sql:
+      if 'SAVEPOINT' not in sql:  # type: ignore[operator]
         tables = sql_metadata.get_query_tables(sql)
         self.db.queries_log.append({
-            'time': duration,
-            'operation': sql.split(maxsplit = 1)[0],
+            'time': duration,  # type: ignore[dict-item]
+            'operation': sql.split(maxsplit = 1)[0],  # type: ignore[union-attr]
             'main_table': tables[0] if len(tables) > 0 else None,
             'join_tables': ', '.join(tables[1:]) if len(tables) > 1 else None,
             'sql': f'{times} times: {sql}' if many else sql,

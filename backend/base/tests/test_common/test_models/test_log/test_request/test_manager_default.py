@@ -23,7 +23,6 @@ class LogRequestDefaultManagerUnitTests(SimpleTestCase):
         {'language': MagicMock()},
         {'client_id': MagicMock(), 'language': MagicMock()},
     ]:
-      # TODO: when patch is working with test-only models, use the decorator.
       with patch.object(LogRequest.objects, 'model', return_value = MagicMock()) as model:
         backend_request = MagicMock()
         backend_request.kwargs = {}
