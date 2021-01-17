@@ -1,18 +1,17 @@
 """Custom database backend. THE FILE NAME IS ESSENTIAL!"""
 
 # Python.
-import re
 import time
 from contextlib import contextmanager
 from typing import Any, Optional, Sized
 
 # Django.
-from django.db.backends.postgresql.base import (
+# noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
+from django.db.backends.postgresql.base import (  # type: ignore[attr-defined]
     DatabaseWrapper as DjangoDatabaseWrapper,
     CursorDebugWrapper as DjangoCursorDebugWrapper
 )
 from django.db.backends.utils import CursorWrapper
-import sql_metadata
 
 
 # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
@@ -28,7 +27,7 @@ class CursorDebugWrapper(DjangoCursorDebugWrapper):  # type: ignore[name-defined
       many: bool = False,
   ) -> None :
     """Customize SQL logging."""
-    if 'SAVEPOINT' not in sql:
+    if 'SAVEPOINT' not in sql:  # type: ignore[operator]
       with super().debug_sql(sql, params, use_last_executed_query, many):
         start = time.monotonic_ns()
         yield

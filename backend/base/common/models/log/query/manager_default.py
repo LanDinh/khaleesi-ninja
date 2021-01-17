@@ -40,6 +40,6 @@ class DefaultManager(Manager[T]):
   def _clean_sql(*, sql: str) -> str :
     cleaned_sql = sql
     for table in sql_metadata.get_query_tables(sql):
-      cleaned_sql = re.sub(fr'"{table}"."([a-z_]+)"', fr'{table}.\1', cleaned_sql)
+      cleaned_sql = re.sub(fr'"{table}"."(?P<column>[a-z_]+)"', fr'{table}.\g<column>', cleaned_sql)
       cleaned_sql = re.sub(fr'"{table}"', table, cleaned_sql)
     return cleaned_sql
