@@ -2,7 +2,8 @@
 
 # Python.
 from datetime import timedelta
-from typing import Optional
+# noinspection SyntaxError,PyMissingOrEmptyDocstring,PyUnresolvedReferences
+import sql_metadata  # type: ignore[import]
 
 # khaleesi.ninja.
 from common.models.log.request.model import LogRequest
@@ -16,19 +17,17 @@ class DefaultManager(Manager[T]):
   def create(  # type: ignore[override]
       self, *,
       request: LogRequest,
-      time: int,  # microseconds.
-      operation: str,
-      main_table: str,
-      join_table: Optional[str],
+      nanoseconds: int,
       sql: str,
   ) -> None :
     """Create a new query log."""
+    tables = sql_metadata.get_query_tables(sql)
     log = self.model(
         request = request,
-        time = timedelta(microseconds = time),
-        operation = operation,
-        main_table = main_table,
-        join_table = join_table,
+        time = timedelta(microseconds = nanoseconds//1000),
+        operation = sql.split(maxsplit = 1)[0],
+        main_table = tables[0] if len(tables) > 0 else None,
+        join_table = ', '.join(tables[1:]) if len(tables) > 1 else None,
         sql = sql,
     )
     log.save()

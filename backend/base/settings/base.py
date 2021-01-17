@@ -1,11 +1,10 @@
 """Custom database backend. THE FILE NAME IS ESSENTIAL!"""
 
 # Python.
+import sys
 import time
 from contextlib import contextmanager
 from typing import Any, Optional, Sized
-# noinspection SyntaxError,PyMissingOrEmptyDocstring,PyUnresolvedReferences
-import sql_metadata  # type: ignore[import]
 
 # Django.
 from django.db.backends.postgresql import base
@@ -25,28 +24,14 @@ class CursorDebugWrapper(base.CursorDebugWrapper):  # type: ignore[name-defined,
       many: bool = False,
   ) -> None :
     """Customize SQL logging."""
+    context = super().debug_sql(sql, params, use_last_executed_query, many)
     start = time.monotonic_ns()
-    try:
-      yield
-    finally:
-      stop = time.monotonic_ns()
-      duration_in_nanoseconds = stop - start
-      if use_last_executed_query:
-        sql = self.db.ops.last_executed_query(self.cursor, sql, params)
-      try:
-        times = len(params) if many else ''  # type: ignore[arg-type]
-      except TypeError:
-        # params could be an iterator.
-        times = '?'
-      if 'SAVEPOINT' not in sql:  # type: ignore[operator]
-        tables = sql_metadata.get_query_tables(sql)
-        self.db.queries_log.append({
-            'time': duration_in_nanoseconds // 1000,  # type: ignore[dict-item]
-            'operation': sql.split(maxsplit = 1)[0],  # type: ignore[union-attr]
-            'main_table': tables[0] if len(tables) > 0 else None,
-            'join_tables': ', '.join(tables[1:]) if len(tables) > 1 else None,
-            'sql': f'{times} times: {sql}' if many else sql,
-        })
+    context.__enter__()  # pylint: disable=no-member
+    yield
+    context.__exit__(*sys.exc_info())  # pylint: disable=no-member
+    stop = time.monotonic_ns()
+    nanoseconds = stop - start
+    self.db.queries_log[-1]['nanoseconds'] = nanoseconds
 
 
 class DatabaseWrapper(base.DatabaseWrapper):
