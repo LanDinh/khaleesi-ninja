@@ -1,18 +1,22 @@
 """Custom database backend. THE FILE NAME IS ESSENTIAL!"""
 
 # Python.
-import sys
+import re
 import time
 from contextlib import contextmanager
 from typing import Any, Optional, Sized
 
 # Django.
-from django.db.backends.postgresql import base
+from django.db.backends.postgresql.base import (
+    DatabaseWrapper as DjangoDatabaseWrapper,
+    CursorDebugWrapper as DjangoCursorDebugWrapper
+)
 from django.db.backends.utils import CursorWrapper
+import sql_metadata
 
 
 # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences
-class CursorDebugWrapper(base.CursorDebugWrapper):  # type: ignore[name-defined,misc]
+class CursorDebugWrapper(DjangoCursorDebugWrapper):  # type: ignore[name-defined,misc]
   """Custom debug wrapper."""
 
   @contextmanager  # type: ignore[arg-type]
@@ -24,17 +28,18 @@ class CursorDebugWrapper(base.CursorDebugWrapper):  # type: ignore[name-defined,
       many: bool = False,
   ) -> None :
     """Customize SQL logging."""
-    context = super().debug_sql(sql, params, use_last_executed_query, many)
-    start = time.monotonic_ns()
-    context.__enter__()  # pylint: disable=no-member
-    yield
-    context.__exit__(*sys.exc_info())  # pylint: disable=no-member
-    stop = time.monotonic_ns()
-    nanoseconds = stop - start
-    self.db.queries_log[-1]['nanoseconds'] = nanoseconds
+    if 'SAVEPOINT' not in sql:
+      with super().debug_sql(sql, params, use_last_executed_query, many):
+        start = time.monotonic_ns()
+        yield
+        stop = time.monotonic_ns()
+      nanoseconds = stop - start
+      self.db.queries_log[-1]['nanoseconds'] = nanoseconds
+    else:
+      yield
 
 
-class DatabaseWrapper(base.DatabaseWrapper):
+class DatabaseWrapper(DjangoDatabaseWrapper):
   """Custom database backend to enable SQL logging."""
 
   def __init__(self, *args: Any, **kwargs: Any) -> None :
