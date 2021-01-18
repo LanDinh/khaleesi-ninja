@@ -20,12 +20,15 @@ def exception_handler(
     context: Dict[str, Any]
 ) -> Optional[Response] :
   """Handle custom exceptions."""
+  # Rest handles transaction rollbacks.
+  request = context['request'].khaleesi.log_request
+  response = rest_exception_handler(exception, context)
+
   if isinstance(exception, KhaleesiException):
-    LogException.objects.create_khaleesi(exception = exception)
+    LogException.objects.create_khaleesi(request = request, exception = exception)
     return Response(data = exception.data, status = exception.code)
 
-  LogException.objects.create_extern(exception = exception)
-  response = rest_exception_handler(exception, context)
+  LogException.objects.create_extern(request = request, exception = exception)
 
   if not response or response.status_code == status.HTTP_404_NOT_FOUND:
     return response

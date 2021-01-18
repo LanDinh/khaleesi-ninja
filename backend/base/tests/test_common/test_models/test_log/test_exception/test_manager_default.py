@@ -14,8 +14,9 @@ from django.http import Http404
 from rest_framework.exceptions import APIException, NotFound
 
 # khaleesi.ninja
-from common.models import LogException
+from common.models import LogException, LogRequest
 from common.exceptions import KhaleesiException
+from test_util.models.log.request import TestLogRequestIntegrationMixin
 from test_util.test import SimpleTestCase, TestCase
 
 
@@ -47,7 +48,7 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           log = self.setup_model()
           with patch.object(LogException.objects, 'model', return_value = log):
             # Perform test.
-            LogException.objects.create_khaleesi(exception = exception)
+            LogException.objects.create_khaleesi(request = LogRequest(), exception = exception)
             # Assert result.
             self.assertEqual(exception.code, log.http_code)
             log.save.assert_called_once_with()
@@ -65,7 +66,7 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           log = self.setup_model()
           with patch.object(LogException.objects, 'model', return_value = log):
             # Perform test.
-            LogException.objects.create_extern(exception = exception)
+            LogException.objects.create_extern(request = LogRequest(), exception = exception)
             # Assert result.
             log.save.assert_called_once_with()
         except TypeError:  # Some exceptions have no empty constructor.
@@ -80,7 +81,11 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
 
 
 # noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
-class LogExceptionDefaultManagerIntegrationTests(LogExceptionDefaultManagerMixin, TestCase):
+class LogExceptionDefaultManagerIntegrationTests(
+    LogExceptionDefaultManagerMixin,
+    TestLogRequestIntegrationMixin,
+    TestCase,
+):
   """The integration tests for exception handling."""
 
   def test_khaleesi_exception_handling(self) -> None :
@@ -90,8 +95,9 @@ class LogExceptionDefaultManagerIntegrationTests(LogExceptionDefaultManagerMixin
         try:
           # Prepare data.
           exception = exception_type()
+          request = LogRequest.objects.create_and_get(**self.create_and_get_minimum_input())
           # Perform test.
-          LogException.objects.create_khaleesi(exception = exception)
+          LogException.objects.create_khaleesi(request = request, exception = exception)
           # Assert result.
           log = LogException.objects.get()
           self.assertEqual(exception.code, log.http_code)
@@ -106,8 +112,9 @@ class LogExceptionDefaultManagerIntegrationTests(LogExceptionDefaultManagerMixin
         try:
           # Prepare data.
           exception = exception_type()
+          request = LogRequest.objects.create_and_get(**self.create_and_get_minimum_input())
           # Perform test.
-          LogException.objects.create_extern(exception = exception)
+          LogException.objects.create_extern(request = request, exception = exception)
           # Assert result.
           log = LogException.objects.get()
           self.assertIsNone(log.http_code)

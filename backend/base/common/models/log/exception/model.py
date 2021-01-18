@@ -7,6 +7,7 @@ from __future__ import annotations
 from django.db import models
 
 # khaleesi.ninja.
+from common.models.log.request.model import LogRequest
 from common.models.log.exception.manager_default import DefaultManager
 from common.models.model import Model
 
@@ -21,6 +22,7 @@ class LogException(Model):
   stacktrace = models.TextField()
 
   # khaleesi.ninja specific attributes.
+  request = models.ForeignKey(LogRequest, on_delete = models.CASCADE)
   http_code = models.IntegerField(blank = True, null = True)
   data = models.TextField(blank = True)
 
