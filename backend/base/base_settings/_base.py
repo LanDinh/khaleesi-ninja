@@ -47,14 +47,17 @@ TEMPLATES = [
 ]
 WSGI_APPLICATION = 'configuration.wsgi.application'
 
+BASE_DATABASE = {
+    'ENGINE': 'settings',
+    'NAME': 'khaleesi_ninja',
+}
 
 # Database
 DATABASES = {
-    'default': {
-        'ENGINE': 'settings',
-        'NAME': 'khaleesi_ninja',
-    }
+    'default': {**BASE_DATABASE},
+    'logging': {**BASE_DATABASE},
 }
+DATABASE_ROUTERS = ['settings.database_router.LoggingRouter']
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',

@@ -3,7 +3,7 @@
 # Python.
 from dataclasses import asdict
 from typing import cast
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
 from common.models import LogRequest, User
@@ -13,7 +13,7 @@ from test_util.models.user import (
     TestUserIntegrationMixin,
     Parameters,
 )
-from test_util.test import SimpleTestCase, TestCase
+from test_util.test import SimpleTestCase, TransactionTestCase
 
 
 # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences,PyTypeHints
@@ -22,19 +22,25 @@ class LogRequestUnitTests(SimpleTestCase, TestUserUnitMixin):
 
   def test_finalize(self) -> None :
     """Test finalization."""
-    for params in self.params():
-      with self.subTest(asdict(params)):
-        # Prepare data.
-        log = LogRequest()
-        log.save = MagicMock()  # type: ignore[assignment]
-        user = self.create_user(params = params)
-        response_code = 200
-        # Perform test.
-        log.finalize(user = user, response_code = response_code)
-        # Assert result.
-        self.assertEqual(user, log.user)
-        self.assertEqual(response_code, log.response_code)
-        self.assertIsNotNone(log.end_time)
+    with patch.object(User.objects, 'db_manager') as manager:
+      for params in self.params():
+        with self.subTest(asdict(params)):
+          # Prepare data.
+          log = LogRequest()
+          log.save = MagicMock()  # type: ignore[assignment]
+          user = self.create_user(params = params)
+          manager.return_value = MagicMock()
+          manager.return_value.get = MagicMock(return_value = user)
+          response_code = 200
+          # Perform test.
+          log.finalize(user = user, response_code = response_code)
+          # Assert result.
+          manager.assert_called_once_with('logging')
+          manager.return_value.get.assert_called_once_with(username = user.username)
+          manager.reset_mock()
+          self.assertEqual(user, log.user)
+          self.assertEqual(response_code, log.response_code)
+          self.assertIsNotNone(log.end_time)
 
   def create_user(self, *, params: Parameters) -> User :
     """Create a unit test user according to requirements, mock super methods."""
@@ -44,7 +50,7 @@ class LogRequestUnitTests(SimpleTestCase, TestUserUnitMixin):
 
 
 class LogRequestIntegrationTests(
-    TestCase,
+    TransactionTestCase,
     TestUserIntegrationMixin,
     TestLogRequestIntegrationMixin,
 ):

@@ -1,12 +1,23 @@
 """Add custom behavior to the DRF test cases."""
 
 # Django.
-from rest_framework.test import APISimpleTestCase, APITestCase
+from rest_framework.test import (
+    APISimpleTestCase,
+    APITestCase,
+    APITransactionTestCase,
+)
+
+
+class TransactionTestCase(APITransactionTestCase):
+  """Custom TestCase class for integration tests."""
+  tags = {'integration'}
+  databases = {'default', 'logging'}
 
 
 class TestCase(APITestCase):
   """Custom TestCase class for integration tests."""
   tags = {'integration'}
+  databases = {'default', 'logging'}
 
 
 class SimpleTestCase(APISimpleTestCase):

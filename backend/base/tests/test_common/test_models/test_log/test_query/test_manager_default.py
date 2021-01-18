@@ -97,7 +97,7 @@ class LogQueryDefaultManagerUnitTests(TestLogQueryDefaultManagerMixin, SimpleTes
               sql_generalized = generalized_sql,
               sql_specific = clean_sql,
           )
-          model.return_value.save.assert_called_once_with()
+          model.return_value.save.assert_called_once()
 
 
 class LogQueryDefaultManagerIntegrationTests(

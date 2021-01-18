@@ -48,7 +48,7 @@ class LogRequest(Model):
 
   def finalize(self, *, user: User, response_code: int) -> None:
     """Finalize the request log."""
-    self.user = user
+    self.user = User.objects.db_manager('logging').get(username = user.username)
     self.response_code = response_code
     self.end_time = timezone.now()
     self.save()

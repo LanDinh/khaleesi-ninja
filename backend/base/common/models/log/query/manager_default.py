@@ -1,5 +1,7 @@
 """Default Manager."""
 
+# pylint: disable=line-too-long
+
 # Python.
 import re
 from datetime import timedelta
@@ -14,17 +16,11 @@ from common.models.manager import  Manager, T
 class DefaultManager(Manager[T]):
   """Default Manager."""
 
-  # noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring
-  def create(  # type: ignore[override]
-      self, *,
-      request: LogRequest,
-      nanoseconds: int,
-      sql: str,
-  ) -> None :
+  # noinspection PyUnresolvedReferences,PyMissingOrEmptyDocstring,PyTypeHints,SyntaxError
+  def create(self, *, request: LogRequest, nanoseconds: int, sql: str) -> None :  # type: ignore[override]
     """Create a new query log."""
     cleaned_sql = self._clean_sql(sql = sql)
     tables = sql_metadata.get_query_tables(cleaned_sql)
-
     log = self.model(
         request = request,
         microseconds = timedelta(microseconds = nanoseconds // 1000),

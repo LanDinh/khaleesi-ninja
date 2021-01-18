@@ -17,6 +17,10 @@ DATABASES['default']['HOST'] = 'localhost'
 DATABASES['default']['PORT'] = ''
 DATABASES['default']['USER'] = 'khaleesi_ninja'
 DATABASES['default']['PASSWORD'] = ''
+DATABASES['logging']['HOST'] = 'localhost'
+DATABASES['logging']['PORT'] = ''
+DATABASES['logging']['USER'] = 'khaleesi_ninja'
+DATABASES['logging']['PASSWORD'] = ''
 
 
 # Rest settings.
