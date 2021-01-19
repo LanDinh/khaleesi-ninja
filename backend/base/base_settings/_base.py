@@ -55,7 +55,12 @@ BASE_DATABASE = {
 # Database
 DATABASES = {
     'default': {**BASE_DATABASE},
-    'logging': {**BASE_DATABASE},
+    'logging': {
+        **BASE_DATABASE,
+        'TEST': {
+          'MIRROR': 'default',
+        },
+    },
 }
 DATABASE_ROUTERS = ['settings.database_router.LoggingRouter']
 CACHES = {
