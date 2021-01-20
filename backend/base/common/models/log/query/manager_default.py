@@ -3,14 +3,23 @@
 # pylint: disable=line-too-long
 
 # Python.
+import json
+import logging
 import re
 from datetime import timedelta
 # noinspection SyntaxError,PyMissingOrEmptyDocstring,PyUnresolvedReferences
 import sql_metadata  # type: ignore[import]
 
+# Django.
+from django.core.serializers.json import DjangoJSONEncoder
+from django.forms.models import model_to_dict
+
 # khaleesi.ninja.
 from common.models.log.request.model import LogRequest
 from common.models.manager import  Manager, T
+
+
+logger = logging.getLogger('khaleesi')
 
 
 class DefaultManager(Manager[T]):
@@ -30,6 +39,7 @@ class DefaultManager(Manager[T]):
         sql_generalized = sql_metadata.generalize_sql(cleaned_sql),
         sql_specific = cleaned_sql,
     )
+    logger.debug(json.dumps(model_to_dict(log), cls = DjangoJSONEncoder))
     log.save()
 
   @staticmethod

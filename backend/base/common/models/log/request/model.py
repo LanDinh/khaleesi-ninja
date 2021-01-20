@@ -4,9 +4,14 @@
 from __future__ import annotations
 
 # Django.
+import json
+import logging
+
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 # khaleesi.ninja.
+from django.forms.models import model_to_dict
 from django.utils import timezone
 
 from common.models.user.model import User
@@ -14,6 +19,8 @@ from common.models.log.request.manager_default import DefaultManager
 from common.models.model import Model, choices
 from common.service_type import ServiceType
 
+
+logger = logging.getLogger('khaleesi')
 
 class LogRequest(Model):
   """Client information."""
@@ -51,4 +58,5 @@ class LogRequest(Model):
     self.user = User.objects.db_manager('logging').get(username = user.username)
     self.response_code = response_code
     self.end_time = timezone.now()
+    logger.info(json.dumps(model_to_dict(self), cls = DjangoJSONEncoder))
     self.save()

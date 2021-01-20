@@ -66,7 +66,11 @@ class LogExceptionDefaultManagerUnitTests(LogExceptionDefaultManagerMixin, Simpl
           log = self.setup_model()
           with patch.object(LogException.objects, 'model', return_value = log):
             # Perform test.
-            LogException.objects.create_extern(request = LogRequest(), exception = exception)
+            LogException.objects.create_extern(
+                request = LogRequest(),
+                response = MagicMock(),
+                exception = exception,
+            )
             # Assert result.
             log.save.assert_called_once_with()
         except TypeError:  # Some exceptions have no empty constructor.

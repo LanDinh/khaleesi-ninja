@@ -17,8 +17,8 @@ from common.models import User, Role
 def create_base_users_and_roles(sender: DjangoAppConfig, **_: Any) -> None :
   """Create base users and roles."""
   if sender.name == 'common' and not isinstance(sender, ServiceConfig):
-    User.migrations.create_superuser()
     User.migrations.create_anonymous_user()
+    User.migrations.create_superuser()
 
   elif isinstance(sender, ServiceConfig):
     Role.migrations.create(service = sender.service)

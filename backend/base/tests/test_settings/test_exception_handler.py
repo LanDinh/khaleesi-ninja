@@ -97,7 +97,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
           self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
           rest_exception_handler.assert_called_once_with(exception, context)
           rest_exception_handler.reset_mock()
-          log.assert_called_once_with(request = self.get_request(), exception = exception)
+          log.assert_called_once_with(request = self.get_request(), response = response, exception = exception)
           log.reset_mock()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
@@ -118,7 +118,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
     # Assert result.
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
     rest_exception_handler.assert_called_once_with(exception, context)
-    log.assert_called_once_with(request = self.get_request(), exception = exception)
+    log.assert_called_once_with(request = self.get_request(), response = response, exception = exception)
 
   @patch.object(LogException.objects, 'create_extern')
   @patch('settings.exception_handler.rest_exception_handler')
@@ -142,7 +142,7 @@ class ExceptionHandlerUnitTests(ExceptionHandlerMixin, SimpleTestCase):
         self.assertEqual(status.HTTP_404_NOT_FOUND, result.status_code)  # type: ignore[union-attr,attr-defined]
         rest_exception_handler.assert_called_once_with(exception, context)
         rest_exception_handler.reset_mock()
-        log.assert_called_once_with(request = self.get_request(), exception = exception)
+        log.assert_called_once_with(request = self.get_request(), response = response, exception = exception)
         log.reset_mock()
 
 
@@ -188,7 +188,6 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestLogRequestInte
           self.assertIsNotNone(response.data)  # type: ignore[union-attr]
           self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
           log = LogException.objects.get(exception = exception.__class__.__name__)
-          self.assertIsNone(log.http_code)
           log.delete()
         except TypeError:  # Some exceptions have no empty constructor.
           pass
@@ -205,7 +204,6 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestLogRequestInte
     self.assertIsNotNone(response.data)  # type: ignore[union-attr]
     self.assertEqual(status.HTTP_418_IM_A_TEAPOT, response.status_code)  # type: ignore[union-attr,attr-defined]
     log = LogException.objects.get(exception = exception.__class__.__name__)
-    self.assertIsNone(log.http_code)
     log.delete()
 
   def test_not_found_exception_handling(self) -> None :
@@ -222,5 +220,4 @@ class ExceptionHandlerIntegrationTests(ExceptionHandlerMixin, TestLogRequestInte
         self.assertIsNotNone(response.data)  # type: ignore[union-attr]
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)  # type: ignore[union-attr,attr-defined]
         log = LogException.objects.get(exception = exception.__class__.__name__)
-        self.assertIsNone(log.http_code)
         log.delete()

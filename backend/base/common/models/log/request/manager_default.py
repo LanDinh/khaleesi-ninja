@@ -2,16 +2,22 @@
 
 # Python.
 import json
+import logging
 from typing import Optional, Dict, Any
 from uuid import UUID
 
 # Django.
+from django.core.serializers.json import DjangoJSONEncoder
+from django.forms.models import model_to_dict
 from django.urls import ResolverMatch
 
 # khaleesi.ninja.
 from common.language_type import Language
 from common.models.manager import  Manager, T
 from common.service_type import ServiceType
+
+
+logger = logging.getLogger('khaleesi')
 
 
 # noinspection PyMissingOrEmptyDocstring,PyUnresolvedReferences,PyTypeHints
@@ -52,5 +58,6 @@ class DefaultManager(Manager[T]):
       log.client_id = client_id  # type: ignore[attr-defined]
     if language:
       log.language = language.name  # type: ignore[attr-defined]
+    logger.info(json.dumps(model_to_dict(log), cls = DjangoJSONEncoder))
     log.save()
     return log

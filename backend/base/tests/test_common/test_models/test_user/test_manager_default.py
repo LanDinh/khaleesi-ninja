@@ -1,7 +1,6 @@
 """The tests for the custom User."""
 
 # Python.
-from datetime import datetime
 from typing import List, cast
 from unittest.mock import call, MagicMock, patch
 
@@ -162,7 +161,6 @@ class UserManagerIntegrationTests(TestUserIntegrationMixin, TestCase):
     self.assertEqual(username, user.username)
     self.assertTrue(user.is_authenticated)
     self.assertTrue(user.is_active)
-    self.assertNotEqual(datetime.min, user.date_joined)
     # Assert the locked state attributes.
     self.assertFalse(user.deleted)
     self.assertFalse(user.admin_locked)

@@ -28,7 +28,7 @@ def exception_handler(
     LogException.objects.create_khaleesi(request = request, exception = exception)
     return Response(data = exception.data, status = exception.code)
 
-  LogException.objects.create_extern(request = request, exception = exception)
+  LogException.objects.create_extern(request = request, response = response, exception = exception)
 
   if not response or response.status_code == status.HTTP_404_NOT_FOUND:
     return response
