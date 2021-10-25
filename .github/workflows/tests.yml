@@ -1,0 +1,40 @@
+name: tests
+on: [push]
+jobs:
+  # Make data lists available across jobs for use in matrix.
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      deployments: ${{ steps.set-deployments.outputs.json }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - id: set-deployments
+        name: Read deployments into matrix
+        uses: ./.github/actions/set-json-output
+        with:
+          filename: .github/data/deployments.json
+
+  # Test that the kubernetes deployments actually work.
+  test-kubernetes-configuration:
+    runs-on: ubuntu-latest
+    needs: [ matrix ]
+    strategy:
+      matrix:
+        deployment: ${{ fromJson(needs.matrix.outputs.deployments) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up minikube
+        run: |
+          curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
+          sudo dpkg -i minikube_latest_amd64.deb
+          minikube start
+      - name: Upgrade kubectl
+        run: |
+          kubectl version
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl $(which kubectl)
+      - name: Spin up the deployment
+        run: ./scripts/deploy.sh ${{ matrix.deployment }}

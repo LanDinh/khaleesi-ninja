@@ -1,0 +1,22 @@
+name: Set JSON output
+description: Set output from JSON file for use in dependent jobs
+inputs:
+  filename:
+    description: The file to read into the output
+    required: true
+outputs:
+  json:
+    description: Parsed content of the JSON file
+    value: ${{ steps.generate-output.outputs.json }}
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: echo Reading JSON from ${{ inputs.filename }}
+    - id: generate-output
+      shell: bash
+      run: |
+        JSON=$(echo $(cat ${{ inputs.filename }}))
+        echo "::set-output name=json::$JSON"
+    - shell: bash
+      run: echo Result is ${{ toJson(steps.generate-output.outputs.json) }}
