@@ -1,5 +1,6 @@
 # khaleesi-ninja
 
+![CI badge](https://github.com/LanDinh/khaleesi-ninja/actions/workflows/tests.yml/badge.svg?branch=main)
 ![lines of code badge](https://img.shields.io/tokei/lines/github/LanDinh/khaleesi-ninja)
 ![licence badge](https://img.shields.io/github/license/LanDinh/khaleesi-ninja)
 
