@@ -40,3 +40,7 @@ The folder structure is as follows:
 * `documentation` A bunch of markdown files to document everything
 * `kubernetes` Kubernetes related configuration - [documentation](documentation/kubernetes.md)
 * `scripts` Utility scripts - [documentation](documentation/scripts.md)
+
+### Manually testing code changes
+
+Build and deploy the changes by running `./scripts/deploy.sh local`
