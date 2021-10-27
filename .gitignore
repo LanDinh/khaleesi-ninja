@@ -1,2 +1,5 @@
+# Frontend
+/frontend/*/node_modules
+
 # IDE
 .idea/
