@@ -1,7 +1,13 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import logo from './logo.svg'
+import './App.css'
 
+
+/**
+ * Renders the app.
+ * @return {JSX.Element}
+ * @constructor
+ */
 function App() {
   return (
     <div className="App">
@@ -20,7 +26,7 @@ function App() {
         </a>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
