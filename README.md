@@ -1,14 +1,20 @@
 # khaleesi-ninja
 
+![latest version](https://img.shields.io/github/v/tag/LanDinh/khaleesi-ninja)
 ![CI badge](https://github.com/LanDinh/khaleesi-ninja/actions/workflows/tests.yml/badge.svg?branch=main)
+[![codecov badge](https://codecov.io/gh/LanDinh/khaleesi-ninja/branch/main/graph/badge.svg?token=tQrhEsgApq)](https://codecov.io/gh/LanDinh/khaleesi-ninja)
 ![lines of code badge](https://img.shields.io/tokei/lines/github/LanDinh/khaleesi-ninja)
 ![licence badge](https://img.shields.io/github/license/LanDinh/khaleesi-ninja)
 
-## Available deployments
+## Available Systems
 
 | Deployment | Intended Use      | Differences in Configuration |
 | ---------- | ----------------- | ---------------------------- |
 | `local`    | Local development | Debug mode is active, requires changes to `/etc/hosts` |
+
+| Gate   | Domain | Use |
+| ------ | ------ | --- |
+| `core` | - | Code shared by all gates |
 
 ## Getting Started
 
@@ -28,9 +34,17 @@ Deployment:
 ![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.21-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 
-Backend:
+Backgates:
 
 ![python badge](https://img.shields.io/badge/python-v3.10-informational)
+
+Frontgates:
+
+![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational)
+![react badge](https://img.shields.io/badge/react-v17.0-informational)
+![create-react-app badge](https://img.shields.io/badge/create_react_app-latest-informational)
+![jest badge](https://img.shields.io/badge/jest-v26.0-informational)
+![eslint badge](https://img.shields.io/badge/eslint-latest-informational)
 
 ### Structure
 
@@ -38,9 +52,11 @@ The folder structure is as follows:
 
 * `.github` CI related configuration - [documentation](documentation/ci.md)
 * `documentation` A bunch of markdown files to document everything
+* `frontgate` The code for the frontgates. One `react` project per frontgate - [documentation](documentation/frontgate.md)
 * `kubernetes` Kubernetes related configuration - [documentation](documentation/kubernetes.md)
 * `scripts` Utility scripts - [documentation](documentation/scripts.md)
+* `templates` Templates used when creating new services - [documentation](documentation/templates.md)
 
-### Manually testing code changes
+### Starting the gates locally
 
 Build and deploy the changes by running `./scripts/deploy.sh local`
