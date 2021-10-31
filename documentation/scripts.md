@@ -3,6 +3,9 @@
 This project offers a bunch of utility scripts.
 All of them expect to be run at the project root.
 
+If the options `[GATE]` and `[SERVICE]` can be passed, either none or both have to be passed.
+If none are passed, the script will iterate over *all* services, otherwise it will only be executed on the specified one.
+
 ## `deploy.sh DEPLOYMENT`
 
 This requires `kubectl` to be connected to a cluster.
@@ -20,8 +23,27 @@ It will prompt the user for some information:
 1. The `type` of service:
    * gate
 
-Afterwards, it will create the following:
+Afterwards, it will do the following:
+
+1. Add the new service to `scripts/gate_service`
 
 For gates, it will additionally create the following:
 
 * A skeleton react project to hold the frontgate code
+
+# Helpers
+
+These scripts are not intended to be called directly, but are used by the other scripts.
+
+## `build_container.sh ENVIRONMENT [GATE SERVICE]`
+
+This will build the containers for either the `development` or `production` environment.
+If no service was specified, it will do so for *all* services.
+Otherwise, it will only do so for the specified service.
+
+Afterwards, any dangling images get pruned.
+
+## `service_loop.sh FUNCTION [GATE SERVICE]`
+
+If no service was specified, the function gets executed on *all* services.
+If a service was specified, the function gets executed on the specified service.
