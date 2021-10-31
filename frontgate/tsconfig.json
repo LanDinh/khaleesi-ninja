@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    // Root.
+    "include": [
+      "src"
+    ],
     // Modules.
     "module": "esnext",
     "moduleResolution": "node",

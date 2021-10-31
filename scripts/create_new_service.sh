@@ -24,6 +24,15 @@ replace_placeholders_in_file() {
 }
 
 
+# Meta.
+add_service_to_lists_of_service() {
+  local gate=${1}
+  local service=${2}
+
+  sed -i "1 a ${gate}.${service}" scripts/gate_services
+}
+
+
 # Frontgate.
 create_frontgate() {
   local gate=${1}
@@ -39,12 +48,8 @@ create_frontgate() {
   rm "${project_folder}/package.json"
   rm -r "${project_folder}/node_modules"
 
-  echo -e "${yellow}Adding necessary files...${clear_color}"
-  cp "${template_folder}/package.json" "${project_folder}/package.json"
-  cp "${template_folder}/tsconfig.json" "${project_folder}/tsconfig.json"
-
-  echo -e "${yellow}Replace placeholders...${clear_color}"
-  replace_placeholders_in_file "${project_folder}/package.json" "GATE" "${gate}"
+  echo -e "${yellow}Adding service to list of services...${clear_color}"
+  add_service_to_lists_of_service "${gate}" frontgate
 }
 
 

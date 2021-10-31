@@ -1,7 +1,5 @@
 # Frontgate
 /frontgate/node_modules
-/frontgate/*/node_modules
-/frontgate/*/build
 
-# IDE
-.idea/
+# Development
+/.idea/
