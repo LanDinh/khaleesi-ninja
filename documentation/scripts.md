@@ -20,6 +20,10 @@ Note that in order for requests to reach the deployment, the appropriate entries
 
 ### `test.sh [GATE SERVICE]`
 
+If no service was specified, this affects all services.
+If `interactive` was specified, the user is provided with a selection prompt to choose the service.
+If `GATE` and `SERVICE` were specified, the specified micro service is affected.
+
 This will first build the test containers.
 Afterwards, it will complete any tests configured - this includes:
 
@@ -64,3 +68,8 @@ Afterwards, any dangling images get pruned.
 
 If no service was specified, the function gets executed on *all* services.
 If a service was specified, the function gets executed on the specified service.
+
+### `interactive_service.sh`
+
+This provides a nice interactive selection prompt for users to choose their service.
+The choice is saved in a temporary file.

@@ -6,10 +6,12 @@ set -u          # Define variables before usage
 set -o pipefail # Make pipes fail
 
 
+# Colors.
 red='\033[0;31m'
 clear_color='\033[0m'
 
 
+# Options.
 function=${1}
 gate_services_file=./scripts/gate_services
 

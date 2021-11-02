@@ -59,8 +59,7 @@ echo -e "${magenta}Enter gate name:${clear_color}"
 read -r gate
 
 echo -e "${magenta}Enter service type:${clear_color}"
-select type in gate
-do
+select type in gate; do
   case $type in
   gate)
     echo -e "${magenta}Creating frontgate...${clear_color}"

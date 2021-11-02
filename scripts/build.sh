@@ -37,7 +37,7 @@ build_container() {
 }
 
 
-echo -e "${yellow}Building the images...${clear_color}"
+echo -e "${yellow}Building the containers...${clear_color}"
 . scripts/service_loop.sh build_container "${@:2}"
 
 echo -e "${yellow}Cleaning up dangling images...${clear_color}"
