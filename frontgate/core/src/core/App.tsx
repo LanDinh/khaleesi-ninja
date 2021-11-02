@@ -1,11 +1,12 @@
-import React from 'react'
-import logo  from '../logo.svg'
+import React, { ReactElement } from 'react'
+// @ts-ignore: svg import
+import logo                    from '../logo.svg'
 import './App.css'
 
 
 /**
  * Renders the app.
- * @return {JSX.Element}
+ * @return { ReactElement }
  * @constructor
  */
 function App() {

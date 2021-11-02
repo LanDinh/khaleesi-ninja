@@ -38,7 +38,7 @@ It will prompt the user for some information:
 
 Afterwards, it will do the following:
 
-1. Add the new service to `scripts/gate_service`
+1. Add the new service to `scripts/gate_service` and `.github/data/services.json`
 
 For gates, it will additionally create the following:
 
