@@ -27,6 +27,8 @@ You need to make sure that these conditions are met:
 * Edit your `/etc/hosts` point all of the endpoints mentioned above for the `local` deployment to your localhost
 * If you also want to test the changes on your Android phone without rooting it, you will need to set up a proxy on your development machine and follow the instructions [here](https://developer.chrome.com/docs/devtools/remote-debugging/local-server/).
 
+### Technologies used
+
 You might want to make yourself familiar with the technologies used:
 
 Deployment:
@@ -59,4 +61,9 @@ The folder structure is as follows:
 
 ### Starting the gates locally
 
-Build and deploy the changes by running `./scripts/deploy.sh local`
+Build and deploy changes by running `./scripts/deploy.sh local`
+
+### Automated tests
+
+Execute the tests by running `./scripts/test.sh`
+

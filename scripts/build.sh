@@ -7,9 +7,7 @@ set -o pipefail # Make pipes fail
 
 
 # Colors.
-magenta='\033[0;35m'
 yellow='\033[0;33m'
-green='\033[0;32m'
 clear_color='\033[0m'
 
 
@@ -34,15 +32,15 @@ build_container() {
       ;;
     esac
 
-  echo -e "${yellow}Building the image khaleesi-ninja/${gate}/${service} for ${environment}....${clear_color}"
+  echo "Building the image khaleesi-ninja/${gate}/${service} for ${environment}...."
   docker build "${type}" --build-arg gate="${gate}" --target "${environment}" -t "khaleesi-ninja/${gate}/${service}"
 }
 
 
-echo -e "${magenta}Building the images...${clear_color}"
+echo -e "${yellow}Building the images...${clear_color}"
 . scripts/service_loop.sh build_container "${@:2}"
 
-echo -e "${magenta}Cleaning up dangling images...${clear_color}"
+echo -e "${yellow}Cleaning up dangling images...${clear_color}"
 docker image prune -f
 
-echo -e "${green}DONE! :D${clear_color}"
+echo -e "${yellow}DONE building the images! :D${clear_color}"

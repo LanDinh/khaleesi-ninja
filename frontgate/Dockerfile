@@ -7,16 +7,16 @@ FROM node:16.13-slim as base
 ARG gate
 ENV KHALEESI_GATE=${gate}
 
-# Data.
+# Metadata.
 WORKDIR /code
-COPY ./package.json /code/frontgate/${KHALEESI_GATE}/
-COPY ./package-lock.json /code/frontgate/${KHALEESI_GATE}/
-COPY ./tsconfig.json /code/frontgate/${KHALEESI_GATE}/
-COPY ./core/src/core /code/frontgate/${KHALEESI_GATE}/src/core/
-COPY ./${KHALEESI_GATE} /code/frontgate/${KHALEESI_GATE}/
+COPY ./package.json /code/
+COPY ./package-lock.json /code/
+COPY ./tsconfig.json /code/
+RUN npm ci
 
-# Install dependencies.
-RUN npm ci --prefix /code/frontgate/${KHALEESI_GATE}/
+# Data.
+COPY ./core/src/core /code/src/core/
+COPY ./${KHALEESI_GATE} /code/
 
 ################################################################################
 #                               Development Base                               #
@@ -28,9 +28,8 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-COPY ./.eslintrc.json /code/frontgate/${KHALEESI_GATE}/
-COPY ./execute_tests.sh /code/frontgate/${KHALEESI_GATE}/
-RUN chmod +x frontgate/${KHALEESI_GATE}/execute_tests.sh
+COPY ./.eslintrc.json /code/
+COPY execute.sh /code/
 
 ################################################################################
 #                              Development Image                               #
@@ -42,7 +41,9 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-COPY --from=development-base /code/ /code/
+WORKDIR /code/frontgate/${KHALEESI_GATE}/
+COPY --from=development-base /code/ /code/frontgate/${KHALEESI_GATE}/
+RUN chmod +x ./execute.sh
 
 # Execute the tests.
-CMD ./execute_tests.sh
+ENTRYPOINT ["./execute.sh"]

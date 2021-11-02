@@ -21,6 +21,9 @@
   ],
   "ignorePatterns": [ "/*/build/*", "/*/src/react-app-env.d.ts" ],
   "rules": {
+    "no-multi-spaces": [ "error", { "exceptions": {
+      "ImportDeclaration": true
+    } } ],
     "object-curly-spacing": [ "error", "always" ],
     "semi": [ "error", "never" ]
   }
