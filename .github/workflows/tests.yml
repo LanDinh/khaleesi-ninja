@@ -66,4 +66,4 @@ jobs:
         with:
           flags: integration
           fail_ci_if_error: true
-          directory: /temp
+          directory: temp/
