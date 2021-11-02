@@ -26,7 +26,7 @@ rm -r -f temp
 mkdir temp
 
 echo -e "${magenta}Building the images...${clear_color}"
-. scripts/build_container.sh development "$@"
+. scripts/build.sh development "$@"
 
 echo -e "${magenta}Testing the services...${clear_color}"
 . scripts/service_loop.sh test_container "$@"
