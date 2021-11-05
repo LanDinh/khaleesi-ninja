@@ -29,7 +29,7 @@ ENV KHALEESI_GATE=${gate}
 
 # Data.
 COPY ./.eslintrc.json /code/
-COPY execute.sh /code/
+COPY execute_develop.sh /code/execute.sh
 
 ################################################################################
 #                              Development Image                               #
@@ -40,6 +40,9 @@ FROM node:16.13-slim as development
 ARG gate
 ENV KHALEESI_GATE=${gate}
 
+# Labels.
+LABEL environment=development
+
 # Data.
 WORKDIR /code/frontgate/${KHALEESI_GATE}/
 COPY --from=development-base /code/ /code/frontgate/${KHALEESI_GATE}/
@@ -47,3 +50,4 @@ RUN chmod +x ./execute.sh
 
 # Execute the tests.
 ENTRYPOINT ["./execute.sh"]
+CMD ["run"]

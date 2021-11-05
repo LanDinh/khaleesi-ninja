@@ -1,0 +1,13 @@
+namePrefix: core-frontgate-
+commonLabels:
+  gate: core
+  service: frontgate
+commonAnnotations:
+  type: frontgate
+images:
+  - name: deployment
+    newName: khaleesi-ninja/core/frontgate
+    newTag: latest
+
+bases:
+  - ../../base

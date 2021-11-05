@@ -39,9 +39,17 @@ test() {
   exit ${return_code}
 }
 
+run() {
+  npm run start
+}
+
 if [ "${command}" = "test" ]; then
   echo -e "${magenta}Execute tests...${clear_color}"
   test
+
+elif [ "${command}" = "run" ]; then
+  echo -e "${magenta}Run development server...${clear_color}"
+  run
 
 else
   echo -e "${red}Unsupported command ${command}!${clear_color}"
