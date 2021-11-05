@@ -1,7 +1,7 @@
 @startuml
 node base {
-  artifact base_deployment as deployment
-  card base_kustomization as kustomization
+  artifact deployment as base_deployment
+  card kustomization as base_kustomization
 }
 
 node service {

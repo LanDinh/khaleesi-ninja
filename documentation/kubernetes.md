@@ -1,6 +1,6 @@
 # Kubernetes Structure
 
-![Kubernetes Structure](/documentation/images/kubernetes.png)
+![Kubernetes Structure](/documentation/images/kubernetes.svg)
 
 The `base` directory contains the basic necessary manifests for each deployment:
 
