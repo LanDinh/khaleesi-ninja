@@ -1,0 +1,28 @@
+@startuml
+node base {
+  artifact base_deployment as deployment
+  card base_kustomization as kustomization
+}
+
+node service {
+  card service_kustomization [
+    kustomization
+    ====
+    namePrefix
+    commonLabels
+    commonAnnotations
+    images
+  ]
+}
+
+node environment {
+  card environment_kustomization [
+    kustomization
+    ====
+    namespace
+  ]
+}
+
+base <-- service
+service <-- environment
+@enduml

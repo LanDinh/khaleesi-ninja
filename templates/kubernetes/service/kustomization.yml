@@ -1,0 +1,13 @@
+namePrefix: ${GATE}-${SERVICE}-
+commonLabels:
+  gate: ${GATE}
+  service: ${SERVICE}
+commonAnnotations:
+  type: ${SERVICE}
+images:
+  - name: deployment
+    newName: khaleesi-ninja/${GATE}/${SERVICE}
+    newTag: latest
+
+bases:
+  - ../../base
