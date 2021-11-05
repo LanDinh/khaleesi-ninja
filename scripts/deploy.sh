@@ -8,16 +8,52 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
+yellow='\033[0;33m'
 green='\033[0;32m'
 clear_color='\033[0m'
 
 
 # Options.
-deployment=${1}
+environment=${1}
+current_service_file=./scripts/temp/current_service
+namespace="khaleesi-ninja-${environment}"
+
+
+# Check if interactive mode.
+services=("${@:2}")
+if [[ $# -eq 2 ]] && [[ "${2}" == "interactive" ]]; then
+  ./scripts/interactive_service.sh
+  while read -r raw_line; do
+    IFS="." read -r -a line <<< "${raw_line}"
+    services=("${line[@]}")
+  done <${current_service_file}
+fi
+
+
+deploy_service() {
+  local gate=${1}
+  local service=${2}
+
+  echo -e "${yellow}Applying the manifests...${clear_color}"
+  kubectl apply -k "kubernetes/${environment}/${gate}-${service}"
+
+  if [ "${environment}" = "local" ]; then
+    echo -e "${yellow}Rebuilding container...${clear_color}"
+    . scripts/build.sh "development" "${gate}" "${service}"
+
+    echo -e "${yellow}Rollout container...${clear_color}"
+    # shellcheck disable=SC2068
+    kubectl rollout restart deployment "${gate}-${service}-deployment" -n "${namespace}"
+  fi
+}
 
 
 echo -e "${magenta}Making sure the namespace exists...${clear_color}"
-kubectl create namespace "khaleesi-ninja-${deployment}" --dry-run=client -o yaml | kubectl apply -f -
+kubectl create namespace "${namespace}" --dry-run=client -o yaml | kubectl apply -f -
+
+echo -e "${magenta}Rollout the service...${clear_color}"
+# shellcheck disable=SC2068
+. scripts/service_loop.sh deploy_service ${services[@]}
 
 
 echo -e "${green}DONE! :D${clear_color}"

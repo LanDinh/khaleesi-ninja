@@ -4,21 +4,32 @@ This project offers a bunch of utility scripts.
 All of them expect to be run at the project root.
 
 If the options `[GATE]` and `[SERVICE]` can be passed, either none or both have to be passed.
+In some cases, passing the gate and service can be substituted by an interactive prompt.
 If none are passed, the script will iterate over *all* services, otherwise it will only be executed on the specified one.
 
 ## Operations
 
-### `deploy.sh DEPLOYMENT`
+### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
+
+If no service was specified, this affects all services.
+If `interactive` was specified, the user is provided with a selection prompt to choose the service.
+If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
 This requires `kubectl` to be connected to a cluster.
 
-1. Make sure that the namespace for the deployment exists
+1. Make sure that the namespace for the environment exists
+1. Apply the manifests for the service
 
-Note that in order for requests to reach the deployment, the appropriate entries will need to be manually added to `/etc/hosts`.
+If the `local` environment was chosen, some more steps are executed:
+
+1. The affected containers get rebuilt
+1. The deployment gets a rolling restart
+
+Note that in order for requests to reach the environment, the appropriate entries might need to be manually added to `/etc/hosts`.
 
 ## Development
 
-### `test.sh [GATE SERVICE]`
+### `test.sh [INTERACTIVE | (GATE SERVICE)]`
 
 If no service was specified, this affects all services.
 If `interactive` was specified, the user is provided with a selection prompt to choose the service.

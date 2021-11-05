@@ -5,16 +5,16 @@ jobs:
   matrix:
     runs-on: ubuntu-latest
     outputs:
-      deployments: ${{ steps.set-deployments.outputs.json }}
+      environments: ${{ steps.set-environments.outputs.json }}
       services: ${{ steps.set-services.outputs.json }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - id: set-deployments
-        name: Read deployments into matrix
+      - id: set-environments
+        name: Read environments into matrix
         uses: ./.github/actions/set-json-output
         with:
-          filename: .github/data/deployments.json
+          filename: .github/data/environments.json
       - id: set-services
         name: Read services into matrix
         uses: ./.github/actions/set-json-output
@@ -30,13 +30,13 @@ jobs:
       - name: Build all development containers
         run: ./scripts/build.sh development
 
-  # Test that the kubernetes deployments actually work.
+  # Test that the kubernetes environments actually work.
   test-kubernetes-configuration:
     runs-on: ubuntu-latest
     needs: [ matrix ]
     strategy:
       matrix:
-        deployment: ${{ fromJson(needs.matrix.outputs.deployments) }}
+        environment: ${{ fromJson(needs.matrix.outputs.environments) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -45,8 +45,8 @@ jobs:
           curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
           sudo dpkg -i minikube_latest_amd64.deb
           minikube start
-      - name: Spin up the deployment
-        run: ./scripts/deploy.sh ${{ matrix.deployment }}
+      - name: Spin up the environment
+        run: ./scripts/deploy.sh ${{ matrix.environment }}
 
   # Execute all tests for all services individually.
   test-all-services:

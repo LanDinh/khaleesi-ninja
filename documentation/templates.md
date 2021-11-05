@@ -14,7 +14,7 @@ This contains templates relevant for kubernetes.
 
 ### `local` folder
 
-This contains the kustomizations necessary for local deployments.
+This contains the kustomizations necessary for the local environment.
 
 ### `service` folder
 

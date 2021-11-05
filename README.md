@@ -8,9 +8,9 @@
 
 ## Available Systems
 
-| Deployment | Intended Use      | Differences in Configuration |
-| ---------- | ----------------- | ---------------------------- |
-| `local`    | Local development | Debug mode is active, requires changes to `/etc/hosts` |
+| Environment | Intended Use      | Differences in Configuration |
+| ----------- | ----------------- | ---------------------------- |
+| `local`     | Local development | Debug mode is active, requires changes to `/etc/hosts` |
 
 | Gate   | Domain | Use |
 | ------ | ------ | --- |
@@ -24,7 +24,7 @@ You need to make sure that these conditions are met:
 
 * Setup a local kubernetes cluster (instructions are in their [official documentation](https://kubernetes.io/docs/setup/))
 * If your local kubernetes setup didn't ship with it, you'll also need to install `kubectl` to control that cluster
-* Edit your `/etc/hosts` point all of the endpoints mentioned above for the `local` deployment to your localhost
+* Edit your `/etc/hosts` point all of the endpoints mentioned above for the `local` environment to your localhost
 * If you also want to test the changes on your Android phone without rooting it, you will need to set up a proxy on your development machine and follow the instructions [here](https://developer.chrome.com/docs/devtools/remote-debugging/local-server/).
 
 ### Technologies used
