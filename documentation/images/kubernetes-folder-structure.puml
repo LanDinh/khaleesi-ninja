@@ -1,4 +1,17 @@
 @startuml
+<style>
+artifact {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+card {
+  BackgroundColor lavender
+  LineColor darkviolet
+  FontColor darkviolet
+}
+</style>
+
 node base {
   artifact deployment as base_deployment
   card kustomization as base_kustomization

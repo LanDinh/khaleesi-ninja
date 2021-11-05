@@ -1,0 +1,25 @@
+@startuml
+<style>
+artifact {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+collections {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+</style>
+
+actor user
+cloud environment {
+  node "frontgate" as frontgate {
+    artifact deployment as front_deployment
+    collections pod as front_pod
+  }
+}
+
+user --> frontgate
+front_deployment <-- front_pod
+@enduml

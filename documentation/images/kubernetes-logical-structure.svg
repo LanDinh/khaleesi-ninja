@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="424px" preserveAspectRatio="none" style="width:268px;height:424px;background:#FFFFFF;" version="1.1" viewBox="0 0 268 424" width="268px" zoomAndPan="magnify"><defs><filter height="300%" id="f3l2xr1ezhilx" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[e18d4bc80fd28bdf82576c0057a5a41c]
+cluster environment--><path d="M34.5203,113.5774 C41.2057,102.8474 51.7023,103.8843 57.699,114.3312 C63.7324,104.5146 71.9616,106.7801 77.0756,115.3026 C84.6816,105.2037 91.1917,103.9818 98.384,115.7065 C101.9263,107.3432 110.6673,106.6305 115.9991,113.6586 C123.6603,103.6016 130.531,104.4821 136.7041,115.1456 C144.1829,105.8477 151.0608,104.3477 158.416,115.2783 C164.5089,105.8545 172.5443,107.0451 178.7374,115.1623 C184.7531,103.0559 194.4849,104.5897 200.8019,114.8652 C206.3894,105.2559 213.8889,103.3148 220.5987,113.7571 C230.5335,101.6824 242.1445,107.0818 245.9166,120 C246.6081,119.1483 247.409,119.4619 247.7257,120.3826 C257.9692,127.2541 259.1586,133.7646 248.6459,141.5389 C256.1444,147.9642 256.4285,154.7076 247.4062,160.025 C256.4244,164.6211 257.9952,170.7584 249.1618,177.1812 C258.6324,184.5519 259.5944,192.1103 248.7925,199.14 C258.445,203.7834 257.3287,209.4584 250.6906,215.9422 C260.6512,221.6286 261.1846,231.3246 250.634,236.9557 C258.6609,242.529 257.3704,249.547 250.0304,254.5944 C258.2051,259.7606 258.6107,267.8553 251.1795,273.9481 C261.6541,280.3532 260.9119,289.11 249.7836,294.0123 C257.8185,299.1948 260.4286,307.7027 250.2879,313.3591 C257.3179,317.3624 258.8967,325.8006 250.9702,330.4027 C260.9831,338.0501 260.5244,344.5661 250.1191,351.3852 C259.2792,358.0651 256.79,366.0813 247.172,369.7474 C255.9771,379.7804 250.7332,390.2883 238.9166,393 C240.0415,393.6511 240.0683,394.8611 238.9487,395.5405 C233.9214,406.1838 227.7798,405.8337 220.2497,398.0851 C215.6544,406.7146 207.1882,408.5569 201.4209,399.3201 C194.089,409.7463 187.2117,410.1595 178.6656,400.7102 C174.3784,411.0662 167.5358,411.0027 159.8642,404.4801 C155.2455,416.8208 144.5747,416.3542 137.3698,407.1847 C131.1073,417.3651 121.8707,415.2654 117.8071,405.0732 C109.8111,412.3177 102.654,411.3423 97.3854,401.7627 C87.8083,411.9747 80.916,410.2643 75.5553,397.7183 C70.197,407.2623 61.7886,408.1705 56.2666,397.8774 C40.9457,408.7998 30.5483,403.9625 26.9166,386 C29.3944,385.3435 30.9492,386.9413 30.6098,389.3712 C21.1661,384.5869 18.0114,374.6926 28.7625,368.1503 C17.9795,364.9339 14.6501,356.7337 23.8717,348.5305 C15.373,343.576 12.8986,335.5378 22.9223,329.6518 C13.3319,325.6535 12.887,318.1877 21.5686,312.7279 C11.2886,307.3256 9.2702,298.5575 20.0411,291.6311 C11.8475,287.7793 11.548,278.9495 18.6127,273.8705 C8.9554,269.7069 6,262.2462 15.3497,254.8261 C8.126,248.2516 10.1394,241.711 18.0424,237.4854 C11.0565,229.6735 10.3305,221.6047 22.1258,217.6614 C14.2183,212.213 11.545,205.4233 20.9211,198.867 C12.3342,192.7498 13.3437,183.7083 22.7118,179.2281 C14.8045,170.8469 16.8325,164.2681 26.3876,159.0712 C16.9213,153.134 19.0776,145.3468 27.4645,140.4417 C18.145,130.7142 20.4259,117.3644 33.9166,113 C34.417,112.8627 34.6229,113.084 34.5203,113.5774 " fill="#FFFFFF" filter="url(#f3l2xr1ezhilx)" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="90" x="91.4166" y="132.5332">environment</text><!--MD5=[05596e4ab25226d09b85b9abaf1de73e]
+cluster frontgate--><polygon fill="#FFFFFF" filter="url(#f3l2xr1ezhilx)" points="50.9166,167,60.9166,157,221.9166,157,221.9166,359,211.9166,369,50.9166,369,50.9166,167" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="211.9166" x2="221.9166" y1="167" y2="157"/><line style="stroke:#A80036;stroke-width:1.0;" x1="50.9166" x2="211.9166" y1="167" y2="167"/><line style="stroke:#A80036;stroke-width:1.0;" x1="211.9166" x2="211.9166" y1="167" y2="369"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="65" x="99.9166" y="184.5332">frontgate</text><!--MD5=[cd4473eb31c3b4fde06f93f1f693d219]
+entity front_deployment--><rect fill="#FFE4C4" filter="url(#f3l2xr1ezhilx)" height="40.6094" style="stroke:#8B4513;stroke-width:1.0;" width="103" x="94.4166" y="206"/><polygon fill="#FFE4C4" points="180.4166,211,180.4166,225,192.4166,225,192.4166,217,186.4166,211,180.4166,211" style="stroke:#8B4513;stroke-width:1.0;"/><line style="stroke:#8B4513;stroke-width:1.0;" x1="186.4166" x2="186.4166" y1="211" y2="217"/><line style="stroke:#8B4513;stroke-width:1.0;" x1="192.4166" x2="186.4166" y1="217" y2="217"/><text fill="#8B4513" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="73" x="104.4166" y="233.5332">deployment</text><!--MD5=[7cc3cd7b61f9e6501f78e5a57108bd0b]
+entity front_pod--><rect fill="#FFE4C4" filter="url(#f3l2xr1ezhilx)" height="33.6094" style="stroke:#8B4513;stroke-width:1.5;" width="40" x="127.9166" y="311"/><rect fill="#FFE4C4" height="33.6094" style="stroke:#8B4513;stroke-width:1.5;" width="40" x="123.9166" y="307"/><text fill="#8B4513" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="24" x="131.9166" y="329.5332">pod</text><!--MD5=[8fc3522a43f8c7199df5e09e5bb0188e]
+entity user--><ellipse cx="58.9166" cy="14" fill="#FEFECE" filter="url(#f3l2xr1ezhilx)" rx="8" ry="8" style="stroke:#A80036;stroke-width:2.0;"/><path d="M58.9166,22 L58.9166,49 M45.9166,30 L71.9166,30 M58.9166,49 L45.9166,64 M58.9166,49 L71.9166,64 " fill="none" filter="url(#f3l2xr1ezhilx)" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="28" x="44.9166" y="85.5332">user</text><!--MD5=[4c1bcac971530c53be28cd372d5485ab]
+link user to frontgate--><path d="M58.9166,89.23 C58.9166,102.1775 58.9166,117.005 58.9166,132.0031 C58.9166,139.5022 58.9166,147.0439 58.9166,154.4146 C58.9166,154.8753 58.9166,155.3353 58.9166,155.7946 C58.9166,156.0242 58.9166,156.2537 58.9166,156.4829 " fill="none" id="user-to-frontgate" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="58.9166,156.4829,62.9166,147.4829,58.9166,151.4829,54.9166,147.4829,58.9166,156.4829" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[81015e4e86b3e1bcd248e8ff5c6110ec]
+reverse link front_deployment to front_pod--><path d="M145.9166,252.34 C145.9166,269.37 145.9166,291.58 145.9166,306.94 " fill="none" id="front_deployment-backto-front_pod" style="stroke:#A80036;stroke-width:1.0;"/><polygon fill="#A80036" points="145.9166,247.23,141.9166,256.23,145.9166,252.23,149.9166,256.23,145.9166,247.23" style="stroke:#A80036;stroke-width:1.0;"/><!--MD5=[d39f9e8cc38eca98708243a21a7c1611]
+@startuml
+<style>
+artifact {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+collections {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+</style>
+
+actor user
+cloud environment {
+  node "frontgate" as frontgate {
+    artifact deployment as front_deployment
+    collections pod as front_pod
+  }
+}
+
+user - -> frontgate
+front_deployment <- - front_pod
+@enduml
+
+PlantUML version 1.2021.11(Sat Oct 02 15:26:11 CEST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: Cp1252
+Language: en
+Country: US
+--></g></svg>
