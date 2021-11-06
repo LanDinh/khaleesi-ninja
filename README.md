@@ -8,9 +8,11 @@
 
 ## Available Systems
 
-| Environment | Intended Use      | Differences in Configuration |
-| ----------- | ----------------- | ---------------------------- |
-| `local`     | Local development | Debug mode is active, requires changes to `/etc/hosts` |
+| Environment       | Intended Use | Differences in Configuration |
+| ----------------- | ------------ | ---------------------------- |
+| `development`     | development  | Debug mode is active         |
+
+Note that when deploying an environment locally, it is necessary to edit `/etc/hosts` to make it reachable.
 
 | Gate   | Domain | Use |
 | ------ | ------ | --- |
@@ -59,11 +61,10 @@ The folder structure is as follows:
 * `scripts` Utility scripts - [documentation](documentation/scripts.md)
 * `templates` Templates used when creating new services - [documentation](documentation/templates.md)
 
-### Starting the gates locally
+### Starting the gates locally in development mode
 
-Build and deploy changes by running `./scripts/deploy.sh local`
+Build and deploy changes by running `./scripts/deploy.sh development`
 
 ### Automated tests
 
 Execute the tests by running `./scripts/test.sh`
-

@@ -20,7 +20,7 @@ This requires `kubectl` to be connected to a cluster.
 1. Make sure that the namespace for the environment exists
 1. Apply the manifests for the service
 
-If the `local` environment was chosen, some more steps are executed:
+If the `development` environment was chosen, some more steps are executed:
 
 1. The affected containers get rebuilt
 1. The deployment gets a rolling restart

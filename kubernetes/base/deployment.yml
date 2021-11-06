@@ -12,7 +12,4 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: deployment
-              containerPort: 80
-
-
-
+              containerPort: 443

@@ -12,9 +12,9 @@ This is a `create-react-app` template for creating new frontgates.
 
 This contains templates relevant for kubernetes.
 
-### `local` folder
+### `environment` folder
 
-This contains the kustomizations necessary for the local environment.
+This contains the kustomizations necessary for the each environment.
 
 ### `service` folder
 

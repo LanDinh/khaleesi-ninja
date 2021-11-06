@@ -49,7 +49,7 @@ create_kubernetes_manifests() {
 
   echo "Creating files for environment kustomizations..."
   while read -r environment; do
-    copy_kubernetes_folder_with_placeholders "${environment}" "${gate}" "${service}"
+    copy_kubernetes_folder_with_placeholders "environment/${environment}" "${gate}" "${service}"
   done < "./scripts/data/environments"
 }
 
