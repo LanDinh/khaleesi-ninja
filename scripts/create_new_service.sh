@@ -93,7 +93,7 @@ create_frontgate() {
   rm "${project_folder}/package.json"
   rm -r "${project_folder}/node_modules"
 
-  create_service_infrastructure "${gate}" "frontgate"
+  create_service_infrastructure "${gate}" "frontgate" "frontgate"
 }
 
 

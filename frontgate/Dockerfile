@@ -39,6 +39,7 @@ FROM node:16.13-slim as development
 # Arguments & environment.
 ARG gate
 ENV KHALEESI_GATE=${gate}
+ENV PORT=443
 
 # Labels.
 LABEL environment=development

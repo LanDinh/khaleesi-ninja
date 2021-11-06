@@ -9,5 +9,13 @@ images:
     newName: khaleesi-ninja/core/frontgate
     newTag: latest
 
+patchesJson6902:
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: Ingress
+      name: ingress
+    path: patch-ingress-host.yml
+
 bases:
   - ../../base/frontgate
