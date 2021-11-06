@@ -8,15 +8,15 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
-red='\033[0;31m'
 yellow='\033[0;33m'
+red='\033[0;31m'
 clear_color=
 
 
 # Options.
 scripts_directory=./scripts
 temp_directory="${scripts_directory}/temp"
-gate_services_file="${scripts_directory}/gate_services"
+gate_services_file="${scripts_directory}/data/gate_services"
 current_service_file="${temp_directory}/current_service"
 
 

@@ -13,7 +13,7 @@ clear_color='\033[0m'
 
 # Options.
 function=${1}
-gate_services_file=./scripts/gate_services
+gate_services_file=./scripts/data/gate_services
 
 
 if [ $# -eq 1 ]; then
