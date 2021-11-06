@@ -1,12 +1,13 @@
 # Frontgate
-/frontgate/node_modules
+/frontgate/node_modules/*
 
 # Backend
-/backend/.venv
-/backend/protos
+/backend/.venv/*
+/backend/protos/*
+!/backend/protos/__init__.py
 
 # Development
-/.idea/
+/.idea/*
 *.iml
-/temp
-/scripts/temp
+/temp/*
+/scripts/temp/*
