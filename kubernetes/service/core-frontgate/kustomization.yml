@@ -10,4 +10,4 @@ images:
     newTag: latest
 
 bases:
-  - ../../base
+  - ../../base/frontgate

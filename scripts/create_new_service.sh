@@ -27,8 +27,9 @@ copy_kubernetes_folder_with_placeholders() {
   local folder=${1}
   local gate=${2}
   local service=${3}
+  local type=${4}
 
-  local source="templates/kubernetes/${folder}/."
+  local source="templates/kubernetes/${type}/${folder}/."
   local destination="kubernetes/${folder}/${gate}-${service}/"
 
   mkdir -p "${destination}"
@@ -43,13 +44,14 @@ copy_kubernetes_folder_with_placeholders() {
 create_kubernetes_manifests() {
   local gate=${1}
   local service=${2}
+  local type=${3}
 
-  echo "Creating files for service definition..."
-  copy_kubernetes_folder_with_placeholders "service" "${gate}" "${service}"
+  echo -e "${yellow}Creating kubernetes base service manifests...${clear_color}"
+  copy_kubernetes_folder_with_placeholders "service" "${gate}" "${service}" "${type}"
 
   echo "Creating files for environment kustomizations..."
   while read -r environment; do
-    copy_kubernetes_folder_with_placeholders "environment/${environment}" "${gate}" "${service}"
+    copy_kubernetes_folder_with_placeholders "environment/${environment}" "${gate}" "${service}" "${type}"
   done < "./scripts/data/environments"
 }
 
@@ -60,15 +62,16 @@ add_service_to_lists_of_service() {
   local service=${2}
 
   sed -i "1 a ${gate}.${service}" scripts/data/gate_services
-  sed -i "1 a \ \ {\"gate\": \"${gate}\", \"service\": \"${service}\"}," .github/data/services.json
+  sed -i "1 a \ \ {\ \"gate\": \"${gate}\", \"service\": \"${service}\"\ }," .github/data/services.json
 }
 
 create_service_infrastructure() {
   local gate=${1}
   local service=${2}
+  local type=${3}
 
   echo -e "${yellow}Creating kubernetes manifests...${clear_color}"
-  create_kubernetes_manifests "${gate}" "${service}"
+  create_kubernetes_manifests "${gate}" "${service}" "${type}"
 
   echo -e "${yellow}Adding service to list of services...${clear_color}"
   add_service_to_lists_of_service "${gate}" "${service}"
