@@ -1,4 +1,2 @@
-namespace: khaleesi-ninja-local
-
 bases:
   - ../../service/${GATE}-${SERVICE}

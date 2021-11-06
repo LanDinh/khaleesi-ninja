@@ -8,14 +8,18 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
-yellow='\033[0;33m'
 green='\033[0;32m'
+yellow='\033[0;33m'
 clear_color='\033[0m'
 
 
 # Options.
 environment=${1}
-current_service_file=./scripts/temp/current_service
+current_service_file="./scripts/temp/current_service"
+
+
+# Validate environment.
+./scripts/valid_environment.sh "${1}"
 namespace="khaleesi-ninja-${environment}"
 
 
