@@ -1,6 +1,9 @@
 # Frontgate
 /frontgate/node_modules
 
+# Backend
+/backend/.venv
+
 # Development
 /.idea/
 *.iml
