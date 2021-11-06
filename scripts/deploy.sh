@@ -39,7 +39,7 @@ deploy_service() {
   local service=${2}
 
   echo -e "${yellow}Applying the manifests...${clear_color}"
-  kubectl apply -k "kubernetes/${environment}/${gate}-${service}"
+  kubectl apply -k "kubernetes/${environment}/${gate}-${service}" -n "${namespace}"
 
   if [ "${environment}" = "local" ]; then
     echo -e "${yellow}Rebuilding container...${clear_color}"
