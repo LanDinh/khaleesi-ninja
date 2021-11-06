@@ -3,6 +3,7 @@
 
 # Backend
 /backend/.venv
+/backend/protos
 
 # Development
 /.idea/
