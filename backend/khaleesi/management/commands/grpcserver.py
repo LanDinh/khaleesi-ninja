@@ -27,19 +27,17 @@ class Command(BaseCommand):
     )
 
   def handle(self, *args, **options):
-    self.address = options['address']
-    self.max_workers = options['max_workers']
     self.run(**options)
 
   def run(self, **options):
     """Run the server."""
-    self.stdout.write(f'Starting gRPC server at ${self.address}')
-    self._serve()
+    self.stdout.write(f'Starting gRPC server at ${options["address"]}')
+    self._serve(**options)
 
-  def _serve(self):
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers = self.max_workers))
+  def _serve(self, **options):
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers = options['max_workers']))
     self._import_handler(server)
-    server.add_insecure_port(self.address)
+    server.add_insecure_port(options['address'])
     server.start()
     server.wait_for_termination()
 
