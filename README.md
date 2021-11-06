@@ -8,9 +8,10 @@
 
 ## Available Systems
 
-| Environment       | Intended Use | Differences in Configuration |
-| ----------------- | ------------ | ---------------------------- |
-| `development`     | development  | Debug mode is active         |
+| Environment       | Intended Use       | Differences in Configuration            |
+| ----------------- | ------------------ | --------------------------------------- |
+| `development`     | development        | Debug mode is active                    |
+| `staging`         | quality assurance  | Mirrors `production`, but without users |
 
 Note that when deploying an environment locally, it is necessary to edit `/etc/hosts` to make it reachable.
 
@@ -31,24 +32,17 @@ You need to make sure that these conditions are met:
 
 ### Technologies used
 
-You might want to make yourself familiar with the technologies used:
+You might want to make yourself familiar with the technologies used.
 
-Deployment:
+The general deployment is done with:
 
 ![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.21-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 
-Backgates:
-
-![python badge](https://img.shields.io/badge/python-v3.10-informational)
-
-Frontgates:
-
-![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational)
-![react badge](https://img.shields.io/badge/react-v17.0-informational)
-![create-react-app badge](https://img.shields.io/badge/create_react_app-latest-informational)
-![jest badge](https://img.shields.io/badge/jest-v26.0-informational)
-![eslint badge](https://img.shields.io/badge/eslint-latest-informational)
+| Service Type | General | Deployment | Development |
+| ------------ | ------- | ---------- | ----------- |
+| Frontgate    | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react_router-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) | ![create-react-app badge](https://img.shields.io/badge/create_react_app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |
+| Backgate     | ![python badge](https://img.shields.io/badge/python-v3.10-informational)
 
 ### Structure
 

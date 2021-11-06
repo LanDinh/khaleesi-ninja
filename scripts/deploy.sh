@@ -48,6 +48,14 @@ deploy_service() {
     echo -e "${yellow}Rollout container...${clear_color}"
     # shellcheck disable=SC2068
     kubectl rollout restart deployment "${gate}-${service}-deployment" -n "${namespace}"
+
+  elif [ "${environment}" = "staging" ]; then
+    echo -e "${yellow}Rebuilding container...${clear_color}"
+    . scripts/build.sh "production" "${gate}" "${service}"
+
+    echo -e "${yellow}Rollout container...${clear_color}"
+    # shellcheck disable=SC2068
+    kubectl rollout restart deployment "${gate}-${service}-deployment" -n "${namespace}"
   fi
 }
 
