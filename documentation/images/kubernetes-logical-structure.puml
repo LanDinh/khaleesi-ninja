@@ -15,11 +15,13 @@ collections {
 actor user
 cloud environment {
   node "frontgate" as frontgate {
+    artifact service as front_service
     artifact deployment as front_deployment
     collections pod as front_pod
   }
 }
 
 user --> frontgate
+front_service <-- front_deployment
 front_deployment <-- front_pod
 @enduml

@@ -12,12 +12,13 @@ card {
 }
 </style>
 
-node base {
+folder base {
   artifact deployment as base_deployment
+  artifact service as base_service
   card kustomization as base_kustomization
 }
 
-node service {
+folder service {
   card service_kustomization [
     kustomization
     ====
@@ -28,7 +29,7 @@ node service {
   ]
 }
 
-node environment {
+folder environment {
   card environment_kustomization [
     kustomization
     ====

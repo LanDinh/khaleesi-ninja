@@ -15,6 +15,7 @@ Each service is represented by one deployment, which controls the pods generated
 The `base` directory contains the basic necessary manifests for each deployment:
 
 * `deployment.yml` defines the kubernetes deployment
+* `service.yml` defines the kubernetes service
 * `kustomization.yml` collects all resources
 
 Each service has a dedicated folder within the `service` directory to allow kustomization per-service.
