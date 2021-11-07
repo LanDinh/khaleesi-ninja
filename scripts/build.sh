@@ -18,22 +18,19 @@ environment=${1}
 build_container() {
   local gate=${1}
   local service=${2}
-  local type=
+  local location=
 
   case $service in
     frontgate)
-      type=frontgate
-      ;;
-    backgate)
-      type=backgate
+      location="frontgate"
       ;;
     *)
-      type=microservice
+      location="backend"
       ;;
     esac
 
   echo "Building the image khaleesi-ninja/${gate}/${service} for ${environment}...."
-  docker build "${type}" --build-arg gate="${gate}" --target "${environment}" -t "khaleesi-ninja/${gate}/${service}"
+  docker build "${location}" --build-arg gate="${gate}" --build-arg service="${service}" --target "${environment}" -t "khaleesi-ninja/${gate}/${service}"
 }
 
 
