@@ -37,5 +37,5 @@ echo "Generating the python protos..."
 build_protos python
 
 echo "Replacing the old python protos..."
-rm "${python_out}"/*
+rm -f "${python_out}"/*
 cp -r temp/* "${python_out}/"
