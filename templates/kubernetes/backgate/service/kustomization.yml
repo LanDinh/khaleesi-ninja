@@ -1,12 +1,12 @@
-namePrefix: core-backgate-
+namePrefix: ${GATE}-${SERVICE}-
 commonLabels:
-  gate: core
-  service: backgate
+  gate: ${GATE}
+  service: ${SERVICE}
 commonAnnotations:
-  type: backgate
+  type: ${SERVICE}
 images:
   - name: deployment
-    newName: khaleesi-ninja/core/backgate
+    newName: khaleesi-ninja/${GATE}/${SERVICE}
     newTag: latest
 
 patchesJson6902:

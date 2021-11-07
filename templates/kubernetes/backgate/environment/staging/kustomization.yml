@@ -7,4 +7,4 @@ patchesJson6902:
     path: patch-ingress-host.yml
 
 bases:
-  - ../../../service/core-backgate
+  - ../../../service/${GATE}-${SERVICE}
