@@ -38,4 +38,5 @@ build_protos python
 
 echo "Replacing the old python protos..."
 rm -f "${python_out}"/*
+mkdir -p "${python_out}"
 cp -r temp/* "${python_out}/"
