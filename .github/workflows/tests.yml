@@ -21,15 +21,6 @@ jobs:
         with:
           filename: .github/data/services.json
 
-  # Test that the dockerfiles work when building all containers simultaneously.
-  test-all-dockerfiles:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Build all development containers
-        run: ./scripts/build.sh development
-
   # Test that the kubernetes environments actually work.
   test-kubernetes-configuration:
     runs-on: ubuntu-latest
