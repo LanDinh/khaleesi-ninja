@@ -1,0 +1,4 @@
+"""Settings for {{ project_name }}."""
+
+# khaleesi-ninja.
+from core.settings import *

@@ -78,6 +78,18 @@ create_service_infrastructure() {
 }
 
 
+# Backgate.
+create_backgate() {
+  local gate=${1}
+  local project_folder="backend/${gate}/backgate"
+  local template_folder="templates/backend"
+
+  echo -e "${yellow}Creating django project...${clear_color}"
+  mkdir -p "$project_folder"
+  python -m django startproject --template="${template_folder}/backgate_template" "${gate}_backgate" "${project_folder}"
+}
+
+
 # Frontgate.
 create_frontgate() {
   local gate=${1}
@@ -105,8 +117,9 @@ echo -e "${magenta}Enter service type:${clear_color}"
 select type in gate; do
   case $type in
   gate)
-    echo -e "${magenta}Creating frontgate...${clear_color}"
+    echo -e "${magenta}Creating gates...${clear_color}"
     create_frontgate "${gate}"
+    create_backgate "${gate}"
     break
     ;;
   *)

@@ -31,23 +31,25 @@ class Command(BaseCommand):
 
   def run(self, **options):
     """Run the server."""
-    self.stdout.write(f'Starting gRPC server at {options["address"]}...')
     self._serve(**options)
 
   def _serve(self, **options):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers = options['max_workers']))
-    self._import_handler(server)
+    self._add_handlers(server)
     server.add_insecure_port(options['address'])
+    self.stdout.write(f'Starting gRPC server at {options["address"]}...')
     server.start()
     server.wait_for_termination()
 
   @staticmethod
-  def _import_handler(server):
+  def _add_handlers(server):
     """
     Attempt to import a class from a string representation.
     """
-    value = f'{settings.GRPC_HANDLER}.register_handler'
-    try:
-      import_string(value)(server)
-    except ImportError as e:
-      raise ImportError(f'Could not import "{value}" for gRPC handler.')
+    raw_handlers = settings.KHALEESI_NINJA["GRPC_HANDLERS"]
+    for raw_handler in raw_handlers:
+      handler = f'{raw_handler}.register_handler'
+      try:
+        import_string(handler)(server)
+      except ImportError as e:
+        raise ImportError(f'Could not import "{handler}" for gRPC handler.')
