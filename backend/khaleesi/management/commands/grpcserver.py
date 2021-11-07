@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
   def run(self, **options):
     """Run the server."""
-    self.stdout.write(f'Starting gRPC server at ${options["address"]}')
+    self.stdout.write(f'Starting gRPC server at {options["address"]}...')
     self._serve(**options)
 
   def _serve(self, **options):
@@ -50,4 +50,4 @@ class Command(BaseCommand):
     try:
       import_string(value)(server)
     except ImportError as e:
-      raise ImportError(f'Could not import "${value}" for gRPC handler.')
+      raise ImportError(f'Could not import "{value}" for gRPC handler.')

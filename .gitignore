@@ -3,8 +3,7 @@
 
 # Backend
 /backend/.venv/*
-/backend/protos/*
-!/backend/protos/__init__.py
+/backend/khaleesi/proto/*
 
 # Development
 /.idea/*
