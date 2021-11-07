@@ -34,7 +34,7 @@ ARG service
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV PYTHONPATH="/code"
-ENV DJANGO_SETTINGS_MODULE="configuration.settings"
+ENV DJANGO_SETTINGS_MODULE="settings"
 
 # Data.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
