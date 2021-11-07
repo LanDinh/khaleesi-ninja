@@ -1,0 +1,13 @@
+namePrefix: core-backgate-
+commonLabels:
+  gate: core
+  service: backgate
+commonAnnotations:
+  type: backgate
+images:
+  - name: deployment
+    newName: khaleesi-ninja/core/backgate
+    newTag: latest
+
+bases:
+  - ../../base/service

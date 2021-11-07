@@ -87,6 +87,8 @@ create_backgate() {
   echo -e "${yellow}Creating django project...${clear_color}"
   mkdir -p "$project_folder"
   python -m django startproject --template="${template_folder}/backgate_template" "${gate}_backgate" "${project_folder}"
+
+  create_service_infrastructure "${gate}" "backgate" "service"
 }
 
 
