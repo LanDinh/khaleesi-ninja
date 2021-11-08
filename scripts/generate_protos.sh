@@ -20,5 +20,5 @@ echo "Generating the python protos..."
 rm -f "${python_out}/proto/"*
 mkdir -p "${python_out}/proto"
 cp "${python_in}/__init__.py" "${python_out}/proto/__init__.py"
-python -m pip install -r "${python_in}/requirements.txt"
+python -m pip install -r "${python_in}/requirements.txt" --upgrade
 python -m grpc_tools.protoc -I proto --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${proto_in}"/*.proto
