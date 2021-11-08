@@ -7,7 +7,8 @@ set -o pipefail # Make pipes fail
 
 
 # Options.
-input="proto/proto"
+proto_in="proto/proto"
+python_in="proto/python"
 python_out="backend/khaleesi"
 
 
@@ -17,8 +18,7 @@ mkdir temp
 
 echo "Generating the python protos..."
 rm -f "${python_out}/proto/"*
-mkdir -p "${python_out}"
-cp proto/python/__init__.py "${python_out}/proto/__init__.py"
-python -m pip install grpcio-tools
-python -m pip install mypy-protobuf
-python -m grpc_tools.protoc -I proto --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${input}"/*.proto
+mkdir -p "${python_out}/proto"
+cp "${python_in}/__init__.py" "${python_out}/proto/__init__.py"
+python -m pip install -r "${python_in}/requirements.txt"
+python -m grpc_tools.protoc -I proto --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${proto_in}"/*.proto
