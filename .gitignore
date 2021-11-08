@@ -10,3 +10,4 @@
 *.iml
 /temp/*
 /scripts/temp/*
+/scripts/local/*
