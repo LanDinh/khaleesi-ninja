@@ -37,7 +37,7 @@ if [[ $# -eq 1 ]] && [[ "${1}" == "interactive" ]]; then
 fi
 
 
-echo -e "${magenta}Clean up old files and create mount directory...${clear_color}"
+echo -e "${magenta}Cleaning up old files and create mount directory...${clear_color}"
 rm -r -f temp
 mkdir temp
 
