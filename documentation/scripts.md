@@ -64,7 +64,7 @@ Of course, you should thoroughly review the `git` diff before committing anythin
 
 The `templates` folder contains the data necessary for this script to work and is documented [here](/documentation/templates.md).
 
-## Helpers
+## `util` folder
 
 These scripts are not intended to be called directly, but are used by the other scripts.
 

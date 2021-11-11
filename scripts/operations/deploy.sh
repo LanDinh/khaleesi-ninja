@@ -19,7 +19,7 @@ current_service_file="./scripts/temp/current_service"
 
 
 # Validate environment.
-./scripts/valid_environment.sh "${1}"
+./scripts/util/valid_environment.sh "${1}"
 namespace="khaleesi-ninja-${environment}"
 
 
@@ -43,7 +43,7 @@ deploy_service() {
 
   if [ "${environment}" = "development" ]; then
     echo -e "${yellow}Rebuilding container...${clear_color}"
-    . scripts/build.sh "development" "${gate}" "${service}"
+    . scripts/util/build.sh "development" "${gate}" "${service}"
 
     echo -e "${yellow}Rollout container...${clear_color}"
     # shellcheck disable=SC2068
@@ -51,7 +51,7 @@ deploy_service() {
 
   elif [ "${environment}" = "staging" ]; then
     echo -e "${yellow}Rebuilding container...${clear_color}"
-    . scripts/build.sh "production" "${gate}" "${service}"
+    . scripts/util/build.sh "production" "${gate}" "${service}"
 
     echo -e "${yellow}Rollout container...${clear_color}"
     # shellcheck disable=SC2068
@@ -68,7 +68,7 @@ kubectl apply -k "kubernetes/infrastructure"
 
 echo -e "${magenta}Rollout the service...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/service_loop.sh deploy_service ${services[@]}
+. scripts/util/service_loop.sh deploy_service ${services[@]}
 
 
 echo -e "${green}DONE! :D${clear_color}"

@@ -43,10 +43,10 @@ mkdir temp
 
 echo -e "${magenta}Building the images...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/build.sh "development" ${services[@]}
+. scripts/util/build.sh "development" ${services[@]}
 
 echo -e "${magenta}Testing the services...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/service_loop.sh test_container ${services[@]}
+. scripts/util/service_loop.sh test_container ${services[@]}
 
 echo -e "${green}DONE! :D${clear_color}"

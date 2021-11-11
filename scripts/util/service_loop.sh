@@ -29,7 +29,7 @@ if [ $# -eq 1 ]; then
 elif [ $# -eq 3 ]; then
   gate=${2}
   service=${3}
-  ./scripts/valid_service.sh "${gate}" "${service}"
+  ./scripts/util/valid_service.sh "${gate}" "${service}"
   echo "Executing for the ${gate} ${service} service..."
   "${function}" "${gate}" "${service}"
   
