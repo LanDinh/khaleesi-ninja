@@ -62,4 +62,4 @@ Build and deploy changes by running `./scripts/operations/deploy.sh development`
 
 ### Automated tests
 
-Execute the tests by running `./scripts/test.sh`
+Execute the tests by running `./scripts/development/test.sh`

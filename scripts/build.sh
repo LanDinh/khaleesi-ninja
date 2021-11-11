@@ -35,7 +35,7 @@ build_container() {
 
 
 echo -e "${yellow}Updating the protos...${clear_color}"
-. scripts/generate_protos.sh
+. scripts/development/generate_protos.sh
 
 echo -e "${yellow}Building the containers...${clear_color}"
 . scripts/service_loop.sh build_container "${@:2}"

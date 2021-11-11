@@ -29,7 +29,7 @@ test_container() {
 # Check if interactive mode.
 services=("$@")
 if [[ $# -eq 1 ]] && [[ "${1}" == "interactive" ]]; then
-  ./scripts/interactive_service.sh
+  ./scripts/development/interactive_service.sh
   while read -r raw_line; do
     IFS="." read -r -a line <<< "${raw_line}"
     services=("${line[@]}")

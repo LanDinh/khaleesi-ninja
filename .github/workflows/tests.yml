@@ -50,7 +50,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Execute the container test
-        run: ./scripts/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }}
+        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }}
       - name: Upload coverage to codecov
         if: ${{ always() }}
         uses: codecov/codecov-action@v2

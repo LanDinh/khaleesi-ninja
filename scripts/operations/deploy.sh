@@ -26,7 +26,7 @@ namespace="khaleesi-ninja-${environment}"
 # Check if interactive mode.
 services=("${@:2}")
 if [[ $# -eq 2 ]] && [[ "${2}" == "interactive" ]]; then
-  ./scripts/interactive_service.sh
+  ./scripts/development/interactive_service.sh
   while read -r raw_line; do
     IFS="." read -r -a line <<< "${raw_line}"
     services=("${line[@]}")

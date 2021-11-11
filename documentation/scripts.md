@@ -27,7 +27,7 @@ If the `development` environment was chosen, some more steps are executed:
 
 Note that in order for requests to reach the environment, the appropriate entries might need to be manually added to `/etc/hosts`.
 
-## Development
+## `development` folder
 
 ### `test.sh [INTERACTIVE | (GATE SERVICE)]`
 

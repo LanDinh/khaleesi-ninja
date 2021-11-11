@@ -120,7 +120,7 @@ select type in gate; do
   case $type in
   gate)
     echo -e "${magenta}Creating gates...${clear_color}"
-    create_frontgate "${gate}"
+    #create_frontgate "${gate}"
     create_backgate "${gate}"
     break
     ;;
