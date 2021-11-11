@@ -37,7 +37,7 @@ jobs:
           sudo dpkg -i minikube_latest_amd64.deb
           minikube start
       - name: Spin up the environment
-        run: ./scripts/deploy.sh ${{ matrix.environment }}
+        run: ./scripts/operations/deploy.sh ${{ matrix.environment }}
 
   # Execute all tests for all services individually.
   test-all-services:

@@ -58,7 +58,7 @@ The folder structure is as follows:
 
 ### Starting the gates locally in development mode
 
-Build and deploy changes by running `./scripts/deploy.sh development`
+Build and deploy changes by running `./scripts/operations/deploy.sh development`
 
 ### Automated tests
 

@@ -7,7 +7,7 @@ If the options `[GATE]` and `[SERVICE]` can be passed, either none or both have 
 In some cases, passing the gate and service can be substituted by an interactive prompt.
 If none are passed, the script will iterate over *all* services, otherwise it will only be executed on the specified one.
 
-## Operations
+## `operations` folder
 
 ### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
 
