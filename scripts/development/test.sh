@@ -14,7 +14,7 @@ clear_color='\033[0m'
 
 
 # Options.
-current_service_file=./scripts/temp/current_service
+current_service_file=./scripts/data/current_service
 
 
 test_container() {
@@ -28,8 +28,7 @@ test_container() {
 
 # Check if interactive mode.
 services=("$@")
-if [[ $# -eq 1 ]] && [[ "${1}" == "interactive" ]]; then
-  ./scripts/development/interactive_service.sh
+if [[ $# -eq 1 ]] && [[ "${1}" == "current_service" ]]; then
   while read -r raw_line; do
     IFS="." read -r -a line <<< "${raw_line}"
     services=("${line[@]}")

@@ -15,7 +15,7 @@ clear_color='\033[0m'
 
 # Options.
 environment=${1}
-current_service_file="./scripts/temp/current_service"
+current_service_file="./scripts/data/current_service"
 
 
 # Validate environment.
@@ -25,8 +25,7 @@ namespace="khaleesi-ninja-${environment}"
 
 # Check if interactive mode.
 services=("${@:2}")
-if [[ $# -eq 2 ]] && [[ "${2}" == "interactive" ]]; then
-  ./scripts/development/interactive_service.sh
+if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
   while read -r raw_line; do
     IFS="." read -r -a line <<< "${raw_line}"
     services=("${line[@]}")

@@ -9,5 +9,5 @@
 /.idea/*
 *.iml
 /temp/*
-/scripts/temp/*
+/scripts/data/current_service
 /scripts/local/*
