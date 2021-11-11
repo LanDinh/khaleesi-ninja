@@ -1,18 +1,25 @@
-# Utility scripts
+# Scripts
 
-This project offers a bunch of utility scripts.
+This project offers a bunch of scripts to ease operations & development.
 All of them expect to be run at the project root.
 
 If the options `[GATE]` and `[SERVICE]` can be passed, either none or both have to be passed.
-In some cases, passing the gate and service can be substituted by an interactive prompt.
-If none are passed, the script will iterate over *all* services, otherwise it will only be executed on the specified one.
+In some cases, a temporary file is used to pass this information, which is written to via an interactive prompt.
+If no information is passed, the script will iterate over *all* services, otherwise it will only be executed on the specified one.
+
+## `data` folder
+
+* `environments` lists all available environments
+* `gate_services` lists all available services
+* `current_service` is an optional file for development to enable quick iterations of testing and deploying. It is not committed to `git`
 
 ## `operations` folder
 
 ### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
 
 If no service was specified, this affects all services.
-If `interactive` was specified, the user is provided with a selection prompt to choose the service.
+If `current_service` was specified, `./scripts/data/current_service` is used as input.
+If this file doesn't exist, `./scripts/development/swich_current_service.sh` is called to create it.
 If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
 This requires `kubectl` to be connected to a cluster.
@@ -32,7 +39,8 @@ Note that in order for requests to reach the environment, the appropriate entrie
 ### `test.sh [INTERACTIVE | (GATE SERVICE)]`
 
 If no service was specified, this affects all services.
-If `interactive` was specified, the user is provided with a selection prompt to choose the service.
+If `current_service` was specified, `./scripts/data/current_service` is used as input.
+If this file doesn't exist, `./scripts/development/swich_current_service.sh` is called to create it.
 If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
 This will first build the test containers.
@@ -41,6 +49,14 @@ Afterwards, it will complete any tests configured - this includes:
 * Unit and integration tests
 * Linting
 * Static type checking (for backgates and microservices)
+
+### `generate_protos.sh`
+
+This will generate the code for all proto files located in `/proto`.
+
+### `switch_current_service.sh`
+
+This will prompt the user to select the `current_service` that is used by `./development/test.sh` and `./operations/deploy.sh`.
 
 ### `create_new_service.sh`
 
@@ -68,9 +84,9 @@ The `templates` folder contains the data necessary for this script to work and i
 
 These scripts are not intended to be called directly, but are used by the other scripts.
 
-### `build.sh ENVIRONMENT [GATE SERVICE]`
+### `build.sh MODE [GATE SERVICE]`
 
-This will build the containers for either the `development` or `production` environment.
+This will build the containers in either `development` or `production` mode.
 If no service was specified, it will do so for *all* services.
 Otherwise, it will only do so for the specified service.
 
@@ -81,7 +97,10 @@ Afterwards, any dangling images get pruned.
 If no service was specified, the function gets executed on *all* services.
 If a service was specified, the function gets executed on the specified service.
 
-### `interactive_service.sh`
+### `valid_environment.sh ENVIRONMENT`
 
-This provides a nice interactive selection prompt for users to choose their service.
-The choice is saved in a temporary file.
+This validates that the provided environment exists.
+
+### `valid_service.sh GATE SERVICE`
+
+This validates that the provided service exists.

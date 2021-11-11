@@ -29,6 +29,9 @@ test_container() {
 # Check if interactive mode.
 services=("$@")
 if [[ $# -eq 1 ]] && [[ "${1}" == "current_service" ]]; then
+  if [ ! -f "${current_service_file}" ]; then
+      . ./scripts/development/switch_current_service.sh
+  fi
   while read -r raw_line; do
     IFS="." read -r -a line <<< "${raw_line}"
     services=("${line[@]}")

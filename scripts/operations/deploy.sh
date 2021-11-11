@@ -26,6 +26,9 @@ namespace="khaleesi-ninja-${environment}"
 # Check if interactive mode.
 services=("${@:2}")
 if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
+  if [ ! -f "${current_service_file}" ]; then
+      . ./scripts/development/switch_current_service.sh
+  fi
   while read -r raw_line; do
     IFS="." read -r -a line <<< "${raw_line}"
     services=("${line[@]}")
