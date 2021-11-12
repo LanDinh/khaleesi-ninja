@@ -3,7 +3,11 @@ kind: Ingress
 metadata:
   name: ingress
 spec:
-  ingressClassName: khaleesi-ninja-ingress-class
+  ingressClassName: ingress-class
+  tls:
+    - hosts:
+      - "*.khaleesi.ninja"
+      secretName: tls-certificate
   rules:
     - host: "khaleesi.ninja"
       http:

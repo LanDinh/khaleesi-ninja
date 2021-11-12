@@ -10,7 +10,7 @@ set -o pipefail # Make pipes fail
 magenta='\033[0;35m'
 yellow='\033[0;33m'
 red='\033[0;31m'
-clear_color=
+clear_color='\033[0m'
 
 
 # Options.

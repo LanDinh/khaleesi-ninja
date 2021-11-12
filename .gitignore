@@ -11,3 +11,6 @@
 /temp/*
 /scripts/data/current_service
 /scripts/local/*
+
+# Operations
+/letsencrypt/*

@@ -12,13 +12,13 @@ python_in="proto/python"
 python_out="backend/khaleesi/proto"
 
 
-echo "Clean up old files and create mount directory..."
+echo "Cleaning up old files and create mount directory..."
 rm -r -f temp
 mkdir temp
 
 echo "Generating the python protos..."
 rm -f "${python_out}/"*
 mkdir -p "${python_out}"
-cp "${python_in}/__init__.py" "${python_out}/__init__.py"
+cp -a "${python_in}/__init__.py" "${python_out}/__init__.py"
 python -m pip install -r "${python_in}/requirements.txt"
 python -m grpc_tools.protoc -I proto --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${proto_in}"/*.proto

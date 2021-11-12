@@ -66,7 +66,7 @@ echo -e "${magenta}Making sure the namespace exists...${clear_color}"
 kubectl create namespace "${namespace}" --dry-run=client -o yaml | kubectl apply -f -
 
 echo -e "${magenta}Making sure the infrastructure is up to date...${clear_color}"
-kubectl apply -k "kubernetes/infrastructure"
+kubectl apply -k "kubernetes/infrastructure" -n "${namespace}"
 
 echo -e "${magenta}Rollout the service...${clear_color}"
 # shellcheck disable=SC2068

@@ -34,6 +34,12 @@ If the `development` environment was chosen, some more steps are executed:
 
 Note that in order for requests to reach the environment, the appropriate entries might need to be manually added to `/etc/hosts`.
 
+### `refresh_tls_certificate.sh`
+
+This can be used to refresh the TLS certificate.
+The contact email address has to be set as environment variable (`KHALEESI_EMAIL`).
+It will be put into the folder `letsencrypt` - note that this folder is listed in `.gitignore` so as not to leak any private keys.
+
 ## `development` folder
 
 ### `test.sh [INTERACTIVE | (GATE SERVICE)]`
