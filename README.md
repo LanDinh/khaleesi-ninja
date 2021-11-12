@@ -60,11 +60,21 @@ The folder structure is as follows:
 * `scripts` Utility scripts - [documentation](documentation/scripts.md)
 * `templates` Templates used when creating new services - [documentation](documentation/templates.md)
 
-### Starting the gates locally in development mode
+### Starting the ecosystem locally
 
-Build and deploy changes by running `./scripts/operations/deploy.sh development`.
+Build and deploy changes by running the following command (most likely, the environment will be either `development` or `integration`:
 
-Optionally, self-signed TLS certificates may be made available to deployments - they are expected to be kubernetes secrets of type `tls` with the name `tls-certificate`.  
+```
+./scripts/operations/deploy.sh <ENVIRONMENT>
+```
+
+Optionally, self-signed TLS certificates may be made available to deployments using the following command:
+
+```
+  kubectl -n "khaleesi-ninja-${ENVIRONMENT}" create secret tls tls-certificate --key "${PATH-TO-CERTIFICATE}/key.pem" --cert "${PATH-TO-CERTIFICATE}/cert.pem"
+```
+
+Note that the namespace must match the chosen environment, and the name of the secret is expected to be `tls-certificate`.
 
 ### Automated tests
 
