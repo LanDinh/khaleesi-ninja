@@ -19,7 +19,7 @@ gate_services_file=./scripts/data/gate_services
 if [ $# -eq 1 ]; then
   echo "No specific service was specified, so executing for all services..."
   while read -r raw_line; do
-    IFS="." read -r -a line <<< "${raw_line}"
+    IFS=":" read -r -a line <<< "${raw_line}"
     gate="${line[0]}"
     service="${line[1]}"
     echo "Executing for the ${gate} ${service} service..."

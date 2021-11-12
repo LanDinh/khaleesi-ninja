@@ -26,7 +26,7 @@ done <${services_file}
 
 # Check validity.
 for raw_service in "${services[@]}"; do
-  IFS="." read -r -a parsed_service <<< "${raw_service}"
+  IFS=":" read -r -a parsed_service <<< "${raw_service}"
   gate="${parsed_service[0]}"
   service="${parsed_service[1]}"
   if [[ "${gate}" == "${input_gate}" ]] && [[ "${service}" == "${input_service}" ]]; then

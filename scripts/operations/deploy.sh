@@ -30,7 +30,7 @@ if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
       . ./scripts/development/switch_current_service.sh
   fi
   while read -r raw_line; do
-    IFS="." read -r -a line <<< "${raw_line}"
+    IFS=":" read -r -a line <<< "${raw_line}"
     services=("${line[@]}")
   done <${current_service_file}
 fi

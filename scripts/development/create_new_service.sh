@@ -61,7 +61,7 @@ add_service_to_lists_of_service() {
   local gate=${1}
   local service=${2}
 
-  sed -i "1 a ${gate}.${service}" scripts/data/gate_services
+  sed -i "1 a ${gate}:${service}" scripts/data/gate_services
   sed -i "1 a \ \ {\ \"gate\": \"${gate}\", \"service\": \"${service}\"\ }," .github/data/services.json
 }
 
