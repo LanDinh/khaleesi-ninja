@@ -74,7 +74,7 @@ refresh_tls_certificate() {
   eval ${copy_out_command}"${current_date}"
 
   echo -e "${yellow}Updating the kubernetes secret...${clear_color}"
-  kubectl delete secret tls-certificate --ignore-not-found=true
+  kubectl delete secret tls-certificate --ignore-not-found=true -n "khaleesi-ninja-${environment}"
   kubectl -n "khaleesi-ninja-${environment}" create secret tls tls-certificate --key "${letsencrypt_certificate_folder}/privkey.pem" --cert "${letsencrypt_certificate_folder}/fullchain.pem"
 }
 
