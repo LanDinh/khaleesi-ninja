@@ -7,3 +7,8 @@ metadata:
     infrastructure: ingress-class
 spec:
   controller: k8s.io/ingress-nginx
+  parameters:
+    kind: IngressParameters
+    name: ingress-class
+    namespace: khaleesi-ninja-{{ .Values.environment }}
+    scope: Namespace

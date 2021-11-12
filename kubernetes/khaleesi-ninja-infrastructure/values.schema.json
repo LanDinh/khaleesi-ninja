@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "properties": {
+    "environment": {
+      "description": "Environment name",
+      "type": "string",
+      "enum": ["development", "integration", "staging", "production"]
+    }
+  },
+  "required": [
+    "environment"
+  ],
+  "title": "Values",
+  "type": "object"
+}

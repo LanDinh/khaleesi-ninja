@@ -24,15 +24,13 @@ If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
 This requires `kubectl` to be connected to a cluster.
 
-1. Make sure that the namespace for the environment exists
+1. Make sure that the necessary infrastructure exists
 1. Apply the manifests for the service
 
-If the `development` environment was chosen, some more steps are executed:
+If the `development` or `integration` environment was chosen, some more steps are executed:
 
 1. The affected containers get rebuilt
 1. The deployment gets a rolling restart
-
-Note that in order for requests to reach the environment, the appropriate entries might need to be manually added to `/etc/hosts`.
 
 ### `refresh_tls_certificate.sh`
 

@@ -8,16 +8,20 @@
 
 ## Available Systems
 
-| Environment       | Intended Use       | Differences in Configuration            |
-| ----------------- | ------------------ | --------------------------------------- |
-| `development`     | development        | Debug mode is active                    |
-| `staging`         | quality assurance  | Mirrors `production`, but without users |
+The following environments are ready to use.
 
-Note that when deploying an environment locally, it is necessary to edit `/etc/hosts` to make it reachable.
+| Environment       | Intended Use       | Install Location | Debug Mode         | Users              |
+| ----------------- | ------------------ | ---------------- | ------------------ | ------------------ |
+| `development`     | development        | localhost        | :heavy_check_mark: | self only          |
+| `integration`     | development        | localhost        | :x:                | self only          |
+| `staging`         | quality assurance  | upstream         | :x:                | selected few users |
+| `production`      | production         | upstream         | :x:                | real users         |
 
-| Gate   | Domain | Use |
-| ------ | ------ | --- |
-| `core` | - | Code shared by all gates |
+The following gates are ready to use.
+
+| Gate   | Domain | `production` | `staging`    | Use                      |
+| ------ | ------ | ------------ | ------------ | ------------------------ |
+| `core` | -      | not deployed | not deployed | Code shared by all gates |
 
 ## Getting Started
 
@@ -27,8 +31,8 @@ You need to make sure that these conditions are met:
 
 * Setup a local kubernetes cluster (instructions are in their [official documentation](https://kubernetes.io/docs/setup/))
 * If your local kubernetes setup didn't ship with it, you'll also need to install `kubectl` to control that cluster
-* Edit your `/etc/hosts` point all of the endpoints mentioned above for the `local` environment to your localhost
-* If you also want to test the changes on your Android phone without rooting it, you will need to set up a proxy on your development machine and follow the instructions [here](https://developer.chrome.com/docs/devtools/remote-debugging/local-server/).
+* Install `helm` (instructions are in their [official documentation](https://helm.sh/docs/intro/install/))
+* If you want to test the changes on your Android phone without rooting it, you will need to set up a proxy on your development machine and follow the instructions [here](https://developer.chrome.com/docs/devtools/remote-debugging/local-server/).
 
 ### Technologies used
 
@@ -36,7 +40,8 @@ You might want to make yourself familiar with the technologies used.
 
 The general deployment is done with:
 
-![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.21-informational)
+![helm badge](https://img.shields.io/badge/helm-v3.7-informational)
+![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.22-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 
 | Service Type | General | Deployment | Development |
@@ -57,7 +62,9 @@ The folder structure is as follows:
 
 ### Starting the gates locally in development mode
 
-Build and deploy changes by running `./scripts/operations/deploy.sh development`
+Build and deploy changes by running `./scripts/operations/deploy.sh development`.
+
+Optionally, self-signed TLS certificates may be made available to deployments - they are expected to be kubernetes secrets of type `tls` with the name `tls-certificate`.  
 
 ### Automated tests
 

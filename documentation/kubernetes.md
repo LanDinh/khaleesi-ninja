@@ -10,39 +10,19 @@ It has a frontgate, which serves the SPA to the user via an ingress configuratio
 This SPA uses the backgate as entry point into the backend system.
 
 The backgate, too, is available via an ingress configuration.
-It calls its own micro services as well the core micro services to serve content.
+It calls its own micro services as well as the core micro services to serve content.
 
 ## Folder Structure
 
-![Kubernetes Folder Structure](/documentation/images/kubernetes-folder-structure.svg)
+All kubernetes configuration is managed via `helm` charts.
 
-### `base` folder
+`khaleesi-ninja-infrastructure`
 
-The `service` directory contains the bare minimum shared by all khaleesi services:
+This contains basic infrastructure necessary for the ecosystem to work:
 
-* `deployment.yml` defines the kubernetes deployment
-* `service.yml` defines the kubernetes service
-* `kustomization.yml` collects all resources
+* namespace
+* ingress class
 
-The `frontgate` directory additionally contains some manifests shared by all frontgates:
+It expects the following values:
 
-* `ingress.yml` defines the ingress configuration to access the frontgate from the outside
-
-### `service` folder
-
-The `service` directory contains the kustomization shared by all services:
-
-* a unique name prefix comprising of the gate and service
-* labels indicating the gate and service
-* an annotation to indicate the type of service
-* the name of the image to use for this service
-
-The `frontgate` directory adds kustomization for all frontgates
-
-* a patch to change the hostname to the correct gate
-
-### `environment` folder
-
-For each environment, the following kustomizations are added for frontgates:
-
-* a patch to change the hostname to the correct environment-subdomain
+* `environment` needs to be one of `development`, `integration`, `staging` and `production`
