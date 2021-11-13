@@ -43,6 +43,8 @@ jobs:
           echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
           sudo apt-get update
           sudo apt-get install helm
+      - name: Set up protoc
+        run: sudo apt-get install protobuf-compiler --yes
       - name: Spin up the environment
         run: ./scripts/operations/deploy.sh ${{ matrix.environment }}
 
@@ -56,6 +58,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Set up protoc
+        run: sudo apt-get install protobuf-compiler --yes
       - name: Execute the container test
         run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }} ${{ matrix.service.version }}
       - name: Upload coverage to codecov
