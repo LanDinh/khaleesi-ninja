@@ -5,13 +5,17 @@ FROM node:16.13-slim as base
 
 # Arguments & environment.
 ARG gate
+ARG version
 ENV KHALEESI_GATE=${gate}
+ENV KHALEESI_VERSION=${version}
 
 # Metadata.
 WORKDIR /code
 COPY ./package.json /code/
 COPY ./package-lock.json /code/
 COPY ./tsconfig.json /code/
+RUN sed -i "s/\${KHALEESI_GATE}/${KHALEESI_GATE}/" "/code/package.json"
+RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package.json"
 RUN npm ci
 
 # Data.
@@ -69,6 +73,10 @@ RUN npm run build
 ################################################################################
 FROM nginx:1.21-alpine AS production
 LABEL environment=production
+
+# Arguments & environment.
+ARG gate
+ENV KHALEESI_GATE=${gate}
 
 # Data.
 WORKDIR /code/frontgate/${KHALEESI_GATE}

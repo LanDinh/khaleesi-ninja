@@ -21,7 +21,7 @@ run() {
 
 source .venv/bin/activate
 
-if [ "${command}" = "run" ]; then
+if [[ "${command}" == "run" ]]; then
   echo -e "${magenta}Running development server...${clear_color}"
   run
 

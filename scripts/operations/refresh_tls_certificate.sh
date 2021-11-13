@@ -22,12 +22,12 @@ domain="khaleesi.ninja"
 copy_in_command=
 copy_out_command=
 
-if [ -z "${COPY_IN}" ]; then
+if [[ -z "${COPY_IN}" ]]; then
     copy_in_command="cp -aR \"${letsencrypt_folder}/live\"/'*' \"${temp_folder}/\""
 else
     copy_in_command="${COPY_IN}"
 fi
-if [ -z "${COPY_OUT}" ]; then
+if [[ -z "${COPY_OUT}" ]]; then
     copy_out_command="cp -aR \"${temp_folder}\"/'*' \"${letsencrypt_folder}//\""
 else
     copy_out_command="${COPY_OUT}"
@@ -87,10 +87,10 @@ done <${environments_file}
 select input in "${environments[@]}"; do
   valid=$(valid_option "${input}")
   if [[ ${valid} == "true" ]]; then
-    echo -e "${magenta}Refreshing TLS certificate for '*.${input}.khaleesi.ninja'...${clear_color}"
     if [[ ${input} != "production" ]]; then
       domain="${input}.khaleesi.ninja"
     fi
+    echo -e "${magenta}Refreshing TLS certificate for '*.${domain}'...${clear_color}"
     refresh_tls_certificate "${input}" "${domain}"
     break
   else

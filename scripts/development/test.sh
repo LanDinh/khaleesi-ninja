@@ -20,8 +20,12 @@ current_service_file=./scripts/data/current_service
 test_container() {
   local gate=${1}
   local service=${2}
+  local version=${3}
 
-  echo -e "${yellow}Executing tests for the ${gate} ${service} service....${clear_color}"
+  echo -e "${yellow}Building the images...${clear_color}"
+  . scripts/util/build.sh "development" "${gate}" "${service}" "${version}"
+
+  echo -e "${yellow}Executing tests for the ${gate} ${service} service...${clear_color}"
   docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" test
 }
 
@@ -29,7 +33,7 @@ test_container() {
 # Check if interactive mode.
 services=("$@")
 if [[ $# -eq 1 ]] && [[ "${1}" == "current_service" ]]; then
-  if [ ! -f "${current_service_file}" ]; then
+  if [[ ! -f "${current_service_file}" ]]; then
       . ./scripts/development/switch_current_service.sh
   fi
   while read -r raw_line; do
@@ -43,9 +47,8 @@ echo -e "${magenta}Cleaning up old files and create mount directory...${clear_co
 rm -r -f temp
 mkdir temp
 
-echo -e "${magenta}Building the images...${clear_color}"
-# shellcheck disable=SC2068
-. scripts/util/build.sh "development" ${services[@]}
+echo -e "${magenta}Updating the protos...${clear_color}"
+. scripts/development/generate_protos.sh
 
 echo -e "${magenta}Testing the services...${clear_color}"
 # shellcheck disable=SC2068

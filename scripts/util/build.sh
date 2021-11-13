@@ -12,35 +12,35 @@ clear_color='\033[0m'
 
 
 # Options.
-environment=${1}
+gate_services_file=./scripts/data/gate_services
+container_mode=${1}
+gate=${2}
+service=${3}
+version=${4}
+location="backend"
+frontgate_version=
 
 
-build_container() {
-  local gate=${1}
-  local service=${2}
-  local location=
-
-  case $service in
-    frontgate)
-      location="frontgate"
-      ;;
-    *)
-      location="backend"
-      ;;
-    esac
-
-  echo "Building the image khaleesi-ninja/${gate}/${service} for ${environment}...."
-  docker build "${location}" --build-arg gate="${gate}" --build-arg service="${service}" --target "${environment}" -t "khaleesi-ninja/${gate}/${service}"
-}
+if [[ "${service}" == "frontgate" ]]; then
+  location="frontgate"
+elif [[ "${service}" == "backgate" ]]; then
+  echo -e "${yellow}Fetching the frontgate version...${clear_color}"
+  raw_frontgate=$(grep "^${gate}:frontgate:" "${gate_services_file}")
+  IFS=":" read -r -a frontgate <<< "${raw_frontgate}"
+  frontgate_version="${frontgate[2]}"
+fi
 
 
-echo -e "${yellow}Updating the protos...${clear_color}"
-. scripts/development/generate_protos.sh
-
-echo -e "${yellow}Building the containers...${clear_color}"
-. scripts/util/service_loop.sh build_container "${@:2}"
+echo -e "${yellow}Building the image khaleesi-ninja/${gate}/${service} for ${container_mode}...${clear_color}"
+docker build "${location}" --build-arg gate="${gate}" --build-arg service="${service}" --build-arg version="${version}" --build-arg frontgate_version="${frontgate_version}" --target "${container_mode}" -t "khaleesi-ninja/${gate}/${service}:latest" -t "khaleesi-ninja/${gate}/${service}:${version}"
 
 echo -e "${yellow}Cleaning up dangling images...${clear_color}"
 docker image prune -f
+
+if [[ -v KHALEESI_MINIKUBE ]]; then
+  echo -e "${yellow}Adding image to minikube registry...${clear_color}"
+  minikube image load "docker.io/khaleesi-ninja/${gate}/${service}:latest"
+  minikube image load "docker.io/khaleesi-ninja/${gate}/${service}:${version}"
+fi
 
 echo -e "${yellow}DONE building the images! :D${clear_color}"

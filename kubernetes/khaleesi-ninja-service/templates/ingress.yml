@@ -1,0 +1,28 @@
+{{ if eq .Values.service "frontgate" "backgate" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.gate }}-{{ .Values.service }}-ingress
+  namespace: khaleesi-ninja-{{ .Values.environment }}
+  labels:
+    gate: {{ .Values.gate }}
+    service: {{ .Values.service }}
+    type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service  }}{{ else }}micro{{ end }}
+spec:
+  ingressClassName: ingress-class-{{ .Values.environment }}
+  tls:
+    - hosts:
+      - {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+      secretName: tls-certificate
+  rules:
+    - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.gate }}-{{ .Values.service }}-service
+                port:
+                  name: service
+{{ end }}

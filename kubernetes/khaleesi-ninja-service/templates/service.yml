@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.gate }}-{{ .Values.service }}-service
+  namespace: khaleesi-ninja-{{ .Values.environment }}
+  labels:
+    gate: {{ .Values.gate }}
+    service: {{ .Values.service }}
+    type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+spec:
+  selector:
+    gate: {{ .Values.gate }}
+    service: {{ .Values.service }}
+    type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+  ports:
+    - name: service
+      protocol: TCP
+      port: 443
+      targetPort: deployment

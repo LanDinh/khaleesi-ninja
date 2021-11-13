@@ -1,6 +1,6 @@
 {
-  "name": "khaleesi-ninja",
-  "version": "0.1.0",
+  "name": "khaleesi-ninja-${KHALEESI_GATE}",
+  "version": "${KHALEESI_VERSION}",
   "private": true,
   "scripts": {
     "start": "react-scripts start",

@@ -8,8 +8,8 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
-green='\033[0;32m'
 yellow='\033[0;33m'
+green='\033[0;32m'
 clear_color='\033[0m'
 
 
@@ -20,13 +20,12 @@ current_service_file="./scripts/data/current_service"
 
 # Validate environment.
 ./scripts/util/valid_environment.sh "${1}"
-namespace="khaleesi-ninja-${environment}"
 
 
 # Check if interactive mode.
 services=("${@:2}")
 if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
-  if [ ! -f "${current_service_file}" ]; then
+  if [[ ! -f "${current_service_file}" ]]; then
       . ./scripts/development/switch_current_service.sh
   fi
   while read -r raw_line; do
@@ -39,33 +38,35 @@ fi
 deploy_service() {
   local gate=${1}
   local service=${2}
+  local version=${3}
 
-  echo -e "${yellow}Applying the manifests...${clear_color}"
-  kubectl apply -k "kubernetes/environment/${environment}/${gate}-${service}" -n "${namespace}"
+  echo -e "${yellow}Deploying the service...${clear_color}"
+  helm upgrade --install "khaleesi-ninja-${environment}-${gate}-${service}" kubernetes/khaleesi-ninja-service --set environment="${environment}" --set gate="${gate}" --set service="${service}" --set version="${version}"
 
-  if [ "${environment}" = "development" ]; then
-    echo -e "${yellow}Rebuilding container...${clear_color}"
-    . scripts/util/build.sh "development" "${gate}" "${service}"
+  if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
+    local container_mode=production
+    if [[ "${environment}" == "development" ]]; then
+      container_mode=development
+    fi
 
-    echo -e "${yellow}Rollout container...${clear_color}"
-    # shellcheck disable=SC2068
-    kubectl rollout restart deployment "${gate}-${service}-deployment" -n "${namespace}"
+    echo -e "${yellow}Rebuilding the container...${clear_color}"
+    . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${version}"
 
-  elif [ "${environment}" = "staging" ]; then
-    echo -e "${yellow}Rebuilding container...${clear_color}"
-    . scripts/util/build.sh "production" "${gate}" "${service}"
-
-    echo -e "${yellow}Rollout container...${clear_color}"
-    # shellcheck disable=SC2068
-    kubectl rollout restart deployment "${gate}-${service}-deployment" -n "${namespace}"
+    echo -e "${yellow}Rolling out the new container...${clear_color}"
+    kubectl rollout restart deployment "${gate}-${service}-deployment" -n "khaleesi-ninja-${environment}"
   fi
 }
 
 
-echo -e "${magenta}Installing the infrastructure...${clear_color}"
-helm upgrade --install khaleesi-ninja-infrastructure kubernetes/khaleesi-ninja-infrastructure --set environment="${environment}"
+echo -e "${magenta}Deploying the infrastructure...${clear_color}"
+helm upgrade --install "khaleesi-ninja-infrastructure-${environment}" kubernetes/khaleesi-ninja-infrastructure --set environment="${environment}"
 
-echo -e "${magenta}Rollout the service...${clear_color}"
+if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
+  echo -e "${magenta}Updating the protos...${clear_color}"
+  . scripts/development/generate_protos.sh
+fi
+
+echo -e "${magenta}Deploying the services...${clear_color}"
 # shellcheck disable=SC2068
 . scripts/util/service_loop.sh deploy_service ${services[@]}
 

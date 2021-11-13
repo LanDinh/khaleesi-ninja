@@ -57,12 +57,13 @@ The folder structure is as follows:
 * `documentation` A bunch of markdown files to document everything
 * `frontgate` The code for the frontgates. One `react` project per frontgate - [documentation](documentation/frontgate.md)
 * `kubernetes` Kubernetes related configuration - [documentation](documentation/kubernetes.md)
+* `proto` Protobuf definitions
 * `scripts` Utility scripts - [documentation](documentation/scripts.md)
 * `templates` Templates used when creating new services - [documentation](documentation/templates.md)
 
 ### Starting the ecosystem locally
 
-Build and deploy changes by running the following command (most likely, the environment will be either `development` or `integration`:
+Build and deploy changes by running the following command (for local deployments, the environment will be either `development` or `integration`):
 
 ```
 ./scripts/operations/deploy.sh <ENVIRONMENT>
@@ -71,11 +72,21 @@ Build and deploy changes by running the following command (most likely, the envi
 Optionally, self-signed TLS certificates may be made available to deployments using the following command:
 
 ```
-  kubectl -n "khaleesi-ninja-${ENVIRONMENT}" create secret tls tls-certificate --key "${PATH-TO-CERTIFICATE}/key.pem" --cert "${PATH-TO-CERTIFICATE}/cert.pem"
+  .scripts/operations/recreate_tls_certificate.sh
 ```
 
-Note that the namespace must match the chosen environment, and the name of the secret is expected to be `tls-certificate`.
+Note that this expects the following files to exist:
+
+* Private key: `letsencrypt/live/live/<ENVIRONMENT>.khaleesi.ninja/privkey.pem`
+* Certificate: `letsencrypt/live/live/<ENVIRONMENT>.khaleesi.ninja/fullchain.pem`
 
 ### Automated tests
 
 Execute the tests by running `./scripts/development/test.sh`
+
+### Hints
+
+* For local development, it is typical to work on a single service for a lengthy amount of time.
+  To make this more user friendly, it is possible to pass the argument `current_service` to both `./scripts/development/test.sh` as well as `./scripts/operations/deploy.sh` (in front of all optional arguments).
+  The first time `current_service` is passed, an interactive prompt will require choosing the service to be worked on.
+  When it is time to switch work to a different service, simply call `./scripts/development/switch_current_service.sh`.

@@ -6,8 +6,10 @@ FROM python:3.10-slim as base
 # Arguments & environment.
 ARG gate
 ARG service
+ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
@@ -31,8 +33,10 @@ LABEL environment=development
 # Arguments & environment.
 ARG gate
 ARG service
+ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 ENV PYTHONPATH="/code"
 ENV DJANGO_SETTINGS_MODULE="settings"
 

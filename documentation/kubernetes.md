@@ -16,7 +16,7 @@ It calls its own micro services as well as the core micro services to serve cont
 
 All kubernetes configuration is managed via `helm` charts.
 
-`khaleesi-ninja-infrastructure`
+### `khaleesi-ninja-infrastructure`
 
 This contains basic infrastructure necessary for the ecosystem to work:
 
@@ -26,3 +26,18 @@ This contains basic infrastructure necessary for the ecosystem to work:
 It expects the following values:
 
 * `environment` needs to be one of `development`, `integration`, `staging` and `production`
+
+### `khaleesi-ninja-service`
+
+This contains manifests necessary for the services to work:
+
+* deployment
+* service
+* ingress (for frontgates and backgates)
+
+It expects the following values:
+
+* `environment` needs to be one of `development`, `integration`, `staging` and `production`
+* `gate` needs to be one of `core`
+* `service` needs to be the service name
+* `version` needs to be the version to be installed for the environments `staging` and `production`

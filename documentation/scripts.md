@@ -35,8 +35,12 @@ If the `development` or `integration` environment was chosen, some more steps ar
 ### `refresh_tls_certificate.sh`
 
 This can be used to refresh the TLS certificate.
-The contact email address has to be set as environment variable (`KHALEESI_EMAIL`).
+The contact email address has to be set as environment variable (`KHALEESI_EMAIL`), as well as the affected domain ('KHALEESI_DOMAIN').
 It will be put into the folder `letsencrypt` - note that this folder is listed in `.gitignore` so as not to leak any private keys.
+
+### `recreate_tls_certificate.sh`
+
+This can be used to recreate the kubernetes secret holding the TLS certificate (e.g. if the namespace gets set up from scratch)
 
 ## `development` folder
 
@@ -73,12 +77,12 @@ It will prompt the user for some information:
 
 Afterwards, it will do the following:
 
-1. Add kubernetes manifests for the new service
 1. Add the new service to `scripts/gate_service` and `.github/data/services.json`
 
 For gates, it will additionally create the following:
 
-* A skeleton react project to hold the frontgate code
+* A skeleton `react` project to hold the frontgate code
+* A skeleton `django` project to hold the backgate code
 
 Of course, you should thoroughly review the `git` diff before committing anything to source control.
 

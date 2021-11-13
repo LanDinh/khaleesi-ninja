@@ -43,11 +43,11 @@ run() {
   npm run start
 }
 
-if [ "${command}" = "test" ]; then
+if [[ "${command}" == "test" ]]; then
   echo -e "${magenta}Execute tests...${clear_color}"
   test
 
-elif [ "${command}" = "run" ]; then
+elif [[ "${command}" == "run" ]]; then
   echo -e "${magenta}Run development server...${clear_color}"
   run
 

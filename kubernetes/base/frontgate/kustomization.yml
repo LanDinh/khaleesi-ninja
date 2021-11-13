@@ -1,5 +1,0 @@
-resources:
-  - ingress.yml
-
-bases:
-  - ../service

@@ -8,14 +8,10 @@ This contains templates relevant for frontgates.
 
 This is a `create-react-app` template for creating new frontgates.
 
-## `kubernetes` folder
+## `backend` folder
 
-This contains templates relevant for kubernetes.
+This contains templates relevant for backgates.
 
-### `environment` folder
+### `backgate_template` folder
 
-This contains the kustomizations necessary for the each environment.
-
-### `service` folder
-
-This contains the overlays necessary to define the service.
+This is a `django-admin startproject` template for creating new backgates.

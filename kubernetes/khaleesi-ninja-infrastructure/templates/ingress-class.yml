@@ -1,8 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:
-  name: ingress-class
+  name: ingress-class-{{ .Values.environment }}
   labels:
+    name: khaleesi-ninja
+    environment: {{ .Values.environment }}
     type: infrastructure
     infrastructure: ingress-class
 spec:

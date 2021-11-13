@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "properties": {
+    "environment": {
+      "description": "Environment name",
+      "type": "string",
+      "enum": ["development", "integration", "staging", "production"]
+    },
+    "gate": {
+      "description": "Gate name",
+      "type": "string",
+      "enum": ["core"]
+    },
+    "service": {
+      "description": "Service name",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "environment",
+    "gate",
+    "service",
+    "version"
+  ],
+  "title": "Values",
+  "type": "object"
+}
