@@ -1,5 +1,6 @@
 # Frontgate
 /frontgate/node_modules/*
+/frontgate/core/src/core/proto/*
 
 # Backend
 /backend/.venv/*

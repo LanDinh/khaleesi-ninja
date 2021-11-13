@@ -20,7 +20,7 @@
     "react",
     "@typescript-eslint"
   ],
-  "ignorePatterns": [ "/*/build/*", "/*/src/react-app-env.d.ts" ],
+  "ignorePatterns": [ "/src/react-app-env.d.ts", "/src/core/proto/*.d.ts" ],
   "rules": {
     "no-multi-spaces": [ "error", { "exceptions": {
       "ImportDeclaration": true

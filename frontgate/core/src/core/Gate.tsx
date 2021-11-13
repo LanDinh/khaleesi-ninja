@@ -1,5 +1,10 @@
+// React.
 import React, { ReactElement } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
+// khaleesi.ninja.
+import { SayHelloRequest } from './proto/core_backgate_pb'
+import { ServiceClient }   from './proto/core_backgate_grpc_web_pb'
 import './App.css'
 
 
@@ -9,6 +14,11 @@ import './App.css'
  * @constructor
  */
 function Gate() {
+  const service = new ServiceClient('https://core.development.khaleesi.ninja:443')
+  const request = new SayHelloRequest()
+  request.setName('Khaleesi, Mother of Dragons')
+  service.sayHello(request, {}, ((_err, response) => console.log(response)))
+
   return (
     <React.StrictMode><BrowserRouter><Routes>
       <Route path="/" element={<div>Test</div>} />

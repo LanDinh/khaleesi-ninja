@@ -37,10 +37,4 @@ docker build "${location}" --build-arg gate="${gate}" --build-arg service="${ser
 echo -e "${yellow}Cleaning up dangling images...${clear_color}"
 docker image prune -f
 
-if [[ -v KHALEESI_MINIKUBE ]]; then
-  echo -e "${yellow}Adding image to minikube registry...${clear_color}"
-  minikube image load "docker.io/khaleesi-ninja/${gate}/${service}:latest"
-  minikube image load "docker.io/khaleesi-ninja/${gate}/${service}:${version}"
-fi
-
 echo -e "${yellow}DONE building the images! :D${clear_color}"
