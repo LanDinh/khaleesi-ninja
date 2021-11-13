@@ -6,25 +6,25 @@ metadata:
   labels:
     gate: {{ .Values.gate }}
     service: {{ .Values.service }}
-    type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+    type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       gate: {{ .Values.gate }}
       service: {{ .Values.service }}
-      type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+      type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
   template:
     metadata:
       labels:
         gate: {{ .Values.gate }}
         service: {{ .Values.service }}
-        type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+        type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
     spec:
       containers:
         - name: deployment
-          image: khaleesi-ninja/{{ .Values.gate }}/{{ .Values.service }}:{{ if eq .Values.environment "development" }}latest{{ else if eq .Values.environment "integration" }}latest{{ else }}{{ .Values.version }}{{ end }}
-          imagePullPolicy: {{ if eq .Values.environment "development" }}Never{{ else if eq .Values.environment "integration" }}Never{{ else }}Always{{ end }}
+          image: khaleesi-ninja/{{ .Values.gate }}/{{ .Values.service }}:{{ if eq .Values.environment "development" "integration" }}latest{{ else }}{{ .Values.version }}{{ end }}
+          imagePullPolicy: {{ if eq .Values.environment "development" "integration" }}Never{{ else }}Always{{ end }}
           ports:
             - name: deployment
               containerPort: 443

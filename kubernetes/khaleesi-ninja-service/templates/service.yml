@@ -6,12 +6,12 @@ metadata:
   labels:
     gate: {{ .Values.gate }}
     service: {{ .Values.service }}
-    type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+    type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
 spec:
   selector:
     gate: {{ .Values.gate }}
     service: {{ .Values.service }}
-    type: {{ if eq .Values.service "frontgate" }}frontgate{{ else if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+    type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
   ports:
     - name: service
       protocol: TCP
