@@ -1,4 +1,4 @@
-{{ if eq .Values.service "frontgate" "backgate" }}
+{{- if eq .Values.service "frontgate" "backgate" }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -8,21 +8,27 @@ metadata:
     gate: {{ .Values.gate }}
     service: {{ .Values.service }}
     type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service  }}{{ else }}micro{{ end }}
+  {{- if eq .Values.service "backgate" }}
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+  {{- end }}
 spec:
   ingressClassName: ingress-class-{{ .Values.environment }}
   tls:
-    - hosts:
+    - secretName: tls-certificate
+      hosts:
       - {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
-      secretName: tls-certificate
   rules:
     - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
       http:
         paths:
-          - path: "/"
+          - path: /{{ if eq .Values.service "backgate" }}khaleesi\..*{{ end }}
             pathType: Prefix
             backend:
               service:
                 name: {{ .Values.gate }}-{{ .Values.service }}-service
                 port:
                   name: service
-{{ end }}
+{{- end }}
