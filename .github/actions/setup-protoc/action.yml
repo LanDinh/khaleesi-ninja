@@ -1,0 +1,17 @@
+name: Setup protoc
+description: Setup protoc for protobuf generation including plugins
+inputs:
+  protoc-gen-grpc-web-version:
+    description: The file to read into the output
+    required: true
+    default: 1.3.0
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: apt-get update && sudo apt-get install protobuf-compiler --yes
+    - shell: bash
+      run: |
+        curl -oL https://github.com/grpc/grpc-web/releases/download/${{ inputs.protoc-gen-grpc-web-version }}/protoc-gen-grpc-web-${{ inputs.protoc-gen-grpc-web-version }}-linux-x86_64
+        mv protoc-gen-grpc-web-${{ inputs.protoc-gen-grpc-web-version }}-linux-x86_64 /usr/local/bin/protoc-gen-grpc-web
+        chmod +x /usr/local/bin/protoc-gen-grpc-web
