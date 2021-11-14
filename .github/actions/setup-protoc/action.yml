@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - shell: bash
-      run: apt-get update && sudo apt-get install protobuf-compiler --yes
+      run: sudo apt-get update && sudo apt-get install protobuf-compiler --yes
     - shell: bash
       run: |
         curl -oL https://github.com/grpc/grpc-web/releases/download/${{ inputs.protoc-gen-grpc-web-version }}/protoc-gen-grpc-web-${{ inputs.protoc-gen-grpc-web-version }}-linux-x86_64
