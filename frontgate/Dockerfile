@@ -45,7 +45,7 @@ LABEL environment=development
 
 # Arguments & environment.
 ARG gate
-ENV PORT=443
+ENV PORT=8000
 ENV KHALEESI_GATE=${gate}
 
 # Data.

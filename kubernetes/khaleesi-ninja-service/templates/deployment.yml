@@ -27,4 +27,4 @@ spec:
           imagePullPolicy: {{ if eq .Values.environment "development" "integration" }}Never{{ else }}Always{{ end }}
           ports:
             - name: deployment
-              containerPort: 443
+              containerPort: 8000

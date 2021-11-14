@@ -15,5 +15,5 @@ spec:
   ports:
     - name: service
       protocol: TCP
-      port: 443
+      port: 8000
       targetPort: deployment

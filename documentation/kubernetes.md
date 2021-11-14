@@ -12,6 +12,12 @@ This SPA uses the backgate as entry point into the backend system.
 The backgate, too, is available via an ingress configuration.
 It calls its own micro services as well as the core micro services to serve content.
 
+### Conventions
+
+| Port | Use                     |
+| ---- | ----------------------- |
+| 8000 | General service         |
+
 ## Folder Structure
 
 All kubernetes configuration is managed via `helm` charts.

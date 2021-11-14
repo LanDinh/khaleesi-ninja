@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
   def add_arguments(self, parser):
     parser.add_argument(
-      'address', nargs = '?', default = '[::]:443',
+      'address', nargs = '?', default = '[::]:8000',
       help = 'Optional address for which to open a port.'
     )
     parser.add_argument(

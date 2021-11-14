@@ -14,7 +14,7 @@ import './App.css'
  * @constructor
  */
 function Gate() {
-  const service = new ServiceClient('https://core.development.khaleesi.ninja:443')
+  const service = new ServiceClient('https://core.development.khaleesi.ninja')
   const request = new SayHelloRequest()
   request.setName('Khaleesi, Mother of Dragons')
   service.sayHello(request, {}, ((_err, response) => console.log(response)))
