@@ -22,7 +22,7 @@ spec:
     - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
       http:
         paths:
-          - path: /{{ if eq .Values.service "backgate" }}khaleesi\..*{{ end }}
+          - path: /{{ if eq .Values.service "backgate" }}(khaleesi|grpc)\..*{{ end }}
             pathType: Prefix
             backend:
               service:

@@ -10,6 +10,7 @@ from django.utils.module_loading import import_string
 
 # gRPC.
 import grpc
+from grpc_reflection.v1alpha import reflection
 
 
 class Command(BaseCommand):
@@ -47,9 +48,15 @@ class Command(BaseCommand):
     Attempt to import a class from a string representation.
     """
     raw_handlers = settings.KHALEESI_NINJA["GRPC_HANDLERS"]
+    service_names = [reflection.SERVICE_NAME]
     for raw_handler in raw_handlers:
-      handler = f'{raw_handler}.register_handler'
+      handler = f'{raw_handler}.service_configuration'
       try:
-        import_string(handler)(server)
+        name, register_handler = import_string(handler)
+        register_handler(server)
+        if settings.DEBUG:
+          service_names.append(name)
       except ImportError as e:
         raise ImportError(f'Could not import "{handler}" for gRPC handler.')
+    if settings.DEBUG:
+      reflection.enable_server_reflection(service_names, server)
