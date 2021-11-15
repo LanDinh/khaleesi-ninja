@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
   def add_arguments(self, parser):
     parser.add_argument(
-      'address', nargs = '?', default = '[::]:8000',
+      'address', nargs = '?', default = f'[::]:{settings.KHALEESI_NINJA["PORT"]}',
       help = 'Optional address for which to open a port.'
     )
     parser.add_argument(

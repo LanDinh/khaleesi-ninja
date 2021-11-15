@@ -26,7 +26,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.gate }}-{{ .Values.service }}-service
+                name: {{ .Values.gate }}-{{ .Values.service }}-{{ if eq .Values.service "backgate" }}envoy-{{ end }}service
                 port:
                   name: service
 {{- end }}
