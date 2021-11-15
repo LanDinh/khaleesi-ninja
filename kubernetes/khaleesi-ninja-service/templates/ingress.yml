@@ -11,8 +11,6 @@ metadata:
   {{- if eq .Values.service "backgate" }}
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
   {{- end }}
 spec:
   ingressClassName: ingress-class-{{ .Values.environment }}

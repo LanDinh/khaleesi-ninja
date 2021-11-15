@@ -26,5 +26,13 @@ spec:
           image: khaleesi-ninja/{{ .Values.gate }}/{{ .Values.service }}:{{ if eq .Values.environment "development" "integration" }}latest{{ else }}{{ .Values.version }}{{ end }}
           imagePullPolicy: {{ if eq .Values.environment "development" "integration" }}Never{{ else }}Always{{ end }}
           ports:
-            - name: deployment
+            - name: {{ if eq .Values.service "backgate" }}grpc-{{ end }}deployment
               containerPort: 8000
+        {{- if eq .Values.service "backgate" }}
+        - name: envoy
+          image: khaleesi-ninja/infrastructure/envoy:latest
+          imagePullPolicy: {{ if eq .Values.environment "development" "integration" }}Never{{ else }}Always{{ end }}
+          ports:
+            - name: deployment
+              containerPort: 8010
+        {{- end }}

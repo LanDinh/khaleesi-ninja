@@ -17,6 +17,7 @@ It calls its own micro services as well as the core micro services to serve cont
 | Port | Use                     |
 | ---- | ----------------------- |
 | 8000 | General service         |
+| 8010 | Sidecar proxy           |
 
 ## Folder Structure
 

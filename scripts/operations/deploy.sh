@@ -59,6 +59,7 @@ deploy_service() {
 
 
 echo -e "${magenta}Deploying the infrastructure...${clear_color}"
+docker build "infrastructure/envoy" -t "khaleesi-ninja/infrastructure/envoy:latest"
 helm upgrade --install "khaleesi-ninja-infrastructure-${environment}" kubernetes/khaleesi-ninja-infrastructure --set environment="${environment}"
 
 if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
