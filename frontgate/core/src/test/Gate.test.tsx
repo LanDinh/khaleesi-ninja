@@ -3,11 +3,11 @@ import React              from 'react'
 import { render, screen } from '@testing-library/react'
 
 // khaleesi.ninja.
-import Gate               from './Gate'
-import { ServiceClient }  from './proto/core_backgate_grpc_web_pb'
+import Gate              from '../core/Gate'
+import { ServiceClient } from '../core/proto/core_backgate_grpc_web_pb'
 
 
-jest.mock('./proto/core_backgate_grpc_web_pb')
+jest.mock('../core/proto/core_backgate_grpc_web_pb')
 
 beforeEach(() => {
   (ServiceClient as jest.Mock).mockClear()

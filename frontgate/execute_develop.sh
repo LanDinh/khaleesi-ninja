@@ -43,6 +43,7 @@ run() {
   npm run start
 }
 
+
 if [[ "${command}" == "test" ]]; then
   echo -e "${magenta}Execute tests...${clear_color}"
   test
