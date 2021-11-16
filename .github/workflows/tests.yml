@@ -62,12 +62,10 @@ jobs:
         uses: ./.github/actions/setup-protoc
       - name: Execute the container test
         run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }} ${{ matrix.service.version }}
-      - name: Debug coverage reports
-        run: ls -al temp
       - name: Upload coverage to codecov
         if: ${{ always() }}
         uses: codecov/codecov-action@v2
         with:
           flags: integration
-          fail_ci_if_error: true
+          #fail_ci_if_error: true
           directory: temp/
