@@ -3,6 +3,7 @@
 # Python.
 from os import environ
 from pathlib import Path
+from typing import Dict, Any, TypedDict, List, cast
 
 
 # Base definition.
@@ -31,6 +32,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # khaleesi.ninja.
-KHALEESI_NINJA = {
-  'PORT': environ.get('PORT', 8000),
-}
+class KhaleesiNinjaSettings(TypedDict):
+  PORT: int
+  GRPC_HANDLERS: List[str]
+
+KHALEESI_NINJA: KhaleesiNinjaSettings = KhaleesiNinjaSettings(
+  PORT = cast(int, environ.get('PORT', 8000)),
+  GRPC_HANDLERS = [],
+)

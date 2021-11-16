@@ -1,1 +1,5 @@
 coverage==6.1.2
+django-stubs==1.9.0
+grpc-stubs==1.24.7
+mypy==0.910
+types-protobuf==3.18.0

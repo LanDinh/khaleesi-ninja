@@ -1,10 +1,14 @@
 """Test the core backgate service."""
 
+# Python.
+from unittest.mock import MagicMock
+
 # Django.
 from django.test import TestCase
 
 # khaleesi.ninja.
-from core.service import SayHelloRequest, Service
+from core.service import Service
+from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 
 
 class CoreBackgateServiceTestCase(TestCase):
@@ -20,6 +24,6 @@ class CoreBackgateServiceTestCase(TestCase):
     name = 'Khaleesi, Mother of Dragons, Breaker of Chains'
     request = SayHelloRequest(name = name)
     # Execute test.
-    response = self.service.SayHello(request = request, context = None)
+    response = self.service.SayHello(request = request, context = MagicMock())
     # Assert results.
     self.assertIn(name, response.message)

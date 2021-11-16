@@ -16,7 +16,7 @@ typescript_out="frontgate/core/src/core/proto"
 echo "Generating the python protos..."
 rm -f "${python_out}/"*
 mkdir -p "${python_out}"
-cp -a "${python_in}/__init__.py" "${python_out}/__init__.py"
+touch "${python_out}/__init__.py"
 python -m pip install -r "${python_in}/requirements.txt"
 python -m grpc_tools.protoc -I "${proto_in}" --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${proto_in}"/*.proto
 

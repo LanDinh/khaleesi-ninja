@@ -31,6 +31,11 @@ test() {
     return_code=1
   fi
 
+  echo -e "${magenta}Mypy...${clear_color}"
+  if ! python -m mypy . --strict --show-error-codes; then
+    return_code=1
+  fi
+
   exit ${return_code}
 }
 
