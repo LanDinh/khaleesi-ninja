@@ -1,3 +1,4 @@
 [
+  { "gate": "core", "service": "backgate", "version": "1.0.0" },
   { "gate": "core", "service": "frontgate", "version": "1.0.0" }
 ]
