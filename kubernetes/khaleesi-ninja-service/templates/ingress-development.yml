@@ -1,0 +1,32 @@
+{{- if eq .Values.environment "development" "integration" }}
+{{- if ne .Values.service "frontgate" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.gate }}-{{ .Values.service }}-development-ingress
+  namespace: khaleesi-ninja-{{ .Values.environment }}
+  labels:
+    gate: {{ .Values.gate }}
+    service: {{ .Values.service }}
+    type: {{ if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: ingress-class-{{ .Values.environment }}
+  tls:
+    - secretName: tls-certificate
+      hosts:
+      - {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+  rules:
+    - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+      http:
+        paths:
+          - path: /grpcui/{{ .Values.gate }}/{{ .Values.service }}/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.gate }}-{{ .Values.service }}-service
+                port:
+                  name: grpcui
+{{- end }}
+{{- end }}

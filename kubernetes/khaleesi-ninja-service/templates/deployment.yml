@@ -36,3 +36,15 @@ spec:
             - name: envoy
               containerPort: 8010
         {{- end }}
+        {{- if eq .Values.environment "development" "integration" }}
+        {{- if ne .Values.service "frontgate" }}
+        - name: grpcui
+          image: fullstorydev/grpcui:latest
+          imagePullPolicy: Always
+          command: ["/bin/grpcui"]
+          args: ["-bind=0.0.0.0", "-port=9000", "-plaintext", "localhost:8000"]
+          ports:
+            - name: grpcui
+              containerPort: 9000
+        {{- end }}
+        {{- end }}

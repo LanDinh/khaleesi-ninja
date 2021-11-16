@@ -23,3 +23,11 @@ spec:
       port: 8010
       targetPort: envoy
     {{- end }}
+    {{- if eq .Values.environment "development" "integration" }}
+    {{- if ne .Values.service "frontgate" }}
+    - name: grpcui
+      protocol: TCP
+      port: 9000
+      targetPort: grpcui
+    {{- end }}
+    {{- end }}
