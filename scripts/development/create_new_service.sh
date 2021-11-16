@@ -13,14 +13,19 @@ yellow='\033[0;33m'
 green='\033[0;32m'
 clear_color='\033[0m'
 
+# Options.
+symlink_frontgate_command=
+symlink_backgate_command=
+symlink_backend_command=
+
 
 # Meta.
 add_service_to_lists_of_service() {
   local gate=${1}
   local service=${2}
 
-  sed -i "1 a ${gate}:${service}" scripts/data/gate_services
-  sed -i "1 a \ \ {\ \"gate\": \"${gate}\", \"service\": \"${service}\"\ }," .github/data/services.json
+  sed -i "1 a ${gate}:${service}:1.0.0" scripts/data/gate_services
+  sed -i "1 a \ \ {\ \"gate\":\ \"${gate}\",\ \"service\":\ \"${service}\",\ \"version\":\ \"1.0.0\"\ }," .github/data/services.json
 }
 
 
@@ -33,6 +38,12 @@ create_backgate() {
   echo -e "${yellow}Creating django project...${clear_color}"
   mkdir -p "$project_folder"
   python -m django startproject --template="${template_folder}/backgate_template" "${gate}_backgate" "${project_folder}"
+
+  echo -e "${yellow}Adding symlinks...${clear_color}"
+  # shellcheck disable=SC2086
+  eval ${symlink_backend_command}
+  # shellcheck disable=SC2086
+  eval ${symlink_backgate_command}
 
   echo -e "${yellow}Adding service to list of services...${clear_color}"
   add_service_to_lists_of_service "${gate}" "backgate"
@@ -54,6 +65,10 @@ create_frontgate() {
   rm "${project_folder}/package.json"
   rm -r "${project_folder}/node_modules"
 
+  echo -e "${yellow}Adding symlinks...${clear_color}"
+  # shellcheck disable=SC2086
+  eval ${symlink_frontgate_command}
+
   echo -e "${yellow}Adding service to list of services...${clear_color}"
   add_service_to_lists_of_service "${gate}" "frontgate"
 }
@@ -63,12 +78,28 @@ create_frontgate() {
 echo -e "${magenta}Enter gate name:${clear_color}"
 read -r gate
 
+if [[ -z "${SYMLINK_FRONTGATE}" ]]; then
+    symlink_frontgate_command="ln -nrs \"../../core/src/core\" \"frontgate/${gate}/src/core\""
+else
+    symlink_frontgate_command="${SYMLINK_FRONTGATE}"
+fi
+if [[ -z "${SYMLINK_BACKGATE}" ]]; then
+    symlink_backgate_command="ln -nrs \"../../core/backgate/core\" \"backend/${gate}/backgate/core\""
+else
+    symlink_backgate_command="${SYMLINK_BACKGATE}"
+fi
+if [[ -z "${SYMLINK_BACKEND}" ]]; then
+    symlink_backend_command="ln -nrs \"../../khaleesi\" \"backend/${gate}/backgate/khaleesi\""
+else
+    symlink_backend_command="${SYMLINK_BACKEND}"
+fi
+
 echo -e "${magenta}Enter service type:${clear_color}"
 select type in gate; do
   case $type in
   gate)
     echo -e "${magenta}Creating gates...${clear_color}"
-    #create_frontgate "${gate}"
+    create_frontgate "${gate}"
     create_backgate "${gate}"
     break
     ;;
