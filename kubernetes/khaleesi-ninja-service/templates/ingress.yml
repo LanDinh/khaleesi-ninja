@@ -7,7 +7,7 @@ metadata:
   labels:
     gate: {{ .Values.gate }}
     service: {{ .Values.service }}
-    type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service  }}{{ else }}micro{{ end }}
+    type: {{ .Values.service  }}
   {{- if eq .Values.service "backgate" }}
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -22,11 +22,11 @@ spec:
     - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
       http:
         paths:
-          - path: /{{ if eq .Values.service "backgate" }}(khaleesi|grpc)\..*{{ end }}
+          - path: /{{ if eq .Values.service "backgate" }}khaleesi\..*{{ end }}
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.gate }}-{{ .Values.service }}-{{ if eq .Values.service "backgate" }}envoy-{{ end }}service
+                name: {{ .Values.gate }}-{{ .Values.service }}-service
                 port:
-                  name: service
+                  name: {{ if eq .Values.service "backgate" }}envoy{{ else }}service{{ end }}
 {{- end }}

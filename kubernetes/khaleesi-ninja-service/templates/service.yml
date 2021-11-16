@@ -17,3 +17,9 @@ spec:
       protocol: TCP
       port: 8000
       targetPort: deployment
+    {{- if eq .Values.service "backgate" }}
+    - name: envoy
+      protocol: TCP
+      port: 8010
+      targetPort: envoy
+    {{- end }}
