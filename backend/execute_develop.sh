@@ -23,6 +23,14 @@ test() {
     return_code=1
   fi
 
+  echo -e "${yellow}Copy coverage reports...${clear_color}"
+  if ! mkdir -p /data/; then
+    return_code=1
+  fi
+  if ! cp .coverage "/data/.coverage"; then
+    return_code=1
+  fi
+
   exit ${return_code}
 }
 
