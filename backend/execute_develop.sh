@@ -31,8 +31,6 @@ test() {
     return_code=1
   fi
 
-  ls -al /data/
-
   exit ${return_code}
 }
 
