@@ -24,10 +24,10 @@ test() {
   fi
 
   echo -e "${yellow}Copy coverage reports...${clear_color}"
-  if ! mkdir -p /data/; then
+  if ! mkdir -p /data/coverage; then
     return_code=1
   fi
-  if ! cp -a .coverage "/data/.coverage"; then
+  if ! cp -a .coverage "/data/coverage/.coverage"; then
     return_code=1
   fi
 
