@@ -68,3 +68,49 @@ RUN chmod +x ./execute.sh
 # Execute the tests.
 ENTRYPOINT ["./execute.sh"]
 CMD ["run"]
+
+################################################################################
+#                               Production Base                                #
+################################################################################
+FROM base as production-base
+
+# Arguments & environment.
+ARG gate
+ARG service
+ARG frontgate_version
+ENV KHALEESI_GATE=${gate}
+ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
+
+# Metadata.
+WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
+COPY ./execute_production.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
+
+# Data.
+RUN rm -r test
+
+################################################################################
+#                               Production Image                               #
+################################################################################
+FROM python:3.10-slim as production
+LABEL environment=production
+
+# Arguments & environment.
+ARG gate
+ARG service
+ARG frontgate_version
+ENV KHALEESI_GATE=${gate}
+ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
+ENV PORT=8000
+ENV PYTHONPATH="/code"
+ENV DJANGO_SETTINGS_MODULE="settings"
+
+# Data.
+WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
+COPY --from=production-base /code/ /code/
+RUN chmod +x ./execute.sh
+
+# Execute the tests.
+ENTRYPOINT ["./execute.sh"]
+CMD ["run"]

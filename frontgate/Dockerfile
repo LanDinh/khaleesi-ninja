@@ -81,6 +81,5 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-WORKDIR /code/frontgate/${KHALEESI_GATE}
 COPY --from=production-base /code/build/ /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
