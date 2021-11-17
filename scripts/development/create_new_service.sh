@@ -14,7 +14,7 @@ green='\033[0;32m'
 clear_color='\033[0m'
 
 
-if [[ -z "${CI}" ]]; then
+if [[ "${CI}" == "true" ]]; then
   magenta=
   red=
   yellow=

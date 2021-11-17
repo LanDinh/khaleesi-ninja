@@ -11,7 +11,7 @@ red='\033[0;31m'
 clear_color='\033[0m'
 
 
-if [[ -z "${CI}" ]]; then
+if [[ "${CI}" == "true" ]]; then
   red=
   clear_color=
 fi

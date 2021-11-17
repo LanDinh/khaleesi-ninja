@@ -11,7 +11,7 @@ yellow='\033[0;33m'
 clear_color='\033[0m'
 
 
-if [[ -z "${CI}" ]]; then
+if [[ "${CI}" == "true" ]]; then
   yellow=
   clear_color=
 fi
