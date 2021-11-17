@@ -8,9 +8,18 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
-yellow='\033[0;33m'
 red='\033[0;31m'
+yellow='\033[0;33m'
 clear_color='\033[0m'
+
+
+if [[ -z "${CI}" ]]; then
+  magenta=
+  red=
+  yellow=
+  clear_color=
+fi
+
 
 # Options.
 letsencrypt_certificate_folder="letsencrypt/live/live"

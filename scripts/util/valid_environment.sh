@@ -11,6 +11,12 @@ red='\033[0;31m'
 clear_color='\033[0m'
 
 
+if [[ -z "${CI}" ]]; then
+  red=
+  clear_color=
+fi
+
+
 # Options.
 input=${1}
 environments_file="./scripts/data/environments"

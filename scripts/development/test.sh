@@ -13,6 +13,14 @@ green='\033[0;32m'
 clear_color='\033[0m'
 
 
+if [[ -z "${CI}" ]]; then
+  magenta=
+  yellow=
+  green=
+  clear_color=
+fi
+
+
 # Options.
 current_service_file=./scripts/data/current_service
 

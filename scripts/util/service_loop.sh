@@ -12,6 +12,13 @@ red='\033[0;31m'
 clear_color='\033[0m'
 
 
+if [[ -z "${CI}" ]]; then
+  magenta=
+  red=
+  clear_color=
+fi
+
+
 # Options.
 gate_services_file=./scripts/data/gate_services
 function=${1}

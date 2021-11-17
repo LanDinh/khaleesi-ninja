@@ -11,6 +11,12 @@ yellow='\033[0;33m'
 clear_color='\033[0m'
 
 
+if [[ -z "${CI}" ]]; then
+  yellow=
+  clear_color=
+fi
+
+
 # Options.
 gate_services_file=./scripts/data/gate_services
 container_mode=${1}

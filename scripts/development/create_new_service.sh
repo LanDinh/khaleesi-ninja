@@ -13,6 +13,15 @@ yellow='\033[0;33m'
 green='\033[0;32m'
 clear_color='\033[0m'
 
+
+if [[ -z "${CI}" ]]; then
+  magenta=
+  red=
+  yellow=
+  green=
+  clear_color=
+fi
+
 # Options.
 symlink_frontgate_command=
 symlink_backgate_command=

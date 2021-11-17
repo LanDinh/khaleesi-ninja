@@ -12,6 +12,15 @@ yellow='\033[0;33m'
 red='\033[0;31m'
 clear_color='\033[0m'
 
+
+if [[ -z "${CI}" ]]; then
+  magenta=
+  red=
+  yellow=
+  clear_color=
+fi
+
+
 # Options.
 scripts_folder=scripts/util/refresh_tls_certificate
 letsencrypt_folder="letsencrypt"
