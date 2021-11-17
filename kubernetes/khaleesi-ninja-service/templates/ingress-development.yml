@@ -16,9 +16,9 @@ spec:
   tls:
     - secretName: tls-certificate
       hosts:
-      - {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+      - admin{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
   rules:
-    - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+    - host: admin{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
       http:
         paths:
           - path: /grpcui/{{ .Values.gate }}/{{ .Values.service }}/(.*)
