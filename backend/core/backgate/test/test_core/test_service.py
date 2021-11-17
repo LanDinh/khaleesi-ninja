@@ -24,6 +24,6 @@ class CoreBackgateServiceTestCase(TestCase):
     name = 'Khaleesi, Mother of Dragons, Breaker of Chains'
     request = SayHelloRequest(name = name)
     # Execute test.
-    response = self.service.SayHello(request = request, context = MagicMock())
+    response = self.service.SayHello(request, MagicMock())
     # Assert results.
     self.assertIn(name, response.message)

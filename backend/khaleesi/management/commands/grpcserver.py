@@ -63,7 +63,7 @@ class Command(BaseCommand):
         register_handler(server)
         if settings.DEBUG:
           service_names.append(name)
-      except ImportError as e:
-        raise ImportError(f'Could not import "{handler}" for gRPC handler.')
+      except ImportError as error:
+        raise ImportError(f'Could not import "{handler}" for gRPC handler.') from error
     if settings.DEBUG:
       reflection.enable_server_reflection(service_names, server)

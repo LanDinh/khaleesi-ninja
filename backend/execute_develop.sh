@@ -36,6 +36,14 @@ test() {
     return_code=1
   fi
 
+  echo -e "${magenta}Pylint...${clear_color}"
+  if ! touch __init__.py; then
+    return_code=1
+  fi
+  if ! pylint "$(pwd)"; then
+    return_code=1
+  fi
+
   exit ${return_code}
 }
 

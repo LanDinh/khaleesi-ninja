@@ -40,6 +40,7 @@ ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
 COPY ./requirements_develop.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./mypy.ini /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
+COPY ./pylintrc /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./execute_develop.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
 RUN ./.venv/bin/pip install -r requirements_develop.txt
 
@@ -58,7 +59,7 @@ ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 ENV KHALEESI_DEBUG=true
 ENV PORT=8000
-ENV PYTHONPATH=/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/proto
+ENV PYTHONPATH=/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}:/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/proto
 ENV DJANGO_SETTINGS_MODULE="settings"
 
 # Data.

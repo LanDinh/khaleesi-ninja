@@ -3,12 +3,12 @@
 # Python.
 from os import environ
 from pathlib import Path
-from typing import Dict, Any, TypedDict, List, cast
+from typing import TypedDict, List, cast
 
 
 # Base definition.
 SECRET_KEY = 'development-keys-are-not-secret-change-before-production!'
-DEBUG = True if 'KHALEESI_DEBUG' in environ else False
+DEBUG = 'KHALEESI_DEBUG' in environ
 TIME_ZONE = 'UTC'
 USE_TZ = True
 
@@ -33,6 +33,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # khaleesi.ninja.
 class KhaleesiNinjaSettings(TypedDict):
+  """Custom khaleesi.ninja settings."""
   PORT: int
   GRPC_HANDLERS: List[str]
 
