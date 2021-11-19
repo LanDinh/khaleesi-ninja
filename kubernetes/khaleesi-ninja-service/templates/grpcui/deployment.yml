@@ -1,0 +1,35 @@
+{{- if eq .Values.environment "development" "integration" }}
+{{- if ne .Values.service "frontgate" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.gate }}-{{ .Values.service }}-grpcui-deployment
+  namespace: khaleesi-ninja-{{ .Values.environment }}
+  labels:
+    gate: {{ .Values.gate }}
+    service: {{ .Values.service }}
+    type: grpcui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      gate: {{ .Values.gate }}
+      service: {{ .Values.service }}
+      type: grpcui
+  template:
+    metadata:
+      labels:
+        gate: {{ .Values.gate }}
+        service: {{ .Values.service }}
+        type: grpcui
+    spec:
+      containers:
+        - name: grpcui
+          image: fullstorydev/grpcui:latest
+          imagePullPolicy: Always
+          args: [ "-port=9000", "-plaintext", "{{ .Values.gate }}-{{ .Values.service }}-service:8000" ]
+          ports:
+            - name: grpcui
+              containerPort: 9000
+{{- end }}
+{{- end }}

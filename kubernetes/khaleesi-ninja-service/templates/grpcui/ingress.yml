@@ -3,12 +3,12 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.gate }}-{{ .Values.service }}-development-ingress
+  name: {{ .Values.gate }}-{{ .Values.service }}-grpcui-ingress
   namespace: khaleesi-ninja-{{ .Values.environment }}
   labels:
     gate: {{ .Values.gate }}
     service: {{ .Values.service }}
-    type: {{ if eq .Values.service "backgate" }}backgate{{ else }}micro{{ end }}
+    type: grpcui
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
@@ -25,7 +25,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.gate }}-{{ .Values.service }}-service
+                name: {{ .Values.gate }}-{{ .Values.service }}-grpcui-service
                 port:
                   name: grpcui
 {{- end }}
