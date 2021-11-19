@@ -13,11 +13,8 @@ green='\033[0;32m'
 clear_color='\033[0m'
 
 
-if [[ "${CI}" == "true" ]]; then
-  magenta=
-  yellow=
-  green=
-  clear_color=
+if [[ "${CI:-false}" == "true" ]]; then
+  export TERM=xterm-color
 fi
 
 

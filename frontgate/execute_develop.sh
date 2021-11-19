@@ -6,24 +6,18 @@ set -u          # Define variables before usage
 set -o pipefail # Make pipes fail
 
 
-magenta='\033[0;35m'
-yellow='\033[0;33m'
-red='\033[0;31m'
-clear_color='\033[0m'
-
-
 command=${1}
 
 
 test() {
   return_code=0
 
-  echo -e "${yellow}React tests...${clear_color}"
+  echo "React tests..."
   if ! npm run test; then
     return_code=1
   fi
 
-  echo -e "${yellow}Copy coverage reports...${clear_color}"
+  echo "Copy coverage reports..."
   if ! mkdir -p /data/; then
     return_code=1
   fi
@@ -31,7 +25,7 @@ test() {
     return_code=1
   fi
 
-  echo -e "${yellow}Eslint...${clear_color}"
+  echo "Eslint..."
   if ! npm run lint; then
     return_code=1
   fi
@@ -45,15 +39,15 @@ run() {
 
 
 if [[ "${command}" == "test" ]]; then
-  echo -e "${magenta}Execute tests...${clear_color}"
+  echo "Execute tests..."
   test
 
 elif [[ "${command}" == "run" ]]; then
-  echo -e "${magenta}Run development server...${clear_color}"
+  echo "Run development server..."
   run
 
 else
-  echo -e "${red}Unsupported command ${command}!${clear_color}"
+  echo "Unsupported command ${command}!"
   exit 1
 fi
 

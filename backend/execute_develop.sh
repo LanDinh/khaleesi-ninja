@@ -6,24 +6,18 @@ set -u          # Define variables before usage
 set -o pipefail # Make pipes fail
 
 
-magenta='\033[0;35m'
-yellow='\033[0;33m'
-red='\033[0;31m'
-clear_color='\033[0m'
-
-
 command=${1}
 
 
 test() {
   return_code=0
 
-  echo -e "${yellow}Django tests...${clear_color}"
+  echo "Django tests..."
   if ! python -m coverage run manage.py test; then
     return_code=1
   fi
 
-  echo -e "${yellow}Copy coverage reports...${clear_color}"
+  echo "Copy coverage reports..."
   if ! mkdir -p /data/coverage; then
     return_code=1
   fi
@@ -31,12 +25,12 @@ test() {
     return_code=1
   fi
 
-  echo -e "${magenta}Mypy...${clear_color}"
+  echo "Mypy..."
   if ! python -m mypy . --strict --show-error-codes; then
     return_code=1
   fi
 
-  echo -e "${magenta}Pylint...${clear_color}"
+  echo "Pylint..."
   if ! touch __init__.py; then
     return_code=1
   fi
@@ -56,15 +50,15 @@ run() {
 source .venv/bin/activate
 
 if [[ "${command}" == "test" ]]; then
-  echo -e "${magenta}Execute tests...${clear_color}"
+  echo "Execute tests..."
   test
 
 elif [[ "${command}" == "run" ]]; then
-  echo -e "${magenta}Running development server...${clear_color}"
+  echo "Running development server..."
   run
 
 else
-  echo -e "${red}Unsupported command ${command}!${clear_color}"
+  echo "Unsupported command ${command}!"
   exit 1
 fi
 
