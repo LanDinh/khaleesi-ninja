@@ -3,7 +3,5 @@ kind: Namespace
 metadata:
   name: khaleesi-ninja-{{ .Values.environment }}
   labels:
-    name: khaleesi-ninja
+    khaleesi-ninja: environment
     environment: {{ .Values.environment }}
-    type: infrastructure
-    infrastructure: namespace

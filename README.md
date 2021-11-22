@@ -63,11 +63,11 @@ The folder structure is as follows:
 
 ### Starting the ecosystem locally
 
-Build and deploy changes by running the following command (for local deployments, the environment will be either `development` or `integration`):
+Build and deploy changes by running the following commands (for local deployments, the environment will be either `development` or `integration`):
 
-```
-./scripts/operations/deploy.sh <ENVIRONMENT>
-```
+* `./scripts/operations/setup_cluster.sh`
+* `./scripts/operations/setup_environment.sh <ENVIRONMENT>`
+* `./scripts/operations/deploy.sh <ENVIRONMENT>`
 
 Optionally, self-signed TLS certificates may be made available to deployments using the following command:
 

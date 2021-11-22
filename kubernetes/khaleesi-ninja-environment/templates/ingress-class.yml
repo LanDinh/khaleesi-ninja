@@ -3,10 +3,8 @@ kind: IngressClass
 metadata:
   name: ingress-class-{{ .Values.environment }}
   labels:
-    name: khaleesi-ninja
+    khaleesi-ninja: environment
     environment: {{ .Values.environment }}
-    type: infrastructure
-    infrastructure: ingress-class
 spec:
   controller: k8s.io/ingress-nginx
   parameters:

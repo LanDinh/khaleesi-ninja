@@ -45,8 +45,12 @@ jobs:
           sudo apt-get install helm
       - name: Setup protoc
         uses: ./.github/actions/setup-protoc
+      - name: Generate protos
+        uses: ./scripts/development/generate_protos.sh
       - name: Set up the cluster
         run: ./scripts/operations/setup_cluster.sh
+      - name: Set up the environment
+        run: ./scripts/operations/setup_environment.sh ${{ matrix.environment }}
       - name: Spin up the environment
         run: ./scripts/operations/deploy.sh ${{ matrix.environment }}
 
@@ -62,6 +66,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup protoc
         uses: ./.github/actions/setup-protoc
+      - name: Generate protos
+        uses: ./scripts/development/generate_protos.sh
       - name: Execute the container test
         run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }} ${{ matrix.service.version }}
       - name: Upload coverage to codecov

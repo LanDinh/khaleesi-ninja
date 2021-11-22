@@ -17,9 +17,17 @@ If no information is passed, the script will iterate over *all* services, otherw
 
 ### `setup_cluster.sh`
 
+This requires `kubectl` to be connected to a cluster.
 Install all necessary controllers to the given cluster:
 
 * `ingress-nginx`: the official `nginx` kubernetes controller, maintained by kubernetes
+
+### `setup_environment.sh`
+
+Install all necessary elements of the given environment:
+
+* `namespace`
+* `ingress-class`
 
 ### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
 
@@ -28,10 +36,7 @@ If `current_service` was specified, `./scripts/data/current_service` is used as 
 If this file doesn't exist, `./scripts/development/swich_current_service.sh` is called to create it.
 If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
-This requires `kubectl` to be connected to a cluster.
-
-1. Make sure that the necessary infrastructure exists
-1. Apply the manifests for the service
+This applies the manifests for the given service.
 
 If the `development` or `integration` environment was chosen, some more steps are executed:
 
