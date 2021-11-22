@@ -15,6 +15,12 @@ If no information is passed, the script will iterate over *all* services, otherw
 
 ## `operations` folder
 
+### `setup_cluster.sh`
+
+Install all necessary controllers to the given cluster:
+
+* `ingress-nginx`: the official `nginx` kubernetes controller, maintained by kubernetes
+
 ### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
 
 If no service was specified, this affects all services.

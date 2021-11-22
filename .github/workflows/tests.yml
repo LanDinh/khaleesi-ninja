@@ -21,8 +21,8 @@ jobs:
         with:
           filename: .github/data/services.json
 
-  # Test that the kubernetes environments actually work.
-  test-kubernetes-configuration:
+  # Test that the kubernetes deployments actually work.
+  test-deployment:
     runs-on: ubuntu-latest
     needs: [ matrix ]
     strategy:
@@ -45,6 +45,8 @@ jobs:
           sudo apt-get install helm
       - name: Setup protoc
         uses: ./.github/actions/setup-protoc
+      - name: Set up the cluster
+        run: ./scripts/operations/setup_cluster.sh
       - name: Spin up the environment
         run: ./scripts/operations/deploy.sh ${{ matrix.environment }}
 
