@@ -26,8 +26,9 @@ Install all necessary controllers to the given cluster:
 
 Install all necessary elements of the given environment:
 
-* `namespace`
-* `ingress-class`
+* the `namespace` for the environment
+* a `ingress-class` for use by the environment
+* a `configmap` holding the default configuration for envoy used as grpc-web proxy
 
 ### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
 

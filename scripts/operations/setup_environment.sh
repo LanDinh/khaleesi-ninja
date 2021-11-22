@@ -25,7 +25,6 @@ environment=${1}
 
 
 echo -e "${magenta}Deploying the environment...${clear_color}"
-docker build "infrastructure/envoy" -t "khaleesi-ninja/infrastructure/envoy:latest"
 helm upgrade --install "khaleesi-ninja-environment-${environment}" kubernetes/khaleesi-ninja-environment --values "kubernetes/environment/${environment}.yml"
 
 
