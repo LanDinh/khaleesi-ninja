@@ -18,7 +18,7 @@ fi
 
 
 echo -e "${magenta}Deploying ingress...${clear_color}"
-helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace
+helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace --set controller.service.type=NodePort
 
 
 echo -e "${magenta}Deploying kubegres...${clear_color}"
