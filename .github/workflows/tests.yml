@@ -46,7 +46,7 @@ jobs:
       - name: Setup protoc
         uses: ./.github/actions/setup-protoc
       - name: Generate protos
-        uses: ./scripts/development/generate_protos.sh
+        run: ./scripts/development/generate_protos.sh
       - name: Set up the cluster
         run: ./scripts/operations/setup_cluster.sh
       - name: Set up the environment
