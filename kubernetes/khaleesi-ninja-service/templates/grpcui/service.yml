@@ -1,23 +1,23 @@
-{{- if eq .Values.environment "development" "integration" }}
-{{- if ne .Values.service "frontgate" }}
+{{- if .Values.grpcui.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.gate }}-{{ .Values.service }}-grpcui-service
-  namespace: khaleesi-ninja-{{ .Values.environment }}
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui-service
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
-    gate: {{ .Values.gate }}
-    service: {{ .Values.service }}
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
     type: grpcui
 spec:
   selector:
-    gate: {{ .Values.gate }}
-    service: {{ .Values.service }}
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
     type: grpcui
   ports:
     - name: grpcui
       protocol: TCP
       port: 8000
       targetPort: grpcui
-{{- end }}
 {{- end }}

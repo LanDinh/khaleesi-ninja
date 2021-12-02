@@ -1,0 +1,5 @@
+type:
+  name: "frontgate"
+ingress:
+  enabled: true
+  path: "/"

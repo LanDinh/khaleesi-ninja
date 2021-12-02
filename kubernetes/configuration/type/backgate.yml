@@ -1,0 +1,11 @@
+type:
+  name: "backgate"
+ingress:
+  enabled: true
+  path: "/khaleesi.(core|api).GateKeeper"
+  port: "grpc-web-envoy"
+  regex_path: true
+grpc_web:
+  enabled: true
+grpcui:
+  enabled: true

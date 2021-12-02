@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package khaleesi.core.backgate;
+package khaleesi.core;
 
 message SayHelloRequest {
   string name = 1;

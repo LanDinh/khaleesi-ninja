@@ -1,31 +1,32 @@
-{{- if eq .Values.environment "development" "integration" }}
-{{- if ne .Values.service "frontgate" }}
+{{- if .Values.ingress.enabled }}
+{{- if .Values.grpcui.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.gate }}-{{ .Values.service }}-grpcui-ingress
-  namespace: khaleesi-ninja-{{ .Values.environment }}
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui-ingress
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
-    gate: {{ .Values.gate }}
-    service: {{ .Values.service }}
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
     type: grpcui
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
-  ingressClassName: ingress-class-{{ .Values.environment }}
+  ingressClassName: ingress-class-{{ .Values.environment.name }}
   tls:
     - secretName: tls-certificate
       hosts:
-      - admin{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+      - admin.{{ .Values.environment.domain }}
   rules:
-    - host: admin{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+    - host: admin.{{ .Values.environment.domain }}
       http:
         paths:
-          - path: /grpcui/{{ .Values.gate }}/{{ .Values.service }}/(.*)
+          - path: /grpcui/{{ .Values.gate.name }}/{{ .Values.service.name }}/(.*)
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.gate }}-{{ .Values.service }}-grpcui-service
+                name: {{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui-service
                 port:
                   name: grpcui
 {{- end }}

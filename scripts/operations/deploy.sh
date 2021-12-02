@@ -44,9 +44,21 @@ deploy_service() {
   local gate=${1}
   local service=${2}
   local version=${3}
+  local type=micro
 
+  if [[ "${service}" == "frontgate" ]] || [[ "${service}" == "backgate" ]]; then
+    type="${service}"
+  fi
+
+  # Note: the order in which to call the values files is important!
+  # Most specific first, to allow more generic ones to override some values
+  # (e.g. only 1 replica for development)
   echo -e "${yellow}Deploying the service...${clear_color}"
-  helm upgrade --install "khaleesi-ninja-${environment}-${gate}-${service}" kubernetes/khaleesi-ninja-service --set environment="${environment}" --set gate="${gate}" --set service="${service}" --set version="${version}"
+  helm upgrade --install "khaleesi-ninja-${environment}-${gate}-${service}" kubernetes/khaleesi-ninja-service \
+    --values "kubernetes/configuration/service/${gate}/${service}.yml" \
+    --values "kubernetes/configuration/type/${type}.yml" \
+    --values "kubernetes/configuration/gate/${gate}.yml" \
+    --values "kubernetes/configuration/environment/${environment}.yml"
 
   if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
     local container_mode=production

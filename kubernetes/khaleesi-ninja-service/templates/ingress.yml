@@ -1,32 +1,33 @@
-{{- if eq .Values.service "frontgate" "backgate" }}
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.gate }}-{{ .Values.service }}-ingress
-  namespace: khaleesi-ninja-{{ .Values.environment }}
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-ingress
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
-    gate: {{ .Values.gate }}
-    service: {{ .Values.service }}
-    type: {{ .Values.service  }}
-  {{- if eq .Values.service "backgate" }}
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: {{ .Values.type.name }}
+  {{- if .Values.ingress.regex_path }}
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
   {{- end }}
 spec:
-  ingressClassName: ingress-class-{{ .Values.environment }}
+  ingressClassName: ingress-class-{{ .Values.environment.name }}
   tls:
     - secretName: tls-certificate
       hosts:
-      - {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+      - {{ .Values.gate.name }}.{{ .Values.environment.domain }}
   rules:
-    - host: {{ .Values.gate }}{{ if ne .Values.environment "production" }}.{{ .Values.environment }}{{ end }}.khaleesi.ninja
+    - host: {{ .Values.gate.name }}.{{ .Values.environment.domain }}
       http:
         paths:
-          - path: /{{ if eq .Values.service "backgate" }}khaleesi\..*{{ end }}
+          - path: {{ .Values.ingress.path }}
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.gate }}-{{ .Values.service }}-service
+                name: {{ .Values.gate.name }}-{{ .Values.service.name }}-service
                 port:
-                  name: {{ if eq .Values.service "backgate" }}envoy{{ else }}service{{ end }}
+                  name: {{ .Values.ingress.port }}
 {{- end }}

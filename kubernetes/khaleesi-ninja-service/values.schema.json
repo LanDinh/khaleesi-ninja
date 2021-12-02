@@ -2,29 +2,96 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "properties": {
     "environment": {
-      "description": "Environment name",
-      "type": "string",
-      "enum": ["development", "integration", "staging", "production"]
+      "description": "environment-specific configuration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "domain": { "type": "string" }
+      },
+      "required": [
+        "name",
+        "domain"
+      ]
     },
     "gate": {
-      "description": "Gate name",
-      "type": "string",
-      "enum": ["core"]
+      "description": "gate configuration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": [
+        "name"
+      ]
     },
     "service": {
-      "description": "Service name",
-      "type": "string"
+      "description": "service configuration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" },
+        "replicas": { "type": "integer" },
+        "image_pull_policy": { "type": "string" }
+      },
+      "required": [
+        "name",
+        "version",
+        "replicas",
+        "image_pull_policy"
+      ]
     },
-    "version": {
-      "description": "Version name",
-      "type": "string"
+    "type": {
+      "description": "type configuration",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "ingress": {
+      "description": "ingress configuration for services exposed to the internet",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "path": { "type": "string" },
+        "port": { "type": "string" },
+        "regex_path": { "type": "boolean" }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
+    "grpc_web": {
+      "description": "grpc-web configuration for gRPC services accessed by browser clients",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "envoy_version": { "type": "string" }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
+    "grpcui": {
+      "description": "grpcui configuration for gRPC services",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "version": { "type": "string" }
+      },
+      "required": [
+        "enabled"
+      ]
     }
   },
   "required": [
     "environment",
     "gate",
     "service",
-    "version"
+    "type",
+    "ingress",
+    "grpc_web"
   ],
   "title": "Values",
   "type": "object"

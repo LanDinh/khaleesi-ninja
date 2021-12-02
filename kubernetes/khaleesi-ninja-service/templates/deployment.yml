@@ -1,39 +1,42 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.gate }}-{{ .Values.service }}-deployment
-  namespace: khaleesi-ninja-{{ .Values.environment }}
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-deployment
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
-    gate: {{ .Values.gate }}
-    service: {{ .Values.service }}
-    type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: {{ .Values.type.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.service.replicas }}
   selector:
     matchLabels:
-      gate: {{ .Values.gate }}
-      service: {{ .Values.service }}
-      type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
+      khaleesi-ninja: service
+      gate: {{ .Values.gate.name }}
+      name: {{ .Values.service.name }}
+      type: {{ .Values.type.name }}
   template:
     metadata:
       labels:
-        gate: {{ .Values.gate }}
-        service: {{ .Values.service }}
-        type: {{ if eq .Values.service "frontgate" "backgate" }}{{ .Values.service }}{{ else }}micro{{ end }}
+        khaleesi-ninja: service
+        gate: {{ .Values.gate.name }}
+        name: {{ .Values.service.name }}
+        type: {{ .Values.type.name }}
     spec:
       containers:
         - name: deployment
-          image: khaleesi-ninja/{{ .Values.gate }}/{{ .Values.service }}:{{ if eq .Values.environment "development" "integration" }}latest{{ else }}{{ .Values.version }}{{ end }}
-          imagePullPolicy: {{ if eq .Values.environment "development" "integration" }}Never{{ else }}Always{{ end }}
+          image: khaleesi-ninja/{{ .Values.gate.name }}/{{ .Values.service.name }}:{{ .Values.service.version }}
+          imagePullPolicy: {{ .Values.service.image_pull_policy }}
           ports:
             - name: deployment
               containerPort: 8000
-      {{- if eq .Values.service "backgate" }}
-        - name: envoy
-          image: envoyproxy/envoy-alpine:v1.20.0
+      {{- if .Values.grpc_web.enabled }}
+        - name: grpc-web-envoy
+          image: envoyproxy/envoy-alpine:{{ .Values.grpc_web.envoy_version }}
           imagePullPolicy: Always
           ports:
-            - name: envoy
+            - name: grpc-web-envoy
               containerPort: 8010
           volumeMounts:
             - name: grpc-web-envoy-config
