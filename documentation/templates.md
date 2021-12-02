@@ -15,3 +15,7 @@ This contains templates relevant for backgates.
 ### `backgate_template` folder
 
 This is a `django-admin startproject` template for creating new backgates.
+
+## `kubernetes` folder
+
+This contains templates for helm chart value files for services. 

@@ -25,12 +25,20 @@ symlink_backend_command=
 
 
 # Meta.
-add_service_to_lists_of_service() {
+add_service_to_list_of_services() {
+  local gate=${1}
+  local service=${2}
+  local type=${3}
+
+  sed -i "1 a \ \ {\ \"gate\":\ \"${gate}\",\ \"name\":\ \"${service}\",\ \"type\":\ \"${type}\",\ \"version\":\ \"1.0.0\",\ \"deploy\":\ \"true\"\ }," data/services.json
+}
+
+add_kubernetes_manifest() {
   local gate=${1}
   local service=${2}
 
-  sed -i "1 a ${gate}:${service}:1.0.0" scripts/data/gate_services
-  sed -i "1 a \ \ {\ \"gate\":\ \"${gate}\",\ \"service\":\ \"${service}\",\ \"version\":\ \"1.0.0\"\ }," .github/data/services.json
+  mkdir -p "kubernetes/configuration/service/${gate}"
+  sed "s/\${SERVICE}/${service}/g" "templates/kubernetes/service.yml" > "kubernetes/configuration/service/${gate}/${service}.yml"
 }
 
 
@@ -51,7 +59,8 @@ create_backgate() {
   eval ${symlink_backgate_command}
 
   echo -e "${yellow}Adding service to list of services...${clear_color}"
-  add_service_to_lists_of_service "${gate}" "backgate"
+  add_service_to_list_of_services "${gate}" "backgate" "backgate"
+  add_kubernetes_manifest "${gate}" "backgate"
 }
 
 
@@ -75,7 +84,8 @@ create_frontgate() {
   eval ${symlink_frontgate_command}
 
   echo -e "${yellow}Adding service to list of services...${clear_color}"
-  add_service_to_lists_of_service "${gate}" "frontgate"
+  add_service_to_list_of_services "${gate}" "frontgate" "frontgate"
+  add_kubernetes_manifest "${gate}" "backgate"
 }
 
 
@@ -100,8 +110,8 @@ else
 fi
 
 echo -e "${magenta}Enter service type:${clear_color}"
-select type in gate; do
-  case $type in
+select input_type in gate; do
+  case $input_type in
   gate)
     echo -e "${magenta}Creating gates...${clear_color}"
     create_frontgate "${gate}"

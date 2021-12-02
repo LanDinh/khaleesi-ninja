@@ -83,7 +83,8 @@ It will prompt the user for some information:
 
 Afterwards, it will do the following:
 
-1. Add the new service to `scripts/gate_service` and `.github/data/services.json`
+1. Add the new service to `data/services.json`
+1. Add kubernetes manifests for the service
 
 For gates, it will additionally create the following:
 
