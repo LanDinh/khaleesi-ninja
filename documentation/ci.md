@@ -10,6 +10,10 @@ This folder contains some `json` files so that multiple jobs can share matrix co
 
 This will read the json files in the `data` folder and make them available as output.
 
+### `setup-protoc`
+
+This will install protoc & plugins necessary for it
+
 ## Workflows folder
 
 ### `tests`

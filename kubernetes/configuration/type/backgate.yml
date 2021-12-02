@@ -3,8 +3,8 @@ type:
 ingress:
   enabled: true
   path: "/khaleesi.(core|api).GateKeeper"
-  port: "grpc-web-envoy"
   regex_path: true
+  port: "grpc-web-envoy"
 grpc_web:
   enabled: true
 grpcui:

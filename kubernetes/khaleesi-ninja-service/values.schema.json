@@ -5,8 +5,14 @@
       "description": "environment-specific configuration",
       "type": "object",
       "properties": {
-        "name": { "type": "string" },
-        "domain": { "type": "string" }
+        "name": {
+          "description": "the name of the environment",
+          "type": "string"
+        },
+        "domain": {
+          "description": "the domain to use",
+          "type": "string"
+        }
       },
       "required": [
         "name",
@@ -17,7 +23,10 @@
       "description": "gate configuration",
       "type": "object",
       "properties": {
-        "name": { "type": "string" }
+        "name": {
+          "description": "the name of the gate",
+          "type": "string"
+        }
       },
       "required": [
         "name"
@@ -27,10 +36,22 @@
       "description": "service configuration",
       "type": "object",
       "properties": {
-        "name": { "type": "string" },
-        "version": { "type": "string" },
-        "replicas": { "type": "integer" },
-        "image_pull_policy": { "type": "string" }
+        "name": {
+          "description": "the name of the service",
+          "type": "string"
+        },
+        "version": {
+          "description": "the version to deploy in production",
+          "type": "string"
+        },
+        "replicas": {
+          "description": "the number of replicas required in production",
+          "type": "integer"
+        },
+        "image_pull_policy": {
+          "description": "whether or not to pull for an image or expect it locally",
+          "type": "string"
+        }
       },
       "required": [
         "name",
@@ -43,7 +64,10 @@
       "description": "type configuration",
       "type": "object",
       "properties": {
-        "name": { "type": "string" }
+        "name": {
+          "description": "the name of the service type",
+          "type": "string"
+        }
       },
       "required": [
         "name"
@@ -53,10 +77,22 @@
       "description": "ingress configuration for services exposed to the internet",
       "type": "object",
       "properties": {
-        "enabled": { "type": "boolean" },
-        "path": { "type": "string" },
-        "port": { "type": "string" },
-        "regex_path": { "type": "boolean" }
+        "enabled": {
+          "description": "whether or not this service requires exposure through the ingress",
+          "type": "boolean"
+        },
+        "path": {
+          "description": "the path pointing to the service",
+          "type": "string"
+        },
+        "regex_path": {
+          "description": "Whether or not the path requires regex parsing",
+          "type": "boolean"
+        },
+        "port": {
+          "description": "the named port the ingress should access for requests",
+          "type": "string"
+        },
       },
       "required": [
         "enabled"
@@ -66,8 +102,14 @@
       "description": "grpc-web configuration for gRPC services accessed by browser clients",
       "type": "object",
       "properties": {
-        "enabled": { "type": "boolean" },
-        "envoy_version": { "type": "string" }
+        "enabled": {
+          "description": "whether or not this service requires a grpc-web proxy",
+          "type": "boolean"
+        },
+        "envoy_version": {
+          "description": "the version to use for the proxy",
+          "type": "string"
+        }
       },
       "required": [
         "enabled"
@@ -77,8 +119,14 @@
       "description": "grpcui configuration for gRPC services",
       "type": "object",
       "properties": {
-        "enabled": { "type": "boolean" },
-        "version": { "type": "string" }
+        "enabled": {
+          "description": "whether or not this service requires exposure through grpcui",
+          "type": "boolean"
+        },
+        "version": {
+          "description": "the grpcui version to use",
+          "type": "string"
+        }
       },
       "required": [
         "enabled"

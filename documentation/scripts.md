@@ -120,7 +120,3 @@ If a service was specified, the function gets executed on the specified service.
 ### `valid_environment.sh ENVIRONMENT`
 
 This validates that the provided environment exists.
-
-### `valid_service.sh GATE SERVICE`
-
-This validates that the provided service exists.

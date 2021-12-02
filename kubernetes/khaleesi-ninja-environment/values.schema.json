@@ -5,8 +5,14 @@
       "description": "environment-specific configuration",
       "type": "object",
       "properties": {
-        "name": { "type": "string" },
-        "domain": { "type": "string" }
+        "name": {
+          "description": "the name of the environment",
+          "type": "string"
+        },
+        "domain": {
+          "description": "the domain to use",
+          "type": "string"
+        }
       },
       "required": [
         "name",

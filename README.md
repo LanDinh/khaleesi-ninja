@@ -65,9 +65,9 @@ The folder structure is as follows:
 
 Build and deploy changes by running the following commands (for local deployments, the environment will be either `development` or `integration`):
 
-* `./scripts/operations/setup_cluster.sh`
-* `./scripts/operations/setup_environment.sh <ENVIRONMENT>`
-* `./scripts/operations/deploy.sh <ENVIRONMENT>`
+* `./scripts/operations/setup_cluster.sh` will add the necessary controllers to the cluster
+* `./scripts/operations/setup_environment.sh <ENVIRONMENT>` will set up resources for the chosen environment
+* `./scripts/operations/deploy.sh <ENVIRONMENT>` will start up all services for that environment
 
 Optionally, self-signed TLS certificates may be made available to deployments using the following command:
 

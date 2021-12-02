@@ -16,6 +16,7 @@ type:
 ingress:
   enabled: false
   #path: "required path"
+  regex_path: false
   port: "service"
 
 # gRPC.

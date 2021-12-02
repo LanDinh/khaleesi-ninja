@@ -2,7 +2,7 @@
 
 ## Logical Structure
 
-![Kubernetes Folder Structure](/documentation/images/kubernetes-logical-structure.svg)
+![Kubernetes Logical Structure](/documentation/images/kubernetes-logical-structure.svg)
 
 Each gate has the same base structure within kubernetes.
 
@@ -23,16 +23,25 @@ It calls its own micro services as well as the core micro services to serve cont
 
 All kubernetes configuration is managed via `helm` charts.
 
-### `khaleesi-ninja-infrastructure`
+### `configuration`
 
-This contains basic infrastructure necessary for the ecosystem to work:
+The configuration consists of four parts, all of which must be specified when installing a helm chart:
+
+* environment: this contains environment-specific configuration like e.g. the domain used for that environment
+* gate: this contains gate-specific configuration, like e.g. the number of postgres replicas to use for the database
+* type: this contains service-type specific configuration, like e.g. if an ingress resource should be set up
+* service: this contains service-specific configuration, like e.g. how many replicas should be used for that service
+
+The combination of these parts must provide valid input for the helm charts.
+They are passed in in reverse order, so that more generic configuration can override specific configuration (e.g. in `development`, only a single replica is required per service).
+
+### `khaleesi-ninja-environment`
+
+This contains basic resources necessary for the ecosystem to work:
 
 * namespace
 * ingress class
-
-It expects the following values:
-
-* `environment` needs to be one of `development`, `integration`, `staging` and `production`
+* default configuration to use for grpc-web envoy proxies
 
 ### `khaleesi-ninja-service`
 
@@ -40,11 +49,9 @@ This contains manifests necessary for the services to work:
 
 * deployment
 * service
-* ingress (for frontgates and backgates)
+* ingress (if required)
 
-It expects the following values:
-
-* `environment` needs to be one of `development`, `integration`, `staging` and `production`
-* `gate` needs to be one of `core`
-* `service` needs to be the service name
-* `version` needs to be the version to be installed for the environments `staging` and `production`
+Furthermore, if grpcui is required, it will additionally deploy:
+* grpcui deployment
+* grpcui service
+* grpcui ingress
