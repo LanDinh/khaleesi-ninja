@@ -1,0 +1,12 @@
+environment:
+  name: "integration"
+  domain: "integration.khaleesi.ninja"
+service:
+  version: "latest"
+  replicas: 1
+  image_pull_policy: "Never"
+grpc_web_envoy:
+  version: "latest"
+grpcui:
+  enabled: true
+  version: "latest"

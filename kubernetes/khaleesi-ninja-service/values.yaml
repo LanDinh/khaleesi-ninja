@@ -1,0 +1,27 @@
+# khaleesi.ninja
+environment:
+  #name: "required name"
+  #domain: "required domain"
+gate:
+  #name: "required name"
+service:
+  #name: "required name"
+  #version: "required stable version"
+  replicas: 1
+  image_pull_policy: "Always"
+type:
+  #name: "required name"
+
+# Kubernetes.
+ingress:
+  enabled: false
+  #path: "required path"
+  port: "service"
+
+# gRPC.
+grpc_web:
+  enabled: false
+  envoy_version: "v1.20.0"
+grpcui:
+  enabled: false
+  version: "v1.2.0"
