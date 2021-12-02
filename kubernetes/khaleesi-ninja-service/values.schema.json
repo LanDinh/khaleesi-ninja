@@ -92,7 +92,7 @@
         "port": {
           "description": "the named port the ingress should access for requests",
           "type": "string"
-        },
+        }
       },
       "required": [
         "enabled"
