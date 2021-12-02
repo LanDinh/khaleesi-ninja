@@ -71,7 +71,7 @@ jobs:
       - name: Generate protos
         run: ./scripts/development/generate_protos.sh
       - name: Execute the container test
-        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }}
+        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
       - name: Upload coverage to codecov
         if: ${{ always() }}
         uses: codecov/codecov-action@v2

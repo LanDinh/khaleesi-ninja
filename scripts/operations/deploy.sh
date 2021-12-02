@@ -47,6 +47,10 @@ deploy_service() {
   local version=${4}
   local deploy=${5}
 
+  if [[ ${deploy} == "false" ]]; then
+    return 0
+  fi
+
   # Note: the order in which to call the values files is important!
   # Most specific first, to allow more generic ones to override some values
   # (e.g. only 1 replica for development)

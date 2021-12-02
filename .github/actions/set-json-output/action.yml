@@ -20,7 +20,7 @@ runs:
       shell: bash
       run: |
         FULL_JSON=$(echo $(cat ${{ inputs.filename }}))
-        DEPLOY_JSON=$(echo $(sed '/"deploy": false/d' ${{ inputs.filename }}))
+        DEPLOY_JSON=$(echo $(sed '/"deploy": "false"/d' ${{ inputs.filename }}))
         echo "::set-output name=full-json::$FULL_JSON"
         echo "::set-output name=deploy-json::$DEPLOY_JSON"
     - shell: bash

@@ -1,4 +1,4 @@
 [
-  { "gate": "core", "name": "backgate", "type": "backgate", "version": "1.0.0","deploy": true },
-  { "gate": "core", "name": "frontgate", "type": "frontgate", "version": "1.0.0", "deploy": true }
+  { "gate": "core", "name": "backgate", "type": "backgate", "version": "1.0.0","deploy": "true" },
+  { "gate": "core", "name": "frontgate", "type": "frontgate", "version": "1.0.0", "deploy": "true" }
 ]
