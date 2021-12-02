@@ -1,9 +1,5 @@
 # CI via Github Actions
 
-## Data folder
-
-This folder contains some `json` files so that multiple jobs can share matrix configuration.
-
 ## Actions folder
 
 ### `set-json-output`

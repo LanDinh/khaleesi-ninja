@@ -1,0 +1,6 @@
+[
+  { "name": "development", "deploy": true },
+  { "name": "integration", "deploy": true },
+  { "name": "staging", "deploy": false },
+  { "name": "production", "deploy": false }
+]

@@ -54,6 +54,7 @@ The general deployment is done with:
 The folder structure is as follows:
 
 * `.github` CI related configuration - [documentation](documentation/ci.md)
+* `data` Lists of things (e.g. services, environments etc.) in json formats
 * `documentation` A bunch of markdown files to document everything
 * `frontgate` The code for the frontgates. One `react` project per frontgate - [documentation](documentation/frontgate.md)
 * `kubernetes` Kubernetes related configuration - [documentation](documentation/kubernetes.md)

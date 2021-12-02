@@ -18,20 +18,24 @@ fi
 
 
 # Options.
-gate_services_file=./scripts/data/gate_services
+all_services_file=./data/services.json
 function=${1}
 input_gate=
 input_service=
+input_type=
 input_version=
+input_deploy=
 
 
 if [[ $# -eq 1 ]]; then
   echo "No specific service was specified, so executing for all services..."
-elif [[ $# -eq 4 ]]; then
+elif [[ $# -eq 6 ]]; then
   input_gate=${2}
   input_service=${3}
-  input_version=${3}
-  echo "${input_gate} ${input_service} version ${input_version} passed..."
+  input_type=${4}
+  input_version=${5}
+  input_deploy=${6}
+  echo "${input_gate} ${input_service} of type ${input_type} v${input_version} passed..."
 else
   echo -e "${red}Wrong number of arguments to service-loop: $#!${clear_color}"
   exit 1
@@ -40,13 +44,18 @@ fi
 
 # Read environments.
 while read -r raw_line; do
-  IFS=":" read -r -a line <<< "${raw_line}"
+  if [[ ${#raw_line} -eq 1 ]]; then
+    continue
+  fi
+  read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
   gate="${line[0]}"
   service="${line[1]}"
-  version="${line[2]}"
+  type="${line[2]}"
+  version="${line[3]}"
+  deploy="${line[4]}"
 
   if { [[ "${gate}" == "${input_gate}" ]] && [[ "${service}" == "${input_service}" ]]; } || [[ $# -eq 1 ]]; then
-    echo -e "${magenta}Executing for the ${gate} ${service} version ${version}...${clear_color}"
-    "${function}" "${gate}" "${service}" "${version}"
+    echo -e "${magenta}Executing for the ${gate} ${service} of type ${type} v${version}...${clear_color}"
+    "${function}" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
   fi
-done <${gate_services_file}
+done <${all_services_file}

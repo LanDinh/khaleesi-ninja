@@ -20,7 +20,7 @@ fi
 
 # Options.
 environment=${1}
-current_service_file="./scripts/data/current_service"
+current_service_file="./data/current_service"
 
 
 # Validate environment.
@@ -34,7 +34,7 @@ if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
       . ./scripts/development/switch_current_service.sh
   fi
   while read -r raw_line; do
-    IFS=":" read -r -a line <<< "${raw_line}"
+    read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
     services=("${line[@]}")
   done <${current_service_file}
 fi
@@ -43,12 +43,9 @@ fi
 deploy_service() {
   local gate=${1}
   local service=${2}
-  local version=${3}
-  local type=micro
-
-  if [[ "${service}" == "frontgate" ]] || [[ "${service}" == "backgate" ]]; then
-    type="${service}"
-  fi
+  local type=${3}
+  local version=${4}
+  local deploy=${5}
 
   # Note: the order in which to call the values files is important!
   # Most specific first, to allow more generic ones to override some values
@@ -67,7 +64,7 @@ deploy_service() {
     fi
 
     echo -e "${yellow}Rebuilding the container...${clear_color}"
-    . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${version}"
+    . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
 
     echo -e "${yellow}Rolling out the new container...${clear_color}"
     kubectl rollout restart deployment "${gate}-${service}-deployment" -n "khaleesi-ninja-${environment}"

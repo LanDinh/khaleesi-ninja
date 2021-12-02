@@ -17,22 +17,24 @@ fi
 
 
 # Options.
-gate_services_file=./scripts/data/gate_services
+all_services_file=./data/services.json
 container_mode=${1}
 gate=${2}
 service=${3}
-version=${4}
+type=${4}
+version=${5}
+deploy=${6}
 location="backend"
 frontgate_version=
 
 
-if [[ "${service}" == "frontgate" ]]; then
+if [[ "${type}" == "frontgate" ]]; then
   location="frontgate"
 elif [[ "${service}" == "backgate" ]]; then
   echo -e "${yellow}Fetching the frontgate version...${clear_color}"
-  raw_frontgate=$(grep "^${gate}:frontgate:" "${gate_services_file}")
-  IFS=":" read -r -a frontgate <<< "${raw_frontgate}"
-  frontgate_version="${frontgate[2]}"
+  raw_frontgate=$(grep "\"gate\": \"${gate}\"" "${all_services_file}" | grep "\"type\": \"frontgate\"")
+  read -r -a frontgate <<< "$(./scripts/util/parse_service.sh "${raw_frontgate}")"
+  frontgate_version="${frontgate[3]}"
 fi
 
 

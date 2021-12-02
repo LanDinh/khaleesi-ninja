@@ -19,20 +19,7 @@ fi
 
 
 # Options.
-current_service_file=./scripts/data/current_service
-
-
-test_container() {
-  local gate=${1}
-  local service=${2}
-  local version=${3}
-
-  echo -e "${yellow}Building the images...${clear_color}"
-  . scripts/util/build.sh "development" "${gate}" "${service}" "${version}"
-
-  echo -e "${yellow}Executing tests for the ${gate} ${service} service...${clear_color}"
-  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" test
-}
+current_service_file="./data/current_service"
 
 
 # Check if interactive mode.
@@ -42,10 +29,25 @@ if [[ $# -eq 1 ]] && [[ "${1}" == "current_service" ]]; then
       . ./scripts/development/switch_current_service.sh
   fi
   while read -r raw_line; do
-    IFS=":" read -r -a line <<< "${raw_line}"
+    read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
     services=("${line[@]}")
   done <${current_service_file}
 fi
+
+
+test_container() {
+  local gate=${1}
+  local service=${2}
+  local type=${3}
+  local version=${4}
+  local deploy=${5}
+
+  echo -e "${yellow}Building the images...${clear_color}"
+  . scripts/util/build.sh "development" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
+
+  echo -e "${yellow}Executing tests for the ${gate} ${service} service...${clear_color}"
+  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" test
+}
 
 
 echo -e "${magenta}Cleaning up old files and create mount directory...${clear_color}"

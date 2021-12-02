@@ -10,7 +10,7 @@
 /.idea/*
 *.iml
 /temp/*
-/scripts/data/current_service
+/data/current_service
 /scripts/local/*
 
 # Operations

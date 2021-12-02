@@ -18,13 +18,17 @@ fi
 
 # Options.
 input=${1}
-environments_file="./scripts/data/environments"
+environments_file="./data/environments.json"
 
 
 # Read environments.
 environments=()
 while read -r raw_line; do
-  environments+=("${raw_line}")
+  if [[ ${#raw_line} -eq 1 ]]; then
+    continue
+  fi
+  IFS="\"" read -r -a line <<< "${raw_line}"
+  environments+=("${line[3]}")
 done <${environments_file}
 
 

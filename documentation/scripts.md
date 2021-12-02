@@ -3,15 +3,9 @@
 This project offers a bunch of scripts to ease operations & development.
 All of them expect to be run at the project root.
 
-If the options `[GATE]` and `[SERVICE]` can be passed, either none or both have to be passed.
+If the options `[GATE]`, `[SERVICE]`, `[TYPE]`, `[VERSION]` and `[DEPLOY]` can be passed, either none or all have to be passed.
 In some cases, a temporary file is used to pass this information, which is written to via an interactive prompt.
 If no information is passed, the script will iterate over *all* services, otherwise it will only be executed on the specified one.
-
-## `data` folder
-
-* `environments` lists all available environments
-* `gate_services` lists all available services
-* `current_service` is an optional file for development to enable quick iterations of testing and deploying. It is not committed to `git`
 
 ## `operations` folder
 
@@ -22,7 +16,7 @@ Install all necessary controllers to the given cluster:
 
 * `ingress-nginx`: the official `nginx` kubernetes controller, maintained by kubernetes
 
-### `setup_environment.sh`
+### `setup_environment.sh ENVIRONMENT`
 
 Install all necessary elements of the given environment:
 
@@ -30,7 +24,7 @@ Install all necessary elements of the given environment:
 * a `ingress-class` for use by the environment
 * a `configmap` holding the default configuration for envoy used as grpc-web proxy
 
-### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE)]`
+### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE TYPE VERSION DEPLOY)]`
 
 If no service was specified, this affects all services.
 If `current_service` was specified, `./scripts/data/current_service` is used as input.
@@ -56,7 +50,7 @@ This can be used to recreate the kubernetes secret holding the TLS certificate (
 
 ## `development` folder
 
-### `test.sh [INTERACTIVE | (GATE SERVICE)]`
+### `test.sh [INTERACTIVE | (GATE SERVICE TYPE VERSION DEPLOY)]`
 
 If no service was specified, this affects all services.
 If `current_service` was specified, `./scripts/data/current_service` is used as input.
@@ -116,6 +110,10 @@ Afterwards, any dangling images get pruned.
 
 If no service was specified, the function gets executed on *all* services.
 If a service was specified, the function gets executed on the specified service.
+
+### `parse_service.sh RAW_INPUT`
+
+This will parse the raw input to extract service information from the json object.
 
 ### `valid_environment.sh ENVIRONMENT`
 

@@ -5,8 +5,10 @@ jobs:
   matrix:
     runs-on: ubuntu-latest
     outputs:
-      environments: ${{ steps.set-environments.outputs.json }}
-      services: ${{ steps.set-services.outputs.json }}
+      all-environments: ${{ steps.set-environments.outputs.full-json }}
+      deploy-environments: ${{ steps.set-environments.outputs.deploy-json }}
+      all-services: ${{ steps.set-services.outputs.full-json }}
+      deploy-services: ${{ steps.set-services.outputs.deploy-json }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -14,12 +16,12 @@ jobs:
         name: Read environments into matrix
         uses: ./.github/actions/set-json-output
         with:
-          filename: .github/data/environments.json
+          filename: data/environments.json
       - id: set-services
         name: Read services into matrix
         uses: ./.github/actions/set-json-output
         with:
-          filename: .github/data/services.json
+          filename: data/services.json
 
   # Test that the kubernetes deployments actually work.
   test-deployment:
@@ -27,7 +29,7 @@ jobs:
     needs: [ matrix ]
     strategy:
       matrix:
-        environment: ${{ fromJson(needs.matrix.outputs.environments) }}
+        environment: ${{ fromJson(needs.matrix.outputs.deploy-environments) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -50,9 +52,9 @@ jobs:
       - name: Set up the cluster
         run: ./scripts/operations/setup_cluster.sh
       - name: Set up the environment
-        run: ./scripts/operations/setup_environment.sh ${{ matrix.environment }}
+        run: ./scripts/operations/setup_environment.sh ${{ matrix.environment.name }}
       - name: Spin up the environment
-        run: ./scripts/operations/deploy.sh ${{ matrix.environment }}
+        run: ./scripts/operations/deploy.sh ${{ matrix.environment.name }}
 
   # Execute all tests for all services individually.
   test-all-services:
@@ -60,7 +62,7 @@ jobs:
     needs: [ matrix ]
     strategy:
       matrix:
-        service: ${{ fromJson(needs.matrix.outputs.services) }}
+        service: ${{ fromJson(needs.matrix.outputs.all-services) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -69,7 +71,7 @@ jobs:
       - name: Generate protos
         run: ./scripts/development/generate_protos.sh
       - name: Execute the container test
-        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }} ${{ matrix.service.version }}
+        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }}
       - name: Upload coverage to codecov
         if: ${{ always() }}
         uses: codecov/codecov-action@v2

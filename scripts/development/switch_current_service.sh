@@ -19,16 +19,19 @@ fi
 
 
 # Options.
-scripts_data_directory=./scripts/data
-gate_services_file="${scripts_data_directory}/gate_services"
-current_service_file="${scripts_data_directory}/current_service"
+data_directory=./data
+all_services_file="${data_directory}/services.json"
+current_service_file="${data_directory}/current_service"
 
 
 # Read services.
 services=()
 while read -r raw_line; do
+  if [[ ${#raw_line} -eq 1 ]]; then
+    continue
+  fi
   services+=("${raw_line}")
-done <${gate_services_file}
+done <${all_services_file}
 
 
 # Helpers.
