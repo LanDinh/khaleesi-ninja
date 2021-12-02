@@ -4,21 +4,21 @@ import { render, screen } from '@testing-library/react'
 
 // khaleesi.ninja.
 import Gate              from '../core/Gate'
-import { ServiceClient } from '../core/proto/core_backgate_grpc_web_pb'
+import { GateKeeperClient } from '../core/proto/core_backgate_grpc_web_pb'
 
 
 jest.mock('../core/proto/core_backgate_grpc_web_pb')
 
 beforeEach(() => {
-  (ServiceClient as jest.Mock).mockClear()
+  (GateKeeperClient as jest.Mock).mockClear()
 })
 
 
 test('renders learn react link', () => {
   render(<Gate />)
 
-  expect(ServiceClient).toHaveBeenCalledTimes(1)
-  const mockServiceClient = (ServiceClient as jest.Mock).mock.instances[0]
+  expect(GateKeeperClient).toHaveBeenCalledTimes(1)
+  const mockServiceClient = (GateKeeperClient as jest.Mock).mock.instances[0]
   const mockSayHello = mockServiceClient.sayHello
   expect(mockSayHello).toHaveBeenCalledTimes(1)
 
