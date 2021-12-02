@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
 // khaleesi.ninja.
 import { SayHelloRequest } from './proto/core_backgate_pb'
-import { ServiceClient }   from './proto/core_backgate_grpc_web_pb'
+import { GateKeeperClient }   from './proto/core_backgate_grpc_web_pb'
 import './App.css'
 
 
@@ -14,7 +14,7 @@ import './App.css'
  * @constructor
  */
 function Gate() {
-  const service = new ServiceClient('https://core.development.khaleesi.ninja')
+  const service = new GateKeeperClient('https://core.development.khaleesi.ninja')
   const request = new SayHelloRequest()
   request.setName('Khaleesi, Mother of Dragons')
   service.sayHello(request, {}, ((_err, response) => console.log(response)))
