@@ -24,7 +24,7 @@ test() {
   if ! python -m coverage xml; then
     return_code=1
   fi
-  if ! cp -a coverage.xml "/data/coverage/coverage.xml"; then
+  if ! cp -a coverage.xml "/data/coverage.xml"; then
     return_code=1
   fi
 
