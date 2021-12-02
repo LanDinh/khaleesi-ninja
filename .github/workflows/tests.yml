@@ -67,7 +67,7 @@ jobs:
       - name: Setup protoc
         uses: ./.github/actions/setup-protoc
       - name: Generate protos
-        uses: ./scripts/development/generate_protos.sh
+        run: ./scripts/development/generate_protos.sh
       - name: Execute the container test
         run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.service }} ${{ matrix.service.version }}
       - name: Upload coverage to codecov
