@@ -46,5 +46,5 @@ spec:
       volumes:
         - name: grpc-web-envoy-config
           configMap:
-            name: grpc-web-envoy-configmap
+            name: grpc-web-envoy-configuration
       {{- end }}
