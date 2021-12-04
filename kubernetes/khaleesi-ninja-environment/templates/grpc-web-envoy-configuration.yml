@@ -6,6 +6,7 @@ metadata:
   labels:
     khaleesi-ninja: environment
     environment: {{ .Values.environment.name }}
+    infrastructure: grpc-web-envoy-configuration
 data:
   envoy.yml: |-
   {{ .Files.Get "data/grpc-web-envoy.yml" | nindent 4 }}

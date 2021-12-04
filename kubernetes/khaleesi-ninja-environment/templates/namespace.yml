@@ -5,3 +5,4 @@ metadata:
   labels:
     khaleesi-ninja: environment
     environment: {{ .Values.environment.name }}
+    infrastructure: namespace

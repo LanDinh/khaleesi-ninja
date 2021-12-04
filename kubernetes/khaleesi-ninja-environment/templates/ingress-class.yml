@@ -5,6 +5,7 @@ metadata:
   labels:
     khaleesi-ninja: environment
     environment: {{ .Values.environment.name }}
+    infrastructure: ingress-class
 spec:
   controller: k8s.io/ingress-nginx
   parameters:
