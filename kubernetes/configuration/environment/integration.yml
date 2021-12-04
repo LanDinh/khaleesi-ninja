@@ -1,6 +1,10 @@
 environment:
   name: "integration"
   domain: "integration.khaleesi.ninja"
+kubegres:
+  replicas: 1
+  size: 200Mi
+  development_credentials: true
 service:
   version: "latest"
   replicas: 1

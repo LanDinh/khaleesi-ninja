@@ -44,10 +44,11 @@ The general deployment is done with:
 ![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.21-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 
-| Service Type | General | Deployment | Development |
-| ------------ | ------- | ---------- | ----------- |
-| Frontgate    | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react_router-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) | ![create-react-app badge](https://img.shields.io/badge/create_react_app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |
-| Backgate     | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.14-informational) <br /> ![django badge](https://img.shields.io/badge/django-v3.2-informational) | | ![grpcio_tools badge](https://img.shields.io/badge/grpcio_tools-v1.41-informational) <br /> ![mypy-protobuf badge](https://img.shields.io/badge/mypy_protobuf-v3.0-informational)
+| Service Type     | General | Infrastructure | Development |
+| ---------------- | ------- | -------------- | ----------- |
+| Frontgate        | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react_router-v6.0-informational) <br /> ![grpc-web badge](https://img.shields.io/badge/grpc_web-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) | ![create-react-app badge](https://img.shields.io/badge/create_react_app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |
+| Backgate / Micro | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.14-informational) <br /> ![django badge](https://img.shields.io/badge/django-v3.2-informational) | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.13-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![grpcio_tools badge](https://img.shields.io/badge/grpcio_tools-v1.41-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v2.11-informational) |
+| Backgate         | | ![envoy badge](https://img.shields.io/badge/envoy-v1.20-informational) | |
 
 ### Structure
 

@@ -1,0 +1,27 @@
+apiVersion: kubegres.reactive-tech.io/v1
+kind: Kubegres
+metadata:
+  name: {{ .Values.gate.name }}-kubegres
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: service
+    infrastructure: kubegres
+    gate: {{ .Values.gate.name }}
+spec:
+  replicas: {{ .Values.kubegres.replicas }}
+  image: {{ .Values.kubegres.image }}
+  database:
+    size: {{ .Values.kubegres.size }}
+  port: 8000
+  env:
+    - name: POSTGRES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.gate.name }}-kubegres-credentials
+          key: superUserPassword
+
+    - name: POSTGRES_REPLICATION_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.gate.name }}-kubegres-credentials
+          key: replicationUserPassword

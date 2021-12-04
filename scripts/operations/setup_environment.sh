@@ -28,5 +28,10 @@ echo -e "${magenta}Deploying the environment...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}" kubernetes/khaleesi-ninja-environment \
   --values "kubernetes/configuration/environment/${environment}.yml"
 
+echo -e "${magenta}Deploying the core gate...${clear_color}"
+helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-gate \
+  --values "kubernetes/configuration/gate/core.yml" \
+  --values "kubernetes/configuration/environment/${environment}.yml"
+
 
 echo -e "${green}DONE! :D${clear_color}"

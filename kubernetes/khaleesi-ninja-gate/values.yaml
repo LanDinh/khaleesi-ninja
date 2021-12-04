@@ -1,0 +1,9 @@
+# khaleesi.ninja
+environment:
+  #name: "required name"
+  #domain: "required domain"
+gate:
+  #name: "required name"
+kubegres:
+  image: postgres:14.1
+  development_credentials: false

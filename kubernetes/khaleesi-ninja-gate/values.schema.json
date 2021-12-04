@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "properties": {
+    "environment": {
+      "description": "environment-specific configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "the name of the environment",
+          "type": "string"
+        },
+        "domain": {
+          "description": "the domain to use",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "domain"
+      ]
+    },
+    "kubegres": {
+      "description": "kubgres configuration",
+      "type": "object",
+      "properties": {
+        "replicas": {
+          "description": "number of replicas for the postgres cluster",
+          "type": "integer"
+        },
+        "size": {
+          "description": "space available to the database",
+          "type": "string"
+        },
+        "image": {
+          "description": "the postgres image to use for the postgres cluster",
+          "type": "string"
+        },
+        "development_credentials": {
+          "description": "automatically create unsafe credentials to ease development - default false",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "replicas",
+        "size",
+        "image",
+        "development_credentials"
+      ]
+    }
+  },
+  "required": [
+    "environment",
+    "kubegres"
+  ],
+  "title": "Values",
+  "type": "object"
+}

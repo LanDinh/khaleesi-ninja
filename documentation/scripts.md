@@ -15,6 +15,7 @@ This requires `kubectl` to be connected to a cluster.
 Install all necessary controllers to the given cluster:
 
 * `ingress-nginx`: the official `nginx` kubernetes controller, maintained by kubernetes
+* `kubegres`: the `postgres` controller
 
 ### `setup_environment.sh ENVIRONMENT`
 
