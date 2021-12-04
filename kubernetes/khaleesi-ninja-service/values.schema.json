@@ -139,7 +139,8 @@
     "service",
     "type",
     "ingress",
-    "grpc_web"
+    "grpc_web",
+    "grpcui"
   ],
   "title": "Values",
   "type": "object"
