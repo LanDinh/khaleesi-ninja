@@ -31,7 +31,7 @@ spec:
           ports:
             - name: deployment
               containerPort: 8000
-          {{- if or .Values.django.enabled }}
+          {{- if or .Values.django.enabled .Values.kubegres.enabled }}
           env:
           {{- end }}
           {{- if .Values.django.enabled }}
@@ -40,6 +40,23 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.gate.name }}-{{ .Values.service.name }}-django-credentials
                   key: secretKey
+          {{- end }}
+          {{- if .Values.kubegres.enabled }}
+            - name: KHALEESI_DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres-configuration
+                  key: host
+            - name: KHALEESI_DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres-configuration
+                  key: port
+            - name: KHALEESI_DATABASE_SUPERUSER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres-configuration
+                  key: superUser
           {{- end }}
       {{- if .Values.grpc_web.enabled }}
         - name: grpc-web-envoy

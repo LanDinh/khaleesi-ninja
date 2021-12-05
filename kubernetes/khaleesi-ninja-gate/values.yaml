@@ -7,3 +7,4 @@ gate:
 kubegres:
   image: postgres:14.1
   development_credentials: false
+  port: 5432

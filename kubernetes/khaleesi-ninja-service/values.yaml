@@ -23,6 +23,10 @@ ingress:
 django:
   enabled: false
 
+# Database.
+kubegres:
+  enabled: false
+
 # gRPC.
 grpc_web:
   enabled: false

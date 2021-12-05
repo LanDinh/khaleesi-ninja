@@ -98,6 +98,43 @@
         "enabled"
       ]
     },
+    "kubegres": {
+      "description": "kubgres configuration",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not a service uses kubegres",
+          "type": "boolean"
+        },
+        "replicas": {
+          "description": "number of replicas for the postgres cluster",
+          "type": "integer"
+        },
+        "size": {
+          "description": "space available to the database",
+          "type": "string"
+        },
+        "image": {
+          "description": "the postgres image to use for the postgres cluster",
+          "type": "string"
+        },
+        "port": {
+          "description": "the port to run postgres in",
+          "type": "integer"
+        },
+        "development_credentials": {
+          "description": "automatically create unsafe credentials to ease development - default false",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "replicas",
+        "size",
+        "image",
+        "port",
+        "development_credentials"
+      ]
+    },
     "django": {
       "description": "django configuration",
       "type": "object",

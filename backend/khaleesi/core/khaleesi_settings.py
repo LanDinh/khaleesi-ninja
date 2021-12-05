@@ -19,30 +19,6 @@ INSTALLED_APPS = [
 
 
 # Database.
-DATABASE = {
-  'ENGINE': 'django.db.backends.postgresql',
-  'HOST': 'core-kubegres',
-  'PORT': '5432',
-  'NAME': 'backgate',
-}
-DATABASES = {
-  'default': {},
-  'read': {
-    **DATABASE,
-    'USER': 'postgres',
-    'PASSWORD': 'superUnsafeSecret',
-  },
-  'write': {
-    **DATABASE,
-    'USER': 'postgres',
-    'PASSWORD': 'superUnsafeSecret',
-  },
-  'migrate': {
-    **DATABASE,
-    'USER': 'postgres',
-    'PASSWORD': 'superUnsafeSecret',
-  },
-}
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
