@@ -6,7 +6,6 @@ from typing import TypedDict, List, cast
 
 
 # Base definition.
-SECRET_KEY = environ['KHALEESI_SECRET_KEY']
 DEBUG = 'KHALEESI_DEBUG' in environ
 TIME_ZONE = 'UTC'
 USE_TZ = True
@@ -45,7 +44,6 @@ DATABASES = {
   },
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-DATABASE_ROUTERS = [ 'khaleesi.core.database_router.DatabaseRouter' ]
 
 
 # khaleesi.ninja.

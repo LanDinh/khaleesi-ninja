@@ -15,7 +15,7 @@ command=${1}
 
 
 run() {
-  python manage.py grpcserver
+  python manage.py grpcserver --settings=khaleesi.core.production_settings
 }
 
 
