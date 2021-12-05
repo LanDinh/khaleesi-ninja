@@ -7,6 +7,7 @@ from typing import Type, Optional, Any
 from django.db.models import Model
 
 
+# noinspection PyMethodMayBeStatic
 class DatabaseRouter:
   """Database router to distinguish between read and write operations."""
 

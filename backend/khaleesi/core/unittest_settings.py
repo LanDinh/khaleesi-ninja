@@ -4,9 +4,9 @@
 from pathlib import Path
 
 # khaleesi.ninja
-# noinspection PyUnresolvedReferences
 from typing import Dict, Any
 
+# noinspection PyUnresolvedReferences
 from settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 
