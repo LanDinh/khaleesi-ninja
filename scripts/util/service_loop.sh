@@ -24,7 +24,6 @@ input_gate=
 input_service=
 input_type=
 input_version=
-input_deploy=
 
 
 if [[ $# -eq 1 ]]; then
@@ -34,7 +33,6 @@ elif [[ $# -eq 6 ]]; then
   input_service=${3}
   input_type=${4}
   input_version=${5}
-  input_deploy=${6}
   echo "${input_gate} ${input_service} of type ${input_type} v${input_version} passed..."
 else
   echo -e "${red}Wrong number of arguments to service-loop: $#!${clear_color}"

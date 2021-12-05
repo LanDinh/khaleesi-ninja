@@ -14,7 +14,7 @@ import grpc
 from grpc_reflection.v1alpha import reflection
 
 # khaleesi.ninja.
-from khaleesi.core.settings import KhaleesiNinjaSettings
+from khaleesi.core.khaleesi_settings import KhaleesiNinjaSettings
 
 
 khaleesi_settings = cast(KhaleesiNinjaSettings, settings.KHALEESI_NINJA)

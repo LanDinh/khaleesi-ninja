@@ -23,19 +23,20 @@ current_service_file="./data/current_service"
 
 
 # Check if interactive mode.
-services=("$@")
-if [[ $# -eq 1 ]] && [[ "${1}" == "current_service" ]]; then
-  if [[ ! -f "${current_service_file}" ]]; then
-    . ./scripts/development/switch_current_service.sh
-  fi
-  while read -r raw_line; do
-    read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
-    services=("${line[@]}")
-  done <${current_service_file}
+services=
+if [[ ! -f "${current_service_file}" ]]; then
+  . ./scripts/development/switch_current_service.sh
 fi
+while read -r raw_line; do
+  read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
+  services=("${line[@]}")
+done <${current_service_file}
+
+echo -e "${magenta}Enter app name:${clear_color}"
+read -r app
 
 
-test_container() {
+make_migrations_container() {
   local gate=${1}
   local service=${2}
   local type=${3}
@@ -45,8 +46,11 @@ test_container() {
   echo -e "${yellow}Building the images...${clear_color}"
   . scripts/util/build.sh "development" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
 
-  echo -e "${yellow}Executing tests for the ${gate} ${service} service...${clear_color}"
-  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" test
+  echo -e "${yellow}Making the migrations...${clear_color}"
+  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" make_migrations "${app}"
+
+  echo -e "${yellow}Copying the migrations...${clear_color}"
+  cp temp/* "backend/${gate}/${service}/${app}/migrations"
 }
 
 
@@ -54,11 +58,8 @@ echo -e "${magenta}Cleaning up old files and create mount directory...${clear_co
 rm -r -f temp
 mkdir temp
 
-echo -e "${magenta}Updating the protos...${clear_color}"
-. scripts/development/generate_protos.sh
-
-echo -e "${magenta}Testing the services...${clear_color}"
+echo -e "${magenta}Making the migrations...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh test_container ${services[@]}
+. scripts/util/service_loop.sh make_migrations_container ${services[@]}
 
 echo -e "${green}DONE! :D${clear_color}"

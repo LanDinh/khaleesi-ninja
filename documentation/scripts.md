@@ -73,6 +73,11 @@ This will generate the code for all proto files located in `/proto`.
 
 This will prompt the user to select the `current_service` that is used by `./development/test.sh` and `./operations/deploy.sh`.
 
+### `make_migrations.sh`
+
+This only exists in `current_service` mode.
+It will prompt the user for the app name for which migrations should be created, and proceed with copying them into the correct migrations folder.
+
 ### `create_new_service.sh`
 
 This will create a new service.

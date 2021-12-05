@@ -4,15 +4,18 @@
 from unittest.mock import MagicMock
 
 # Django.
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 # khaleesi.ninja.
+from core.models import TestModel
 from core.service import Service
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 
 
-class CoreBackgateServiceTestCase(TestCase):
+class CoreBackgateServiceTestCase(TransactionTestCase):
   """Test the core backgate service."""
+
+  databases = {'read', 'write'}
 
   def setUp(self) -> None :
     """Instantiate the service."""
@@ -27,3 +30,5 @@ class CoreBackgateServiceTestCase(TestCase):
     response = self.service.SayHello(request, MagicMock())
     # Assert results.
     self.assertIn(name, response.message)
+    self.assertEqual(1, TestModel.objects.count())
+    self.assertIn(name, TestModel.objects.get().text)

@@ -13,7 +13,7 @@ test() {
   return_code=0
 
   echo "Django tests..."
-  if ! python -m coverage run manage.py test; then
+  if ! python -m coverage run manage.py test --settings=khaleesi.core.unittest_settings; then
     return_code=1
   fi
 
@@ -49,6 +49,12 @@ run() {
   python manage.py grpcserver
 }
 
+make_migrations() {
+  app=${1}
+  python manage.py makemigrations "${app}"
+  cp -a "${app}/migrations"/* /data/
+}
+
 
 source .venv/bin/activate
 
@@ -59,6 +65,10 @@ if [[ "${command}" == "test" ]]; then
 elif [[ "${command}" == "run" ]]; then
   echo "Running development server..."
   run
+
+elif [[ "${command}" == "make_migrations" ]]; then
+  echo "Making migrations..."
+  make_migrations "${2}"
 
 else
   echo "Unsupported command ${command}!"

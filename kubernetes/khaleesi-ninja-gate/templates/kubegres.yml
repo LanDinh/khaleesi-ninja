@@ -12,7 +12,7 @@ spec:
   image: {{ .Values.kubegres.image }}
   database:
     size: {{ .Values.kubegres.size }}
-  port: 8000
+  port: 5432
   env:
     - name: POSTGRES_PASSWORD
       valueFrom:

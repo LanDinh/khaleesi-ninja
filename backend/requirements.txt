@@ -2,3 +2,4 @@ Django==3.2.9
 grpcio==1.41.1
 grpcio-reflection==1.41.1
 protobuf==3.19.1
+psycopg2==2.9.2

@@ -2,7 +2,6 @@
 
 # Python.
 from os import environ
-from pathlib import Path
 from typing import TypedDict, List, cast
 
 
@@ -21,14 +20,32 @@ INSTALLED_APPS = [
 
 
 # Database.
-PROJECT_DIR = Path(__file__).resolve().parent.parent
+DATABASE = {
+  'ENGINE': 'django.db.backends.postgresql',
+  'HOST': 'core-kubegres',
+  'PORT': '5432',
+  'NAME': 'backgate',
+}
 DATABASES = {
-  'default': {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': PROJECT_DIR / 'db.sqlite3',
-  }
+  'default': {},
+  'read': {
+    **DATABASE,
+    'USER': 'postgres',
+    'PASSWORD': 'superUnsafeSecret',
+  },
+  'write': {
+    **DATABASE,
+    'USER': 'postgres',
+    'PASSWORD': 'superUnsafeSecret',
+  },
+  'migrate': {
+    **DATABASE,
+    'USER': 'postgres',
+    'PASSWORD': 'superUnsafeSecret',
+  },
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DATABASE_ROUTERS = [ 'khaleesi.core.database_router.DatabaseRouter' ]
 
 
 # khaleesi.ninja.

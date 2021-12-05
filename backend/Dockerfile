@@ -11,6 +11,10 @@ ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
+# Prerequisites.
+RUN apt-get update && apt-get install -y python3-dev libpq-dev gcc
+RUN export PATH=/usr/lib/postgresql/X.Y/bin/:$PATH
+
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
 COPY ./requirements.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
@@ -49,6 +53,9 @@ RUN ./.venv/bin/pip install -r requirements_develop.txt
 ################################################################################
 FROM python:3.10-slim as development
 LABEL environment=development
+
+# Prerequisites.
+RUN apt-get update && apt-get install -y postgresql
 
 # Arguments & environment.
 ARG gate
@@ -96,6 +103,9 @@ RUN rm -r test
 ################################################################################
 FROM python:3.10-slim as production
 LABEL environment=production
+
+# Prerequisites.
+RUN apt-get update && apt-get install -y postgresql
 
 # Arguments & environment.
 ARG gate

@@ -23,7 +23,6 @@ gate=${2}
 service=${3}
 type=${4}
 version=${5}
-deploy=${6}
 location="backend"
 frontgate_version=
 
