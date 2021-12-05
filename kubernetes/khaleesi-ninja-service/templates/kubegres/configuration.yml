@@ -1,3 +1,4 @@
+{{ if .Values.kubegres.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -12,3 +13,4 @@ data:
   database: {{ .Values.gate.name }}-{{ .Values.service.name }}
   writeUser: {{ .Values.gate.name }}-{{ .Values.service.name }}
   readUser: {{ .Values.gate.name }}-{{ .Values.service.name }}
+{{ end }}
