@@ -98,6 +98,19 @@
         "enabled"
       ]
     },
+    "django": {
+      "description": "django configuration",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not this service uses django",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
     "grpc_web": {
       "description": "grpc-web configuration for gRPC services accessed by browser clients",
       "type": "object",

@@ -5,6 +5,8 @@ ingress:
   path: "/khaleesi.(core|api).GateKeeper"
   regex_path: true
   port: "grpc-web-envoy"
+django:
+  enabled: true
 grpc_web:
   enabled: true
 grpcui:

@@ -19,6 +19,10 @@ ingress:
   regex_path: false
   port: "service"
 
+# Django.
+django:
+  enabled: false
+
 # gRPC.
 grpc_web:
   enabled: false

@@ -6,7 +6,7 @@ from typing import TypedDict, List, cast
 
 
 # Base definition.
-SECRET_KEY = 'development-keys-are-not-secret-change-before-production!'
+SECRET_KEY = environ['KHALEESI_SECRET_KEY']
 DEBUG = 'KHALEESI_DEBUG' in environ
 TIME_ZONE = 'UTC'
 USE_TZ = True
@@ -15,7 +15,7 @@ USE_TZ = True
 # Installed apps.
 INSTALLED_APPS = [
   'khaleesi',  # custom commands.
-  'core',  # common models.
+  'core',      # common models.
 ]
 
 
