@@ -10,6 +10,10 @@ from typing import Dict, Any
 from settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 
+# Base definition.
+SECRET_KEY = 'development-keys-are-not-secret-change-before-production!'
+
+
 # Database.
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 TEST_DATABASE = {
