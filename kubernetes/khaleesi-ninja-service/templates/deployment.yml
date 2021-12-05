@@ -57,6 +57,11 @@ spec:
                 configMapKeyRef:
                   name: {{ .Values.gate.name }}-kubegres-configuration
                   key: superUser
+            - name: KHALEESI_DATABASE_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres-credentials
+                  key: superUserPassword
           {{- end }}
       {{- if .Values.grpc_web.enabled }}
         - name: grpc-web-envoy

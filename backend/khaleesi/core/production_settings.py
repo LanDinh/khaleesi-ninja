@@ -23,18 +23,18 @@ DATABASES = {
   'default': {},
   'read': {
     **DATABASE,
-    'PASSWORD': 'superUnsafeSecret',
     'USER': environ['KHALEESI_DATABASE_SUPERUSER'],
+    'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
   },
   'write': {
     **DATABASE,
-    'PASSWORD': 'superUnsafeSecret',
     'USER': environ['KHALEESI_DATABASE_SUPERUSER'],
+    'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
   },
   'migrate': {
     **DATABASE,
-    'PASSWORD': 'superUnsafeSecret',
     'USER': environ['KHALEESI_DATABASE_SUPERUSER'],
+    'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
   },
 }
 DATABASE_ROUTERS = [ 'khaleesi.core.database_router.DatabaseRouter' ]
