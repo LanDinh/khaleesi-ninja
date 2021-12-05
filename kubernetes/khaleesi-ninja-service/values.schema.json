@@ -121,18 +121,13 @@
         "port": {
           "description": "the port to run postgres in",
           "type": "integer"
-        },
-        "development_credentials": {
-          "description": "automatically create unsafe credentials to ease development - default false",
-          "type": "boolean"
         }
       },
       "required": [
         "replicas",
         "size",
         "image",
-        "port",
-        "development_credentials"
+        "port"
       ]
     },
     "django": {

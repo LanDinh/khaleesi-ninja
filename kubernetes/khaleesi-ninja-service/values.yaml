@@ -26,6 +26,8 @@ django:
 # Database.
 kubegres:
   enabled: false
+  image: postgres:14.1
+  port: 5432
 
 # gRPC.
 grpc_web:
