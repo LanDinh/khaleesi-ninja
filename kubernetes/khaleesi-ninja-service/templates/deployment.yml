@@ -62,6 +62,31 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.gate.name }}-kubegres-credentials
                   key: superUserPassword
+            - name: KHALEESI_DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+                  key: database
+            - name: KHALEESI_DATABASE_WRITE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+                  key: writeUser
+            - name: KHALEESI_DATABASE_WRITE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-credentials
+                  key: writePassword
+            - name: KHALEESI_DATABASE_READ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+                  key: readUser
+            - name: KHALEESI_DATABASE_READ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-credentials
+                  key: readPassword
           {{- end }}
       {{- if .Values.grpc_web.enabled }}
         - name: grpc-web-envoy

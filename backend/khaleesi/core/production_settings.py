@@ -15,21 +15,21 @@ SECRET_KEY = environ['KHALEESI_SECRET_KEY']
 # Database.
 DATABASE = {
   'ENGINE': 'django.db.backends.postgresql',
-  'NAME': 'backgate',
   'HOST': environ['KHALEESI_DATABASE_HOST'],
   'PORT': environ['KHALEESI_DATABASE_PORT'],
+  'NAME': environ['KHALEESI_DATABASE_NAME'],
 }
 DATABASES = {
   'default': {},
   'read': {
     **DATABASE,
-    'USER': environ['KHALEESI_DATABASE_SUPERUSER'],
-    'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
+    'USER': environ['KHALEESI_DATABASE_READ_USER'],
+    'PASSWORD': environ['KHALEESI_DATABASE_READ_PASSWORD'],
   },
   'write': {
     **DATABASE,
-    'USER': environ['KHALEESI_DATABASE_SUPERUSER'],
-    'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
+    'USER': environ['KHALEESI_DATABASE_WRITE_USER'],
+    'PASSWORD': environ['KHALEESI_DATABASE_WRITE_PASSWORD'],
   },
   'migrate': {
     **DATABASE,

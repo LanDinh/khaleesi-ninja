@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: {{ .Values.type.name }}
+data:
+  database: {{ .Values.gate.name }}-{{ .Values.service.name }}
+  writeUser: {{ .Values.gate.name }}-{{ .Values.service.name }}
+  readUser: {{ .Values.gate.name }}-{{ .Values.service.name }}
