@@ -10,7 +10,7 @@ metadata:
     name: {{ .Values.service.name }}
     type: kubegres
 data:
-  database: {{ .Values.gate.name }}-{{ .Values.service.name }}
-  writeUser: {{ .Values.gate.name }}-{{ .Values.service.name }}
-  readUser: {{ .Values.gate.name }}-{{ .Values.service.name }}
+  database: {{ .Values.service.name }}
+  writeUser: {{ .Values.service.name }}-writer
+  readUser: {{ .Values.service.name }}-reader
 {{ end }}
