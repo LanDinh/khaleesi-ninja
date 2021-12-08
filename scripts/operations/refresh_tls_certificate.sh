@@ -88,7 +88,11 @@ refresh_tls_certificate() {
 echo -e "${magenta}Choose environment:${clear_color}"
 environments=()
 while read -r raw_line; do
-  environments+=("${raw_line}")
+  if [[ ${#raw_line} -eq 1 ]]; then
+    continue
+  fi
+  read -r -a line <<< "$(./scripts/util/parse_environment.sh "${raw_line}")"
+  environments+=("${line[0]}")
 done <${environments_file}
 select input in "${environments[@]}"; do
   valid=$(valid_option "${input}")

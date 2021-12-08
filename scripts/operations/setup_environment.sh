@@ -28,6 +28,9 @@ echo -e "${magenta}Deploying the environment...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}" kubernetes/khaleesi-ninja-environment \
   --values "kubernetes/configuration/environment/${environment}.yml"
 
+echo -e "${magenta}Ensuring TLS certificates exist...${clear_color}"
+./scripts/util/valid_environment.sh "${environment}"
+
 echo -e "${magenta}Deploying the core gate...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-gate \
   --values "kubernetes/configuration/gate/core.yml" \

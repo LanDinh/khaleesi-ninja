@@ -8,7 +8,6 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
-red='\033[0;31m'
 yellow='\033[0;33m'
 clear_color='\033[0m'
 
@@ -20,25 +19,8 @@ fi
 
 # Options.
 letsencrypt_certificate_folder="letsencrypt/live/live"
-environments_file="./scripts/data/environments"
 domain="khaleesi.ninja"
-environment=
-
-
-# Helpers.
-valid_option() {
-  local input=$1
-  local valid=false
-
-  for environment in "${environments[@]}"; do
-    if [[ "${environment}" == "${input}" ]]; then
-      valid=true
-      break
-    fi
-  done
-
-  echo "${valid}"
-}
+environment="${1}"
 
 
 recreate_tls_certificate() {
@@ -51,28 +33,12 @@ recreate_tls_certificate() {
 }
 
 
-if [[ $# -eq 1 ]]; then
-  environment=${1}
-  ./scripts/util/valid_environment.sh "${environment}"
-else
-  echo -e "${magenta}Choose environment:${clear_color}"
-  environments=()
-  while read -r raw_line; do
-    environments+=("${raw_line}")
-  done <${environments_file}
-  select input in "${environments[@]}"; do
-    valid=$(valid_option "${input}")
-    if [[ ${valid} == "true" ]]; then
-      break
-    else
-      echo -e "${red}Invalid environment chosen!${clear_color}"
-    fi
-  done
-fi
+./scripts/util/valid_environment.sh "${environment}"
 
-if [[ ${input} != "production" ]]; then
-  domain="${input}.khaleesi.ninja"
+
+if [[ ${environment} != "production" ]]; then
+  domain="${environment}.khaleesi.ninja"
 fi
 
 echo -e "${magenta}Recreating TLS certificate for '*.${domain}'...${clear_color}"
-recreate_tls_certificate "${input}" "${domain}"
+recreate_tls_certificate "${environment}" "${domain}"
