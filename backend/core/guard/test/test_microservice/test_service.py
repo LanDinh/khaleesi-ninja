@@ -1,16 +1,14 @@
 """Test the core backgate service."""
 
 # Python.
-from unittest.mock import MagicMock, patch
-
-# Grpc.
-import grpc
+from unittest.mock import MagicMock
 
 # Django.
 from django.test import TransactionTestCase
 
 # khaleesi.ninja.
-from core.service import Service
+from microservice.models import TestModel
+from microservice.service import Service
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 
 
@@ -23,8 +21,7 @@ class CoreBackgateServiceTestCase(TransactionTestCase):
     """Instantiate the service."""
     self.service =  Service()
 
-  @patch.object(grpc, 'insecure_channel')
-  def test_say_hello(self, _: MagicMock) -> None :
+  def test_say_hello(self) -> None :
     """Test saying hello."""
     # Prepare data.
     name = 'Khaleesi, Mother of Dragons, Breaker of Chains'
@@ -32,4 +29,6 @@ class CoreBackgateServiceTestCase(TransactionTestCase):
     # Execute test.
     response = self.service.SayHello(request, MagicMock())
     # Assert results.
-    self.assertIn('The guard says:', response.message)
+    self.assertIn(name, response.message)
+    self.assertEqual(1, TestModel.objects.count())
+    self.assertIn(name, TestModel.objects.get().text)

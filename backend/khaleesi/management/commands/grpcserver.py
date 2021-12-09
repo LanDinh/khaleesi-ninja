@@ -2,7 +2,7 @@
 
 # Python.
 from concurrent import futures
-from typing import Any, cast
+from typing import Any
 
 # Django.
 from django.core.management.base import BaseCommand, CommandParser
@@ -13,11 +13,8 @@ from django.utils.module_loading import import_string
 import grpc
 from grpc_reflection.v1alpha import reflection
 
-# khaleesi.ninja.
-from khaleesi.core.khaleesi_settings import KhaleesiNinjaSettings
 
-
-khaleesi_settings = cast(KhaleesiNinjaSettings, settings.KHALEESI_NINJA)
+khaleesi_settings = settings.KHALEESI_NINJA
 
 
 class Command(BaseCommand):

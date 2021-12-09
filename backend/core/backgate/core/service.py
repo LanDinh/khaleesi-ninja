@@ -4,7 +4,6 @@
 import grpc
 
 # khaleesi-ninja.
-from core.models import TestModel
 from khaleesi.proto.core_backgate_pb2 import DESCRIPTOR, SayHelloRequest, SayHelloResponse
 from khaleesi.proto.core_backgate_pb2_grpc import GateKeeperStub, GateKeeperServicer, add_GateKeeperServicer_to_server  # pylint: disable=line-too-long
 
@@ -15,7 +14,7 @@ class Service(GateKeeperServicer):
   def SayHello(self, request: SayHelloRequest, _: grpc.ServicerContext) -> SayHelloResponse :  # pylint: disable=invalid-name,no-self-use
     """Says hello."""
     channel = grpc.insecure_channel("core-guard-service:8000")
-    client = GateKeeperStub(channel)
+    client = GateKeeperStub(channel)  # type: ignore[no-untyped-call]
     response = client.SayHello(request)
     return SayHelloResponse(message = f'The guard says: "{response.message}"')
 
