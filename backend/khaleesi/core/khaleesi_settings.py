@@ -14,7 +14,6 @@ USE_TZ = True
 # Installed apps.
 INSTALLED_APPS = [
   'khaleesi',  # custom commands.
-  'core',      # common models.
 ]
 
 

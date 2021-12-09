@@ -1,0 +1,8 @@
+type:
+  name: "micro"
+kubegres:
+  enabled: true
+django:
+  enabled: true
+grpcui:
+  enabled: true
