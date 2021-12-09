@@ -25,17 +25,17 @@ DATABASE = {
 DATABASES = {
   'default': {},
   'read': {
-    **DATABASE,
+    **DATABASE,  # type: ignore[arg-type]
     'USER': environ['KHALEESI_DATABASE_READ_USER'],
     'PASSWORD': environ['KHALEESI_DATABASE_READ_PASSWORD'],
   },
   'write': {
-    **DATABASE,
+    **DATABASE,  # type: ignore[arg-type]
     'USER': environ['KHALEESI_DATABASE_WRITE_USER'],
     'PASSWORD': environ['KHALEESI_DATABASE_WRITE_PASSWORD'],
   },
   'migrate': {
-    **DATABASE,
+    **DATABASE,  # type: ignore[arg-type]
     'USER': environ['KHALEESI_DATABASE_SUPERUSER'],
     'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
   },
