@@ -46,12 +46,13 @@ test() {
 
 
 run() {
-  python manage.py grpcserver --settings=khaleesi.core.production_settings
+  python manage.py migrate --database migrate --settings khaleesi.core.production_settings
+  python manage.py grpcserver --settings khaleesi.core.production_settings
 }
 
 make_migrations() {
   app=${1}
-  python manage.py makemigrations "${app}" --settings=khaleesi.core.unittest_settings
+  python manage.py makemigrations "${app}" --settings khaleesi.core.unittest_settings
   cp -a "${app}/migrations"/* /data/
 }
 

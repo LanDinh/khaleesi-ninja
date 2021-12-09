@@ -18,6 +18,9 @@ DATABASE = {
   'HOST': environ['KHALEESI_DATABASE_HOST'],
   'PORT': environ['KHALEESI_DATABASE_PORT'],
   'NAME': environ['KHALEESI_DATABASE_NAME'],
+  'OPTIONS': {
+    'options': '-c search_path=khaleesi'
+  },
 }
 DATABASES = {
   'default': {},
