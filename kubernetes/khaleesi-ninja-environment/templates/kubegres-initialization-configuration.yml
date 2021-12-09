@@ -8,5 +8,9 @@ metadata:
     environment: {{ .Values.environment.name }}
     infrastructure: kubegres-initialization-configuration
 data:
-  initialization.sql: |-
-  {{ .Files.Get "data/kubegres-initialization.sql" | nindent 4 }}
+  perform-initialization.sh: |-
+  {{ .Files.Get "data/kubegres-perform-initialization.sh" | nindent 4 }}
+  initialize-postgres.sql: |-
+  {{ .Files.Get "data/kubegres-initialize-postgres.sql" | nindent 4 }}
+  initialize-database.sql: |-
+  {{ .Files.Get "data/kubegres-initialize-database.sql" | nindent 4 }}
