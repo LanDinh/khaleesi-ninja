@@ -5,9 +5,9 @@ import grpc
 
 # khaleesi-ninja.
 from khaleesi.core.service_configuration import ServiceConfiguration
-from microservice.models import TestModel
 from khaleesi.proto.core_backgate_pb2 import DESCRIPTOR, SayHelloRequest, SayHelloResponse
 from khaleesi.proto.core_backgate_pb2_grpc import GateKeeperServicer, add_GateKeeperServicer_to_server  # pylint: disable=line-too-long
+from microservice.models import TestModel
 
 
 class Service(GateKeeperServicer):
