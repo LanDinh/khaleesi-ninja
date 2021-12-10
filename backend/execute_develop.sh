@@ -13,7 +13,7 @@ test() {
   return_code=0
 
   echo "Django tests..."
-  if ! python -m coverage run manage.py test --settings=khaleesi.core.unittest_settings; then
+  if ! python -m coverage run manage.py test --settings=khaleesi.core.settings.unittest; then
     return_code=1
   fi
 
@@ -46,13 +46,13 @@ test() {
 
 
 run() {
-  python manage.py migrate --database migrate --settings khaleesi.core.production_settings
-  python manage.py grpcserver --settings khaleesi.core.production_settings
+  python manage.py migrate --database migrate --settings khaleesi.core.settings.production
+  python manage.py grpcserver --settings khaleesi.core.settings.production
 }
 
 make_migrations() {
   app=${1}
-  python manage.py makemigrations "${app}" --settings khaleesi.core.unittest_settings
+  python manage.py makemigrations "${app}" --settings khaleesi.core.settings.unittest
   cp -a "${app}/migrations"/* /data/
 }
 

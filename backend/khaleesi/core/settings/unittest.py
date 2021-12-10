@@ -2,10 +2,9 @@
 
 # Python.
 from pathlib import Path
-
-# khaleesi.ninja
 from typing import Dict, Any
 
+# khaleesi.ninja
 # noinspection PyUnresolvedReferences
 from settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
