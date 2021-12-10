@@ -19,11 +19,7 @@ Install all necessary controllers to the given cluster:
 
 ### `setup_environment.sh ENVIRONMENT`
 
-Install all necessary elements of the given environment:
-
-* the `namespace` for the environment
-* a `ingress-class` for use by the environment
-* a `configmap` holding the default configuration for envoy used as grpc-web proxy
+Install all necessary elements of the given environment as well as all gates - see the [kubernetes documentation](kubernetes.md) for details.
 
 ### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE TYPE VERSION DEPLOY)]`
 
@@ -32,7 +28,7 @@ If `current_service` was specified, `./scripts/data/current_service` is used as 
 If this file doesn't exist, `./scripts/development/swich_current_service.sh` is called to create it.
 If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
-This applies the manifests for the given service.
+This applies the manifests for the given service - see the [kubernetes documentation](kubernetes.md) for details.
 
 If the `development` or `integration` environment was chosen, some more steps are executed:
 
@@ -44,10 +40,6 @@ If the `development` or `integration` environment was chosen, some more steps ar
 This can be used to refresh the TLS certificate.
 The contact email address has to be set as environment variable (`KHALEESI_EMAIL`), as well as the affected domain ('KHALEESI_DOMAIN').
 It will be put into the folder `letsencrypt` - note that this folder is listed in `.gitignore` so as not to leak any private keys.
-
-### `recreate_tls_certificate.sh`
-
-This can be used to recreate the kubernetes secret holding the TLS certificate (e.g. if the namespace gets set up from scratch)
 
 ## `development` folder
 
@@ -86,6 +78,8 @@ It will prompt the user for some information:
 1. The `gate` this new service is for
 1. The `type` of service:
    * gate
+   * micro
+1. If micro was specified as type, the `service` name will be prompted for 
 
 Afterwards, it will do the following:
 
@@ -96,6 +90,10 @@ For gates, it will additionally create the following:
 
 * A skeleton `react` project to hold the frontgate code
 * A skeleton `django` project to hold the backgate code
+
+For microservices, it will additionally create the following:
+
+* A skeleton `django` project to hold the code
 
 Of course, you should thoroughly review the `git` diff before committing anything to source control.
 
@@ -113,6 +111,10 @@ Otherwise, it will only do so for the specified service.
 
 Afterwards, any dangling images get pruned.
 
+### `recreate_tls_certificate.sh`
+
+This can be used to recreate the kubernetes secret holding the TLS certificate (e.g. if the namespace gets set up from scratch)
+
 ### `service_loop.sh FUNCTION [GATE SERVICE]`
 
 If no service was specified, the function gets executed on *all* services.
@@ -121,6 +123,10 @@ If a service was specified, the function gets executed on the specified service.
 ### `parse_service.sh RAW_INPUT`
 
 This will parse the raw input to extract service information from the json object.
+
+### `parse_environment.sh RAW_INPUT`
+
+This will parse the raw input to extract environment information from the json object.
 
 ### `valid_environment.sh ENVIRONMENT`
 

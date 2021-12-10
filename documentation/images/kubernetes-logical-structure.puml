@@ -1,32 +1,38 @@
 @startuml
-<style>
-artifact {
-  BackgroundColor bisque
-  LineColor saddlebrown
-  FontColor saddlebrown
-}
-collections {
-  BackgroundColor bisque
-  LineColor saddlebrown
-  FontColor saddlebrown
-}
-cloud {
-  BackgroundColor lavender
-  LineColor darkviolet
-  FontColor darkviolet
-}
-</style>
+actor user as user #lightpink;line:darkred;text:darkred
 
-actor user
-package "frontgate" as frontgate {
-  cloud ingress as front_ingress
-  artifact service as front_service
-  artifact deployment as front_deployment
-  collections pod as front_pod
-}
+' GATE
+cloud       "frontgate"     as frontgate    #lavender;line:darkviolet;text:darkviolet
+cloud       "backgate"      as backgate     #lavender;line:darkviolet;text:darkviolet
+collections "microservices" as microservice #lavender;line:darkviolet;text:darkviolet
 
-user --> front_ingress
-front_ingress --> front_service
-front_service --> front_deployment
-front_deployment --> front_pod
+' CORE
+cloud       "core frontgate"     as core_frontgate    #aliceblue;line:darkblue;text:darkblue
+cloud       "core backgate"      as core_backgate     #aliceblue;line:darkblue;text:darkblue
+collections "core microservices" as core_microservice #lavender;line:darkviolet;text:darkviolet
+
+' 3RD PARTY
+artifact    "kubegres" as kubegres #bisque;line:saddlebrown;text:saddlebrown
+collections "gRPC UI"  as grpcui   #bisque;line:saddlebrown;text:saddlebrown
+
+' gate connections
+user      --> frontgate         #saddlebrown;text:saddlebrown : https
+frontgate --> backgate          #darkviolet;text:darkviolet   : "grpc-web"
+backgate  --> core_microservice #darkviolet;text:darkviolet   : gGRPC
+backgate  --> microservice      #darkviolet;text:darkviolet   : gGRPC
+
+' gate inheritance
+core_frontgate ^-- frontgate #darkblue
+core_backgate  ^-- backgate  #darkblue
+
+' kubegres connection
+backgate          --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+microservice      --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+core_microservice --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+
+' grpcui connection
+user   --> grpcui            #saddlebrown;text:saddlebrown : https
+grpcui <-- backgate          #darkviolet;text:darkviolet   : gGRPC
+grpcui <-- microservice      #darkviolet;text:darkviolet   : gGRPC
+grpcui <-- core_microservice #darkviolet;text:darkviolet   : gGRPC
 @enduml

@@ -46,8 +46,8 @@ The general deployment is done with:
 
 | Service Type     | General | Infrastructure | Development |
 | ---------------- | ------- | -------------- | ----------- |
-| Frontgate        | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react_router-v6.0-informational) <br /> ![grpc-web badge](https://img.shields.io/badge/grpc_web-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) | ![create-react-app badge](https://img.shields.io/badge/create_react_app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |
-| Backgate / Micro | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.14-informational) <br /> ![django badge](https://img.shields.io/badge/django-v3.2-informational) | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.13-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![grpcio_tools badge](https://img.shields.io/badge/grpcio_tools-v1.41-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v2.11-informational) |
+| Frontgate        | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react--router-v6.0-informational) <br /> ![grpc-web badge](https://img.shields.io/badge/grpc--web-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) | ![create-react-app badge](https://img.shields.io/badge/create--react--app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |
+| Backgate / Micro | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.14-informational) <br /> ![django badge](https://img.shields.io/badge/django-v3.2-informational) | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.13-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![grpcio-tools badge](https://img.shields.io/badge/grpcio--tools-v1.41-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v2.11-informational) |
 | Backgate         | | ![envoy badge](https://img.shields.io/badge/envoy-v1.20-informational) | |
 
 ### Structure
@@ -55,6 +55,7 @@ The general deployment is done with:
 The folder structure is as follows:
 
 * `.github` CI related configuration - [documentation](documentation/ci.md)
+* `backend` The code for the backgates and microservices. They are grouped by gate. One `django` project per service - [documentation](documentation/backend.md)
 * `data` Lists of things (e.g. services, environments etc.) in json formats
 * `documentation` A bunch of markdown files to document everything
 * `frontgate` The code for the frontgates. One `react` project per frontgate - [documentation](documentation/frontgate.md)
@@ -67,20 +68,16 @@ The folder structure is as follows:
 
 Build and deploy changes by running the following commands (for local deployments, the environment will be either `development` or `integration`):
 
-* `./scripts/operations/setup_cluster.sh` will add the necessary controllers to the cluster
-* `./scripts/operations/setup_environment.sh <ENVIRONMENT>` will set up resources for the chosen environment
-* `./scripts/operations/deploy.sh <ENVIRONMENT>` will start up all services for that environment
+1. `./scripts/operations/setup_cluster.sh` will add the necessary controllers to the cluster
+1. `./scripts/operations/setup_environment.sh <ENVIRONMENT>` will set up resources for the chosen environment
+1. `./scripts/operations/deploy.sh <ENVIRONMENT>` will start up all gates and services for that environment
 
-Optionally, self-signed TLS certificates may be made available to deployments using the following command:
-
-```
-  .scripts/operations/recreate_tls_certificate.sh
-```
-
-Note that this expects the following files to exist:
+If self-signed TLS certificates are required, make sure that the following files exist:
 
 * Private key: `letsencrypt/live/live/<ENVIRONMENT>.khaleesi.ninja/privkey.pem`
 * Certificate: `letsencrypt/live/live/<ENVIRONMENT>.khaleesi.ninja/fullchain.pem`
+
+This happens ideally before step 2, otherwise, simply repeat step 2.
 
 ### Automated tests
 

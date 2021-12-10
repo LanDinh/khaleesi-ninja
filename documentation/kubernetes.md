@@ -6,11 +6,14 @@
 
 Each gate has the same base structure within kubernetes.
 
-It has a frontgate, which serves the SPA to the user via an ingress configuration.
+It has a `frontgate`, which serves the SPA to the user via an `ingress` configuration and inherits from the `core frontgate`.
 This SPA uses the backgate as entry point into the backend system.
 
-The backgate, too, is available via an ingress configuration.
-It calls its own micro services as well as the core micro services to serve content.
+The `backgate`, too, is available via an `ingress` configuration, and inherits from the `core backgate`.
+It calls its own `microservices` as well as the `core microservices` to serve content.
+
+Both the `backgates` and `microservices` have access to the `postgres` database deployed by `kubegres`.
+They also expose their API via `gRPC UI`.
 
 ### Conventions
 
@@ -41,7 +44,23 @@ This contains basic resources necessary for the ecosystem to work:
 
 * namespace
 * ingress class
-* default configuration to use for grpc-web envoy proxies
+* default configuration to use for `grpc-web` `envoy` proxies
+* default configuration to use for `kubegres` - this includes:
+  * SQL script to install extensions, create users & databases
+  * SQL script to apply user permissions
+    
+### `khaleesi-ninja-gate`
+
+This contains basic resources shared within a gate:
+
+* `kubegres` manifest to deploy a database cluster
+* `kubegres` instance configuration - this includes:
+  * `kubegres` host
+  * `kubegres` port
+  * `kubegres` superuser name
+* development credentials if required - this includes:
+  * `kubegres` superuser password
+  * `kubegres` replication user password
 
 ### `khaleesi-ninja-service`
 
@@ -50,8 +69,22 @@ This contains manifests necessary for the services to work:
 * deployment
 * service
 * ingress (if required)
+* development credentials if required - this includes:
+  * `django` secret key
 
-Furthermore, if grpcui is required, it will additionally deploy:
-* grpcui deployment
-* grpcui service
-* grpcui ingress
+If `kubegres` is required, it will additionally deploy:
+
+* `kubegres` initialization job which will trigger user & database creation
+* `kubegres` configuration - this includes:
+  * `kubegres` database name
+  * `kubegres` write user name
+  * `kubegres` read user name
+* development credentials if required - this includes:
+  * `kubegres` write user password
+  * `kubegres` read user password
+
+If `grpcui` is required, it will additionally deploy:
+
+* `grpcui` deployment
+* `grpcui` service
+* `grpcui` ingress

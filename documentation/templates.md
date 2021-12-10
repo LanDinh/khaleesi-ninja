@@ -16,6 +16,10 @@ This contains templates relevant for backgates.
 
 This is a `django-admin startproject` template for creating new backgates.
 
+### `micro_template` folder
+
+This is a `django-admin startproject` template for creating new microservices.
+
 ## `kubernetes` folder
 
 This contains templates for helm chart value files for services. 

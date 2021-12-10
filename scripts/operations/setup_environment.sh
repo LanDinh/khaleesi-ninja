@@ -29,7 +29,7 @@ helm upgrade --install "khaleesi-ninja-${environment}" kubernetes/khaleesi-ninja
   --values "kubernetes/configuration/environment/${environment}.yml"
 
 echo -e "${magenta}Ensuring TLS certificates exist...${clear_color}"
-./scripts/util/valid_environment.sh "${environment}"
+./scripts/util/recreate_tls_certificate.sh "${environment}"
 
 echo -e "${magenta}Deploying the core gate...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-gate \
