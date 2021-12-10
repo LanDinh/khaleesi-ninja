@@ -13,9 +13,6 @@ from django.utils.module_loading import import_string
 import grpc
 from grpc_reflection.v1alpha import reflection
 
-# khaleesi.ninja.
-from khaleesi.core.service_configuration import ServiceConfiguration
-
 
 khaleesi_settings = settings.KHALEESI_NINJA
 
@@ -59,7 +56,7 @@ class Command(BaseCommand):
     for raw_handler in raw_handlers:
       handler = f'{raw_handler}.service_configuration'
       try:
-        service_configuration: ServiceConfiguration = import_string(handler)
+        service_configuration = import_string(handler)
         service_configuration.register_service(server)
         service_names.append(service_configuration.name)
       except ImportError as error:
