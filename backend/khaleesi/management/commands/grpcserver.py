@@ -13,6 +13,9 @@ from django.utils.module_loading import import_string
 import grpc
 from grpc_reflection.v1alpha import reflection
 
+# khaleesi.ninja.
+from khaleesi.core.service_configuration import ServiceConfiguration
+
 
 khaleesi_settings = settings.KHALEESI_NINJA
 
@@ -56,9 +59,9 @@ class Command(BaseCommand):
     for raw_handler in raw_handlers:
       handler = f'{raw_handler}.service_configuration'
       try:
-        name, register_handler = import_string(handler)
-        register_handler(server)
-        service_names.append(name)
+        service_configuration: ServiceConfiguration = import_string(handler)
+        service_configuration.register_service(server)
+        service_names.append(service_configuration.name)
       except ImportError as error:
         raise ImportError(f'Could not import "{handler}" for gRPC handler.') from error
     reflection.enable_server_reflection(service_names, server)
