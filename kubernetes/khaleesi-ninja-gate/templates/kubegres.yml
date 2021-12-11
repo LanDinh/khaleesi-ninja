@@ -17,11 +17,11 @@ spec:
     - name: POSTGRES_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: {{ .Values.gate.name }}-kubegres-credentials
+          name: {{ .Values.gate.name }}-kubegres
           key: superUserPassword
 
     - name: POSTGRES_REPLICATION_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: {{ .Values.gate.name }}-kubegres-credentials
+          name: {{ .Values.gate.name }}-kubegres
           key: replicationUserPassword

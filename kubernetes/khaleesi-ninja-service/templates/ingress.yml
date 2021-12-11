@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-ingress
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}
   namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
     khaleesi-ninja: service
@@ -27,7 +27,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.gate.name }}-{{ .Values.service.name }}-service
+                name: {{ .Values.gate.name }}-{{ .Values.service.name }}
                 port:
                   name: {{ .Values.ingress.port }}
 {{- end }}

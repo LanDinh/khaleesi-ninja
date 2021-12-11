@@ -14,7 +14,7 @@ class Service(GateKeeperServicer):
 
   def SayHello(self, request: SayHelloRequest, _: grpc.ServicerContext) -> SayHelloResponse :  # pylint: disable=invalid-name,no-self-use
     """Says hello."""
-    channel = grpc.insecure_channel("core-guard-service:8000")
+    channel = grpc.insecure_channel("core-guard:8000")
     client = GateKeeperStub(channel)  # type: ignore[no-untyped-call]
     response = client.SayHello(request)
     return SayHelloResponse(message = f'The guard says: "{response.message}"')

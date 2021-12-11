@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.gate.name }}-kubegres-configuration
+  name: {{ .Values.gate.name }}-kubegres
   namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
     khaleesi-ninja: service

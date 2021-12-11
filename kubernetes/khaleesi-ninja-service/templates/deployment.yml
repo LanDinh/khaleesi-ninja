@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-deployment
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}
   namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
     khaleesi-ninja: service
@@ -38,54 +38,54 @@ spec:
             - name: KHALEESI_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-django-credentials
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-django
                   key: secretKey
           {{- end }}
           {{- if .Values.kubegres.enabled }}
             - name: KHALEESI_DATABASE_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres-configuration
+                  name: {{ .Values.gate.name }}-kubegres
                   key: host
             - name: KHALEESI_DATABASE_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres-configuration
+                  name: {{ .Values.gate.name }}-kubegres
                   key: port
             - name: KHALEESI_DATABASE_SUPERUSER
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres-configuration
+                  name: {{ .Values.gate.name }}-kubegres
                   key: superUser
             - name: KHALEESI_DATABASE_SUPERUSER_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres-credentials
+                  name: {{ .Values.gate.name }}-kubegres
                   key: superUserPassword
             - name: KHALEESI_DATABASE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
                   key: database
             - name: KHALEESI_DATABASE_WRITE_USER
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
                   key: writeUser
             - name: KHALEESI_DATABASE_WRITE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-credentials
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
                   key: writePassword
             - name: KHALEESI_DATABASE_READ_USER
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-configuration
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
                   key: readUser
             - name: KHALEESI_DATABASE_READ_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-credentials
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
                   key: readPassword
           {{- end }}
       {{- if .Values.grpc_web.enabled }}
@@ -96,12 +96,12 @@ spec:
             - name: grpc-web-envoy
               containerPort: 8010
           volumeMounts:
-            - name: grpc-web-envoy-config
+            - name: grpc-web-envoy
               readOnly: true
               mountPath: /config
           args: [ "envoy", "--config-path", "/config/envoy.yml" ]
       volumes:
-        - name: grpc-web-envoy-config
+        - name: grpc-web-envoy
           configMap:
-            name: grpc-web-envoy-configuration
+            name: grpc-web-envoy
       {{- end }}

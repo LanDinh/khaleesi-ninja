@@ -41,7 +41,7 @@ You might want to make yourself familiar with the technologies used.
 The general deployment is done with:
 
 ![helm badge](https://img.shields.io/badge/helm-v3.7-informational)
-![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.21-informational)
+![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.22-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 
 | Service Type     | General | Infrastructure | Development |

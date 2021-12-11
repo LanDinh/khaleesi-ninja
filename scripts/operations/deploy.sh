@@ -71,7 +71,7 @@ deploy_service() {
     . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
 
     echo -e "${yellow}Rolling out the new container...${clear_color}"
-    kubectl rollout restart deployment "${gate}-${service}-deployment" -n "khaleesi-ninja-${environment}"
+    kubectl rollout restart deployment "${gate}-${service}" -n "khaleesi-ninja-${environment}"
   fi
 }
 

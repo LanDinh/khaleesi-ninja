@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: kubegres-initialization-configuration
+  name: kubegres-initialization
   namespace: khaleesi-ninja-{{ .Values.environment.name }}
   labels:
     khaleesi-ninja: environment
     environment: {{ .Values.environment.name }}
-    infrastructure: kubegres-initialization-configuration
+    infrastructure: kubegres-initialization
 data:
   perform-initialization.sh: |-
   {{ .Files.Get "data/kubegres-perform-initialization.sh" | nindent 4 }}
