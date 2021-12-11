@@ -28,8 +28,11 @@ echo -e "${magenta}Deploying the environment...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}" kubernetes/khaleesi-ninja-environment \
   --values "kubernetes/configuration/environment/${environment}.yml"
 
-echo -e "${magenta}Ensuring TLS certificates exist...${clear_color}"
-./scripts/util/recreate_tls_certificate.sh "${environment}"
+
+if [[ "${CI:-false}" != "true" ]]; then
+  echo -e "${magenta}Ensuring TLS certificates exist...${clear_color}"
+  ./scripts/util/recreate_tls_certificate.sh "${environment}"
+fi
 
 echo -e "${magenta}Deploying the core gate...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-gate \
