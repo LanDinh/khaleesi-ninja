@@ -7,6 +7,14 @@ grafana:
   namespaceOverride: "khaleesi-monitoring"
   service:
     port: 3000
+  sidecar:
+    datasources:
+      label: grafana_datasource
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Viewer
 
 kube-state-metrics:
   namespaceOverride: "khaleesi-monitoring"
