@@ -44,6 +44,10 @@ The general deployment is done with:
 ![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.22-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 
+Other infrastructure consists of:
+
+![kube-promethus badge](https://img.shields.io/badge/kube--prometheus-v0.9-informational)
+
 | Service Type     | General | Infrastructure | Development |
 | ---------------- | ------- | -------------- | ----------- |
 | Frontgate        | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react--router-v6.0-informational) <br /> ![grpc-web badge](https://img.shields.io/badge/grpc--web-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) | ![create-react-app badge](https://img.shields.io/badge/create--react--app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |

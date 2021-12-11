@@ -1,0 +1,21 @@
+namespaceOverride: "khaleesi-monitoring"
+commonLabels:
+  khaleesi-ninja: monitoring
+  infrastructure: kube-prometheus-stack
+
+grafana:
+  namespaceOverride: "khaleesi-monitoring"
+  service:
+    port: 3000
+
+kube-state-metrics:
+  namespaceOverride: "khaleesi-monitoring"
+
+prometheus-node-exporter:
+  namespaceOverride: "khaleesi-monitoring"
+  hostRootFsMount: false
+
+kubeScheduler:
+  service:
+    selector:
+      component: kube-scheduler

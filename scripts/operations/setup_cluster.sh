@@ -24,5 +24,11 @@ helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.git
 echo -e "${magenta}Deploying kubegres...${clear_color}"
 kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.13/kubegres.yaml
 
+echo -e "${magenta}Deploying kube-prometheus...${clear_color}"
+kubectl create namespace khaleesi-monitoring --dry-run=client -o yaml | kubectl apply -f -
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack --values kubernetes/configuration/third_party/kube-prometheus-stack.yml
+
 
 echo -e "${green}DONE! :D${clear_color}"
