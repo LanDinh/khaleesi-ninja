@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: grafana-datasource
+  name: grafana-datasource-{{ .Values.environment.name }}
   namespace: khaleesi-monitoring
   labels:
     khaleesi-ninja: environment

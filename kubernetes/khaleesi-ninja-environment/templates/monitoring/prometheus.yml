@@ -25,6 +25,7 @@ spec:
     matchLabels:
       app: kube-prometheus-stack
       release: kube-prometheus
+  serviceAccountName: prometheus
   serviceMonitorSelector:
     matchLabels:
       monitoring: khaleesi-ninja-{{ .Values.environment.name }}
