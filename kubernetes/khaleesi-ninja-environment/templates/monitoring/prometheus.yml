@@ -10,17 +10,17 @@ metadata:
 spec:
   alerting:
     alertmanagers:
-      - name: kube-prometheus-kube-prome-alertmanager
-        namespace: khaleesi-monitoring
-        port: http-web
-        pathPrefix: /
-        apiVersion: v2
-  image: quay.io/prometheus/prometheus:v2.31.1
+      - name: {{ .Values.alertmanager.name }}
+        namespace: {{ .Values.alertmanager.namespace }}
+        port: {{ .Values.alertmanager.port }}
+        pathPrefix: {{ .Values.alertmanager.pathPrefix }}
+        apiVersion: {{ .Values.alertmanager.apiVersion }}
+  image: {{ .Values.prometheus.image }}
   logLevel: info
   paused: false
-  replicas: 1
-  retention: 20d
-  routePrefix: /
+  replicas: {{ .Values.prometheus.replicas }}
+  retention: {{ .Values.prometheus.retention }}
+  routePrefix: {{ .Values.prometheus.routePrefix }}
   ruleSelector:
     matchLabels:
       app: kube-prometheus-stack

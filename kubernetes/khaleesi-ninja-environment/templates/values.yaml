@@ -1,0 +1,13 @@
+prometheus:
+  image: quay.io/prometheus/prometheus:v2.31.1
+  logLevel: info
+  paused: false
+  replicas: 1
+  retention: 20d
+  routePrefix: /
+alertmanager:
+  name: kube-prometheus-kube-prome-alertmanager
+  namespace: khaleesi-monitoring
+  port: http-web
+  pathPrefix: "/"
+  apiVersion: v2
