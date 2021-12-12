@@ -15,7 +15,7 @@ spec:
         port: {{ .Values.alertmanager.port }}
         pathPrefix: {{ .Values.alertmanager.pathPrefix }}
         apiVersion: {{ .Values.alertmanager.apiVersion }}
-  image: {{ .Values.prometheus.image }}
+  image: quay.io/prometheus/prometheus:{{ .Values.prometheus.version }}
   logLevel: info
   paused: false
   replicas: {{ .Values.prometheus.replicas }}
