@@ -25,5 +25,18 @@ prometheus-node-exporter:
 
 kubeScheduler:
   service:
-    selector:
-      component: kube-scheduler
+    targetPort: 10259
+  serviceMonitor:
+    https: true
+    insecureSkipVerify: true
+
+kubeControllerManager:
+  service:
+    targetPort: 10257
+  serviceMonitor:
+    https: true
+    insecureSkipVerify: true
+
+kubeEtcd:
+  service:
+    targetPort: 2381
