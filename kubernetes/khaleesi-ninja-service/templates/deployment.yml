@@ -88,6 +88,15 @@ spec:
                   name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
                   key: readPassword
           {{- end }}
+      {{- if .Values.nginx_prometheus_exporter.enabled }}
+        - name: nginx-prometheus-exporter
+          image: nginx/nginx-prometheus-exporter:{{ .Values.nginx_prometheus_exporter.version }}
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 8020
+          args: [ "-nginx.scrape-uri=http://localhost:8000/metrics", "-web.listen-address=:8020" ]
+      {{- end }}
       {{- if .Values.grpc_web.enabled }}
         - name: grpc-web-envoy
           image: envoyproxy/envoy-alpine:{{ .Values.grpc_web.envoy_version }}

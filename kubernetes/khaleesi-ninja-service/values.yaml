@@ -29,6 +29,11 @@ kubegres:
   image: postgres:14.1
   port: 5432
 
+# Monitoring.
+nginx_prometheus_exporter:
+  enabled: false
+  version: "0.9.0"
+
 # gRPC.
 grpc_web:
   enabled: false

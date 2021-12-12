@@ -13,3 +13,5 @@ grpc_web:
   envoy_version: "v1.20-latest"
 grpcui:
   version: "latest"
+nginx_prometheus_exporter:
+  enabled: false  # development builds don't export metrics.

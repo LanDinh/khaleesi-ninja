@@ -3,3 +3,5 @@ type:
 ingress:
   enabled: true
   path: "/"
+nginx_prometheus_exporter:
+  enabled: true
