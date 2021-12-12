@@ -11,6 +11,7 @@ grafana:
     datasources:
       label: grafana_datasource
     dashboards:
+      label: grafana_dashboard
       folderAnnotation: khaleesi_folder
       provider:
         name: kubernetes

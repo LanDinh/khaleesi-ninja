@@ -28,7 +28,14 @@ echo -e "${magenta}Deploying kube-prometheus...${clear_color}"
 kubectl create namespace khaleesi-monitoring --dry-run=client -o yaml | kubectl apply -f -
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack --values kubernetes/configuration/third_party/kube-prometheus-stack.yml
+helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack --values kubernetes/configuration/third-party/kube-prometheus-stack.yml
+
+echo -e "${magenta}Deploying custom Grafana dashboards...${clear_color}"
+kubectl -n "khaleesi-monitoring" delete configmap grafana-dashboards-third-party --ignore-not-found=true
+kubectl -n "khaleesi-monitoring" create configmap grafana-dashboards-third-party --from-file=kubernetes/configuration/third-party/grafana-dashboards/nginx.json
+kubectl -n "khaleesi-monitoring" annotate configmap grafana-dashboards-third-party khaleesi_folder=third-party
+kubectl -n "khaleesi-monitoring" label configmap grafana-dashboards-third-party grafana_dashboard=1
+
 
 
 echo -e "${green}DONE! :D${clear_color}"

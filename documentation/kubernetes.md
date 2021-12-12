@@ -21,6 +21,7 @@ They also expose their API via `gRPC UI`.
 | ---- | ----------------------- |
 | 8000 | General service         |
 | 8010 | Sidecar proxy           |
+| 8020 | Metrics                 |
 
 ## Folder Structure
 
@@ -34,6 +35,10 @@ The configuration consists of four parts, all of which must be specified when in
 * gate: this contains gate-specific configuration, like e.g. the number of postgres replicas to use for the database
 * type: this contains service-type specific configuration, like e.g. if an ingress resource should be set up
 * service: this contains service-specific configuration, like e.g. how many replicas should be used for that service
+* third-party: this contains configuration necessary for third parties
+  * `kube-prometheus-stack.yml` is the configuration of the monitoring stack
+  * grafana-dashboards contains third party dashboards
+    * nginx: [last update](https://github.com/nginxinc/nginx-prometheus-exporter/tree/master/grafana) on 2020-07-17 
 
 The combination of these parts must provide valid input for the helm charts.
 They are passed in in reverse order, so that more generic configuration can override specific configuration (e.g. in `development`, only a single replica is required per service).
