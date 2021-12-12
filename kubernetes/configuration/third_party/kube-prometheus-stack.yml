@@ -10,6 +10,15 @@ grafana:
   sidecar:
     datasources:
       label: grafana_datasource
+    dashboards:
+      folderAnnotation: khaleesi_folder
+      provider:
+        name: kubernetes
+        disableDelete: true
+        foldersFromFilesStructure: true
+      annotations:
+        khaleesi_folder: kubernetes
+
   grafana.ini:
     auth.anonymous:
       enabled: true
