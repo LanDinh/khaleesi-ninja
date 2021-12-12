@@ -29,3 +29,8 @@ spec:
   serviceMonitorSelector:
     matchLabels:
       monitoring: khaleesi-ninja-{{ .Values.environment.name }}
+  podMetadata:
+    labels:
+      khaleesi-ninja: monitoring
+      environment: {{ .Values.environment.name }}
+      infrastructure: prometheus
