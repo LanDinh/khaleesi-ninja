@@ -11,6 +11,7 @@ metadata:
   annotations:
     khaleesi_folder: khaleesi/{{ .Values.environment.name }}
 data:
-  {{ range $path, $contents :=  .Files.Glob  "data/grafana-dashboards/khaleesi/**.json" }}
-    {{ base $path }}: {{ $.Files.Get $path | toJson }}
-  {{ end }}
+{{- range $path, $contents :=  .Files.Glob  "data/grafana-dashboards/khaleesi/**.json" }}
+  {{ base $path }}: |
+  {{- tpl ($.Files.Get $path) $ | nindent 4 }}
+{{- end -}}
