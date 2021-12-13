@@ -143,6 +143,33 @@
         "enabled"
       ]
     },
+    "probe": {
+      "description": "kubernetes probe configuration",
+      "type": "object",
+      "properties": {
+        "http": {
+          "description": "kubernetes http probe configuration",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "whether to use http probes",
+              "type": "boolean"
+            },
+            "readiness": {
+              "description": "path for the readiness probe",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "readiness"
+          ]
+        }
+      },
+      "required": [
+        "http"
+      ]
+    },
     "nginx_prometheus_exporter": {
       "description": "nginx configuration to export prometheus metrics",
       "type": "object",
@@ -204,6 +231,7 @@
     "ingress",
     "kubegres",
     "django",
+    "probe",
     "nginx_prometheus_exporter",
     "grpc_web",
     "grpcui"

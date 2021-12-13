@@ -31,6 +31,12 @@ spec:
           ports:
             - name: deployment
               containerPort: 8000
+          {{- if .Values.probe.http.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.readiness }}
+              port: deployment
+          {{- end }}
           {{- if or .Values.django.enabled .Values.kubegres.enabled }}
           env:
           {{- end }}

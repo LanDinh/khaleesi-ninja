@@ -3,5 +3,8 @@ type:
 ingress:
   enabled: true
   path: "/"
+probe:
+  http:
+    enabled: true
 nginx_prometheus_exporter:
   enabled: true

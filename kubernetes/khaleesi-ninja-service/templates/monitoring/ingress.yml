@@ -1,0 +1,34 @@
+{{- if and .Values.ingress.enabled .Values.probe.http.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-monitoring
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: {{ .Values.type.name }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /forbidden
+  {{- if .Values.ingress.regex_path }}
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  {{- end }}
+spec:
+  ingressClassName: ingress-class-{{ .Values.environment.name }}
+  tls:
+    - secretName: tls-certificate
+      hosts:
+      - {{ .Values.gate.name }}.{{ .Values.environment.domain }}
+  rules:
+    - host: {{ .Values.gate.name }}.{{ .Values.environment.domain }}
+      http:
+        paths:
+          - path: {{ .Values.ingress.path }}monitoring
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.gate.name }}-{{ .Values.service.name }}
+                port:
+                  name: {{ .Values.ingress.port }}
+{{- end }}

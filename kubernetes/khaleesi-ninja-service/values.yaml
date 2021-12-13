@@ -30,6 +30,11 @@ kubegres:
   port: 5432
 
 # Monitoring.
+probe:
+  http:
+    enabled: false
+    readiness: "/monitoring/ready"
+
 nginx_prometheus_exporter:
   enabled: false
   version: "0.9.0"
