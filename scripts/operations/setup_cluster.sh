@@ -18,17 +18,19 @@ fi
 
 
 echo -e "${magenta}Deploying ingress...${clear_color}"
-helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace --set controller.admissionWebhooks.enabled=false
+helm upgrade --install ingress-nginx ingress-nginx \
+  --repo https://kubernetes.github.io/ingress-nginx \
+  --namespace ingress-nginx --create-namespace \
+  --set controller.admissionWebhooks.enabled=false
 
 
 echo -e "${magenta}Deploying kubegres...${clear_color}"
 kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.13/kubegres.yaml
 
 echo -e "${magenta}Deploying kube-prometheus...${clear_color}"
-kubectl create namespace khaleesi-monitoring --dry-run=client -o yaml | kubectl apply -f -
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack --values kubernetes/configuration/third-party/kube-prometheus-stack.yml
+helm upgrade --install kube-prometheus kube-prometheus-stack \
+  --repo https://prometheus-community.github.io/helm-charts \
+  --namespace khaleesi-monitoring --create-namespace
 
 echo -e "${magenta}Deploying third party Grafana dashboards...${clear_color}"
 kubectl -n "khaleesi-monitoring" delete configmap grafana-dashboards-third-party --ignore-not-found=true
