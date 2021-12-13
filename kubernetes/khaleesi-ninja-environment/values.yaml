@@ -1,10 +1,8 @@
 prometheus:
   version: v2.31.1
-  logLevel: info
-  paused: false
   replicas: 1
   retention: 20d
-  routePrefix: /
+  routePrefix: "/"
 alertmanager:
   name: kube-prometheus-kube-prome-alertmanager
   namespace: khaleesi-monitoring

@@ -143,6 +143,24 @@
         "enabled"
       ]
     },
+    "nginx_prometheus_exporter": {
+      "description": "nginx configuration to export prometheus metrics",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not this service requires nginx-prometheus-exporter",
+          "type": "boolean"
+        },
+        "version": {
+          "description": "nginx-prometheus-exporter version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "version"
+      ]
+    },
     "grpc_web": {
       "description": "grpc-web configuration for gRPC services accessed by browser clients",
       "type": "object",
@@ -184,6 +202,9 @@
     "service",
     "type",
     "ingress",
+    "kubegres",
+    "django",
+    "nginx_prometheus_exporter",
     "grpc_web",
     "grpcui"
   ],

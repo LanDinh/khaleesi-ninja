@@ -19,6 +19,19 @@
         "domain"
       ]
     },
+    "gate": {
+      "description": "gate configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "the name of the gate",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
     "kubegres": {
       "description": "kubgres configuration",
       "type": "object",
@@ -54,6 +67,7 @@
   },
   "required": [
     "environment",
+    "gate",
     "kubegres"
   ],
   "title": "Values",

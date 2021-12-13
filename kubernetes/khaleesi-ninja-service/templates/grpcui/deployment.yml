@@ -29,7 +29,7 @@ spec:
         - name: grpcui
           image: fullstorydev/grpcui:{{ .Values.grpcui.version }}
           imagePullPolicy: Always
-          args: [ "-port=9000", "-plaintext", "{{ .Values.gate.name }}-{{ .Values.service.name }}-service:8000" ]
+          args: [ "-port=9000", "-plaintext", "{{ .Values.gate.name }}-{{ .Values.service.name }}:8000" ]
           ports:
             - name: grpcui
               containerPort: 9000

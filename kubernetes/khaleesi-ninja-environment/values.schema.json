@@ -18,10 +18,73 @@
         "name",
         "domain"
       ]
+    },
+    "alertmanager": {
+      "description": "alertmanager configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "name of the alertmanager service",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "namespace of the alertmanager service",
+          "type": "string"
+        },
+        "port": {
+          "description": "named port of the alertmanager service",
+          "type": "string"
+        },
+        "pathPrefix": {
+          "description": "path prefix of the alertmanager service",
+          "type": "string"
+        },
+        "apiVersion": {
+          "description": "alertmanager api version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "namespace",
+        "port",
+        "pathPrefix",
+        "apiVersion"
+      ]
+    },
+    "prometheus": {
+      "description": "prometheus configuration",
+      "type": "object",
+      "properties": {
+        "version": {
+          "description": "prometheus version",
+          "type": "string"
+        },
+        "replicas": {
+          "description": "number of prometheus replicas",
+          "type": "integer"
+        },
+        "retention": {
+          "description": "amount of time to keep metric data",
+          "type": "string"
+        },
+        "routePrefix": {
+          "description": "prometheus route prefix",
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "replicas",
+        "retention",
+        "routePrefix"
+      ]
     }
   },
   "required": [
-    "environment"
+    "environment",
+    "alertmanager",
+    "prometheus"
   ],
   "title": "Values",
   "type": "object"
