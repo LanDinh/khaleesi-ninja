@@ -21,16 +21,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 29,
-  "iteration": 1639356926597,
+  "id": 5,
+  "iteration": 1639404151946,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "P7363055710D8F94A"
-      },
+      "datasource": {},
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -87,7 +84,7 @@
             "uid": "P7363055710D8F94A"
           },
           "exemplar": true,
-          "expr": "up{namespace=\"khaleesi-ninja-${namespace}\",khaleesi_ninja=\"service\",gate=\"${gate}\"}",
+          "expr": "up{khaleesi_ninja=\"service\",gate=\"${gate}\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "{{name}}",
@@ -106,30 +103,21 @@
     "list": [
       {
         "current": {
-          "selected": true,
-          "text": "integration",
-          "value": "integration"
+          "selected": false,
+          "text": "No data sources found",
+          "value": ""
         },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "P7363055710D8F94A"
-        },
-        "definition": "label_values(namespace)",
         "hide": 0,
         "includeAll": false,
-        "label": "namespace",
+        "label": "",
         "multi": false,
-        "name": "namespace",
+        "name": "environment",
         "options": [],
-        "query": {
-          "query": "label_values(namespace)",
-          "refId": "StandardVariableQuery"
-        },
+        "query": "prometheus",
         "refresh": 1,
         "regex": "khaleesi-ninja-([^-]*)",
         "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
+        "type": "datasource"
       },
       {
         "current": {
