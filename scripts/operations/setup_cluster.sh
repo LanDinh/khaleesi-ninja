@@ -30,11 +30,17 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm upgrade --install kube-prometheus prometheus-community/kube-prometheus-stack --values kubernetes/configuration/third-party/kube-prometheus-stack.yml
 
-echo -e "${magenta}Deploying custom Grafana dashboards...${clear_color}"
+echo -e "${magenta}Deploying third party Grafana dashboards...${clear_color}"
 kubectl -n "khaleesi-monitoring" delete configmap grafana-dashboards-third-party --ignore-not-found=true
 kubectl -n "khaleesi-monitoring" create configmap grafana-dashboards-third-party --from-file=kubernetes/configuration/third-party/grafana-dashboards/nginx.json
 kubectl -n "khaleesi-monitoring" annotate configmap grafana-dashboards-third-party khaleesi_folder=third-party
 kubectl -n "khaleesi-monitoring" label configmap grafana-dashboards-third-party grafana_dashboard=1
+
+echo -e "${magenta}Deploying khaleesi Grafana dashboards...${clear_color}"
+kubectl -n "khaleesi-monitoring" delete configmap grafana-dashboards-khaleesi --ignore-not-found=true
+kubectl -n "khaleesi-monitoring" create configmap grafana-dashboards-khaleesi --from-file=kubernetes/configuration/cluster/grafana-dashboards/khaleesi-ninja.json
+kubectl -n "khaleesi-monitoring" annotate configmap grafana-dashboards-khaleesi khaleesi_folder=khaleesi
+kubectl -n "khaleesi-monitoring" label configmap grafana-dashboards-khaleesi grafana_dashboard=1
 
 
 

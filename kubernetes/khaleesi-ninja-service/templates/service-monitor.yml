@@ -21,3 +21,8 @@ spec:
       gate: {{ .Values.gate.name }}
       name: {{ .Values.service.name }}
       type: {{ .Values.type.name }}
+  targetLabels:
+    - khaleesi-ninja
+    - gate
+    - name
+    - type
