@@ -1,4 +1,4 @@
 apiVersion: v2
-name: khaleesi-ninja-infrastructure
+name: khaleesi-ninja-environment
 version: 1.0.0
 kubeVersion: ">= 1.21.5"
