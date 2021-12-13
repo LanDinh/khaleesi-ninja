@@ -23,6 +23,16 @@ static_resources:
                   max_stream_duration:
                     grpc_timeout_header_max: 0s
           http_filters:
+          - name: envoy.filters.http.health_check
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.health_check.v3.HealthCheck
+              pass_through_mode: false
+              headers:
+              - name: ":path"
+                string_match:
+                  safe_regex:
+                    google_re2: {}
+                    regex: "/monitoring/(alive|ready)"
           - name: envoy.filters.http.grpc_web
           - name: envoy.filters.http.router
   clusters:
