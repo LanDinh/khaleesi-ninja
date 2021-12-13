@@ -4,7 +4,7 @@
 from typing import Optional, Any
 
 # khaleesi.ninja.
-from .database_router import DatabaseRouter
+from khaleesi.core.database_router import DatabaseRouter
 
 
 class TestDatabaseRouter(DatabaseRouter):

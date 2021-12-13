@@ -6,7 +6,7 @@ from django.conf import settings
 from django.test import SimpleTestCase
 
 # khaleesi.ninja.
-from khaleesi.core.database_router import DatabaseRouter
+from khaleesi.core.database_router.production import DatabaseRouter
 
 
 class DatabaseRouterTestCase(SimpleTestCase):
