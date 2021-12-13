@@ -17,7 +17,6 @@ grafana:
         foldersFromFilesStructure: true
       annotations:
         khaleesi_folder: kubernetes
-
   grafana.ini:
     auth.anonymous:
       enabled: true

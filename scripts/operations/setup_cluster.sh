@@ -30,7 +30,8 @@ kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.13/
 echo -e "${magenta}Deploying kube-prometheus...${clear_color}"
 helm upgrade --install kube-prometheus kube-prometheus-stack \
   --repo https://prometheus-community.github.io/helm-charts \
-  --namespace khaleesi-monitoring --create-namespace
+  --namespace khaleesi-monitoring --create-namespace \
+  --values kubernetes/configuration/third-party/kube-prometheus-stack.yml
 
 echo -e "${magenta}Deploying third party Grafana dashboards...${clear_color}"
 kubectl -n "khaleesi-monitoring" delete configmap grafana-dashboards-third-party --ignore-not-found=true
