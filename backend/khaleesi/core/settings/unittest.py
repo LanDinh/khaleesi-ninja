@@ -36,4 +36,4 @@ DATABASES: Dict[str, Any] = {
     'TEST': TEST_DATABASE_TEST_SETTINGS,
   },
 }
-DATABASE_ROUTERS = [ 'khaleesi.core.unittest_database_router.TestDatabaseRouter' ]
+DATABASE_ROUTERS = [ 'khaleesi.core.database_router.unittest.TestDatabaseRouter' ]

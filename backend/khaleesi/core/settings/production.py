@@ -40,4 +40,4 @@ DATABASES = {
     'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
   },
 }
-DATABASE_ROUTERS = [ 'khaleesi.core.database_router.DatabaseRouter' ]
+DATABASE_ROUTERS = [ 'khaleesi.core.database_router.production.DatabaseRouter' ]
