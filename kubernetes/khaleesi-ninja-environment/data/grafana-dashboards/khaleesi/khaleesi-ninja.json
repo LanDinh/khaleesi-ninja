@@ -21,13 +21,16 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 5,
-  "iteration": 1639404151946,
+  "id": 30,
+  "iteration": 1639418787714,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "datasource": {},
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -75,16 +78,16 @@
         "textMode": "name"
       },
       "pluginVersion": "8.3.1",
-      "repeat": "gate",
+      "repeat": "service",
       "repeatDirection": "v",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "P7363055710D8F94A"
+            "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "up{khaleesi_ninja=\"service\",gate=\"${gate}\"}",
+          "expr": "up{namespace=~\"khaleesi-ninja-[^-]+\",khaleesi_ninja=\"service\",gate=\"${gate}\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "{{name}}",
@@ -104,43 +107,42 @@
       {
         "current": {
           "selected": false,
-          "text": "No data sources found",
-          "value": ""
+          "text": "khaleesi-ninja-integration",
+          "value": "khaleesi-ninja-integration"
         },
-        "hide": 0,
+        "hide": 2,
         "includeAll": false,
-        "label": "",
         "multi": false,
-        "name": "environment",
+        "name": "datasource",
         "options": [],
         "query": "prometheus",
         "refresh": 1,
-        "regex": "khaleesi-ninja-([^-]*)",
+        "regex": "khaleesi-ninja-integration",
         "skipUrlSync": false,
         "type": "datasource"
       },
       {
         "current": {
           "selected": false,
-          "text": "core",
-          "value": "core"
+          "text": "frontgate",
+          "value": "frontgate"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "P7363055710D8F94A"
         },
-        "definition": "label_values(gate)",
+        "definition": "label_values(service)",
         "hide": 2,
         "includeAll": false,
         "multi": false,
-        "name": "gate",
+        "name": "service",
         "options": [],
         "query": {
-          "query": "label_values(gate)",
+          "query": "label_values(service)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
-        "regex": "",
+        "regex": "[^-]+-([^-]+)",
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
@@ -148,13 +150,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "khaleesi.ninja",
   "uid": "pklG5Xh7z",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
