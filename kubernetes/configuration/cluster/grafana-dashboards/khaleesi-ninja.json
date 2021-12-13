@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 29,
-  "iteration": 1639356187842,
+  "iteration": 1639356926597,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -78,6 +78,8 @@
         "textMode": "name"
       },
       "pluginVersion": "8.3.1",
+      "repeat": "gate",
+      "repeatDirection": "v",
       "targets": [
         {
           "datasource": {
@@ -85,7 +87,7 @@
             "uid": "P7363055710D8F94A"
           },
           "exemplar": true,
-          "expr": "up{namespace=\"khaleesi-ninja-${namespace}\",khaleesi_ninja=\"service\",gate=\"core\"}",
+          "expr": "up{namespace=\"khaleesi-ninja-${namespace}\",khaleesi_ninja=\"service\",gate=\"${gate}\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "{{name}}",
@@ -104,7 +106,7 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "integration",
           "value": "integration"
         },
@@ -128,6 +130,32 @@
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "core",
+          "value": "core"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "P7363055710D8F94A"
+        },
+        "definition": "label_values(gate)",
+        "hide": 2,
+        "includeAll": false,
+        "multi": false,
+        "name": "gate",
+        "options": [],
+        "query": {
+          "query": "label_values(gate)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
@@ -139,6 +167,6 @@
   "timezone": "",
   "title": "khaleesi.ninja",
   "uid": "pklG5Xh7z",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
