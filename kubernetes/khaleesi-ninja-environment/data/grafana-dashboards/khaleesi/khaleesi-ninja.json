@@ -22,7 +22,7 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": 30,
-  "iteration": 1639418787714,
+  "iteration": 1639420393703,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -38,8 +38,6 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 1,
-          "min": 0,
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -48,11 +46,16 @@
                 "value": null
               },
               {
-                "color": "super-light-green",
-                "value": 50
+                "color": "#EAB839",
+                "value": 1
+              },
+              {
+                "color": "green",
+                "value": 100
               }
             ]
-          }
+          },
+          "unit": "none"
         },
         "overrides": []
       },
@@ -72,7 +75,7 @@
           "calcs": [
             "last"
           ],
-          "fields": "",
+          "fields": "/^frontgate$/",
           "values": false
         },
         "textMode": "name"
@@ -87,7 +90,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "up{namespace=~\"khaleesi-ninja-[^-]+\",khaleesi_ninja=\"service\",gate=\"${gate}\"}",
+          "expr": "sum by (name) (up{namespace=~\"khaleesi-ninja-[^-]+\",khaleesi_ninja=\"service\",gate=\"core\"})",
           "instant": false,
           "interval": "",
           "legendFormat": "{{name}}",
@@ -157,6 +160,6 @@
   "timezone": "",
   "title": "khaleesi.ninja",
   "uid": "pklG5Xh7z",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
