@@ -34,6 +34,7 @@ probe:
   http:
     enabled: false
     readiness: "/monitoring/ready"
+    liveness: "/monitoring/alive"
 
 nginx_prometheus_exporter:
   enabled: false

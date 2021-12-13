@@ -158,11 +158,16 @@
             "readiness": {
               "description": "path for the readiness probe",
               "type": "string"
+            },
+            "liveness": {
+              "description": "path for the liveness probe",
+              "type": "string"
             }
           },
           "required": [
             "enabled",
-            "readiness"
+            "readiness",
+            "liveness"
           ]
         }
       },

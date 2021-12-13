@@ -36,6 +36,10 @@ spec:
             httpGet:
               path: {{ .Values.probe.http.readiness }}
               port: deployment
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.liveness }}
+              port: deployment
           {{- end }}
           {{- if or .Values.django.enabled .Values.kubegres.enabled }}
           env:
