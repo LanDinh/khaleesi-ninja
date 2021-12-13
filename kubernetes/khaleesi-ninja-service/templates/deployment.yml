@@ -106,6 +106,14 @@ spec:
             - name: metrics
               containerPort: 8020
           args: [ "-nginx.scrape-uri=http://localhost:8000/monitoring/metrics", "-web.listen-address=:8020" ]
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.readiness }}
+              port: metrics
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.liveness }}
+              port: metrics
       {{- end }}
       {{- if .Values.grpc_web.enabled }}
         - name: grpc-web-envoy
