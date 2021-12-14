@@ -33,4 +33,12 @@ spec:
           ports:
             - name: grpcui
               containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: grpcui
+          livenessProbe:
+            httpGet:
+              path: /
+              port: grpcui
 {{- end }}
