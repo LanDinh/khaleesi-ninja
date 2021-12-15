@@ -2,6 +2,7 @@
 
 # Python.
 from concurrent import futures
+from signal import signal, SIGTERM
 from typing import Any
 
 # Django.
@@ -44,6 +45,15 @@ class Command(BaseCommand):
     server.add_insecure_port(options['address'])
     self.stdout.write(f'Starting gRPC server at {options["address"]}...')
     server.start()
+
+    def handle_sigterm(*_: Any) -> None :
+      """Shutdown gracefully."""
+      self.stdout.write(f'Stopping gRPC server at {options["address"]}...')
+      done_event = server.stop(30)
+      done_event.wait(30)
+      self.stdout.write(f'Stop complete.')
+
+    signal(SIGTERM, handle_sigterm)
     server.wait_for_termination()
 
   @staticmethod
