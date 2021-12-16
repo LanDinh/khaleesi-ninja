@@ -76,7 +76,7 @@
           "calcs": [
             "last"
           ],
-          "fields": "/^frontgate$/",
+          "fields": "",
           "values": false
         },
         "textMode": "name"
