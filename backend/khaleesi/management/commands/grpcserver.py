@@ -51,7 +51,7 @@ class Command(BaseCommand):
       self.stdout.write(f'Stopping gRPC server at {options["address"]}...')
       done_event = server.stop(30)
       done_event.wait(30)
-      self.stdout.write(f'Stop complete.')
+      self.stdout.write('Stop complete.')
 
     signal(SIGTERM, handle_sigterm)
     server.wait_for_termination()
