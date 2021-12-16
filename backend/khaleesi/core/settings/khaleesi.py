@@ -25,9 +25,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 class KhaleesiNinjaSettings(TypedDict):
   """Custom khaleesi.ninja settings."""
   PORT: int
+  METRICS_PORT: int
   GRPC_HANDLERS: List[str]
 
 KHALEESI_NINJA: KhaleesiNinjaSettings = KhaleesiNinjaSettings(
   PORT = cast(int, environ.get('PORT', 8000)),
+  METRICS_PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),
   GRPC_HANDLERS = [],
 )

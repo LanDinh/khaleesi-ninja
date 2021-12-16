@@ -31,6 +31,10 @@ spec:
           ports:
             - name: deployment
               containerPort: 8000
+            {{- if .Values.django.enabled }}
+            - name: metrics
+              containerPort: 8020
+            {{- end }}
           {{- if .Values.probe.http.enabled }}
           readinessProbe:
             httpGet:

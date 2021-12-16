@@ -19,12 +19,10 @@ spec:
       protocol: TCP
       port: 8000
       targetPort: deployment
-    {{- if .Values.nginx_prometheus_exporter.enabled }}
     - name: metrics
       protocol: TCP
       port: 8020
       targetPort: metrics
-    {{- end }}
     {{- if .Values.grpc_web.enabled }}
     - name: grpc-web-envoy
       protocol: TCP

@@ -14,6 +14,12 @@ from django.utils.module_loading import import_string
 import grpc
 from grpc_reflection.v1alpha import reflection
 
+# prometheus.
+from prometheus_client import start_http_server  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
+
+# khaleesi.ninja.
+from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
+
 
 khaleesi_settings = settings.KHALEESI_NINJA
 
@@ -40,11 +46,16 @@ class Command(BaseCommand):
     self._serve(**options)
 
   def _serve(self, **options: Any) -> None :
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers = options['max_workers']))
+    interceptors = [ PrometheusServerInterceptor() ]
+    server = grpc.server(
+        futures.ThreadPoolExecutor(max_workers = options['max_workers']),
+        interceptors = interceptors  # type: ignore[arg-type] # fixed upstream
+    )
     self._add_handlers(server)
     server.add_insecure_port(options['address'])
     self.stdout.write(f'Starting gRPC server at {options["address"]}...')
     server.start()
+    start_http_server(int(khaleesi_settings['METRICS_PORT']))
 
     def handle_sigterm(*_: Any) -> None :
       """Shutdown gracefully."""
@@ -61,7 +72,7 @@ class Command(BaseCommand):
     """
     Attempt to import a class from a string representation.
     """
-    raw_handlers = khaleesi_settings["GRPC_HANDLERS"]
+    raw_handlers = khaleesi_settings['GRPC_HANDLERS']
     service_names = [reflection.SERVICE_NAME]
     for raw_handler in raw_handlers:
       handler = f'{raw_handler}.service_configuration'
