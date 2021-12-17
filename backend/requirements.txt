@@ -1,4 +1,4 @@
-Django==3.2.9
+Django==4.0.0
 grpc-interceptor==0.13.0
 grpcio==1.42.0
 grpcio-reflection==1.41.1
