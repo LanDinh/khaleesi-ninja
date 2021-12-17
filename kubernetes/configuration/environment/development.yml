@@ -1,0 +1,17 @@
+environment:
+  name: "development"
+  domain: "development.khaleesi.ninja"
+  development_credentials: true
+kubegres:
+  replicas: 1
+  size: 200Mi
+service:
+  version: "latest"
+  replicas: 1
+  image_pull_policy: "Never"
+grpc_web:
+  envoy_version: "v1.20-latest"
+grpcui:
+  version: "latest"
+nginx_prometheus_exporter:
+  enabled: false  # development builds don't export metrics.

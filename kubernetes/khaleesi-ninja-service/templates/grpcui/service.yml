@@ -1,0 +1,23 @@
+{{- if .Values.grpcui.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: grpcui
+spec:
+  selector:
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: grpcui
+  ports:
+    - name: grpcui
+      protocol: TCP
+      port: 8000
+      targetPort: grpcui
+{{- end }}

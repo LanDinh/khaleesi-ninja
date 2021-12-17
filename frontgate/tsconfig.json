@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    // Modules.
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    // Emit.
+    "noEmit": true,
+    // Javascript support.
+    "allowJs": false,
+    // Interop constraints.
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    // Language and environment.
+    "jsx": "react-jsx",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "target": "es6",
+    // Completeness
+    "skipLibCheck": true,
+    // Type checking.
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedParameters": true,
+    "strict": true,
+  },
+  "include": [
+    "src"
+  ]
+}

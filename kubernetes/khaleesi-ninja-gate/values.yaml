@@ -1,0 +1,10 @@
+# khaleesi.ninja
+environment:
+  #name: "required name"
+  #domain: "required domain"
+gate:
+  #name: "required name"
+kubegres:
+  enabled: false
+  image: postgres:14.1
+  port: 5432

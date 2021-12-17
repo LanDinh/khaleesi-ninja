@@ -1,0 +1,12 @@
+ignore:
+  # Frontgate.
+  - frontgate/core/src/core/reportWebVitals.ts
+  - frontgate/core/src/index.tsx
+  # Backend library.
+  - backend/manage.py
+  - backend/khaleesi/core/settings/**
+  - backend/core/backgate/core/backgate_settings.py
+  # Backend.
+  - backend/*/*/*/migrations/**
+  - backend/*/*/settings.py
+  - backend/*/*/test/**

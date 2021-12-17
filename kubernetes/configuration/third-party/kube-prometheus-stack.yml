@@ -1,0 +1,45 @@
+commonLabels:
+  khaleesi-ninja: monitoring
+  infrastructure: kube-prometheus-stack
+
+grafana:
+  service:
+    port: 3000
+  sidecar:
+    datasources:
+      label: grafana_datasource
+    dashboards:
+      label: grafana_dashboard
+      folderAnnotation: khaleesi_folder
+      provider:
+        name: kubernetes
+        disableDelete: true
+        foldersFromFilesStructure: true
+      annotations:
+        khaleesi_folder: kubernetes
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Viewer
+
+prometheus-node-exporter:
+  hostRootFsMount: false
+
+kubeScheduler:
+  service:
+    targetPort: 10259
+  serviceMonitor:
+    https: true
+    insecureSkipVerify: true
+
+kubeControllerManager:
+  service:
+    targetPort: 10257
+  serviceMonitor:
+    https: true
+    insecureSkipVerify: true
+
+kubeEtcd:
+  service:
+    targetPort: 2381

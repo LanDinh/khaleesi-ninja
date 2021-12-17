@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: environment
+    environment: {{ .Values.environment.name }}
+    infrastructure: namespace

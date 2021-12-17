@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}-monitoring
+  labels:
+    khaleesi-ninja: monitoring
+    environment: {{ .Values.environment.name }}
+    infrastructure: prometheus
+spec:
+  selector:
+    khaleesi-ninja: monitoring
+    environment: {{ .Values.environment.name }}
+    infrastructure: prometheus
+  ports:
+    - name: metrics
+      protocol: TCP
+      port: 8000
+      targetPort: 9090

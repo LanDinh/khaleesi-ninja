@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: service
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: {{ .Values.type.name }}
+spec:
+  replicas: {{ .Values.service.replicas }}
+  selector:
+    matchLabels:
+      khaleesi-ninja: service
+      gate: {{ .Values.gate.name }}
+      name: {{ .Values.service.name }}
+      type: {{ .Values.type.name }}
+  template:
+    metadata:
+      labels:
+        khaleesi-ninja: service
+        gate: {{ .Values.gate.name }}
+        name: {{ .Values.service.name }}
+        type: {{ .Values.type.name }}
+    spec:
+      containers:
+        - name: deployment
+          image: khaleesi-ninja/{{ .Values.gate.name }}/{{ .Values.service.name }}:{{ .Values.service.version }}
+          imagePullPolicy: {{ .Values.service.image_pull_policy }}
+          ports:
+            - name: deployment
+              containerPort: 8000
+            {{- if .Values.django.enabled }}
+            - name: metrics
+              containerPort: 8020
+            {{- end }}
+          {{- if .Values.probe.http.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.readiness }}
+              port: deployment
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.liveness }}
+              port: deployment
+          {{- end }}
+          {{- if or .Values.django.enabled .Values.kubegres.enabled }}
+          env:
+          {{- end }}
+          {{- if .Values.django.enabled }}
+            - name: KHALEESI_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-django
+                  key: secretKey
+          {{- end }}
+          {{- if .Values.kubegres.enabled }}
+            - name: KHALEESI_DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres
+                  key: host
+            - name: KHALEESI_DATABASE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres
+                  key: port
+            - name: KHALEESI_DATABASE_SUPERUSER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres
+                  key: superUser
+            - name: KHALEESI_DATABASE_SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-kubegres
+                  key: superUserPassword
+            - name: KHALEESI_DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
+                  key: database
+            - name: KHALEESI_DATABASE_WRITE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
+                  key: writeUser
+            - name: KHALEESI_DATABASE_WRITE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
+                  key: writePassword
+            - name: KHALEESI_DATABASE_READ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
+                  key: readUser
+            - name: KHALEESI_DATABASE_READ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
+                  key: readPassword
+          {{- end }}
+      {{- if .Values.nginx_prometheus_exporter.enabled }}
+        - name: nginx-prometheus-exporter
+          image: nginx/nginx-prometheus-exporter:{{ .Values.nginx_prometheus_exporter.version }}
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 8020
+          args: [ "-nginx.scrape-uri=http://localhost:8000/monitoring/metrics", "-web.listen-address=:8020" ]
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.readiness }}
+              port: metrics
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.liveness }}
+              port: metrics
+      {{- end }}
+      {{- if .Values.grpc_web.enabled }}
+        - name: grpc-web-envoy
+          image: envoyproxy/envoy-alpine:{{ .Values.grpc_web.envoy_version }}
+          imagePullPolicy: Always
+          ports:
+            - name: grpc-web-envoy
+              containerPort: 8010
+          volumeMounts:
+            - name: grpc-web-envoy
+              readOnly: true
+              mountPath: /config
+          args: [ "envoy", "--config-path", "/config/envoy.yml" ]
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.readiness }}
+              port: grpc-web-envoy
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.http.liveness }}
+              port: grpc-web-envoy
+      volumes:
+        - name: grpc-web-envoy
+          configMap:
+            name: grpc-web-envoy
+      {{- end }}

@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prometheus-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: monitoring
+    environment: {{ .Values.environment.name }}
+    infrastructure: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kube-prometheus-kube-prome-prometheus
+subjects:
+  - kind: ServiceAccount
+    name: prometheus
+    namespace: khaleesi-ninja-{{ .Values.environment.name }}-monitoring

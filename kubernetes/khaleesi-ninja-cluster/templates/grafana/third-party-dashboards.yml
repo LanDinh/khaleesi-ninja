@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-third-party
+  namespace: khaleesi-monitoring
+  labels:
+    khaleesi-ninja: cluster
+    infrastructure: grafana
+    grafana_dashboard: "1"
+  annotations:
+    khaleesi_folder: third-party
+data:
+  nginx.json: |-
+  {{ .Files.Get "data/grafana-dashboards/third-party/nginx.json" | nindent 4 }}

@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.gate.name }}-{{ .Values.service.name }}
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}-monitoring
+  labels:
+    khaleesi-ninja: monitoring
+    gate: {{ .Values.gate.name }}
+    name: {{ .Values.service.name }}
+    type: {{ .Values.type.name }}
+    monitoring: khaleesi-ninja-{{ .Values.environment.name }}
+spec:
+  endpoints:
+    - port: metrics
+  namespaceSelector:
+    matchNames:
+      - khaleesi-ninja-{{ .Values.environment.name }}
+  selector:
+    matchLabels:
+      khaleesi-ninja: service
+      gate: {{ .Values.gate.name }}
+      name: {{ .Values.service.name }}
+      type: {{ .Values.type.name }}
+  targetLabels:
+    - khaleesi-ninja
+    - gate
+    - name
+    - type

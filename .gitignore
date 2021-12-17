@@ -1,0 +1,17 @@
+# Frontgate
+/frontgate/node_modules/*
+/frontgate/core/src/core/proto/*
+
+# Backend
+/backend/.venv/*
+/backend/khaleesi/proto/*
+
+# Development
+/.idea/*
+*.iml
+/temp/*
+/data/current_service
+/scripts/local/*
+
+# Operations
+/letsencrypt/*

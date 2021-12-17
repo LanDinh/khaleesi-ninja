@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="695px" preserveAspectRatio="none" style="width:582px;height:695px;background:#FFFFFF;" version="1.1" viewBox="0 0 582 695" width="582px" zoomAndPan="magnify"><defs><filter height="300%" id="fojkigqwanqqo" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><!--MD5=[8fc3522a43f8c7199df5e09e5bb0188e]
+entity user--><ellipse cx="291.67" cy="14" fill="#FFB6C1" filter="url(#fojkigqwanqqo)" rx="8" ry="8" style="stroke:#8B0000;stroke-width:1.5;"/><path d="M291.67,22 L291.67,49 M278.67,30 L304.67,30 M291.67,49 L278.67,64 M291.67,49 L304.67,64 " fill="none" filter="url(#fojkigqwanqqo)" style="stroke:#8B0000;stroke-width:1.5;"/><text fill="#8B0000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="28" x="277.67" y="84.0332">user</text><!--MD5=[6acc1f646e0f2fcb2ccae54730d1672f]
+entity frontgate--><path d="M60.9872,175.1502 C63.1347,168.6407 66.7634,167.1957 72.1077,172.0111 C75.6066,166.1776 79.5736,166.7777 83.2269,171.8537 C85.2644,165.8938 89.6865,163.4852 94.7595,168.729 C99.1551,164.4781 103.6393,165.1984 106.5474,170.5543 C111.3917,165.7589 117.8943,166.5567 120.0296,173.6314 C123.3282,167.532 129.0089,167.509 132.2892,173.6497 C142.3786,174.0075 145.6951,182.445 140.5754,190.3494 C145.2843,200.1257 142.7744,205.8006 131.4824,206.6522 C128.6749,212.89 124.7268,213.2966 119.9346,208.7842 C118.1907,215.8649 114.5533,216.7661 108.5427,213.4667 C106.734,221.2402 100.5716,221.8411 95.6779,216.4909 C90.2257,220.6964 86.372,219.1101 84.1795,212.8943 C79.0979,217.8912 74.4207,215.9734 72.2236,209.8053 C67.0594,215.8163 61.5547,212.6265 59.6597,206.4384 C51.214,203.9328 49.6947,198.6078 53.8547,191.2761 C48.5525,184.1018 51.0108,175.5668 60.9872,175.1502 " fill="#E6E6FA" filter="url(#fojkigqwanqqo)" style="stroke:#9400D3;stroke-width:1.5;"/><text fill="#9400D3" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="66.17" y="195.0332">frontgate</text><!--MD5=[44f162fa27c90984df2daaddf8f7ba9d]
+entity backgate--><path d="M125.8602,426.2049 C128.565,420.7912 132.1959,419.6865 136.2954,424.8258 C138.8769,418.5196 145.1451,416.5797 149.5406,422.9269 C152.6658,417.1441 156.9815,416.109 161.8605,420.8795 C165.5389,417.258 169.6316,418.3184 171.7049,422.8237 C176.2009,416.1601 182.2606,416.5769 185.8439,423.756 C191.0322,420.5226 194.6637,421.6274 196.8415,427.423 C204.759,429.3105 205.2662,436.0599 200.5499,441.3189 C206.6388,447.9194 205.4285,453.68 197.782,458.0015 C195.2393,464.745 189.1579,466.7701 183.7675,461.2579 C182.6851,466.9426 178.1205,469.7707 173.2474,465.1142 C170.8739,472.6619 166.6121,472.0738 161.3448,468.1051 C154.8772,473.4924 150.1569,470.9648 148.2323,463.478 C143.5727,467.7349 139.6319,466.1659 137.1583,460.9283 C132.6086,466.7162 127.0232,464.4633 124.8101,458.4776 C116.1982,454.8181 114.9522,448.2505 122.4592,442.2551 C116.1466,435.4039 116.9031,429.8205 125.8602,426.2049 " fill="#E6E6FA" filter="url(#fojkigqwanqqo)" style="stroke:#9400D3;stroke-width:1.5;"/><text fill="#9400D3" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="58" x="130.67" y="447.0332">backgate</text><!--MD5=[8025ad86b7bfd9c9a9c22787cab830ca]
+entity microservice--><rect fill="#E6E6FA" filter="url(#fojkigqwanqqo)" height="33.6094" style="stroke:#9400D3;stroke-width:1.5;" width="102" x="216.67" y="547.5"/><rect fill="#E6E6FA" height="33.6094" style="stroke:#9400D3;stroke-width:1.5;" width="102" x="212.67" y="543.5"/><text fill="#9400D3" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="86" x="220.67" y="566.0332">microservices</text><!--MD5=[d7b5257a7f82d78d4bfc4a1c03f5802b]
+entity core_frontgate--><path d="M43.7231,32.1992 C47.7066,25.8918 51.9742,24.7124 57.2218,30.8251 C60.1192,22.748 64.7282,21.92 70.4823,28.1836 C73.8153,20.9429 78.6277,22.1523 83.1182,26.9707 C86.1169,19.8232 91.9189,19.931 96.6207,25.1043 C101.0212,20.3628 106.8047,20.7341 109.2288,27.3067 C113.6001,21.3497 117.1769,22.4493 121.1429,27.7361 C126.4433,22.7054 131.7253,23.4458 135.1906,29.9676 C139.9562,24.0401 143.9935,23.8048 148.245,30.4993 C156.3504,34.3508 159.0908,40.659 151.9679,47.7895 C157.2196,54.3716 155.4323,61.1918 146.6242,62.753 C142.5334,69.2275 138.538,68.652 133.6434,63.6632 C131.2996,71.2371 125.6654,71.1898 120.9863,65.9742 C117.4893,71.1312 112.2514,71.5995 108.5436,66.2232 C105.5363,72.4984 100.6688,74.0321 95.6636,68.381 C90.5112,75.143 85.6518,74.0133 82.1788,66.7646 C77.6274,73.2966 72.5982,72.1029 69.0196,65.7696 C64.7262,71.6047 59.5652,70.8152 56.7388,64.3097 C51.9965,69.1741 46.8684,68.8739 44.3475,61.9706 C36.1947,58.6537 34.9871,53.8224 41.2637,47.4426 C34.0978,41.164 36.2813,36.1209 43.7231,32.1992 " fill="#F0F8FF" filter="url(#fojkigqwanqqo)" style="stroke:#00008B;stroke-width:1.5;"/><text fill="#00008B" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="89" x="50.17" y="51.5332">core frontgate</text><!--MD5=[1a0f94d5cf7f8400c3216e2b087b76e5]
+entity core_backgate--><path d="M108.5961,300.7538 C111.3984,295.1071 116.9208,293.0061 121.3679,298.9398 C125.6193,293.3462 130.2763,292.884 134.5127,298.9567 C137.8025,291.5603 142.3513,291.1091 147.8942,296.6209 C151.5732,289.1018 156.2716,289.3513 161.6115,294.874 C165.9704,290.0181 172.3464,291.0326 174.8348,297.1317 C178.9626,292.0529 184.6193,291.5607 187.4561,298.4888 C191.4711,293.0168 196.1247,291.7698 200.1389,298.4896 C205.4057,293.5025 210.5525,293.208 213.6733,300.7989 C221.8742,304.1886 222.5183,311.1094 214.8953,315.789 C222.3849,321.0875 221.5246,327.7535 213.8622,332.0918 C210.0236,339.3375 205.0764,340.6631 199.6853,333.6336 C197.0442,340.1076 192.081,341.148 187.6558,335.3878 C185.9213,343.5028 179.0893,344.2804 173.9366,338.8497 C171.297,345.4158 166.1314,345.5723 161.6808,340.8087 C155.6878,347.6614 149.5769,345.2752 147.093,337.3458 C142.57,343.1089 138.3879,341.851 134.9486,336.1934 C130.4826,342.5196 123.8873,342.1848 121.1372,334.5017 C117.134,339.6406 111.5941,338.6544 109.8605,332.2789 C101.3135,330.5684 96.5411,324.8053 103.2212,316.6332 C96.8096,309.0161 98.7739,302.8759 108.5961,300.7538 " fill="#F0F8FF" filter="url(#fojkigqwanqqo)" style="stroke:#00008B;stroke-width:1.5;"/><text fill="#00008B" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="90" x="114.67" y="321.0332">core backgate</text><!--MD5=[65604176e8d8f18ec29561fe29311dc3]
+entity core_microservice--><rect fill="#E6E6FA" filter="url(#fojkigqwanqqo)" height="33.6094" style="stroke:#9400D3;stroke-width:1.5;" width="134" x="357.67" y="547.5"/><rect fill="#E6E6FA" height="33.6094" style="stroke:#9400D3;stroke-width:1.5;" width="134" x="353.67" y="543.5"/><text fill="#9400D3" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="118" x="361.67" y="566.0332">core microservices</text><!--MD5=[12b6f4cc1aa0afeec12ab2767c8165cb]
+entity kubegres--><rect fill="#FFE4C4" filter="url(#fojkigqwanqqo)" height="23.6094" style="stroke:#8B4513;stroke-width:1.5;" width="79" x="315.17" y="659.5"/><text fill="#8B4513" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="59" x="325.17" y="677.0332">kubegres</text><!--MD5=[76c72a0d0666ffe20c687699125b4b7c]
+entity prometheus--><rect fill="#FFE4C4" filter="url(#fojkigqwanqqo)" height="23.6094" style="stroke:#8B4513;stroke-width:1.5;" width="95" x="471.17" y="303.5"/><text fill="#8B4513" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="75" x="481.17" y="321.0332">prometheus</text><!--MD5=[97029dda41c7f1332efacff3a5502fd8]
+entity grafana--><rect fill="#FFE4C4" filter="url(#fojkigqwanqqo)" height="23.6094" style="stroke:#8B4513;stroke-width:1.5;" width="69" x="421.17" y="177.5"/><text fill="#8B4513" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="49" x="431.17" y="195.0332">grafana</text><!--MD5=[c43275934993365e73f815055c43169b]
+entity grpcui--><rect fill="#FFE4C4" filter="url(#fojkigqwanqqo)" height="33.6094" style="stroke:#8B4513;stroke-width:1.5;" width="69" x="259.17" y="300.5"/><rect fill="#FFE4C4" height="33.6094" style="stroke:#8B4513;stroke-width:1.5;" width="69" x="255.17" y="296.5"/><text fill="#8B4513" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="53" x="263.17" y="319.0332">gRPC UI</text><!--MD5=[4c1bcac971530c53be28cd372d5485ab]
+link user to frontgate--><path d="M276.86,57.64 C246.18,79.68 174.86,130.9 131.11,162.33 " fill="none" id="user-to-frontgate" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="126.96,165.3,136.5986,163.2758,131.0141,162.3736,131.9163,156.7891,126.96,165.3" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="29" x="193.67" y="131.9951">https</text><!--MD5=[e88d0c3170881a4bbc09b9d1a8d6efc3]
+link frontgate to backgate--><path d="M71.02,213.71 C43.96,243.23 6,295.63 27.67,339.5 C45.03,374.64 81.12,400.92 111.19,417.85 " fill="none" id="frontgate-to-backgate" style="stroke:#9400D3;stroke-width:1.0;"/><polygon fill="#9400D3" points="115.58,420.28,109.6355,412.4274,111.2032,417.8627,105.7679,419.4304,115.58,420.28" style="stroke:#9400D3;stroke-width:1.0;"/><text fill="#9400D3" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="52" x="28.67" y="320.9951">grpc-web</text><!--MD5=[9845fedf5f1eec3a3df83dbd3902cd48]
+link backgate to core_microservice--><path d="M203.69,462.42 C252.14,484.34 329.58,519.38 378.21,541.38 " fill="none" id="backgate-to-core_microservice" style="stroke:#9400D3;stroke-width:1.0;"/><polygon fill="#9400D3" points="382.82,543.47,376.2628,536.1213,378.2628,541.4128,372.9713,543.4129,382.82,543.47" style="stroke:#9400D3;stroke-width:1.0;"/><text fill="#9400D3" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="44" x="315.67" y="509.9951">gGRPC</text><!--MD5=[60b711a3e7ee0456b56300d528ce2d11]
+link backgate to microservice--><path d="M137.91,465.82 C127.09,480.31 118.32,498.91 128.67,513.5 C146.59,538.76 178.87,550.83 207.6,556.55 " fill="none" id="backgate-to-microservice" style="stroke:#9400D3;stroke-width:1.0;"/><polygon fill="#9400D3" points="212.55,557.48,204.4492,551.8785,207.6369,556.5517,202.9638,559.7394,212.55,557.48" style="stroke:#9400D3;stroke-width:1.0;"/><text fill="#9400D3" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="44" x="129.67" y="509.9951">gGRPC</text><!--MD5=[0a99729eb451b362cc728da948db0909]
+reverse link core_frontgate to frontgate--><path d="M94.67,90.09 C94.67,114.91 94.67,145.11 94.67,165.46 " fill="none" id="core_frontgate-backto-frontgate" style="stroke:#00008B;stroke-width:1.0;"/><polygon fill="none" points="87.67,90.05,94.67,70.05,101.67,90.05,87.67,90.05" style="stroke:#00008B;stroke-width:1.0;"/><!--MD5=[2a9f2c9e7969d849168d27ba0d07efab]
+reverse link core_backgate to backgate--><path d="M159.67,359.73 C159.67,379.04 159.67,401.02 159.67,417.17 " fill="none" id="core_backgate-backto-backgate" style="stroke:#00008B;stroke-width:1.0;"/><polygon fill="none" points="152.67,359.53,159.67,339.53,166.67,359.53,152.67,359.53" style="stroke:#00008B;stroke-width:1.0;"/><!--MD5=[20f303ef0e3f1ceb25d79fc3796db8d0]
+link backgate to kubegres--><path d="M135.19,465.64 C127.76,474.22 120.55,484.56 116.67,495.5 C109.1,516.84 102.67,554.99 122.67,581.5 C167.22,640.55 256.17,660.43 310.06,667.11 " fill="none" id="backgate-to-kubegres" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="315.16,667.72,306.7041,662.6704,310.196,667.1209,305.7456,670.6128,315.16,667.72" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="123.67" y="567.9951">PostgreSQL</text><!--MD5=[5c22ef53bc0baa1f3a55c8884d78d8c7]
+link microservice to kubegres--><path d="M272.71,581.59 C278.75,595.63 288.41,615.07 300.67,629.5 C309.54,639.94 321.51,649.36 331.92,656.53 " fill="none" id="microservice-to-kubegres" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="336.27,659.46,331.0334,651.1187,332.1208,656.67,326.5694,657.7574,336.27,659.46" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="301.67" y="625.9951">PostgreSQL</text><!--MD5=[732a68cc731abfc65a16c75390cb43d6]
+link core_microservice to kubegres--><path d="M411.14,581.65 C398.07,602.21 377,635.37 364.63,654.84 " fill="none" id="core_microservice-to-kubegres" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="361.68,659.48,369.8686,654.0076,364.3505,655.2529,363.1052,649.7348,361.68,659.48" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="391.67" y="625.9951">PostgreSQL</text><!--MD5=[ebeecff86a530073d0cf729f15426187]
+link user to grpcui--><path d="M291.67,87.63 C291.67,144.37 291.67,245.5 291.67,291.08 " fill="none" id="user-to-grpcui" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="291.67,296.36,295.67,287.36,291.67,291.36,287.67,287.36,291.67,296.36" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="29" x="292.67" y="194.9951">https</text><!--MD5=[ed49c424daeb847e1ca634a7283e2f07]
+link grpcui to backgate--><path d="M260.8,334.63 C246.03,344.06 228.59,356.35 214.67,369.5 C200.91,382.51 187.83,399.15 177.88,413.05 " fill="none" id="grpcui-to-backgate" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="174.89,417.27,183.3494,412.2263,177.7745,413.186,176.8149,407.6111,174.89,417.27" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="44" x="215.67" y="383.9951">gGRPC</text><!--MD5=[8684e832bb6e6df6324481441824544a]
+link grpcui to microservice--><path d="M289.76,334.52 C285.12,378.23 273.27,489.89 268.12,538.41 " fill="none" id="grpcui-to-microservice" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="267.59,543.46,272.5191,534.9333,268.1186,538.488,264.564,534.0875,267.59,543.46" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="44" x="281.67" y="446.9951">gGRPC</text><!--MD5=[42d9ff75d472a91c0ddba987f6203674]
+link grpcui to core_microservice--><path d="M301.3,334.52 C324.77,378.41 384.87,490.8 410.64,539 " fill="none" id="grpcui-to-core_microservice" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="413.02,543.46,412.3092,533.6368,410.6648,539.0494,405.2522,537.4051,413.02,543.46" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="44" x="370.67" y="446.9951">gGRPC</text><!--MD5=[bb46cba489358a65f8e57311820a7cbb]
+link user to grafana--><path d="M306.23,59.56 C336.53,85.71 406.29,145.89 438.63,173.8 " fill="none" id="user-to-grafana" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="442.76,177.36,438.5464,168.458,438.9698,174.099,433.3288,174.5223,442.76,177.36" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="29" x="393.67" y="131.9951">https</text><!--MD5=[28f6f5fcb7b9f8330c57ea7d871da9ec]
+link grafana to prometheus--><path d="M461.26,201.5 C472.49,223.6 497.8,273.42 510.74,298.88 " fill="none" id="grafana-to-prometheus" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="513,303.34,512.4774,293.505,510.7297,298.8851,505.3496,297.1374,513,303.34" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="22" x="491.67" y="257.9951">http</text><!--MD5=[97b7c28b935ce2e5a52fa36551ebbd05]
+link prometheus to backgate--><path d="M486.81,327.5 C423.93,349.22 283.48,397.74 208.7,423.56 " fill="none" id="prometheus-to-backgate" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="203.88,425.23,213.6928,426.0721,208.606,423.5974,211.0806,418.5106,203.88,425.23" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="22" x="360.67" y="383.9951">http</text><!--MD5=[89fe9cfb16edb864c1ff6264f4d88470]
+link prometheus to microservice--><path d="M521.83,327.68 C528.72,354.62 542,424 509.67,465.5 C486.16,495.69 388.3,527.63 323.88,546 " fill="none" id="prometheus-to-microservice" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="318.91,547.41,328.6577,548.818,323.7224,546.0534,326.4871,541.1181,318.91,547.41" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="22" x="528.67" y="446.9951">http</text><!--MD5=[4d3fd51de488deced1ccab3fc95d5ba4]
+link prometheus to core_microservice--><path d="M514.3,327.66 C499.59,365.21 451.7,487.42 431.64,538.61 " fill="none" id="prometheus-to-core_microservice" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="429.79,543.34,436.8026,536.4245,431.6174,538.6859,429.356,533.5007,429.79,543.34" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="22" x="478.67" y="446.9951">http</text><!--MD5=[83cdbd29bfaa6ec53bdd806def9833d9]
+link prometheus to kubegres--><path d="M529.16,327.69 C537.92,337.78 549.88,353.46 555.67,369.5 C562.94,389.64 558.78,396.11 559.67,417.5 C560.56,438.81 563.98,444.61 559.67,465.5 C548.33,520.48 538.45,533.3 509.67,581.5 C495.72,604.86 493.83,613.71 471.67,629.5 C450.15,644.83 422.36,654.89 399.27,661.2 " fill="none" id="prometheus-to-kubegres" style="stroke:#8B4513;stroke-width:1.0;"/><polygon fill="#8B4513" points="394.42,662.49,404.1462,664.0396,399.2516,661.2035,402.0877,656.3089,394.42,662.49" style="stroke:#8B4513;stroke-width:1.0;"/><text fill="#8B4513" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="22" x="552.67" y="509.9951">http</text><!--MD5=[fd000013cd3c917cccb6f02e38962427]
+@startuml
+actor user as user #lightpink;line:darkred;text:darkred
+
+' GATE
+cloud       "frontgate"     as frontgate    #lavender;line:darkviolet;text:darkviolet
+cloud       "backgate"      as backgate     #lavender;line:darkviolet;text:darkviolet
+collections "microservices" as microservice #lavender;line:darkviolet;text:darkviolet
+
+' CORE
+cloud       "core frontgate"     as core_frontgate    #aliceblue;line:darkblue;text:darkblue
+cloud       "core backgate"      as core_backgate     #aliceblue;line:darkblue;text:darkblue
+collections "core microservices" as core_microservice #lavender;line:darkviolet;text:darkviolet
+
+' 3RD PARTY
+card        "kubegres"   as kubegres   #bisque;line:saddlebrown;text:saddlebrown
+card        "prometheus" as prometheus #bisque;line:saddlebrown;text:saddlebrown
+card        "grafana"    as grafana    #bisque;line:saddlebrown;text:saddlebrown
+collections "gRPC UI"    as grpcui     #bisque;line:saddlebrown;text:saddlebrown
+
+' gate connections
+user      - -> frontgate         #saddlebrown;text:saddlebrown : https
+frontgate - -> backgate          #darkviolet;text:darkviolet   : "grpc-web"
+backgate  - -> core_microservice #darkviolet;text:darkviolet   : gGRPC
+backgate  - -> microservice      #darkviolet;text:darkviolet   : gGRPC
+
+' gate inheritance
+core_frontgate ^- - frontgate #darkblue
+core_backgate  ^- - backgate  #darkblue
+
+' kubegres connection
+backgate          - -> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+microservice      - -> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+core_microservice - -> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+
+' grpcui connection
+user   - -> grpcui            #saddlebrown;text:saddlebrown : https
+grpcui - -> backgate          #saddlebrown;text:saddlebrown : gGRPC
+grpcui - -> microservice      #saddlebrown;text:saddlebrown : gGRPC
+grpcui - -> core_microservice #saddlebrown;text:saddlebrown : gGRPC
+
+' prometheus connection
+user       - -> grafana           #saddlebrown;text:saddlebrown : https
+grafana    - -> prometheus        #saddlebrown;text:saddlebrown : http
+prometheus - -> backgate          #saddlebrown;text:saddlebrown : http
+prometheus - -> microservice      #saddlebrown;text:saddlebrown : http
+prometheus - -> core_microservice #saddlebrown;text:saddlebrown : http
+prometheus - -> kubegres          #saddlebrown;text:saddlebrown : http
+@enduml
+
+@startuml
+actor user as user #lightpink;line:darkred;text:darkred
+
+cloud       "frontgate"     as frontgate    #lavender;line:darkviolet;text:darkviolet
+cloud       "backgate"      as backgate     #lavender;line:darkviolet;text:darkviolet
+collections "microservices" as microservice #lavender;line:darkviolet;text:darkviolet
+
+cloud       "core frontgate"     as core_frontgate    #aliceblue;line:darkblue;text:darkblue
+cloud       "core backgate"      as core_backgate     #aliceblue;line:darkblue;text:darkblue
+collections "core microservices" as core_microservice #lavender;line:darkviolet;text:darkviolet
+
+card        "kubegres"   as kubegres   #bisque;line:saddlebrown;text:saddlebrown
+card        "prometheus" as prometheus #bisque;line:saddlebrown;text:saddlebrown
+card        "grafana"    as grafana    #bisque;line:saddlebrown;text:saddlebrown
+collections "gRPC UI"    as grpcui     #bisque;line:saddlebrown;text:saddlebrown
+
+user      - -> frontgate         #saddlebrown;text:saddlebrown : https
+frontgate - -> backgate          #darkviolet;text:darkviolet   : "grpc-web"
+backgate  - -> core_microservice #darkviolet;text:darkviolet   : gGRPC
+backgate  - -> microservice      #darkviolet;text:darkviolet   : gGRPC
+
+core_frontgate ^- - frontgate #darkblue
+core_backgate  ^- - backgate  #darkblue
+
+backgate          - -> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+microservice      - -> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+core_microservice - -> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
+
+user   - -> grpcui            #saddlebrown;text:saddlebrown : https
+grpcui - -> backgate          #saddlebrown;text:saddlebrown : gGRPC
+grpcui - -> microservice      #saddlebrown;text:saddlebrown : gGRPC
+grpcui - -> core_microservice #saddlebrown;text:saddlebrown : gGRPC
+
+user       - -> grafana           #saddlebrown;text:saddlebrown : https
+grafana    - -> prometheus        #saddlebrown;text:saddlebrown : http
+prometheus - -> backgate          #saddlebrown;text:saddlebrown : http
+prometheus - -> microservice      #saddlebrown;text:saddlebrown : http
+prometheus - -> core_microservice #saddlebrown;text:saddlebrown : http
+prometheus - -> kubegres          #saddlebrown;text:saddlebrown : http
+@enduml
+
+PlantUML version 1.2021.15(Tue Nov 30 17:45:34 CET 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: Cp1252
+Language: en
+Country: US
+--></g></svg>
