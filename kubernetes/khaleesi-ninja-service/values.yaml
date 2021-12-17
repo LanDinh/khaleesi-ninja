@@ -15,7 +15,7 @@ type:
 # Kubernetes.
 ingress:
   enabled: false
-  #path: "required path"
+  path: "/"
   regex_path: false
   port: "service"
 

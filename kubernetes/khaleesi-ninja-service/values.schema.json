@@ -95,7 +95,10 @@
         }
       },
       "required": [
-        "enabled"
+        "enabled",
+        "path",
+        "regex_path",
+        "port"
       ]
     },
     "kubegres": {
@@ -124,6 +127,7 @@
         }
       },
       "required": [
+        "enabled",
         "replicas",
         "size",
         "image",
@@ -207,7 +211,8 @@
         }
       },
       "required": [
-        "enabled"
+        "enabled",
+        "envoy_version"
       ]
     },
     "grpcui": {
@@ -224,7 +229,8 @@
         }
       },
       "required": [
-        "enabled"
+        "enabled",
+        "version"
       ]
     }
   },

@@ -58,6 +58,7 @@
         }
       },
       "required": [
+        "enabled",
         "replicas",
         "size",
         "image",

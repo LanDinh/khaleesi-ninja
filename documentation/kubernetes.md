@@ -43,6 +43,12 @@ The configuration consists of four parts, all of which must be specified when in
 The combination of these parts must provide valid input for the helm charts.
 They are passed in in reverse order, so that more generic configuration can override specific configuration (e.g. in `development`, only a single replica is required per service).
 
+### `khaleesi-ninja-cluster`
+
+This contains basic resources that are shared cluster-wide:
+
+* third-party grafana dashboards
+
 ### `khaleesi-ninja-environment`
 
 This contains basic resources necessary for the ecosystem to work:
@@ -53,6 +59,14 @@ This contains basic resources necessary for the ecosystem to work:
 * default configuration to use for `kubegres` - this includes:
   * SQL script to install extensions, create users & databases
   * SQL script to apply user permissions
+  
+Additionally, the following resources are necessary for monitoring:
+
+* prometheus instance
+* service account & role binding for prometheus
+* service & service monitor for prometheus
+* grafana datasource for the prometheus instance
+* grafana custom dashboards
     
 ### `khaleesi-ninja-gate`
 
@@ -74,6 +88,7 @@ This contains manifests necessary for the services to work:
 * deployment
 * service
 * ingress (if required)
+* service monitor for monitoring
 * development credentials if required - this includes:
   * `django` secret key
 
