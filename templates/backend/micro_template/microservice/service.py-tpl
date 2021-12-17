@@ -1,4 +1,4 @@
-"""{{ project_name }} Service"""
+"""{{ project_name }} service"""
 
 # gRPC.
 import grpc

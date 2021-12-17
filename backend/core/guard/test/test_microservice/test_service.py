@@ -1,4 +1,4 @@
-"""Test the core backgate service."""
+"""Test the core guard service."""
 
 # Python.
 from unittest.mock import MagicMock
@@ -12,7 +12,7 @@ from microservice.service import Service
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 
 
-class CoreBackgateServiceTestCase(TransactionTestCase):
+class CoreGuardServiceTestCase(TransactionTestCase):
   """Test the core backgate service."""
 
   databases = {'read', 'write'}

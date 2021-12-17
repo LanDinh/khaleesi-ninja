@@ -1,4 +1,4 @@
-"""Core Backgate Service"""
+"""core-backgate service"""
 
 # gRPC.
 import grpc

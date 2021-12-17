@@ -2,7 +2,7 @@ type:
   name: "backgate"
 ingress:
   enabled: true
-  path: "/khaleesi.(core|api).GateKeeper"
+  path: "/khaleesi\.(core|api)\.backgate\.[a-zA-Z0-9]+"
   regex_path: true
   port: "grpc-web-envoy"
 kubegres:

@@ -1,4 +1,4 @@
-"""Settings for core_guard."""
+"""Settings for core-guard."""
 
 # khaleesi-ninja.
 from khaleesi.core.settings.khaleesi import  *  # pylint: disable=wildcard-import,unused-wildcard-import

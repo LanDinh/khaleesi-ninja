@@ -1,4 +1,4 @@
-"""Core backgate models."""
+"""core-backgate models."""
 
 from django.db import models
 
