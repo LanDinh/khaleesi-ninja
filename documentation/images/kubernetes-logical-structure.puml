@@ -12,8 +12,10 @@ cloud       "core backgate"      as core_backgate     #aliceblue;line:darkblue;t
 collections "core microservices" as core_microservice #lavender;line:darkviolet;text:darkviolet
 
 ' 3RD PARTY
-artifact    "kubegres" as kubegres #bisque;line:saddlebrown;text:saddlebrown
-collections "gRPC UI"  as grpcui   #bisque;line:saddlebrown;text:saddlebrown
+card        "kubegres"   as kubegres   #bisque;line:saddlebrown;text:saddlebrown
+card        "prometheus" as prometheus #bisque;line:saddlebrown;text:saddlebrown
+card        "grafana"    as grafana    #bisque;line:saddlebrown;text:saddlebrown
+collections "gRPC UI"    as grpcui     #bisque;line:saddlebrown;text:saddlebrown
 
 ' gate connections
 user      --> frontgate         #saddlebrown;text:saddlebrown : https
@@ -32,7 +34,15 @@ core_microservice --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
 
 ' grpcui connection
 user   --> grpcui            #saddlebrown;text:saddlebrown : https
-grpcui <-- backgate          #darkviolet;text:darkviolet   : gGRPC
-grpcui <-- microservice      #darkviolet;text:darkviolet   : gGRPC
-grpcui <-- core_microservice #darkviolet;text:darkviolet   : gGRPC
+grpcui --> backgate          #saddlebrown;text:saddlebrown : gGRPC
+grpcui --> microservice      #saddlebrown;text:saddlebrown : gGRPC
+grpcui --> core_microservice #saddlebrown;text:saddlebrown : gGRPC
+
+' prometheus connection
+user       --> grafana           #saddlebrown;text:saddlebrown : https
+grafana    --> prometheus        #saddlebrown;text:saddlebrown : http
+prometheus --> backgate          #saddlebrown;text:saddlebrown : http
+prometheus --> microservice      #saddlebrown;text:saddlebrown : http
+prometheus --> core_microservice #saddlebrown;text:saddlebrown : http
+prometheus --> kubegres          #saddlebrown;text:saddlebrown : http
 @enduml

@@ -15,6 +15,8 @@ It calls its own `microservices` as well as the `core microservices` to serve co
 Both the `backgates` and `microservices` have access to the `postgres` database deployed by `kubegres`.
 They also expose their API via `gRPC UI`.
 
+One `prometheus` instance scrapes metrics from everywhere, and they are available via `grafana` dashboards.
+
 ### Conventions
 
 | Port | Use                     |
