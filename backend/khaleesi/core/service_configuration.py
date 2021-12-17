@@ -26,6 +26,6 @@ class ServiceConfiguration(Generic[Service]):
 
     def register_service(server: Server) -> None:
       """Register the service to the server."""
-      add_service_to_server(service, server)
+      add_service_to_server(service, server)  # pragma: no cover
 
     self.register_service = register_service
