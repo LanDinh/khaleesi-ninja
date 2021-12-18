@@ -6,9 +6,17 @@ import "google/protobuf/timestamp.proto";
 import "core.proto";
 
 
+message Grpc {
+  string khaleesi_gate    = 1;
+  string khaleesi_service = 2;
+  string grpc_service     = 3;
+  string grpc_method      = 4;
+}
+
+
 message GenericMetadata {
   google.protobuf.Timestamp timestamp = 1;
-  khaleesi.core.Grpc        logger    = 2;
+  Grpc                      logger    = 2;
 }
 
 

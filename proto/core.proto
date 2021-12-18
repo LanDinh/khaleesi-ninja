@@ -5,10 +5,3 @@ package khaleesi.core;
 message User {
   string id = 1;
 }
-
-message Grpc {
-  string khaleesi_gate    = 1;
-  string khaleesi_service = 2;
-  string grpc_service     = 3;
-  string grpc_method      = 4;
-}
