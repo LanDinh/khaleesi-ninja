@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package khaleesi.core.guard;
+
+import "google/protobuf/timestamp.proto";
+import "core.proto";
+
+
+message GenericMetadata {
+  google.protobuf.Timestamp timestamp = 1;
+  khaleesi.core.Grpc        logger    = 2;
+}
+
+
+message Event {
+
+  message Target {
+    string             type  = 1;
+    string             id    = 2;
+    khaleesi.core.User owner = 3;
+  }
+
+  message Origin {
+    oneof origin {
+      khaleesi.core.User user   = 1;
+      string             system = 2;
+    }
+  }
+
+  message Action {
+    enum ActionType {
+      UNKNOWN = 0;
+      CREATE  = 1;
+      READ    = 2;
+      UPDATE  = 3;
+      DELETE  = 4;
+      ACT     = 5;
+    }
+
+    ActionType type        = 1;
+    string     action      = 2;
+    string     result      = 3;
+    string     description = 4;
+  }
+
+  GenericMetadata metadata = 1;
+  Target          target   = 2;
+  Origin          origin   = 3;
+  Action          action   = 4;
+}
+
+message LogResponse {}
+
+service Sawyer {
+  rpc LogEvent (Event) returns (LogResponse);
+}
