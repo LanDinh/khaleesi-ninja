@@ -24,7 +24,7 @@ message Event {
 
   message Target {
     string             type  = 1;
-    string             id    = 2;
+    int64              id    = 2;
     khaleesi.core.User owner = 3;
   }
 
