@@ -20,6 +20,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
     # Prepare data.
     initial_value = self._get_counter_value()
     # Execute test.
+    # noinspection PyTypeChecker
     self.interceptor.intercept(MagicMock(), MagicMock(), MagicMock(), MagicMock())
     # Assert result.
     self.assertEqual(initial_value + 1, self._get_counter_value())

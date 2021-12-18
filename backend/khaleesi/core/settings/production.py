@@ -1,6 +1,7 @@
 """Base settings for backend services."""
 
 # Python.
+# noinspection PyUnresolvedReferences
 from os import environ
 
 # khaleesi.ninja.

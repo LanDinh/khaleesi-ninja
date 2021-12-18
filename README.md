@@ -46,7 +46,7 @@ The general deployment is done with:
 
 Other infrastructure consists of:
 
-![kube-promethus badge](https://img.shields.io/badge/kube--prometheus-v0.9-informational)
+![kube-prometheus badge](https://img.shields.io/badge/kube--prometheus-v0.9-informational)
 
 | Service Type     | General | Infrastructure | Development |
 | ---------------- | ------- | -------------- | ----------- |

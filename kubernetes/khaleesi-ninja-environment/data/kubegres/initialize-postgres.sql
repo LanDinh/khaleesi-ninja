@@ -21,6 +21,7 @@ END
 $$ LANGUAGE plpgsql;
 
 
+-- noinspection SyntaxError
 SELECT pg_temp.create_users_and_database(
     :'superUser', :'superUserPassword',
     :'writeUser', :'writePassword',
