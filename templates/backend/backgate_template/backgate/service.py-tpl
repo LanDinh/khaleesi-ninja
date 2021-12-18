@@ -4,9 +4,10 @@
 import grpc
 
 # khaleesi-ninja.
-from microservice.models import SomeModel
+from khaleesi.core.service_configuration import ServiceConfiguration
 from khaleesi.proto.{{ project_name }}_pb2 import DESCRIPTOR, SomeRequest, SomeResponse
 from khaleesi.proto.{{ project_name }}_pb2_grpc import SomeStub, SomeServicer, add_SomeServicer_to_server
+from microservice.models import SomeModel
 
 
 class Service(SomeServicer):
@@ -17,13 +18,11 @@ class Service(SomeServicer):
     channel = grpc.insecure_channel("some-micro-service:8000")
     client = SomeStub(channel)
     response = client.SomeMethod(request)
-    return SomeReponse()
+    return SomeResponse()
 
 
-def register_handler(server: grpc.Server) -> None :
-  """Register the handler."""
-  add_SomeServicer_to_server(Service(), server)  # type: ignore[no-untyped-call]
-
-full_name = DESCRIPTOR.services_by_name['GateKeeper'].full_name
-
-service_configuration = (full_name, register_handler)
+service_configuration = ServiceConfiguration[Service](
+  name = DESCRIPTOR.services_by_name['SomeService'].full_name,
+  add_service_to_server = add_SomeServicer_to_server,
+  service = Service()
+)
