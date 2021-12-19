@@ -7,9 +7,9 @@ from unittest.mock import MagicMock
 from django.test import TransactionTestCase
 
 # khaleesi.ninja.
+from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 from microservice.models import TestModel
 from microservice.service import Service
-from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 
 
 class CoreGuardServiceTestCase(TransactionTestCase):
