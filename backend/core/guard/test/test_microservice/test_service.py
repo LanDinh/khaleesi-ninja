@@ -3,10 +3,8 @@
 # Python.
 from unittest.mock import MagicMock
 
-# Django.
-from django.test import TransactionTestCase
-
 # khaleesi.ninja.
+from khaleesi.core.test_util import TransactionTestCase
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 from microservice.models import TestModel
 from microservice.service import Service

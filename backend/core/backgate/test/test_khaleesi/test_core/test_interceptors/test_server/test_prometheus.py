@@ -3,11 +3,9 @@
 # Python.
 from unittest.mock import MagicMock
 
-# Django.
-from django.test import SimpleTestCase
-
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
+from khaleesi.core.test_util import SimpleTestCase
 
 
 class PrometheusServerInterceptorTest(SimpleTestCase):

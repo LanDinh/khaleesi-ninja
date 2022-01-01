@@ -6,11 +6,9 @@ from unittest.mock import MagicMock, patch
 # Grpc.
 import grpc
 
-# Django.
-from django.test import TransactionTestCase
-
 # khaleesi.ninja.
 from core.service import Service
+from khaleesi.core.test_util import TransactionTestCase
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 
 

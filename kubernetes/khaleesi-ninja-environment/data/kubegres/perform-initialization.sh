@@ -18,7 +18,7 @@ fi
 
 if [[ $# -eq 1 ]] && [[ "${1}" == "drop_database" ]]; then
   echo -e "${magenta}Dropping database...${clear_color}"
-  dropdb --if-exists "${KHALEESI_DATABASE_NAME}"
+  dropdb --if-exists --force "${KHALEESI_DATABASE_NAME}"
 fi
 
 
