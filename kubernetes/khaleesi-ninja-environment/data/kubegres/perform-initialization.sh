@@ -16,6 +16,11 @@ if [[ "${CI:-false}" == "true" ]]; then
   export TERM=xterm-color
 fi
 
+if [[ $# -eq 1 ]] && [[ "${1}" == "drop_database" ]]; then
+  echo -e "${magenta}Dropping database...${clear_color}"
+  dropdb --if-exists "${KHALEESI_DATABASE_NAME}"
+fi
+
 
 echo -e "${magenta}Creating users and database...${clear_color}"
 psql -a -f /config/initialize-postgres.sql \

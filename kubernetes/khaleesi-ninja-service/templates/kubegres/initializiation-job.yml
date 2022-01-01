@@ -16,7 +16,7 @@ spec:
       containers:
         - name: create-user-and-database
           image: {{ .Values.kubegres.image }}
-          command: [ "bin/bash", "/config/perform-initialization.sh" ]
+          command: [ "bin/bash", "/config/perform-initialization.sh"{{ if .Values.service.drop_database }}, "drop_database"{{ end }} ]
           volumeMounts:
             - name: kubegres-initialization
               readOnly: true

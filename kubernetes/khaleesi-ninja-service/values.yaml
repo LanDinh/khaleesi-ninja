@@ -9,6 +9,7 @@ service:
   #version: "required stable version"
   replicas: 1
   image_pull_policy: "Always"
+  drop_database: false
 type:
   #name: "required name"
 

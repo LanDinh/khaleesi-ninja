@@ -21,6 +21,7 @@ fi
 # Options.
 environment=${1}
 current_service_file="./data/current_service"
+drop_database=false
 
 
 # Validate environment.
@@ -29,7 +30,7 @@ current_service_file="./data/current_service"
 
 # Check if interactive mode.
 services=("${@:2}")
-if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
+if { [[ $# -eq 2 ]] || [[ $# -eq 3 ]]; } && [[ "${2}" == "current_service" ]]; then
   if [[ ! -f "${current_service_file}" ]]; then
       . ./scripts/development/switch_current_service.sh
   fi
@@ -37,6 +38,10 @@ if [[ $# -eq 2 ]] && [[ "${2}" == "current_service" ]]; then
     read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
     services=("${line[@]}")
   done <${current_service_file}
+
+  if [[ $# -eq 3 ]] && [[ "${3}" == "drop_database" ]]; then
+    drop_database=true
+  fi
 fi
 
 
@@ -59,7 +64,8 @@ deploy_service() {
     --values "kubernetes/configuration/service/${gate}/${service}.yml" \
     --values "kubernetes/configuration/type/${type}.yml" \
     --values "kubernetes/configuration/gate/${gate}.yml" \
-    --values "kubernetes/configuration/environment/${environment}.yml"
+    --values "kubernetes/configuration/environment/${environment}.yml" \
+    --set service.drop_database="${drop_database}"
 
   if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
     local container_mode=production
