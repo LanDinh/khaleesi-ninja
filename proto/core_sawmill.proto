@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package khaleesi.core.guard;
+package khaleesi.core.sawmill;
 
 import "google/protobuf/timestamp.proto";
 import "core.proto";
@@ -14,7 +14,7 @@ message Grpc {
 }
 
 
-message GenericMetadata {
+message Metadata {
   google.protobuf.Timestamp timestamp = 1;
   Grpc                      logger    = 2;
 }
@@ -37,28 +37,44 @@ message Event {
 
   message Action {
     enum ActionType {
-      UNKNOWN = 0;
-      CREATE  = 1;
-      READ    = 2;
-      UPDATE  = 3;
-      DELETE  = 4;
-      ACT     = 5;
+      UNKNOWN_ACTION = 0;
+      CREATE         = 1;
+      READ           = 2;
+      UPDATE         = 3;
+      DELETE         = 4;
+      CUSTOM         = 5;
     }
 
-    ActionType type        = 1;
-    string     action      = 2;
-    string     result      = 3;
-    string     description = 4;
+    enum ResultType {
+      UNKNOWN_RESULT = 0;
+      SUCCESS        = 1;
+      WARNING        = 2;
+      ERROR          = 3;
+    }
+
+    ActionType crud_type   = 1;
+    string     custom_type = 2;
+    ResultType result      = 3;
+    string     details     = 4;
   }
 
-  GenericMetadata metadata = 1;
+  Metadata metadata = 1;
   Target          target   = 2;
   Origin          origin   = 3;
   Action          action   = 4;
 }
 
-message LogResponse {}
+message LogResponse {
+  enum ResultType {
+    UNKNOWN       = 0;
+    SUCCESS       = 1;
+    PARSING_ERROR = 2;
+    FATAL_ERROR   = 3;
+  }
+  ResultType result = 1;
+  string     errors = 2;
+}
 
-service Sawyer {
+service Sawmill {
   rpc LogEvent (Event) returns (LogResponse);
 }

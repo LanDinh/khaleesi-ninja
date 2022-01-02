@@ -1,4 +1,4 @@
-"""core-backgate service"""
+"""core-backgate service."""
 
 # gRPC.
 import grpc
@@ -10,7 +10,7 @@ from khaleesi.proto.core_backgate_pb2_grpc import GateKeeperStub, GateKeeperServ
 
 
 class Service(GateKeeperServicer):
-  """Core Backgate Service"""
+  """core-backgate service."""
 
   def SayHello(self, request: SayHelloRequest, _: grpc.ServicerContext) -> SayHelloResponse :  # pylint: disable=invalid-name,no-self-use
     """Says hello."""

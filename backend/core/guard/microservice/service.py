@@ -1,4 +1,4 @@
-"""core-guard Service"""
+"""core-guard service."""
 
 # gRPC.
 import grpc
@@ -11,7 +11,7 @@ from microservice.models import TestModel
 
 
 class Service(GateKeeperServicer):
-  """Core Backgate Service"""
+  """core-guard service."""
 
   def SayHello(self, request: SayHelloRequest, _: grpc.ServicerContext) -> SayHelloResponse :
     """Says hello."""

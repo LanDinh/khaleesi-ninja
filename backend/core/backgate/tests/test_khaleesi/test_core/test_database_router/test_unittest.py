@@ -19,7 +19,7 @@ class DatabaseRouterTestCase(SimpleTestCase):
       with self.subTest(app = app.name):
         # Prepare data.
         count = 0
-        # Execute tests.
+        # Execute test.
         for database in ['read', 'write']:
           result = self.database_router.allow_migrate(database, app.name)
           if result:

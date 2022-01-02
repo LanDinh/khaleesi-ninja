@@ -1,4 +1,4 @@
-"""{{ project_name }} service"""
+"""{{ project_name }} service."""
 
 # gRPC.
 import grpc
@@ -11,7 +11,7 @@ from microservice.models import SomeModel
 
 
 class Service(SomeServicer):
-  """{{ project_name }} Service"""
+  """{{ project_name }} service."""
 
   def SomeMethod(self, request: SomeRequest, _: grpc.ServicerContext) -> SomeResponse :
     """Does something."""
