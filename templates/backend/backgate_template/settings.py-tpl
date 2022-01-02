@@ -1,8 +1,9 @@
 """Settings for {{ project_name }}."""
 
+# pylint: disable=undefined-variable
+
 # khaleesi-ninja.
 from core.backgate_settings import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
-
-INSTALLED_APPS.append('microservice')  # pylint: disable=undefined-variable
-KHALEESI_NINJA['GRPC_HANDLERS'].append('microservice.service')  # pylint: disable=undefined-variable
+INSTALLED_APPS.append('microservice')
+KHALEESI_NINJA['GRPC_HANDLERS'].append('microservice.service')
