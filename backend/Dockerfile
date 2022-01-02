@@ -97,7 +97,7 @@ WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
 COPY ./execute_production.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
 
 # Data.
-RUN rm -r test
+RUN rm -r tests
 
 ################################################################################
 #                               Production Image                               #
