@@ -58,15 +58,29 @@ Other infrastructure consists of:
 
 The folder structure is as follows:
 
-* `.github` CI related configuration - [documentation](documentation/ci.md)
-* `backend` The code for the backgates and microservices. They are grouped by gate. One `django` project per service - [documentation](documentation/backend.md)
+* `backend` The code for the backgates and microservices. They are grouped by gate. One `django` project per service.
+* `.github` CI related configuration - [documentation](documentation/folder-structure/ci.md)
 * `data` Lists of things (e.g. services, environments etc.) in json formats
 * `documentation` A bunch of markdown files to document everything
-* `frontgate` The code for the frontgates. One `react` project per frontgate - [documentation](documentation/frontgate.md)
-* `kubernetes` Kubernetes related configuration - [documentation](documentation/kubernetes.md)
+* `frontgate` The code for the frontgates. One `react` project per frontgate.
+* `kubernetes` Kubernetes related configuration - [documentation](documentation/folder-structure/kubernetes.md)
 * `proto` Protobuf definitions
-* `scripts` Utility scripts - [documentation](documentation/scripts.md)
-* `templates` Templates used when creating new services - [documentation](documentation/templates.md)
+* `scripts` Utility scripts - [documentation](documentation/folder-structure/scripts.md)
+* `templates` Templates used when creating new services - [documentation](documentation/folder-structure/templates.md)
+
+The logical structure is as follows: 
+
+* Each `gate` covers a specific group of use cases, and they all contain the following elements:
+  * A `frontgate` which serves a SPA to browsers.
+    To create a new `frontgate`, use its [custom template](/templates/frontgate/cra-template-khaleesi-ninja-frontgate)
+  * A `backgate` which serves as entry point into the backend system.
+    The `frontgate` communicates with the `backgate` via `grpc-web`
+    To create a new `backgate`, use its [custom template](/templates/backend/backgate_template)
+  * Multiple microservices, which encapsulate different functions from each other.
+    They communicate with each other and the `backgate` via `grpc`.
+    To create a new microservice, use its [custom template](/templates/backend/micro_template)
+* The different gates are:
+  * `core`: bundle common logic - [documentation](/documentation/logical-structure/core.md)
 
 ### Starting the ecosystem locally
 

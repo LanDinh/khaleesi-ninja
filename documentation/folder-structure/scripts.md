@@ -21,11 +21,13 @@ Install all necessary controllers to the given cluster:
 
 Install all necessary elements of the given environment as well as all gates - see the [kubernetes documentation](kubernetes.md) for details.
 
-### `deploy.sh ENVIRONMENT [INTERACTIVE | (GATE SERVICE TYPE VERSION DEPLOY)]`
+### `deploy.sh ENVIRONMENT [current_service [drop_database] | (GATE SERVICE TYPE VERSION DEPLOY)]`
 
 If no service was specified, this affects all services.
 If `current_service` was specified, `./scripts/data/current_service` is used as input.
 If this file doesn't exist, `./scripts/development/swich_current_service.sh` is called to create it.
+If `drop_database` was specified additionally, it will completely wipe the database and re-apply all migrations.
+
 If `GATE` and `SERVICE` were specified, the specified micro service is affected.
 
 This applies the manifests for the given service - see the [kubernetes documentation](kubernetes.md) for details.
@@ -43,7 +45,7 @@ It will be put into the folder `letsencrypt` - note that this folder is listed i
 
 ## `development` folder
 
-### `test.sh [INTERACTIVE | (GATE SERVICE TYPE VERSION DEPLOY)]`
+### `test.sh [current_service | (GATE SERVICE TYPE VERSION DEPLOY)]`
 
 If no service was specified, this affects all services.
 If `current_service` was specified, `./scripts/data/current_service` is used as input.
@@ -97,7 +99,7 @@ For microservices, it will additionally create the following:
 
 Of course, you should thoroughly review the `git` diff before committing anything to source control.
 
-The `templates` folder contains the data necessary for this script to work and is documented [here](/documentation/templates.md).
+The `templates` folder contains the data necessary for this script to work and is documented [here](/documentation/folder-structure/templates.mdture/templates.md).
 
 ## `util` folder
 

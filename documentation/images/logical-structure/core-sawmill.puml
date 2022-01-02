@@ -1,0 +1,46 @@
+@startuml
+' ********************************************* STYLE **********************************************
+<style>
+agent {
+  BackgroundColor lavender
+  LineColor darkviolet
+  FontColor darkviolet
+}
+rectangle {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+</style>
+
+' ******************************************** OBJECTS *********************************************
+agent metadata[
+  Metadata
+  ====
+  meta_event_timestamp
+  meta_logged_timestamp
+  ----
+  meta_logger_khaleesi_gate
+  meta_logger_khaleesi_service
+  meta_logger_grpc_service
+  meta_logger_grpc_method
+]
+rectangle event [
+  Event
+  ====
+  target_type
+  target_id
+  target_owner
+  ----
+  origin_user
+  origin_system
+  ----
+  action_type
+  action_result
+  action_details
+]
+
+' ******************************************* RELATIONS ********************************************
+metadata ^-- event #darkviolet;text:darkviolet
+
+@enduml

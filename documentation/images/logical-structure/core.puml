@@ -1,0 +1,34 @@
+@startuml
+' ********************************************* STYLE **********************************************
+<style>
+agent {
+  BackgroundColor lavender
+  LineColor darkviolet
+  FontColor darkviolet
+}
+rectangle {
+  BackgroundColor bisque
+  LineColor saddlebrown
+  FontColor saddlebrown
+}
+</style>
+
+' ******************************************** OBJECTS *********************************************
+agent frontgate
+agent backgate
+rectangle guard
+rectangle sawmill [
+  Sawmill
+  ====
+  log event
+]
+
+' ******************************************* RELATIONS ********************************************
+frontgate --> backgate #darkviolet;text:darkviolet : contact backgate
+
+backgate --> guard #saddlebrown;text:saddlebrown : access permissions
+
+backgate --> sawmill #saddlebrown;text:saddlebrown : logging
+guard    --> sawmill #saddlebrown;text:saddlebrown : logging
+
+@enduml

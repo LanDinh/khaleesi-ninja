@@ -2,7 +2,7 @@
 
 ## Logical Structure
 
-![Kubernetes Logical Structure](/documentation/images/kubernetes-logical-structure.svg)
+![Kubernetes Logical Structure](/documentation/images/folder-structure/kubernetes-logical-structure.svg)
 
 Each gate has the same base structure within kubernetes.
 
