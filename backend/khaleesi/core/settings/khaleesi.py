@@ -27,10 +27,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # khaleesi.ninja
 KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSettings(
   METADATA = definition.KhaleesiNinjaMetadata(
-    GATE    = environ.get('KHALEESI_GATE'),
-    SERVICE = environ.get('KHALEESI_SERVICE'),
+    GATE    = environ['KHALEESI_GATE'],
+    SERVICE = environ['KHALEESI_SERVICE'],
     TYPE    = definition.KhaleesiNinjaServiceType.MICRO,
-    VERSION = environ.get('KHALEESI_VERSION'),
+    VERSION = environ['KHALEESI_VERSION'],
   ),
   GRPC = definition.KhaleesiNinjaGrpc(
     PORT     = cast(int, environ.get('PORT', 8000)),
