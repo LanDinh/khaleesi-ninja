@@ -20,9 +20,10 @@ from prometheus_client import start_http_server  # type: ignore[import] # https:
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
+from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 
 
-khaleesi_settings = settings.KHALEESI_NINJA
+khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 
 
 class Command(BaseCommand):
