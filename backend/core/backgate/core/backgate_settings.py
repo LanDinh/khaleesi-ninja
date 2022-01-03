@@ -5,4 +5,4 @@ from khaleesi.core.settings.khaleesi import  *  # pylint: disable=wildcard-impor
 
 
 INSTALLED_APPS.append('core')  # pylint: disable=undefined-variable
-KHALEESI_NINJA['GRPC_HANDLERS'].append('core.service')  # pylint: disable=undefined-variable
+KHALEESI_NINJA['GRPC']['HANDLERS'].append('core.service')  # pylint: disable=undefined-variable

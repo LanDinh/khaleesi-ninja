@@ -22,14 +22,29 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # khaleesi.ninja.
+class KhaleesiNinjaGrpc(TypedDict):
+  """Grpc configuration for khaleesi.ninja services."""
+
+  PORT        : int
+  HANDLERS    : List[str]
+
+class KhaleesiNinjaMonitoring(TypedDict):
+  """Grpc configuration for khaleesi.ninja services."""
+
+  PORT        : int
+
 class KhaleesiNinjaSettings(TypedDict):
   """Custom khaleesi.ninja settings."""
-  PORT: int
-  METRICS_PORT: int
-  GRPC_HANDLERS: List[str]
+
+  GRPC      : KhaleesiNinjaGrpc
+  MONITORING: KhaleesiNinjaMonitoring
 
 KHALEESI_NINJA: KhaleesiNinjaSettings = KhaleesiNinjaSettings(
-  PORT = cast(int, environ.get('PORT', 8000)),
-  METRICS_PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),
-  GRPC_HANDLERS = [],
+  GRPC = KhaleesiNinjaGrpc(
+    PORT         = cast(int, environ.get('PORT', 8000)),
+    HANDLERS     = [],
+  ),
+  MONITORING = KhaleesiNinjaMonitoring(
+    PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),
+  ),
 )

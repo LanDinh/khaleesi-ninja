@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
   def add_arguments(self, parser: CommandParser) -> None :
     parser.add_argument(
-      'address', nargs = '?', default = f'[::]:{khaleesi_settings["PORT"]}',
+      'address', nargs = '?', default = f'[::]:{khaleesi_settings["GRPC"]["PORT"]}',
       help = 'Optional address for which to open a port.'
     )
     parser.add_argument(
@@ -56,7 +56,7 @@ class Command(BaseCommand):
     server.add_insecure_port(options['address'])
     self.stdout.write(f'Starting gRPC server at {options["address"]}...')
     server.start()
-    start_http_server(int(khaleesi_settings['METRICS_PORT']))
+    start_http_server(int(khaleesi_settings['MONITORING']['PORT']))
 
     def handle_sigterm(*_: Any) -> None :
       """Shutdown gracefully."""
@@ -73,7 +73,7 @@ class Command(BaseCommand):
     """
     Attempt to import a class from a string representation.
     """
-    raw_handlers = khaleesi_settings['GRPC_HANDLERS']
+    raw_handlers = khaleesi_settings['GRPC']['HANDLERS']
     service_names = [reflection.SERVICE_NAME]
     for raw_handler in raw_handlers:
       handler = f'{raw_handler}.service_configuration'
