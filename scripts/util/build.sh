@@ -38,7 +38,14 @@ fi
 
 
 echo -e "${yellow}Building the image khaleesi-ninja/${gate}/${service} for ${container_mode}...${clear_color}"
-docker build "${location}" --build-arg gate="${gate}" --build-arg service="${service}" --build-arg version="${version}" --build-arg frontgate_version="${frontgate_version}" --target "${container_mode}" -t "khaleesi-ninja/${gate}/${service}:latest" -t "khaleesi-ninja/${gate}/${service}:${version}"
+docker build "${location}" \
+  --build-arg gate="${gate}" \
+  --build-arg service="${service}" \
+  --build-arg version="${version}" \
+  --build-arg frontgate_version="${frontgate_version}" \
+  --target "${container_mode}" \
+  -t "khaleesi-ninja/${gate}/${service}:latest" \
+  -t "khaleesi-ninja/${gate}/${service}:${version}"
 
 echo -e "${yellow}Cleaning up dangling images...${clear_color}"
 docker image prune -f

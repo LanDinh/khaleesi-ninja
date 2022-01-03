@@ -6,9 +6,11 @@ FROM python:3.10-slim as base
 # Arguments & environment.
 ARG gate
 ARG service
+ARG version
 ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Prerequisites.
@@ -35,9 +37,11 @@ FROM base as development-base
 # Arguments & environment.
 ARG gate
 ARG service
+ARG version
 ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
@@ -60,9 +64,11 @@ RUN apt-get update && apt-get install -y postgresql
 # Arguments & environment.
 ARG gate
 ARG service
+ARG version
 ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 ENV KHALEESI_DEBUG=true
 ENV KHALEESI_METRICS_PORT=8020
@@ -87,9 +93,11 @@ FROM base as production-base
 # Arguments & environment.
 ARG gate
 ARG service
+ARG version
 ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
@@ -111,9 +119,11 @@ RUN apt-get update && apt-get install -y postgresql
 # Arguments & environment.
 ARG gate
 ARG service
+ARG version
 ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
+ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 ENV KHALEESI_METRICS_PORT=8020
 ENV PORT=8000
