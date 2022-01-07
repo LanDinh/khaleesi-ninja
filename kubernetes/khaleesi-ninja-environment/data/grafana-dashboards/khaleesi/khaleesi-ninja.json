@@ -22,56 +22,117 @@
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1639424284341,
   "links": [],
-  "liveNow": false,
+  "liveNow": true,
   "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "panels": [],
+      "title": "Instances",
+      "type": "row"
+    },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
-          "mappings": [],
-          "min": 0,
-          "thresholds": {
-            "mode": "percentage",
-            "steps": [
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "healthy"
+            },
+            "properties": [
               {
-                "color": "super-light-red",
-                "value": null
-              },
-              {
-                "color": "super-light-yellow",
-                "value": 1
-              },
-              {
-                "color": "super-light-green",
-                "value": 100
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
               }
             ]
           },
-          "unit": "none"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "dead"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "unhealthy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "terminating"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "super-light-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 9,
-        "w": 12,
+        "h": 4,
+        "w": 24,
         "x": 0,
-        "y": 0
+        "y": 1
       },
-      "id": 2,
+      "id": 4,
       "options": {
-        "colorMode": "background",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
+        "legend": {
+          "displayMode": "hidden",
+          "placement": "bottom"
+        },
+        "pieType": "donut",
         "reduceOptions": {
           "calcs": [
             "last"
@@ -79,11 +140,158 @@
           "fields": "",
           "values": false
         },
-        "textMode": "name"
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "pluginVersion": "8.3.1",
-      "repeat": "service",
-      "repeatDirection": "v",
+      "repeat": "gate",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": false,
+          "expr": "sum by (khaleesi_health) (khaleesi_health{khaleesi_gate=\"$gate\"})",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_health}}`}}",
+          "refId": "A"
+        }
+      ],
+      "title": "$gate",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: healthy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: unhealthy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: dead"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: terminating"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
       "targets": [
         {
           "datasource": {
@@ -91,19 +299,17 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (name) (up{namespace=~\"khaleesi-ninja-[^-]+\",khaleesi_ninja=\"service\",gate=\"core\"})",
-          "instant": false,
+          "expr": "sum by (khaleesi_health, khaleesi_gate) (khaleesi_health) > 0",
           "interval": "",
-          "legendFormat": "{{`{{name}}`}}",
-          "refId": "up"
+          "legendFormat": "{{`{{khaleesi_gate}}: {{khaleesi_health}}`}}",
+          "refId": "A"
         }
       ],
-      "title": "core",
-      "transformations": [],
-      "type": "stat"
+      "title": "Instance health",
+      "type": "timeseries"
     }
   ],
-  "schemaVersion": 33,
+  "schemaVersion": 34,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -124,6 +330,32 @@
         "regex": "khaleesi-ninja-[^-]+",
         "skipUrlSync": false,
         "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(khaleesi_gate)",
+        "hide": 2,
+        "includeAll": true,
+        "multi": false,
+        "name": "gate",
+        "options": [],
+        "query": {
+          "query": "label_values(khaleesi_gate)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
