@@ -12,4 +12,4 @@ metadata:
     khaleesi_folder: khaleesi/{{ .Values.environment.name }}
 data:
   khaleesi-ninja.json: |
-  {{ .Files.Get "data/grafana-dashboards/khaleesi/khaleesi-ninja.json" | nindent 4 }}
+  {{- tpl ($.Files.Get "data/grafana-dashboards/khaleesi/khaleesi-ninja.json") $ | nindent 4 }}
