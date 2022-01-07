@@ -46,7 +46,7 @@ class EnumMetric(Generic[T]):
     self._metric = Gauge(
       metric_id.name,
       description,
-      list(server_labels.keys()) + [ metric_id.name],
+      list(server_labels.keys()) + [ metric_id.name ],
       registry = REGISTRY,
     )
     self._id = metric_id
@@ -54,9 +54,9 @@ class EnumMetric(Generic[T]):
   def set(self, *, value: T) -> None :
     """Set the metric to the given value."""
     for enum in type(value):
-      self._metric.labels(**server_labels, **{self._id.name: str(enum)}).set(0)
-    self._metric.labels(**server_labels, **{self._id.name: str(value)}).set(1)
+      self._metric.labels(**server_labels, **{self._id.name: enum.name}).set(0)
+    self._metric.labels(**server_labels, **{self._id.name: value.name}).set(1)
 
   def get_value(self, *, value: T) -> int :
     """Return the current value of the metric."""
-    return int(self._metric.labels(**server_labels, **{self._id.name: str(value)})._value.get())  # pylint: disable=protected-access
+    return int(self._metric.labels(**server_labels, **{self._id.name: value.name})._value.get())  # pylint: disable=protected-access
