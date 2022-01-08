@@ -60,6 +60,6 @@ message LogResponse {
   string     errors = 2;
 }
 
-service Sawmill {
+service Lumberjack {
   rpc LogEvent (Event) returns (LogResponse);
 }

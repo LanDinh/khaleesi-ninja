@@ -6,11 +6,15 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.service_configuration import ServiceConfiguration
 from khaleesi.proto.{{ project_name }}_pb2 import DESCRIPTOR, SomeRequest, SomeResponse
-from khaleesi.proto.{{ project_name }}_pb2_grpc import SomeStub, SomeServicer, add_SomeServicer_to_server
+from khaleesi.proto.{{ project_name }}_pb2_grpc import (
+    SomeStub,
+    SomeServicer as Servicer,
+    add_SomeServicer_to_server as add_to_server
+)
 from microservice.models import SomeModel
 
 
-class Service(SomeServicer):
+class Service(Servicer):
   """{{ project_name }} service."""
 
   def SomeMethod(self, request: SomeRequest, _: grpc.ServicerContext) -> SomeResponse :
@@ -23,6 +27,6 @@ class Service(SomeServicer):
 
 service_configuration = ServiceConfiguration[Service](
   name = DESCRIPTOR.services_by_name['SomeService'].full_name,
-  add_service_to_server = add_SomeServicer_to_server,
+  add_service_to_server = add_to_server,
   service = Service()
 )

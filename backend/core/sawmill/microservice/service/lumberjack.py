@@ -9,12 +9,15 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, Event, LogResponse
-from khaleesi.proto.core_sawmill_pb2_grpc import SawmillServicer, add_SawmillServicer_to_server
+from khaleesi.proto.core_sawmill_pb2_grpc import (
+    LumberjackServicer as Servicer,
+    add_LumberjackServicer_to_server as add_to_server
+)
 from microservice.models import Event as DbEvent
 from microservice.models.abstract import Metadata
 
 
-class Service(SawmillServicer):
+class Service(Servicer):
   """core-sawmill service."""
 
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogResponse :
@@ -39,7 +42,7 @@ class Service(SawmillServicer):
 
 
 service_configuration = ServiceConfiguration[Service](
-  name = DESCRIPTOR.services_by_name['Sawmill'].full_name,
-  add_service_to_server = add_SawmillServicer_to_server,
+  name = DESCRIPTOR.services_by_name['Lumberjack'].full_name,
+  add_service_to_server = add_to_server,
   service = Service()
 )
