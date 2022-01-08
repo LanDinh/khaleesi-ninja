@@ -9,4 +9,4 @@ ignore:
   # Backend.
   - backend/*/*/*/migrations/**
   - backend/*/*/settings.py
-  - backend/*/*/test/**
+  - backend/*/*/tests/**
