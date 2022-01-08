@@ -30,3 +30,6 @@ class HealthMetric(EnumMetric[HealthMetricType]):
   def set_terminating(self) -> None :
     """Set to terminating."""
     self.set(value = HealthMetricType.TERMINATING)
+
+
+HEALTH = HealthMetric()
