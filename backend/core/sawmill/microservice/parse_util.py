@@ -18,9 +18,9 @@ def _parse_input(
 ) -> Tuple[Optional[T], str] :
   """Attempt to parse the input."""
   try:
-    if raw is None:
-      return default, ''
-    return parser(raw), ''
+    if raw:
+      return parser(raw), ''
+    return default, ''
   except (TypeError, ValueError) as exception:
     return default, f'{type(exception).__name__} parsing {name}: {str(exception)}.\n'
 
