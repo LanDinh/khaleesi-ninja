@@ -43,6 +43,7 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -121,8 +122,8 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 5,
+        "h": 4,
+        "w": 24,
         "x": 0,
         "y": 1
       },
@@ -144,7 +145,7 @@
           "mode": "single"
         }
       },
-      "repeat": "service",
+      "repeat": "version",
       "repeatDirection": "h",
       "targets": [
         {
@@ -153,14 +154,14 @@
             "uid": "${datasource}"
           },
           "exemplar": false,
-          "expr": "sum by (khaleesi_health) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"})",
+          "expr": "sum by (khaleesi_health) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", khaleesi_version=\"$version\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "{{`{{khaleesi_health}}`}}",
           "refId": "A"
         }
       ],
-      "title": "Instance health",
+      "title": "$version",
       "type": "piechart"
     },
     {
@@ -215,8 +216,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "healthy"
+              "id": "byRegexp",
+              "options": ".*: healthy"
             },
             "properties": [
               {
@@ -230,8 +231,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "unhealthy"
+              "id": "byRegexp",
+              "options": ".*: unhealthy"
             },
             "properties": [
               {
@@ -245,8 +246,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "dead"
+              "id": "byRegexp",
+              "options": ".*: dead"
             },
             "properties": [
               {
@@ -260,8 +261,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "terminating"
+              "id": "byRegexp",
+              "options": ".*: terminating"
             },
             "properties": [
               {
@@ -277,9 +278,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 19,
-        "x": 5,
-        "y": 1
+        "w": 24,
+        "x": 0,
+        "y": 5
       },
       "id": 8,
       "options": {
@@ -299,9 +300,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_health) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}) > 0",
+          "expr": "sum by (khaleesi_health, khaleesi_version) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}) > 0",
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_health}}`}}",
+          "legendFormat": "{{`{{khaleesi_version}}: {{khaleesi_health}}`}}",
           "refId": "A"
         }
       ],
@@ -330,6 +331,32 @@
         "regex": "khaleesi-ninja-[^-]+",
         "skipUrlSync": false,
         "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(khaleesi_version)",
+        "hide": 2,
+        "includeAll": true,
+        "multi": false,
+        "name": "version",
+        "options": [],
+        "query": {
+          "query": "label_values(khaleesi_version)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
