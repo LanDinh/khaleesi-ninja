@@ -48,7 +48,8 @@ make_migrations_container() {
   docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" make_migrations "${app}"
 
   echo -e "${yellow}Copying the migrations...${clear_color}"
-  cp temp/* "backend/${gate}/${service}/${app}/migrations"
+  cp -r temp/* "backend/${gate}/${service}/${app}/migrations"
+  rm -r "backend/${gate}/${service}/${app}/migrations/__pycache__"
 }
 
 
