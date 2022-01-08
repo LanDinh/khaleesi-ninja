@@ -52,14 +52,14 @@ class EnumMetric(Generic[T]):
   def set(self, *, value: T) -> None :
     """Set the metric to the given value."""
     for enum in type(value):
-      self._metric.labels(self._labels(value = enum)).set(0)
-    self._metric.labels(self._labels(value = value)).set(1)
+      self._metric.labels(**self._labels(value = enum)).set(0)
+    self._metric.labels(**self._labels(value = value)).set(1)
 
   def get_value(self, *, value: T) -> int :
     """Return the current value of the metric."""
     # noinspection PyProtectedMember
-    return int(self._metric.labels(self._labels(value = value))._value.get())  # pylint: disable=protected-access
+    return int(self._metric.labels(**self._labels(value = value))._value.get())  # pylint: disable=protected-access
 
   def _labels(self, *, value: T) -> Dict[str, str] :
     """Shortcut to get all labels."""
-    return { **server_labels, **{self._id.name.lower(): value.name.lower()} }
+    return { **server_labels, self._id.name.lower(): value.name.lower() }
