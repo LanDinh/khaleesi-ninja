@@ -8,6 +8,7 @@ set -o pipefail # Make pipes fail
 
 # Colors.
 magenta='\033[0;35m'
+red='\033[0;31m'
 yellow='\033[0;33m'
 green='\033[0;32m'
 clear_color='\033[0m'
@@ -32,9 +33,6 @@ while read -r raw_line; do
   services=("${line[@]}")
 done <${current_service_file}
 
-echo -e "${magenta}Enter app name:${clear_color}"
-read -r app
-
 
 make_migrations_container() {
   local gate=${1}
@@ -54,11 +52,34 @@ make_migrations_container() {
 }
 
 
+echo -e "${magenta}Choose app type:${clear_color}"
+select input_app in microservice core custom; do
+  case $input_app in
+  microservice)
+    app=microservice
+    break
+    ;;
+  core)
+    app=core
+    break
+    ;;
+  custom)
+    echo -e "${magenta}Enter custom app name:${clear_color}"
+    read -r app
+    break
+    ;;
+  *)
+    echo -e "${red}Invalid app type"
+    ;;
+  esac
+done
+
+
 echo -e "${magenta}Cleaning up old files and create mount directory...${clear_color}"
 rm -r -f temp
 mkdir temp
 
-echo -e "${magenta}Making the migrations...${clear_color}"
+echo -e "${magenta}Making the migrations for the app ${app}...${clear_color}"
 # shellcheck disable=SC2068
 . scripts/util/service_loop.sh make_migrations_container ${services[@]}
 
