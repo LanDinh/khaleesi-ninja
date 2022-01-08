@@ -11,17 +11,8 @@ class HealthMetricTestCase(SimpleTestCase, EnumMetricTestMixin[HealthMetricType]
   """Test the server health metric."""
 
   metric = HEALTH
-
-  def test_set_healthy(self) -> None :
-    """Test setting to healthy."""
-    # Execute test.
-    HEALTH.set_healthy()
-    # Assert result.
-    self.assert_enum_metric_value(value = HealthMetricType.HEALTHY)
-
-  def test_set_terminating(self) -> None :
-    """Test setting to healthy."""
-    # Execute test.
-    HEALTH.set_terminating()
-    # Assert result.
-    self.assert_enum_metric_value(value = HealthMetricType.TERMINATING)
+  enum_type = HealthMetricType
+  custom_setters = [
+      ( HealthMetricType.HEALTHY    , metric.set_healthy ),
+      ( HealthMetricType.TERMINATING, metric.set_terminating ),
+  ]
