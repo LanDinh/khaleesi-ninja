@@ -28,7 +28,7 @@ class EventManager(models.Manager['Event']):
     if grpc_event.action.crud_type == GrpcEvent.Action.ActionType.CUSTOM:
       action_type = grpc_event.action.custom_type
     else:
-      action_type = str(grpc_event.action.crud_type)
+      action_type = GrpcEvent.Action.ActionType.Name(grpc_event.action.crud_type)
 
     return self.create(
       # Metadata.
@@ -39,10 +39,10 @@ class EventManager(models.Manager['Event']):
       target_owner = target_owner,
       # Origin.
       origin_user = grpc_event.request_metadata.user.id,
-      origin_type = str(grpc_event.request_metadata.user.type),
+      origin_type = grpc_event.request_metadata.user.type,
       # Action.
       action_type = action_type,
-      action_result = str(grpc_event.action.result),
+      action_result = grpc_event.action.result,
       action_details = grpc_event.action.details,
     )
 
@@ -57,11 +57,11 @@ class Event(Metadata):
 
   # Origin.
   origin_user   = models.TextField(default = 'UNKNOWN')
-  origin_type   = models.TextField(default = 'UNKNOWN')
+  origin_type   = models.IntegerField(default = 0)
 
   # Action.
   action_type    = models.TextField(default = 'UNKNOWN')
-  action_result  = models.TextField(default = 'UNKNOWN')
+  action_result  = models.IntegerField(default = 0)
   action_details = models.TextField(default = 'UNKNOWN')
 
   objects = EventManager()

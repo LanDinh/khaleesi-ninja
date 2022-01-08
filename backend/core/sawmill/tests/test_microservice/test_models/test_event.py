@@ -43,14 +43,14 @@ class EventManagerTestCase(TransactionTestCase):
     result = Event.objects.log_event(grpc_event = grpc_event)
     # Assert result.
     metadata.assert_called_once()
-    self.assertEqual(grpc_event.request_metadata.user.id       , result.origin_user)
-    self.assertEqual(str(grpc_event.request_metadata.user.type), result.origin_type)
+    self.assertEqual(grpc_event.request_metadata.user.id  , result.origin_user)
+    self.assertEqual(grpc_event.request_metadata.user.type, result.origin_type)
     self.assertEqual('', metadata.call_args.kwargs['errors'])
-    self.assertEqual(grpc_event.target.type                    , result.target_type)
-    self.assertEqual(grpc_event.target.id                      , result.target_id)
-    self.assertEqual(grpc_event.action.custom_type             , result.action_type)
-    self.assertEqual(str(grpc_event.action.result)             , result.action_result)
-    self.assertEqual(grpc_event.action.details                 , result.action_details)
+    self.assertEqual(grpc_event.target.type               , result.target_type)
+    self.assertEqual(grpc_event.target.id                 , result.target_id)
+    self.assertEqual(grpc_event.action.custom_type        , result.action_type)
+    self.assertEqual(grpc_event.action.result             , result.action_result)
+    self.assertEqual(grpc_event.action.details            , result.action_details)
 
   def test_log_event_empty(self, metadata: MagicMock, uuid: MagicMock) -> None :
     """Test logging an empty gRPC event."""
@@ -95,8 +95,8 @@ class EventManagerTestCase(TransactionTestCase):
       # Execute test.
       result = Event.objects.log_event(grpc_event = grpc_event)
       # Assert result.
-      self.assertEqual(str(action_type), result.action_type)
-      self.assertEqual('', result.meta_logging_errors)
+      self.assertEqual(action_type, GrpcEvent.Action.ActionType.Value(result.action_type))
+      self.assertEqual(''         , result.meta_logging_errors)
 
   def test_log_event_custom_action_type(self, metadata: MagicMock, uuid: MagicMock) -> None :
     """Test custom action type propagation."""
