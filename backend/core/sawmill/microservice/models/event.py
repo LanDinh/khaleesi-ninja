@@ -65,3 +65,34 @@ class Event(Metadata):
   action_details = models.TextField(default = 'UNKNOWN')
 
   objects = EventManager()
+
+  def to_grpc_event(self) -> GrpcEvent :
+    """Map to gRPC event message."""
+
+    grpc_event = GrpcEvent()
+    # Request metadata.
+    grpc_event.request_metadata.user.id   = self.origin_user
+    grpc_event.request_metadata.user.type = self.origin_type
+    # Metadata.
+    grpc_event.metadata.timestamp.FromDatetime(self.meta_event_timestamp)
+    grpc_event.metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
+    grpc_event.metadata.logger.request_id       = self.meta_logger_request_id
+    grpc_event.metadata.logger.khaleesi_gate    = self.meta_logger_khaleesi_gate
+    grpc_event.metadata.logger.khaleesi_service = self.meta_logger_khaleesi_service
+    grpc_event.metadata.logger.grpc_service     = self.meta_logger_grpc_service
+    grpc_event.metadata.logger.grpc_method      = self.meta_logger_grpc_method
+    # Target.
+    grpc_event.target.type     = self.target_type
+    grpc_event.target.id       = self.target_id
+    if self.target_owner:
+      grpc_event.target.owner.id = str(self.target_owner)
+    # Action.
+    try:
+      grpc_event.action.crud_type = GrpcEvent.Action.ActionType.Value(self.action_type)
+    except ValueError:
+      grpc_event.action.crud_type = GrpcEvent.Action.ActionType.CUSTOM
+      grpc_event.action.custom_type = self.action_type
+    grpc_event.action.result  = self.action_result  # type: ignore[assignment]
+    grpc_event.action.details = self.action_details
+
+    return grpc_event

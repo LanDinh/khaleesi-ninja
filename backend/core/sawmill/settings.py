@@ -8,3 +8,4 @@ from khaleesi.core.settings.khaleesi import  *  # pylint: disable=wildcard-impor
 
 INSTALLED_APPS.append('microservice')
 KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.lumberjack')
+KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.sawyer')

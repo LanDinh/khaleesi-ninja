@@ -7,8 +7,9 @@ import "core.proto";
 
 
 message Metadata {
-  google.protobuf.Timestamp         timestamp = 1;
-  khaleesi.core.GrpcRequestMetadata logger    = 2;
+  google.protobuf.Timestamp         timestamp        = 1;
+  google.protobuf.Timestamp         logged_timestamp = 2;
+  khaleesi.core.GrpcRequestMetadata logger           = 3;
 }
 
 
@@ -62,4 +63,16 @@ message LogResponse {
 
 service Lumberjack {
   rpc LogEvent (Event) returns (LogResponse);
+}
+
+message LogFilter {
+
+}
+
+message EventsList {
+  repeated Event events = 1;
+}
+
+service Sawyer {
+  rpc GetEvents(LogFilter) returns (EventsList);
 }
