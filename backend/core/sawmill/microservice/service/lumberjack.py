@@ -20,24 +20,29 @@ from microservice.models.abstract import Metadata
 class Service(Servicer):
   """core-sawmill service."""
 
-  def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogResponse :
+  def LogEvent(self, request: Event, context: grpc.ServicerContext) -> LogResponse :
     """Log events."""
-    return self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
+    return self._handle_response(
+      method = lambda: DbEvent.objects.log_event(grpc_event = request),
+      context = context,
+    )
 
   @staticmethod
-  def _handle_response(*, method: Callable[[], Metadata]) -> LogResponse :
+  def _handle_response(
+      *,
+      method: Callable[[], Metadata],
+      context: grpc.ServicerContext,
+  ) -> LogResponse :
     """Wrap responses for logging."""
     response = LogResponse()
     try:
       metadata = method()
       if metadata.meta_logging_errors:
-        response.result = LogResponse.ResultType.PARSING_ERROR
-        response.errors = metadata.meta_logging_errors
-      else:
-        response.result = LogResponse.ResultType.SUCCESS
+        context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+        context.set_details(metadata.meta_logging_errors)
     except Exception as exception:  # pylint: disable=broad-except
-      response.result = LogResponse.ResultType.FATAL_ERROR
-      response.errors = f'{type(exception).__name__}: {str(exception)}'
+      context.set_code(grpc.StatusCode.INTERNAL)
+      context.set_details(f'{type(exception).__name__}: {str(exception)}')
     return response
 
 

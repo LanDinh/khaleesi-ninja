@@ -50,16 +50,7 @@ message Event {
   Action                        action           = 4;
 }
 
-message LogResponse {
-  enum ResultType {
-    UNKNOWN       = 0;
-    SUCCESS       = 1;
-    PARSING_ERROR = 2;
-    FATAL_ERROR   = 3;
-  }
-  ResultType result = 1;
-  string     errors = 2;
-}
+message LogResponse {}
 
 service Lumberjack {
   rpc LogEvent (Event) returns (LogResponse);
