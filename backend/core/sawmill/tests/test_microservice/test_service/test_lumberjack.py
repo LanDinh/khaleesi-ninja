@@ -1,4 +1,4 @@
-"""Test the core-sawmill service."""
+"""Test the core-sawmill lumberjack service."""
 
 # Python.
 from typing import Callable, Any
@@ -10,8 +10,8 @@ from khaleesi.proto.core_sawmill_pb2 import LogResponse
 from microservice.service.lumberjack import DbEvent, Service  # type: ignore[attr-defined]
 from tests.models import Metadata
 
-class SawmillServiceTestCase(SimpleTestCase):
-  """Test the core-sawmill service."""
+class LumberjackServiceTestCase(SimpleTestCase):
+  """Test the core-sawmill lumberjack service."""
 
   service = Service()
 
