@@ -17,11 +17,11 @@ class HealthMetricTestCase(SimpleTestCase, EnumMetricTestMixin[HealthMetricType]
     # Execute test.
     HEALTH.set_healthy()
     # Assert result.
-    self.assert_enum_metric_value(value = HealthMetricType.healthy)
+    self.assert_enum_metric_value(value = HealthMetricType.HEALTHY)
 
   def test_set_terminating(self) -> None :
     """Test setting to healthy."""
     # Execute test.
     HEALTH.set_terminating()
     # Assert result.
-    self.assert_enum_metric_value(value = HealthMetricType.terminating)
+    self.assert_enum_metric_value(value = HealthMetricType.TERMINATING)

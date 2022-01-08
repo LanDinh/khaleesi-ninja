@@ -99,7 +99,7 @@ For microservices, it will additionally create the following:
 
 Of course, you should thoroughly review the `git` diff before committing anything to source control.
 
-The `templates` folder contains the data necessary for this script to work and is documented [here](/documentation/folder-structure/templates.mdture/templates.md).
+The `templates` folder contains the data necessary for this script to work and is documented [here](/documentation/folder-structure/templates.md).
 
 ## `util` folder
 
