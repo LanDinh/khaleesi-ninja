@@ -25,15 +25,10 @@ class EventManager(models.Manager['Event']):
     )
     errors += target_owner_error
 
-    origin_user, origin_user_error = parse_uuid(
-      raw = grpc_event.origin.user.id,
-      name = 'origin_user',
-    )
-    errors += origin_user_error
-
-    action_type = str(grpc_event.action.crud_type)
-    if action_type == str(GrpcEvent.Action.ActionType.CUSTOM):
+    if grpc_event.action.crud_type == GrpcEvent.Action.ActionType.CUSTOM:
       action_type = grpc_event.action.custom_type
+    else:
+      action_type = str(grpc_event.action.crud_type)
 
     return self.create(
       # Metadata.
@@ -43,8 +38,8 @@ class EventManager(models.Manager['Event']):
       target_id = grpc_event.target.id,
       target_owner = target_owner,
       # Origin.
-      origin_user = origin_user,
-      origin_system = grpc_event.origin.system,
+      origin_user = grpc_event.request_metadata.user.id,
+      origin_type = str(grpc_event.request_metadata.user.type),
       # Action.
       action_type = action_type,
       action_result = str(grpc_event.action.result),
@@ -61,8 +56,8 @@ class Event(Metadata):
   target_owner = models.UUIDField(null = True, blank = True)
 
   # Origin.
-  origin_user   = models.UUIDField(null = True, blank = True)
-  origin_system = models.TextField(blank = True)
+  origin_user   = models.TextField(default = 'UNKNOWN')
+  origin_type   = models.TextField(default = 'UNKNOWN')
 
   # Action.
   action_type    = models.TextField(default = 'UNKNOWN')

@@ -21,6 +21,7 @@ class Metadata(models.Model):
   meta_logged_timestamp = models.DateTimeField(auto_now_add = True)
 
   # Logger.
+  meta_logger_request_id       = models.TextField(default = 'UNKNOWN')
   meta_logger_khaleesi_gate    = models.TextField(default = 'UNKNOWN')
   meta_logger_khaleesi_service = models.TextField(default = 'UNKNOWN')
   meta_logger_grpc_service     = models.TextField(default = 'UNKNOWN')
@@ -41,10 +42,11 @@ class Metadata(models.Model):
         # Time.
         'meta_event_timestamp': event_timestamp,
         # Logger.
-        'meta_logger_khaleesi_gate': metadata.logger.khaleesi_gate,
+        'meta_logger_request_id'      : metadata.logger.request_id,
+        'meta_logger_khaleesi_gate'   : metadata.logger.khaleesi_gate,
         'meta_logger_khaleesi_service': metadata.logger.khaleesi_service,
-        'meta_logger_grpc_service': metadata.logger.grpc_service,
-        'meta_logger_grpc_method': metadata.logger.grpc_method,
+        'meta_logger_grpc_service'    : metadata.logger.grpc_service,
+        'meta_logger_grpc_method'     : metadata.logger.grpc_method,
         # Misc.
         'meta_logging_errors': errors,
     }

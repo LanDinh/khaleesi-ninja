@@ -3,5 +3,27 @@ syntax = "proto3";
 package khaleesi.core;
 
 message User {
-  string id = 1;
+  enum UserType {
+    UNKNOWN       = 0;
+    ANONYMOUS     = 1;
+    AUTHENTICATED = 2;
+    PRIVILEGED    = 3;
+    SYSTEM        = 4;
+  }
+
+  string   id   = 1;
+  UserType type = 2;
+}
+
+message GrpcRequestMetadata {
+  string request_id       = 1;
+  string khaleesi_gate    = 2;
+  string khaleesi_service = 3;
+  string grpc_service     = 4;
+  string grpc_method      = 5;
+}
+
+message RequestMetadata {
+  GrpcRequestMetadata caller = 1;
+  User                user   = 2;
 }

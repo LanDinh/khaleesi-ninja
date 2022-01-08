@@ -7,6 +7,7 @@ from uuid import uuid4
 
 # khaleesi.ninja.
 from khaleesi.core.test_util import TransactionTestCase
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent
 from microservice.models import Event
 
@@ -23,7 +24,10 @@ class EventManagerTestCase(TransactionTestCase):
     uuid.return_value = (uuid4(), '')
     now = datetime.now(tz = timezone.utc)
     grpc_event = GrpcEvent()
+    grpc_event.request_metadata.user.id         = 'origin-system'
+    grpc_event.request_metadata.user.type       = User.UserType.SYSTEM
     grpc_event.metadata.timestamp.FromDatetime(now)
+    grpc_event.metadata.logger.request_id       = 'metadata-request-id'
     grpc_event.metadata.logger.khaleesi_gate    = 'metadata-khaleesi-gate'
     grpc_event.metadata.logger.khaleesi_service = 'metadata-khaleesi-service'
     grpc_event.metadata.logger.grpc_service     = 'metadata-grpc-service'
@@ -31,7 +35,6 @@ class EventManagerTestCase(TransactionTestCase):
     grpc_event.target.type                      = 'target-type'
     grpc_event.target.id                        = 13
     grpc_event.target.owner.id                  = str(uuid4())
-    grpc_event.origin.system                    = 'origin-system'
     grpc_event.action.crud_type                 = GrpcEvent.Action.ActionType.CUSTOM
     grpc_event.action.custom_type               = 'action-type'
     grpc_event.action.result                    = GrpcEvent.Action.ResultType.SUCCESS
@@ -40,13 +43,14 @@ class EventManagerTestCase(TransactionTestCase):
     result = Event.objects.log_event(grpc_event = grpc_event)
     # Assert result.
     metadata.assert_called_once()
+    self.assertEqual(grpc_event.request_metadata.user.id       , result.origin_user)
+    self.assertEqual(str(grpc_event.request_metadata.user.type), result.origin_type)
     self.assertEqual('', metadata.call_args.kwargs['errors'])
-    self.assertEqual(grpc_event.target.type                 , result.target_type)
-    self.assertEqual(grpc_event.target.id                   , result.target_id)
-    self.assertEqual(grpc_event.origin.system               , result.origin_system)
-    self.assertEqual(grpc_event.action.custom_type          , result.action_type)
-    self.assertEqual(str(grpc_event.action.result)          , result.action_result)
-    self.assertEqual(grpc_event.action.details              , result.action_details)
+    self.assertEqual(grpc_event.target.type                    , result.target_type)
+    self.assertEqual(grpc_event.target.id                      , result.target_id)
+    self.assertEqual(grpc_event.action.custom_type             , result.action_type)
+    self.assertEqual(str(grpc_event.action.result)             , result.action_result)
+    self.assertEqual(grpc_event.action.details                 , result.action_details)
 
   def test_log_event_empty(self, metadata: MagicMock, uuid: MagicMock) -> None :
     """Test logging an empty gRPC event."""
@@ -64,7 +68,7 @@ class EventManagerTestCase(TransactionTestCase):
   def test_log_event_appends_uuid_errors(self, metadata: MagicMock, uuid: MagicMock) -> None :
     """Test uuid errors get appended correctly."""
     # Prepare data.
-    errors = [ (uuid4(), 'invalid target_owner'), (uuid4(), 'invalid origin_user') ]
+    errors = [ (uuid4(), 'invalid target_owner') ]
     uuid.side_effect = errors
     metadata.return_value = {}
     grpc_event = GrpcEvent()

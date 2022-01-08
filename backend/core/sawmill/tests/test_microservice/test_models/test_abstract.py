@@ -21,15 +21,17 @@ class MetadataTestCase(SimpleTestCase):
     timestamp.return_value = (now, '')
     grpc_metadata = GrpcMetadata()
     grpc_metadata.timestamp.FromDatetime(now)
-    grpc_metadata.logger.khaleesi_gate = 'khaleesi-gate'
+    grpc_metadata.logger.request_id       = 'request-id'
+    grpc_metadata.logger.khaleesi_gate    = 'khaleesi-gate'
     grpc_metadata.logger.khaleesi_service = 'khaleesi-service'
-    grpc_metadata.logger.grpc_service = 'grpc-service'
-    grpc_metadata.logger.grpc_method = 'grpc-method'
+    grpc_metadata.logger.grpc_service     = 'grpc-service'
+    grpc_metadata.logger.grpc_method      = 'grpc-method'
     errors = 'test errors'
     # Execute test.
     result = Metadata.log_metadata(metadata = grpc_metadata, errors = errors)
     # Assert result.
     self.assertEqual(now                                  , result['meta_event_timestamp'])
+    self.assertEqual(grpc_metadata.logger.request_id      , result['meta_logger_request_id'])
     self.assertEqual(grpc_metadata.logger.khaleesi_gate   , result['meta_logger_khaleesi_gate'])
     self.assertEqual(grpc_metadata.logger.khaleesi_service, result['meta_logger_khaleesi_service'])
     self.assertEqual(grpc_metadata.logger.grpc_service    , result['meta_logger_grpc_service'])

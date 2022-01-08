@@ -6,17 +6,9 @@ import "google/protobuf/timestamp.proto";
 import "core.proto";
 
 
-message Grpc {
-  string khaleesi_gate    = 1;
-  string khaleesi_service = 2;
-  string grpc_service     = 3;
-  string grpc_method      = 4;
-}
-
-
 message Metadata {
-  google.protobuf.Timestamp timestamp = 1;
-  Grpc                      logger    = 2;
+  google.protobuf.Timestamp         timestamp = 1;
+  khaleesi.core.GrpcRequestMetadata logger    = 2;
 }
 
 
@@ -26,13 +18,6 @@ message Event {
     string             type  = 1;
     int64              id    = 2;
     khaleesi.core.User owner = 3;
-  }
-
-  message Origin {
-    oneof origin {
-      khaleesi.core.User user   = 1;
-      string             system = 2;
-    }
   }
 
   message Action {
@@ -58,10 +43,10 @@ message Event {
     string     details     = 4;
   }
 
-  Metadata metadata = 1;
-  Target          target   = 2;
-  Origin          origin   = 3;
-  Action          action   = 4;
+  khaleesi.core.RequestMetadata request_metadata = 1;
+  Metadata                      metadata         = 2;
+  Target                        target           = 3;
+  Action                        action           = 4;
 }
 
 message LogResponse {
