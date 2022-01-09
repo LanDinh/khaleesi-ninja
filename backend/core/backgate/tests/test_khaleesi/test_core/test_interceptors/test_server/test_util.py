@@ -1,6 +1,7 @@
 """Test server interceptor utility."""
 
 # Python.
+from functools import partial
 from unittest.mock import MagicMock
 
 # khaleesi.ninja.
@@ -15,18 +16,26 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
 
   def test_intercept(self) -> None :
     """Test the counter gets incremented."""
-    # Prepare data.
-    service_name = 'protobuf.package.Service'
-    method_name = 'Method'
-    full_interceptor_method_name = '/protobuf.package.Service/Method'
-    self.interceptor.khaleesi_intercept = lambda **kwargs : self.assertEqual(  # type: ignore[assignment]  # pylint: disable=line-too-long
-      (service_name, method_name),
-      (kwargs['service_name'], kwargs['method_name'])
-    )
-    # Execute test and assert result.
-    self.interceptor.intercept(
-      method      = lambda *args: None,
-      request     = MagicMock(),
-      context     = MagicMock(),
-      method_name = full_interceptor_method_name,
-    )
+    for description, service, method, full_input in [
+        ( 'full input', 'protobuf.package.Service', 'Method', '/protobuf.package.Service/Method' ),
+        ( 'empty service', 'UNKNOWN', 'Method', '//Method' ),
+        ( 'empty method', 'protobuf.package.Service', 'UNKNOWN', '/protobuf.package.Service/' ),
+        ( 'empty input', 'UNKNOWN', 'UNKNOWN', '' ),
+    ]:
+      with self.subTest(case = description):
+        # Prepare data.
+        self.interceptor.khaleesi_intercept = partial(  # type: ignore[assignment]  # pylint: disable=line-too-long
+          lambda inner_service, inner_method, **kwargs : self.assertEqual(
+            (inner_service, inner_method),
+            (kwargs['service_name'], kwargs['method_name'])
+          ),
+          inner_service = service,
+          inner_method = method,
+        )
+        # Execute test and assert result.
+        self.interceptor.intercept(
+          method      = lambda *args: None,
+          request     = MagicMock(),
+          context     = MagicMock(),
+          method_name = full_input,
+        )

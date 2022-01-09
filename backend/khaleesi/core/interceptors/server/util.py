@@ -25,12 +25,19 @@ class ServerInterceptor(GrpcServerInterceptor):
   ) -> Any :
     """Intercept the method call."""
     method_name_parts = method_name.split('/')
-    grpc_service_name = method_name_parts[1]
-    grpc_method_name  = method_name_parts[2]
+    grpc_service_name = method_name_parts[1] if len(method_name_parts) > 1 else ''
+    grpc_method_name  = method_name_parts[2] if len(method_name_parts) > 2 else ''
     return self.khaleesi_intercept(
       method       = method,
       request      = request,
       context      = context,
-      service_name = grpc_service_name,
-      method_name  = grpc_method_name
+      service_name = self.string_or_unknown(value = grpc_service_name),
+      method_name  = self.string_or_unknown(value = grpc_method_name),
     )
+
+  @staticmethod
+  def string_or_unknown(*, value: str) -> str :
+    """Either return the value, or UNKNOWN if empty."""
+    if value:
+      return value
+    return 'UNKNOWN'
