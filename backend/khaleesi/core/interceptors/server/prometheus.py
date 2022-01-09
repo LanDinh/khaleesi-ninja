@@ -47,7 +47,8 @@ class PrometheusServerInterceptor(ServerInterceptor):
       }
       user = User.UserType.UNKNOWN
     try:
-      response = method(request, context)
+      with INCOMING_REQUESTS.track_in_progress(user = user, **labels):
+        response = method(request, context)
       INCOMING_REQUESTS.inc(status = StatusCode.OK, user = user, **labels)
       return response
     except KhaleesiException as exception:

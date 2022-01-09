@@ -122,7 +122,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 24,
+        "w": 12,
         "x": 0,
         "y": 1
       },
@@ -314,12 +314,117 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 85
+        "y": 13
       },
       "id": 10,
       "panels": [],
       "title": "Requests",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "internal: .*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[1m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`{{status}}: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
+          "refId": "NOK"
+        }
+      ],
+      "title": "Incoming errors",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -411,7 +516,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 86
+        "y": 22
       },
       "id": 12,
       "options": {
@@ -505,31 +610,15 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "internal: .*"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 86
+        "y": 22
       },
-      "id": 13,
+      "id": 15,
       "options": {
         "legend": {
           "calcs": [],
@@ -547,14 +636,13 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[1m]))",
-          "hide": false,
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (khaleesi_incoming_requests_in_progress{khaleesi_gate=\"{{ .Values.gate.name }}\"})",
           "interval": "",
-          "legendFormat": "{{`{{status}}: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
-          "refId": "NOK"
+          "legendFormat": "{{`{{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
+          "refId": "A"
         }
       ],
-      "title": "Incoming errors",
+      "title": "Incoming requests in progress",
       "type": "timeseries"
     }
   ],

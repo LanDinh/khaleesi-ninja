@@ -44,6 +44,22 @@ class RequestsMetric(CounterMetric):
     """Increment the metric."""
     super().inc(**self.without_extra_arguments(kwargs = locals()))
 
+  def track_in_progress(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+      self, *,
+      user                 : int,
+      grpc_service         : str,
+      grpc_method          : str,
+      peer_khaleesi_gate   : str,
+      peer_khaleesi_service: str,
+      peer_grpc_service    : str,
+      peer_grpc_method     : str,
+  ) -> Any :
+    """Increment the metric."""
+    return super().track_in_progress(
+      status = StatusCode.UNKNOWN,
+      **self.without_extra_arguments(kwargs = locals()),
+    )
+
   def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       status               : StatusCode,
@@ -57,6 +73,22 @@ class RequestsMetric(CounterMetric):
   ) -> int :
     """Increment the metric."""
     return super().get_value(**self.without_extra_arguments(kwargs = locals()))
+
+  def get_in_progress_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+      self, *,
+      user                 : int,
+      grpc_service         : str,
+      grpc_method          : str,
+      peer_khaleesi_gate   : str,
+      peer_khaleesi_service: str,
+      peer_grpc_service    : str,
+      peer_grpc_method     : str,
+  ) -> int :
+    """Increment the metric."""
+    return super().get_in_progress_value(
+      status = StatusCode.UNKNOWN,
+      **self.without_extra_arguments(kwargs = locals()),
+    )
 
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,

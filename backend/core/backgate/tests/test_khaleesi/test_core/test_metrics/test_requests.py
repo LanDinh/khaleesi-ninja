@@ -17,25 +17,38 @@ from tests.test_khaleesi.test_core.test_metrics.test_util import CounterMetricTe
 class RequestsMetricTestMixin(CounterMetricTestMixin):
   """Test mixin for requests metrics."""
 
+  labels = {
+      'grpc_service'         : 'grpc-service',
+      'grpc_method'          : 'grpc-method',
+      'peer_khaleesi_gate'   : 'peer-khaleesi-gate',
+      'peer_khaleesi_service': 'peer-khaleesi-service',
+      'peer_grpc_service'    : 'peer-grpc-service',
+      'peer_grpc_method'     : 'peer-grpc-method',
+  }
+
   def test_inc(self) -> None :
     """Test incrementing the counter."""
     # Prepare data.
-    labels = {
-        'grpc_service'         : 'grpc-service',
-        'grpc_method'          : 'grpc-method',
-        'peer_khaleesi_gate'   : 'peer-khaleesi-gate',
-        'peer_khaleesi_service': 'peer-khaleesi-service',
-        'peer_grpc_service'    : 'peer-grpc-service',
-        'peer_grpc_method'     : 'peer-grpc-method',
-    }
     for status, (_, user) in product(StatusCode, User.UserType.items()):
       with self.subTest(status = status.name, user = user):  # type: ignore[attr-defined]  # pylint: disable=no-member
         # Execute test and assert result.
-        self.execute_and_assert(
-          method = partial(self.metric.inc, status = status, user = user, **labels),
+        self.execute_and_assert_counter(
+          method = partial(self.metric.inc, status = status, user = user, **self.labels),
           status = status,
           user   = user,
-          **labels
+          **self.labels
+        )
+
+  def test_track_in_progress(self) -> None :
+    """Test tracking the in progress data."""
+    # Prepare data.
+    for _, user in User.UserType.items():
+      with self.subTest(user = user):  # type: ignore[attr-defined]  # pylint: disable=no-member
+        # Execute test and assert result.
+        self.execute_and_assert_in_progress(
+          method = partial(self.metric.track_in_progress, user = user, **self.labels),
+          user   = user,
+          **self.labels
         )
 
 

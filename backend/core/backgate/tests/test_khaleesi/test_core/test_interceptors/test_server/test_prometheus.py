@@ -184,17 +184,14 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
 
   def assert_metric_call(self, *, metric: MagicMock, request: Any, status: StatusCode) -> None :
     """Assert the metric call was correct."""
-    peer_khaleesi_gate    = request.request_metadata.caller.khaleesi_gate    or 'UNKNOWN'
-    peer_khaleesi_service = request.request_metadata.caller.khaleesi_service or 'UNKNOWN'
-    peer_grpc_service     = request.request_metadata.caller.grpc_service     or 'UNKNOWN'
-    peer_grpc_method      = request.request_metadata.caller.grpc_method      or 'UNKNOWN'
-    metric.inc.assert_called_once_with(
-      status                = status,
-      user                  = request.request_metadata.user.type,
-      grpc_service          = self.service_name,
-      grpc_method           = self.method_name,
-      peer_khaleesi_gate    = peer_khaleesi_gate,
-      peer_khaleesi_service = peer_khaleesi_service,
-      peer_grpc_service     = peer_grpc_service,
-      peer_grpc_method      = peer_grpc_method,
-    )
+    labels = {
+        'user'                 : request.request_metadata.user.type,
+        'grpc_service'         : self.service_name,
+        'grpc_method'          : self.method_name,
+        'peer_khaleesi_gate'   : request.request_metadata.caller.khaleesi_gate    or 'UNKNOWN',
+        'peer_khaleesi_service': request.request_metadata.caller.khaleesi_service or 'UNKNOWN',
+        'peer_grpc_service'    : request.request_metadata.caller.grpc_service     or 'UNKNOWN',
+        'peer_grpc_method'     : request.request_metadata.caller.grpc_method      or 'UNKNOWN',
+    }
+    metric.inc.assert_called_once_with(status = status, **labels)
+    metric.track_in_progress.assert_called_once_with(**labels)
