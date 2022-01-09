@@ -82,7 +82,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     message = 'fatal exception'
     logging.side_effect = Exception(message)
     # Execute test and assert result.
-    with self.assertRaises(InternalServerException) as cm:
+    with self.assertRaises(InternalServerException) as context:
       method()
     logging.assert_called_once()
-    self.assertEqual(f'Exception: {message}', cm.exception.private_details)
+    self.assertEqual(f'Exception: {message}', context.exception.private_details)

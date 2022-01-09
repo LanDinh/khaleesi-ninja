@@ -37,7 +37,7 @@ class Service(Servicer):
         )
       return LogResponse()
     except KhaleesiException as exception:
-      raise from exception
+      raise exception from None
     except Exception as exception:  # pylint: disable=broad-except
       raise InternalServerException(
         public_details = '',
