@@ -14,7 +14,6 @@ class EnumMetricTestMixin(Generic[EnumType]):
 
   metric: EnumMetric[EnumType]
   enum_type: Type[EnumType]
-  custom_setters: List[Tuple[Callable[[], None], EnumType]]
 
   def test_set(self) -> None :
     """Test setting a value."""
@@ -28,10 +27,10 @@ class EnumMetricTestMixin(Generic[EnumType]):
 
   def test_setters(self) -> None :
     """Test all custom setters."""
-    for method, value in self.custom_setters:
-      with self.subTest(method = method.__name__):  # type: ignore[attr-defined]  # pylint: disable=no-member
+    for value in self.enum_type:
+      with self.subTest(value = str(value)):  # type: ignore[attr-defined]  # pylint: disable=no-member
         # Execute test.
-        method()
+        getattr(self.metric, f'set_{value.name.lower()}')()
         # Assert result.
         self.assert_enum_metric_value(value = value)
 

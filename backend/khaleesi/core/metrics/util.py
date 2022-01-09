@@ -2,6 +2,7 @@
 
 # Python.
 from enum import Enum
+from functools import partial
 from typing import TypeVar, Generic, Dict, Type, List, Any
 
 # Django.
@@ -84,14 +85,17 @@ EnumType = TypeVar('EnumType', bound = Enum)  # pylint: disable=invalid-name
 class EnumMetric(Generic[EnumType], GaugeMetric):
   """Metric representing enum data."""
 
-  def __init__(self, *, metric_id: Metric, description: str) -> None :
+  def __init__(self, *, metric_id: Metric, description: str, enum_type: Type[EnumType]) -> None :
     """Initialize the enum metric."""
     super().__init__(
       metric_id = metric_id,
       description = description,
       additional_labels= [ metric_id.name.lower() ],
     )
+    for value in enum_type:
+      setattr(self, f'set_{value.name.lower()}', partial(self.set, value = value))
 
+  # noinspection PyMethodOverriding
   def set(self, *, value: EnumType) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ
     """Set the metric to the given value."""
     for enum in type(value):

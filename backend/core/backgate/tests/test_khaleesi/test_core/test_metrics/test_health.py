@@ -12,7 +12,3 @@ class HealthMetricTestCase(SimpleTestCase, EnumMetricTestMixin[HealthMetricType]
 
   metric = HEALTH
   enum_type = HealthMetricType
-  custom_setters = [
-      ( metric.set_healthy    , HealthMetricType.HEALTHY ),
-      ( metric.set_terminating, HealthMetricType.TERMINATING ),
-  ]
