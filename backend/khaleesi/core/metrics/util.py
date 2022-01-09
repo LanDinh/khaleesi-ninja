@@ -60,9 +60,13 @@ class AbstractMetric:
     # noinspection PyProtectedMember
     return int(self._metric.labels(**self.labels(**kwargs))._value.get())  # pylint: disable=protected-access
 
-  def labels(self, **kwargs: Any) -> Dict[str, str] :  # pylint: disable=no-self-use
+  def labels(self, **kwargs: str) -> Dict[str, str] :  # pylint: disable=no-self-use
     """Shortcut to get all labels."""
-    return { **server_labels, **kwargs }
+    return {
+        **server_labels,
+        **{ key: value for key, value in kwargs.items() if not value.startswith('unknown') },
+        **{ key: value.upper() for key, value in kwargs.items() if value.startswith('unknown') },
+    }
 
   @staticmethod
   def without_extra_arguments(*, kwargs: Dict[str, Any]) -> Dict[str, Any] :
