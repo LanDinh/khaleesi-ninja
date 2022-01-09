@@ -7,7 +7,11 @@ from typing import Callable
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.exceptions import KhaleesiException, InvalidArgumentException, InternalServerException
+from khaleesi.core.exceptions import (
+    KhaleesiException,
+    InvalidArgumentException,
+    InternalServerException,
+)
 from khaleesi.core.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, Event, LogResponse
 from khaleesi.proto.core_sawmill_pb2_grpc import (
@@ -42,7 +46,7 @@ class Service(Servicer):
       raise InternalServerException(
         public_details = '',
         private_details =f'{type(exception).__name__}: {str(exception)}',
-      )
+      ) from exception
 
 
 service_configuration = ServiceConfiguration[Service](

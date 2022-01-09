@@ -67,10 +67,10 @@ class LumberjackServiceTestCase(SimpleTestCase):
     expected_result = Metadata(meta_logging_errors ='some parsing errors')
     logging.return_value = expected_result
     # Execute test and assert result.
-    with self.assertRaises(InvalidArgumentException) as cm:
+    with self.assertRaises(InvalidArgumentException) as context:
       method()
     logging.assert_called_once()
-    self.assertEqual(expected_result.meta_logging_errors, cm.exception.private_details)
+    self.assertEqual(expected_result.meta_logging_errors, context.exception.private_details)
 
   def _execute_logging_test_with_fatal_error(
       self, *,
