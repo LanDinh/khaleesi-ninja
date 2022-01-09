@@ -67,7 +67,7 @@ class RequestsMetric(CounterMetric):
     """Shortcut to get all labels."""
     return super().labels(
       status = status.name.lower(),
-      user   = User.UserType.Name(user).lower(),
+      user   = User.UserType.Name(user).lower(),  # type: ignore[arg-type]
       **additional_labels,
     )
 
