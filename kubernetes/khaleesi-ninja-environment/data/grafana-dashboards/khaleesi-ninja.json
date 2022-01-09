@@ -431,7 +431,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (khaleesi_incoming_requests_total{status=\"ok\"})",
+          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (rate(khaleesi_incoming_requests_total{status=\"ok\"}[1m]))",
           "interval": "",
           "legendFormat": "{{`OK: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -442,7 +442,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (khaleesi_incoming_requests_total{status!=\"ok\"})",
+          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (rate(khaleesi_incoming_requests_total{status!=\"ok\"}[1m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
@@ -547,7 +547,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate, status) (khaleesi_incoming_requests_total{status!=\"ok\"})",
+          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\"}[1m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",

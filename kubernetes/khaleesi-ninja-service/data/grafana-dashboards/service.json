@@ -432,7 +432,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"})",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (rate(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[1m]))",
           "interval": "",
           "legendFormat": "{{`OK: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -443,7 +443,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"})",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (rate(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[1m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
@@ -548,7 +548,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate, status) (khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"})",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[1m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",

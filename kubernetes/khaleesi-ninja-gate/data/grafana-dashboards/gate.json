@@ -431,7 +431,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"})",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (rate(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[1m]))",
           "interval": "",
           "legendFormat": "{{`OK: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -442,7 +442,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"})",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (rate(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[1m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
@@ -547,7 +547,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"})",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[1m]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
