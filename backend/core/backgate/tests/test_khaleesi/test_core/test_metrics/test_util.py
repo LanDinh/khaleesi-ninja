@@ -25,15 +25,6 @@ class EnumMetricTestMixin(Generic[EnumType]):
         # Assert result.
         self.assert_enum_metric_value(value = value)
 
-  def test_setters(self) -> None :
-    """Test all custom setters."""
-    for value in self.enum_type:
-      with self.subTest(value = str(value)):  # type: ignore[attr-defined]  # pylint: disable=no-member
-        # Execute test.
-        getattr(self.metric, f'set_{value.name.lower()}')()
-        # Assert result.
-        self.assert_enum_metric_value(value = value)
-
   def assert_enum_metric_value(self, *, value: EnumType) -> None :
     """Assert the metric values."""
     total = 0

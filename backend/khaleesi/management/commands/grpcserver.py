@@ -20,7 +20,7 @@ from prometheus_client import start_http_server  # type: ignore[import] # https:
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
-from khaleesi.core.metrics import HEALTH as HEALTH_METRIC
+from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 
 
@@ -63,7 +63,7 @@ class Command(BaseCommand):
     def handle_sigterm(*_: Any) -> None :
       """Shutdown gracefully."""
       self.stdout.write(f'Stopping gRPC server at {options["address"]}...')
-      HEALTH_METRIC.set_terminating()
+      HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
       done_event = server.stop(30)
       done_event.wait(30)
       self.stdout.write('Stop complete.')
