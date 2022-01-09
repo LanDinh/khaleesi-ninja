@@ -29,5 +29,5 @@ class CoreBackgateServiceTestCase(TransactionTestCase):
     request = SayHelloRequest(name = name)
     # Execute test.
     response = self.service.SayHello(request, MagicMock())
-    # Assert results.
+    # Assert result.
     self.assertIn('The guard says:', response.message)

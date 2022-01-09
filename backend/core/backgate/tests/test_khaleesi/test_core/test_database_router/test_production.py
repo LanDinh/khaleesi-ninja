@@ -20,7 +20,7 @@ class DatabaseRouterTestCase(SimpleTestCase):
       with self.subTest(model = f'{model.__module__}.{model.__name__}'):
         # Execute test.
         result = self.database_router.db_for_read(model)
-        # Assert results.
+        # Assert result.
         self.assertEqual('read', result)
 
   def test_db_for_write(self) -> None :
@@ -29,7 +29,7 @@ class DatabaseRouterTestCase(SimpleTestCase):
       with self.subTest(model = f'{model.__module__}.{model.__name__}'):
         # Execute test.
         result = self.database_router.db_for_write(model)
-        # Assert results.
+        # Assert results
         self.assertEqual('write', result)
 
   def test_allow_migrate(self) -> None :
@@ -38,7 +38,7 @@ class DatabaseRouterTestCase(SimpleTestCase):
       with self.subTest(app = app.name):
         # Execute test.
         result = self.database_router.allow_migrate('migrate', app.name)
-        # Assert results.
+        # Assert result.
         self.assertTrue(result)
 
   def test_prohibit_migrate(self) -> None :
@@ -48,5 +48,5 @@ class DatabaseRouterTestCase(SimpleTestCase):
         with self.subTest(database = database, app = app.name):
           # Execute test.
           result = self.database_router.allow_migrate(database, app.name)
-          # Assert results.
+          # Assert result.
           self.assertFalse(result)

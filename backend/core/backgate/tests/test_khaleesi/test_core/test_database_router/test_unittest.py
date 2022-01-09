@@ -24,5 +24,5 @@ class DatabaseRouterTestCase(SimpleTestCase):
           result = self.database_router.allow_migrate(database, app.name)
           if result:
             count += 1
-        # Assert results.
+        # Assert result.
         self.assertEqual(1, count)
