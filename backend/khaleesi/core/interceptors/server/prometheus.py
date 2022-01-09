@@ -10,13 +10,13 @@ from grpc import ServicerContext, StatusCode
 from khaleesi.core.exceptions import KhaleesiException
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.metrics.requests import OUTGOING_REQUESTS
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.proto.core_pb2 import RequestMetadata, User
 
 
 class PrometheusServerInterceptor(ServerInterceptor):
   """Interceptor to collect prometheus metrics."""
 
-  def khaleesi_intercept(  # pylint: disable=no-self-use
+  def khaleesi_intercept(
       self, *,
       method: Callable[[Any, ServicerContext], Any],
       request: Any,
@@ -25,16 +25,27 @@ class PrometheusServerInterceptor(ServerInterceptor):
       method_name: str,
   ) -> Any :
     """Collect the prometheus metrics."""
-    metadata: RequestMetadata = request.request_metadata
-    labels = {
-        'grpc_service'          : service_name,
-        'grpc_method'           : method_name,
-        'peer_khaleesi_gate'    : metadata.caller.khaleesi_gate,
-        'peer_khaleesi_service' : metadata.caller.khaleesi_service,
-        'peer_grpc_service'     : metadata.caller.grpc_service,
-        'peer_grpc_method'      : metadata.caller.grpc_method,
-    }
-    user = metadata.user.type
+    if hasattr(request, 'request_metadata'):
+      metadata: RequestMetadata = request.request_metadata
+      labels = {
+          'grpc_service'         : service_name,
+          'grpc_method'          : method_name,
+          'peer_khaleesi_gate'   : self.string_or_unknown(value = metadata.caller.khaleesi_gate),
+          'peer_khaleesi_service': self.string_or_unknown(value = metadata.caller.khaleesi_service),
+          'peer_grpc_service'    : self.string_or_unknown(value = metadata.caller.grpc_service),
+          'peer_grpc_method'     : self.string_or_unknown(value = metadata.caller.grpc_method),
+      }
+      user = metadata.user.type
+    else:
+      labels = {
+          'grpc_service'         : service_name,
+          'grpc_method'          : method_name,
+          'peer_khaleesi_gate'   : 'UNKNOWN',
+          'peer_khaleesi_service': 'UNKNOWN',
+          'peer_grpc_service'    : 'UNKNOWN',
+          'peer_grpc_method'     : 'UNKNOWN',
+      }
+      user = User.UserType.UNKNOWN
     try:
       response = method(request, context)
       OUTGOING_REQUESTS.inc(status = StatusCode.OK, user = user, **labels)
