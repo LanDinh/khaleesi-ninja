@@ -1,7 +1,6 @@
 """Server requests metrics."""
 
 # Python.
-from enum import Enum
 from typing import Dict
 
 # gRPC.
@@ -9,14 +8,7 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.util import CounterMetric, Metric
-
-class RequestUserMetricType(Enum):
-  """Different user types."""
-
-  ANONYMOUS     = 0
-  AUTHENTICATED = 1
-  PRIVILEGED    = 2
-  SYSTEM        = 3
+from khaleesi.proto.core_pb2 import User
 
 
 class RequestsMetric(CounterMetric):
@@ -41,7 +33,7 @@ class RequestsMetric(CounterMetric):
   def inc(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       status               : StatusCode,
-      user                 : RequestUserMetricType,
+      user                 : int,
       grpc_service         : str,
       grpc_method          : str,
       peer_khaleesi_gate   : str,
@@ -55,7 +47,7 @@ class RequestsMetric(CounterMetric):
   def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       status               : StatusCode,
-      user                 : RequestUserMetricType,
+      user                 : int,
       grpc_service         : str,
       grpc_method          : str,
       peer_khaleesi_gate   : str,
@@ -69,13 +61,13 @@ class RequestsMetric(CounterMetric):
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,
       status: StatusCode,
-      user  : RequestUserMetricType,
+      user  : int,
       **additional_labels: str,
   ) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return super().labels(
       status = status.name.lower(),
-      user   = user.name.lower(),
+      user   = User.UserType.Name(user).lower(),
       **additional_labels,
     )
 
