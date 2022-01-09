@@ -71,7 +71,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(test = test.__name__):
         test(request = request, request_params = request_params)  # pylint: disable=no-value-for-parameter
 
-  @patch('khaleesi.core.interceptors.server.prometheus.OUTGOING_REQUESTS')
+  @patch('khaleesi.core.interceptors.server.prometheus.INCOMING_REQUESTS')
   def _execute_intercept_ok_test(
       self,
       metric: MagicMock,
@@ -96,7 +96,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         # Assert result.
         self.assert_metric_call(metric = metric, request = expected_request, status = StatusCode.OK)
 
-  @patch('khaleesi.core.interceptors.server.prometheus.OUTGOING_REQUESTS')
+  @patch('khaleesi.core.interceptors.server.prometheus.INCOMING_REQUESTS')
   def _execute_intercept_khaleesi_exception_test(
       self,
       metric: MagicMock,
@@ -120,6 +120,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         )
         # Execute test.
         with self.assertRaises(KhaleesiException):
+          # noinspection PyTypeChecker
           self.interceptor.khaleesi_intercept(
             method       = partial(
               lambda inner_exception, *args : _raise(inner_exception),
@@ -133,7 +134,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         # Assert result.
         self.assert_metric_call(metric = metric, request = expected_request, status = status)
 
-  @patch('khaleesi.core.interceptors.server.prometheus.OUTGOING_REQUESTS')
+  @patch('khaleesi.core.interceptors.server.prometheus.INCOMING_REQUESTS')
   def _execute_intercept_other_exception_test(
       self,
       metric: MagicMock,

@@ -9,7 +9,7 @@ from grpc import ServicerContext, StatusCode
 # khaleesi.ninja.
 from khaleesi.core.exceptions import KhaleesiException
 from khaleesi.core.interceptors.server.util import ServerInterceptor
-from khaleesi.core.metrics.requests import OUTGOING_REQUESTS
+from khaleesi.core.metrics.requests import INCOMING_REQUESTS
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 
 
@@ -48,11 +48,11 @@ class PrometheusServerInterceptor(ServerInterceptor):
       user = User.UserType.UNKNOWN
     try:
       response = method(request, context)
-      OUTGOING_REQUESTS.inc(status = StatusCode.OK, user = user, **labels)
+      INCOMING_REQUESTS.inc(status = StatusCode.OK, user = user, **labels)
       return response
     except KhaleesiException as exception:
-      OUTGOING_REQUESTS.inc(status = exception.status, user = user, **labels)
+      INCOMING_REQUESTS.inc(status = exception.status, user = user, **labels)
       raise exception from None
     except Exception as exception:
-      OUTGOING_REQUESTS.inc(status = StatusCode.UNKNOWN, user = user, **labels)
+      INCOMING_REQUESTS.inc(status = StatusCode.UNKNOWN, user = user, **labels)
       raise exception from None
