@@ -4,10 +4,8 @@
 from typing import Callable, Any
 from unittest.mock import patch, MagicMock
 
-# gRPC.
-import grpc
-
 # khaleesi.ninja.
+from khaleesi.core.exceptions import InvalidArgumentException, InternalServerException
 from khaleesi.core.test_util import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import LogResponse
 from microservice.service.lumberjack import DbEvent, Service  # type: ignore[attr-defined]
@@ -25,14 +23,14 @@ class LumberjackServiceTestCase(SimpleTestCase):
   def test_log_event(self) -> None :
     """Test logging events."""
     self._execute_logging_tests(
-      method = lambda context: self.service.LogEvent(MagicMock(), context),
+      method = lambda : self.service.LogEvent(MagicMock(), MagicMock()),
       logging_object = DbEvent.objects,
       logging_method = 'log_event',
     )
 
   def _execute_logging_tests(
       self, *,
-      method: Callable[[grpc.ServicerContext], LogResponse],
+      method: Callable[[], LogResponse],
       logging_object: Any,
       logging_method: str,
   ) -> None :
@@ -48,50 +46,43 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _execute_successful_logging_test(
       self, *,
-      method: Callable[[grpc.ServicerContext], LogResponse],
+      method: Callable[[], LogResponse],
       logging: MagicMock,
   ) -> None :
     """Successful call to logging method."""
     # Prepare data.
     logging.return_value = Metadata()
-    context = MagicMock()
     # Execute test.
-    method(context)
+    method()
     # Assert result.
     logging.assert_called_once()
-    context.set_code.assert_not_called()
-    context.set_details.assert_not_called()
 
   def _execute_logging_test_with_parsing_error(
       self, *,
-      method: Callable[[grpc.ServicerContext], LogResponse],
+      method: Callable[[], LogResponse],
       logging: MagicMock,
   ) -> None :
     """Call to logging method that results in parsing errors."""
     # Prepare data.
     expected_result = Metadata(meta_logging_errors ='some parsing errors')
     logging.return_value = expected_result
-    context = MagicMock()
-    # Execute test.
-    method(context)
-    # Assert result.
+    # Execute test and assert result.
+    with self.assertRaises(InvalidArgumentException) as cm:
+      method()
     logging.assert_called_once()
-    context.set_code.assert_called_once_with(grpc.StatusCode.INVALID_ARGUMENT)
-    context.set_details.assert_called_once_with(expected_result.meta_logging_errors)
+    self.assertEqual(expected_result.meta_logging_errors, cm.exception.private_details)
 
   def _execute_logging_test_with_fatal_error(
       self, *,
-      method: Callable[[grpc.ServicerContext], LogResponse],
+      method: Callable[[], LogResponse],
       logging: MagicMock,
   ) -> None :
     """Call to logging method that results in fatal errors."""
     # Prepare data.
     message = 'fatal exception'
     logging.side_effect = Exception(message)
-    context = MagicMock()
-    # Execute test.
-    method(context)
-    # Assert result.
+    # Execute test and assert result.
+    with self.assertRaises(InternalServerException) as cm:
+      method()
     logging.assert_called_once()
-    context.set_code.assert_called_once_with(grpc.StatusCode.INTERNAL)
-    context.set_details.assert_called_once_with(f'Exception: {message}')
+    self.assertEqual(f'Exception: {message}', cm.exception.private_details)
