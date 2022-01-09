@@ -17,9 +17,9 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
   def test_intercept(self) -> None :
     """Test the counter gets incremented."""
     for description, service, method, full_input in [
-        ( 'full input', 'protobuf.package.Service', 'Method', '/protobuf.package.Service/Method' ),
+        ( 'full input', 'Service', 'Method', '/protobuf.package.Service/Method' ),
         ( 'empty service', 'UNKNOWN', 'Method', '//Method' ),
-        ( 'empty method', 'protobuf.package.Service', 'UNKNOWN', '/protobuf.package.Service/' ),
+        ( 'empty method', 'Service', 'UNKNOWN', '/protobuf.package.Service/' ),
         ( 'empty input', 'UNKNOWN', 'UNKNOWN', '' ),
     ]:
       with self.subTest(case = description):

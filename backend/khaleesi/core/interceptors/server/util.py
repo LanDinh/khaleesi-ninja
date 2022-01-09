@@ -31,7 +31,7 @@ class ServerInterceptor(GrpcServerInterceptor):
       method       = method,
       request      = request,
       context      = context,
-      service_name = self.string_or_unknown(value = grpc_service_name),
+      service_name = self.string_or_unknown(value = grpc_service_name).split('.')[-1],
       method_name  = self.string_or_unknown(value = grpc_method_name),
     )
 
