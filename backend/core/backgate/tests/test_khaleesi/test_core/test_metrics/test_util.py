@@ -1,20 +1,20 @@
 """Test monitoring metrics utility."""
 
 # Python.
-from enum import Enum
 from typing import TypeVar, Generic, Type, Callable, Tuple, List
 
 # khaleesi.ninja.
-from khaleesi.core.metrics.util import EnumMetric
+from khaleesi.core.metrics.util import (
+    EnumMetric, EnumType,
+)
 
 
-T = TypeVar('T', bound = Enum)  # pylint: disable=invalid-name
-class EnumMetricTestMixin(Generic[T]):
+class EnumMetricTestMixin(Generic[EnumType]):
   """Helper methods for test classes for enum metrics."""
 
-  metric: EnumMetric[T]
-  enum_type: Type[T]
-  custom_setters: List[Tuple[T, Callable[[], None]]]
+  metric: EnumMetric[EnumType]
+  enum_type: Type[EnumType]
+  custom_setters: List[Tuple[Callable[[], None], EnumType]]
 
   def test_set(self) -> None :
     """Test setting a value."""
@@ -28,14 +28,14 @@ class EnumMetricTestMixin(Generic[T]):
 
   def test_setters(self) -> None :
     """Test all custom setters."""
-    for value, method in self.custom_setters:
+    for method, value in self.custom_setters:
       with self.subTest(method = method.__name__):  # type: ignore[attr-defined]  # pylint: disable=no-member
         # Execute test.
         method()
         # Assert result.
         self.assert_enum_metric_value(value = value)
 
-  def assert_enum_metric_value(self, *, value: T) -> None :
+  def assert_enum_metric_value(self, *, value: EnumType) -> None :
     """Assert the metric values."""
     total = 0
     for value_counter in type(value):
