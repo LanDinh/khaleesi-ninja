@@ -1,12 +1,10 @@
 """Test monitoring metrics utility."""
 
 # Python.
-from typing import TypeVar, Generic, Type, Callable, Tuple, List
+from typing import Generic, Type, Callable, Any
 
 # khaleesi.ninja.
-from khaleesi.core.metrics.util import (
-    EnumMetric, EnumType,
-)
+from khaleesi.core.metrics.util import EnumMetric, EnumType, CounterMetric
 
 
 class EnumMetricTestMixin(Generic[EnumType]):
@@ -19,7 +17,7 @@ class EnumMetricTestMixin(Generic[EnumType]):
     """Test setting a value."""
     # Prepare data.
     for value in self.enum_type:
-      with self.subTest(value = str(value)):  # type: ignore[attr-defined]  # pylint: disable=no-member
+      with self.subTest(value = value.name):  # type: ignore[attr-defined]  # pylint: disable=no-member
         # Execute test.
         self.metric.set(value = value)
         # Assert result.
@@ -32,3 +30,19 @@ class EnumMetricTestMixin(Generic[EnumType]):
       total += self.metric.get_value(value = value_counter)
     self.assertEqual(1, self.metric.get_value(value = value))  # type: ignore[attr-defined]  # pylint: disable=no-member
     self.assertEqual(1, total)  # type: ignore[attr-defined]  # pylint: disable=no-member
+
+
+class CounterMetricTestMixin:
+  """Helper methods for test classes for counter metrics with two labels."""
+
+  metric: CounterMetric
+
+  def execute_and_assert(self, *, method: Callable[[], None], **labels: Any) -> None :
+    """Execute the increment and assert it worked."""
+    # Prepare data.
+    original_value = self.metric.get_value(**labels)
+    # Execute tests.
+    method()
+    # Assert result.
+    new_value = self.metric.get_value(**labels)
+    self.assertEqual(original_value + 1, new_value)  # type: ignore[attr-defined]  # pylint: disable=no-member

@@ -8,7 +8,7 @@ from typing import TypeVar, Generic, Dict, Type, List, Any
 from django.conf import settings
 
 # Prometheus.
-from prometheus_client import Gauge  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
+from prometheus_client import Counter, Gauge  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
 from prometheus_client.metrics import MetricWrapperBase  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
 from prometheus_client.registry import REGISTRY  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
 
@@ -28,7 +28,9 @@ server_labels = {
 class Metric(Enum):
   """List of metric names to avoid clashes."""
 
-  KHALEESI_HEALTH = 1
+  KHALEESI_HEALTH            = 1
+  KHALEESI_OUTGOING_REQUESTS = 2
+  KHALEESI_INCOMING_REQUESTS = 3
 
 
 class AbstractMetric:
@@ -39,9 +41,9 @@ class AbstractMetric:
 
   def __init__(
       self, *,
-      metric_id: Metric,
-      description: str,
-      metric_type: Type[MetricWrapperBase],
+      metric_id        : Metric,
+      description      : str,
+      metric_type      : Type[MetricWrapperBase],
       additional_labels: List[str],
   ) -> None :
     """Initialize the metric."""
@@ -62,6 +64,14 @@ class AbstractMetric:
     """Shortcut to get all labels."""
     return { **server_labels, **kwargs }
 
+  @staticmethod
+  def without_extra_arguments(*, kwargs: Dict[str, Any]) -> Dict[str, Any] :
+    """Pass on all arguments except for the self argument."""
+    return {
+        key: value
+        for key, value in kwargs.items()
+        if key != 'self' and not key.startswith('__')
+    }
 
 class GaugeMetric(AbstractMetric):
   """Gauge metric."""
@@ -69,15 +79,32 @@ class GaugeMetric(AbstractMetric):
   def __init__(self, *, metric_id: Metric, description: str, additional_labels: List[str]) -> None :
     """Initialize the enum metric."""
     super().__init__(
-      metric_id = metric_id,
-      description = description,
-      metric_type = Gauge,
+      metric_id         = metric_id,
+      description       = description,
+      metric_type       = Gauge,
       additional_labels = additional_labels,
     )
 
   def set(self, *, gauge_value: int, **kwargs: Any) -> None :
     """Set the metric to the given value."""
     self._metric.labels(**self.labels(**kwargs)).set(gauge_value)
+
+
+class CounterMetric(AbstractMetric):
+  """Counter metric."""
+
+  def __init__(self, *, metric_id: Metric, description: str, additional_labels: List[str]) -> None :
+    """Initialize the enum metric."""
+    super().__init__(
+      metric_id         = metric_id,
+      description       = description,
+      metric_type       = Counter,
+      additional_labels = additional_labels,
+    )
+
+  def inc(self, **kwargs: Any) -> None :
+    """Set the metric to the given value."""
+    self._metric.labels(**self.labels(**kwargs)).inc()
 
 
 EnumType = TypeVar('EnumType', bound = Enum)  # pylint: disable=invalid-name
@@ -87,9 +114,9 @@ class EnumMetric(Generic[EnumType], GaugeMetric):
   def __init__(self, *, metric_id: Metric, description: str) -> None :
     """Initialize the enum metric."""
     super().__init__(
-      metric_id = metric_id,
-      description = description,
-      additional_labels= [ metric_id.name.lower() ],
+      metric_id         = metric_id,
+      description       = description,
+      additional_labels = [ metric_id.name.lower() ],
     )
 
   # noinspection PyMethodOverriding
