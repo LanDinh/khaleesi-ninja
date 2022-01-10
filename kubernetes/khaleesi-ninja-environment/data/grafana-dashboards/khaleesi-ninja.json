@@ -277,9 +277,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
+        "w": 12,
         "x": 0,
-        "y": 21
+        "y": 113
       },
       "id": 8,
       "options": {
@@ -307,19 +307,6 @@
       ],
       "title": "Instance health",
       "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 29
-      },
-      "id": 10,
-      "panels": [],
-      "title": "Requests",
-      "type": "row"
     },
     {
       "datasource": {
@@ -350,7 +337,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -366,10 +353,6 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
               }
             ]
           }
@@ -378,7 +361,22 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": ".*: unhealthy"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: dead"
             },
             "properties": [
               {
@@ -389,16 +387,31 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: terminating"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 30
+        "w": 12,
+        "x": 12,
+        "y": 113
       },
-      "id": 13,
+      "id": 15,
       "options": {
         "legend": {
           "calcs": [],
@@ -416,15 +429,27 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\"}[1m]))",
-          "hide": false,
+          "expr": "sum by (khaleesi_health, khaleesi_gate) (khaleesi_health{khaleesi_health!=\"healthy\"}) > 0",
           "interval": "",
-          "legendFormat": "{{`{{status}}: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
-          "refId": "NOK"
+          "legendFormat": "{{`{{khaleesi_gate}}: {{khaleesi_health}}`}}",
+          "refId": "A"
         }
       ],
-      "title": "Incoming errors",
+      "title": "Instance health errors",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 121
+      },
+      "id": 10,
+      "panels": [],
+      "title": "Requests",
+      "type": "row"
     },
     {
       "datasource": {
@@ -516,7 +541,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 38
+        "y": 122
       },
       "id": 12,
       "options": {
@@ -600,6 +625,110 @@
             "mode": "absolute",
             "steps": [
               {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "internal: .*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 122
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate, status) (rate(khaleesi_incoming_requests_total{status!=\"ok\"}[1m]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`{{status}}: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
+          "refId": "NOK"
+        }
+      ],
+      "title": "Incoming errors",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
                 "color": "green",
                 "value": null
               },
@@ -615,8 +744,8 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 38
+        "x": 0,
+        "y": 130
       },
       "id": 14,
       "options": {
