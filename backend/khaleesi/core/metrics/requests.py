@@ -1,7 +1,7 @@
 """Server requests metrics."""
 
 # Python.
-from typing import Dict
+from typing import Dict, Any
 
 # gRPC.
 from grpc import StatusCode
