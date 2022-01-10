@@ -70,7 +70,7 @@ select input_app in microservice core custom; do
     break
     ;;
   *)
-    echo -e "${red}Invalid app type"
+    echo -e "${red}Invalid app type${clear_color}"
     ;;
   esac
 done

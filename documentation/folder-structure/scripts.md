@@ -101,6 +101,12 @@ Of course, you should thoroughly review the `git` diff before committing anythin
 
 The `templates` folder contains the data necessary for this script to work and is documented [here](/documentation/folder-structure/templates.md).
 
+### `adjust_grafana_dashboards.sh`
+
+Grafana dashboards export final `json`, whereas we need to replace some of these things by variables that can be consumed by `helm`.
+
+This adjusts the dashboards to not need manual effort to fix the generated `json`.
+
 ## `util` folder
 
 These scripts are not intended to be called directly, but are used by the other scripts.

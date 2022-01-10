@@ -156,7 +156,7 @@ select input_type in gate micro; do
     break
     ;;
   *)
-    echo -e "${red}Invalid service type"
+    echo -e "${red}Invalid service type${clear_color}"
     ;;
   esac
 done
