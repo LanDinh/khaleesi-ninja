@@ -95,21 +95,6 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "OK: .*"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
               "options": "NOK: .*"
             },
             "properties": [
@@ -126,7 +111,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 1
       },
@@ -242,8 +227,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 8,
         "y": 1
       },
       "id": 13,
@@ -331,9 +316,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 9
+        "w": 8,
+        "x": 16,
+        "y": 1
       },
       "id": 14,
       "options": {
@@ -368,7 +353,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 9
       },
       "id": 6,
       "panels": [],
@@ -428,58 +413,13 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": ".*: healthy"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*: unhealthy"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*: dead"
+              "options": ".*: not healthy"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
                   "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*: terminating"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
                   "mode": "fixed"
                 }
               }
@@ -491,7 +431,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 18
+        "y": 10
       },
       "id": 8,
       "options": {
@@ -511,10 +451,22 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_health, khaleesi_gate) (khaleesi_health) > 0",
+          "expr": "sum by (khaleesi_gate) (khaleesi_health{khaleesi_health=\"healthy\"}) > 0",
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: {{khaleesi_health}}`}}",
-          "refId": "A"
+          "legendFormat": "{{`{{khaleesi_gate}}: healthy`}}",
+          "refId": "healthy"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by (khaleesi_gate) (khaleesi_health{khaleesi_health!=\"healthy\"}) > 0",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_gate}}: not healthy`}}",
+          "refId": "not healthy"
         }
       ],
       "title": "Instance health",
@@ -621,7 +573,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 18
+        "y": 10
       },
       "id": 15,
       "options": {
@@ -703,7 +655,7 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},

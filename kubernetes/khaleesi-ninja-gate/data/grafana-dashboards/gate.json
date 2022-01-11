@@ -95,21 +95,6 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "OK: .*"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
               "options": "NOK: .*"
             },
             "properties": [
@@ -126,7 +111,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 1
       },
@@ -212,8 +197,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -242,8 +226,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 8,
         "y": 1
       },
       "id": 13,
@@ -317,8 +301,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -331,9 +314,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 9
+        "w": 8,
+        "x": 16,
+        "y": 1
       },
       "id": 15,
       "options": {
@@ -368,7 +351,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 9
       },
       "id": 6,
       "panels": [],
@@ -428,58 +411,13 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": ".*: healthy"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*: unhealthy"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*: dead"
+              "options": ".*: not healthy"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
                   "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".*: terminating"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
                   "mode": "fixed"
                 }
               }
@@ -491,7 +429,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 18
+        "y": 10
       },
       "id": 8,
       "options": {
@@ -511,10 +449,21 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_health, khaleesi_service) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\"}) > 0",
+          "expr": "sum by (khaleesi_service) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_health=\"healthy\"}) > 0",
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_service}}: {{khaleesi_health}}`}}",
-          "refId": "A"
+          "legendFormat": "{{`{{khaleesi_service}}: healthy`}}",
+          "refId": "healthy"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by (khaleesi_service) (khaleesi_health{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_health!=\"healthy\"}) > 0",
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_service}}: not healthy`}}",
+          "refId": "not healthy"
         }
       ],
       "title": "Instance health",
@@ -621,7 +570,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 18
+        "y": 10
       },
       "id": 17,
       "options": {
@@ -703,7 +652,7 @@
     ]
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
