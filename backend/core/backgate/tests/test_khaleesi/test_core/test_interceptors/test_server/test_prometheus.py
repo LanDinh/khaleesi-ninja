@@ -3,7 +3,7 @@
 # Python.
 from functools import partial
 from itertools import product
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 from unittest.mock import MagicMock, patch
 
 # gRPC.
@@ -84,7 +84,10 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(user = user_label.lower()):
         # Prepare data.
         metric.reset_mock()
-        expected_request = self._get_request(user = user_type, **request_params)
+        expected_request = self._get_request(
+          user = None if request is not None else user_type,
+          **request_params
+        )
         # Execute test.
         self.interceptor.khaleesi_intercept(
           method       = lambda *args : None,
@@ -109,7 +112,10 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(status = status.name, user = user_label.lower()):
         # Prepare data.
         metric.reset_mock()
-        expected_request = self._get_request(user = user_type, **request_params)
+        expected_request = self._get_request(
+          user = None if request is not None else user_type,
+          **request_params
+        )
         exception = KhaleesiException(
           status          = status,
           gate            = 'gate',
@@ -147,7 +153,10 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(user = user_label.lower()):
         # Prepare data.
         metric.reset_mock()
-        expected_request = self._get_request(user = user_type, **request_params)
+        expected_request = self._get_request(
+          user = None if request is not None else user_type,
+          **request_params
+        )
         # Execute test.
         with self.assertRaises(Exception):
           self.interceptor.khaleesi_intercept(
@@ -167,7 +176,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
   @staticmethod
   def _get_request(
       *,
-      user: int,
+      user: Union[None, 'User.UserType.V'],
       khaleesi_gate: Optional[str]    = 'khaleesi-gate',
       khaleesi_service: Optional[str] = 'khaleesi-service',
       grpc_service: Optional[str]     = 'grpc-service',
@@ -175,7 +184,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
   ) -> Any :
     """Helper to create the request object."""
     request = MagicMock(request_metadata = RequestMetadata())
-    request.request_metadata.user.type               = user
+    request.request_metadata.user.type = user if user is not None else User.UserType.UNKNOWN
     request.request_metadata.caller.khaleesi_gate    = khaleesi_gate
     request.request_metadata.caller.khaleesi_service = khaleesi_service
     request.request_metadata.caller.grpc_service     = grpc_service

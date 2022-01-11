@@ -33,7 +33,7 @@ class RequestsMetric(CounterMetric):
   def inc(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       status               : StatusCode,
-      user                 : int,
+      user                 : 'User.UserType.V',
       grpc_service         : str,
       grpc_method          : str,
       peer_khaleesi_gate   : str,
@@ -46,7 +46,7 @@ class RequestsMetric(CounterMetric):
 
   def track_in_progress(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
-      user                 : int,
+      user                 : 'User.UserType.V',
       grpc_service         : str,
       grpc_method          : str,
       peer_khaleesi_gate   : str,
@@ -63,7 +63,7 @@ class RequestsMetric(CounterMetric):
   def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       status               : StatusCode,
-      user                 : int,
+      user                 : 'User.UserType.V',
       grpc_service         : str,
       grpc_method          : str,
       peer_khaleesi_gate   : str,
@@ -76,7 +76,7 @@ class RequestsMetric(CounterMetric):
 
   def get_in_progress_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
-      user                 : int,
+      user                 : 'User.UserType.V',
       grpc_service         : str,
       grpc_method          : str,
       peer_khaleesi_gate   : str,
@@ -92,14 +92,14 @@ class RequestsMetric(CounterMetric):
 
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,
-      status: StatusCode,
-      user  : int,
+      status             : StatusCode,
+      user               : 'User.UserType.V',
       **additional_labels: str,
   ) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return super().labels(
       status = status.name.lower(),
-      user   = User.UserType.Name(user).lower(),  # type: ignore[arg-type]
+      user   = User.UserType.Name(user).lower(),
       **additional_labels,
     )
 
