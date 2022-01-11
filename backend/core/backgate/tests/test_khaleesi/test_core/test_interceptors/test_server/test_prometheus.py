@@ -47,7 +47,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(case = name):
         self._execute_intercept_tests(request_params = request_params)  # type: ignore[arg-type]
 
-  def test_intercept_without_metadata(self) -> None :
+  def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
     self._execute_intercept_tests(request = {}, request_params = {
         'khaleesi_gate'   : '',
@@ -88,7 +88,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         # Execute test.
         self.interceptor.khaleesi_intercept(
           method       = lambda *args : None,
-          request      = request or expected_request,
+          request      = request if request is not None else expected_request,
           context      = MagicMock(),
           service_name = self.service_name,
           method_name  = self.method_name,
@@ -126,7 +126,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
               lambda inner_exception, *args : _raise(inner_exception),
               exception,
             ),
-            request      = request or expected_request,
+            request      = request if request is not None else expected_request,
             context      = MagicMock(),
             service_name = self.service_name,
             method_name  = self.method_name,
@@ -152,7 +152,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         with self.assertRaises(Exception):
           self.interceptor.khaleesi_intercept(
             method       = lambda *args : _raise(Exception('exception')),
-            request      = request or expected_request,
+            request      = request if request is not None else expected_request,
             context      = MagicMock(),
             service_name = self.service_name,
             method_name  = self.method_name,
