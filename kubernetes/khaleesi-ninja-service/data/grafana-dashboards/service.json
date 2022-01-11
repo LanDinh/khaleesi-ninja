@@ -148,7 +148,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
           "interval": "",
           "legendFormat": "{{`OK: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -159,7 +159,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
@@ -264,7 +264,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate, status) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate, status) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
