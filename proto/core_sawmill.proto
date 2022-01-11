@@ -23,12 +23,15 @@ message Event {
 
   message Action {
     enum ActionType {
+      // Special.
       UNKNOWN_ACTION = 0;
-      CREATE         = 1;
-      READ           = 2;
-      UPDATE         = 3;
-      DELETE         = 4;
-      CUSTOM         = 5;
+      CUSTOM         = 1;
+
+      // CRUD.
+      CREATE         = 10;
+      READ           = 11;
+      UPDATE         = 12;
+      DELETE         = 13;
     }
 
     enum ResultType {
@@ -45,7 +48,7 @@ message Event {
   }
 
   khaleesi.core.RequestMetadata request_metadata = 1;
-  Metadata                      metadata         = 2;
+  Metadata                      logging_metadata = 2;
   Target                        target           = 3;
   Action                        action           = 4;
 }

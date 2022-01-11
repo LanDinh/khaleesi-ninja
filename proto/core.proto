@@ -4,11 +4,14 @@ package khaleesi.core;
 
 message User {
   enum UserType {
+    // Non human.
     UNKNOWN       = 0;
-    ANONYMOUS     = 1;
-    AUTHENTICATED = 2;
-    PRIVILEGED    = 3;
-    SYSTEM        = 4;
+    SYSTEM        = 1;
+
+    // Human.
+    ANONYMOUS     = 10;
+    AUTHENTICATED = 11;
+    PRIVILEGED    = 12;
   }
 
   string   id   = 1;

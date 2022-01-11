@@ -26,12 +26,12 @@ class EventManagerTestCase(TransactionTestCase):
     grpc_event = GrpcEvent()
     grpc_event.request_metadata.user.id         = 'origin-system'
     grpc_event.request_metadata.user.type       = User.UserType.SYSTEM
-    grpc_event.metadata.timestamp.FromDatetime(now)
-    grpc_event.metadata.logger.request_id       = 'metadata-request-id'
-    grpc_event.metadata.logger.khaleesi_gate    = 'metadata-khaleesi-gate'
-    grpc_event.metadata.logger.khaleesi_service = 'metadata-khaleesi-service'
-    grpc_event.metadata.logger.grpc_service     = 'metadata-grpc-service'
-    grpc_event.metadata.logger.grpc_method      = 'metadata-grpc-method'
+    grpc_event.logging_metadata.timestamp.FromDatetime(now)
+    grpc_event.logging_metadata.logger.request_id       = 'metadata-request-id'
+    grpc_event.logging_metadata.logger.khaleesi_gate    = 'metadata-khaleesi-gate'
+    grpc_event.logging_metadata.logger.khaleesi_service = 'metadata-khaleesi-service'
+    grpc_event.logging_metadata.logger.grpc_service     = 'metadata-grpc-service'
+    grpc_event.logging_metadata.logger.grpc_method      = 'metadata-grpc-method'
     grpc_event.target.type                      = 'target-type'
     grpc_event.target.id                        = 13
     grpc_event.target.owner.id                  = str(uuid4())
@@ -141,17 +141,26 @@ class EventTestCase(SimpleTestCase):
     result = event.to_grpc_event()
     # Assert result.
     self.assertEqual(event.meta_event_timestamp,
-      result.metadata.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+      result.logging_metadata.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
     self.assertEqual(
       event.meta_logged_timestamp,
-      result.metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+      result.logging_metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
-    self.assertEqual(event.meta_logger_request_id      , result.metadata.logger.request_id)
-    self.assertEqual(event.meta_logger_khaleesi_gate   , result.metadata.logger.khaleesi_gate)
-    self.assertEqual(event.meta_logger_khaleesi_service, result.metadata.logger.khaleesi_service)
-    self.assertEqual(event.meta_logger_grpc_service    , result.metadata.logger.grpc_service)
-    self.assertEqual(event.meta_logger_grpc_method     , result.metadata.logger.grpc_method)
+    self.assertEqual(event.meta_logger_request_id      , result.logging_metadata.logger.request_id)
+    self.assertEqual(
+      event.meta_logger_khaleesi_gate,
+      result.logging_metadata.logger.khaleesi_gate,
+    )
+    self.assertEqual(
+      event.meta_logger_khaleesi_service,
+      result.logging_metadata.logger.khaleesi_service,
+    )
+    self.assertEqual(
+      event.meta_logger_grpc_service,
+      result.logging_metadata.logger.grpc_service,
+    )
+    self.assertEqual(event.meta_logger_grpc_method     , result.logging_metadata.logger.grpc_method)
     self.assertEqual(event.target_type                 , result.target.type)
     self.assertEqual(event.target_id                   , result.target.id)
     self.assertEqual(str(event.target_owner)           , result.target.owner.id)

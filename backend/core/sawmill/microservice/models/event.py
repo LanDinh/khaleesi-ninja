@@ -32,7 +32,7 @@ class EventManager(models.Manager['Event']):
 
     return self.create(
       # Metadata.
-      **self.model.log_metadata(metadata = grpc_event.metadata, errors = errors),
+      **self.model.log_metadata(metadata = grpc_event.logging_metadata, errors = errors),
       # Target.
       target_type = grpc_event.target.type,
       target_id = grpc_event.target.id,
@@ -74,13 +74,13 @@ class Event(Metadata):
     grpc_event.request_metadata.user.id   = self.origin_user
     grpc_event.request_metadata.user.type = self.origin_type
     # Metadata.
-    grpc_event.metadata.timestamp.FromDatetime(self.meta_event_timestamp)
-    grpc_event.metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
-    grpc_event.metadata.logger.request_id       = self.meta_logger_request_id
-    grpc_event.metadata.logger.khaleesi_gate    = self.meta_logger_khaleesi_gate
-    grpc_event.metadata.logger.khaleesi_service = self.meta_logger_khaleesi_service
-    grpc_event.metadata.logger.grpc_service     = self.meta_logger_grpc_service
-    grpc_event.metadata.logger.grpc_method      = self.meta_logger_grpc_method
+    grpc_event.logging_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
+    grpc_event.logging_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
+    grpc_event.logging_metadata.logger.request_id       = self.meta_logger_request_id
+    grpc_event.logging_metadata.logger.khaleesi_gate    = self.meta_logger_khaleesi_gate
+    grpc_event.logging_metadata.logger.khaleesi_service = self.meta_logger_khaleesi_service
+    grpc_event.logging_metadata.logger.grpc_service     = self.meta_logger_grpc_service
+    grpc_event.logging_metadata.logger.grpc_method      = self.meta_logger_grpc_method
     # Target.
     grpc_event.target.type     = self.target_type
     grpc_event.target.id       = self.target_id
