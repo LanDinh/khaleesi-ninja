@@ -14,7 +14,7 @@ class SawyerServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch.object(Event.objects, 'all')
+  @patch.object(Event.objects, 'filter')
   def test_get_events(self, db_events: MagicMock) -> None :
     """Test getting logged events."""
     # Prepare data.

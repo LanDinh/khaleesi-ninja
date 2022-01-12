@@ -5,7 +5,7 @@ from os import environ
 from typing import cast
 
 # khaleesi.ninja.
-from . import definition
+from . import definition as definition  # pylint: disable=useless-import-alias
 
 
 # Base definition.
