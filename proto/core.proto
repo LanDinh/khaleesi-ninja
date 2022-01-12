@@ -2,6 +2,9 @@ syntax = "proto3";
 
 package khaleesi.core;
 
+import "google/protobuf/timestamp.proto";
+
+
 message User {
   enum UserType {
     // Non human.
@@ -18,7 +21,7 @@ message User {
   UserType type = 2;
 }
 
-message GrpcRequestMetadata {
+message GrpcCallerDetails {
   string request_id       = 1;
   string khaleesi_gate    = 2;
   string khaleesi_service = 3;
@@ -27,6 +30,11 @@ message GrpcRequestMetadata {
 }
 
 message RequestMetadata {
-  GrpcRequestMetadata caller = 1;
-  User                user   = 2;
+  // Set by calling service.
+  GrpcCallerDetails         caller           = 1;
+  User                      user             = 2;
+  google.protobuf.Timestamp timestamp        = 3;
+
+  // Response-only fields.
+  google.protobuf.Timestamp logged_timestamp = 10;
 }

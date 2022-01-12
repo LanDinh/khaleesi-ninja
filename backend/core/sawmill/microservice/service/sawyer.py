@@ -20,7 +20,7 @@ class Service(Servicer):
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
     result = EventsList()
-    for event in DbEvent.objects.filter(origin_type = User.UserType.SYSTEM):
+    for event in DbEvent.objects.filter(meta_user_type = User.UserType.SYSTEM):
       result.events.append(event.to_grpc_event())
     return result
 

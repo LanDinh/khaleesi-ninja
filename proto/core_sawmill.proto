@@ -2,15 +2,7 @@ syntax = "proto3";
 
 package khaleesi.core.sawmill;
 
-import "google/protobuf/timestamp.proto";
 import "core.proto";
-
-
-message LoggingMetadata {
-  google.protobuf.Timestamp         timestamp        = 1;
-  google.protobuf.Timestamp         logged_timestamp = 2;
-  khaleesi.core.GrpcRequestMetadata logger           = 3;
-}
 
 
 message Event {
@@ -52,9 +44,8 @@ message Event {
   }
 
   khaleesi.core.RequestMetadata request_metadata = 1;
-  LoggingMetadata               logging_metadata = 2;
-  Target                        target           = 3;
-  Action                        action           = 4;
+  Target                        target           = 2;
+  Action                        action           = 3;
 }
 
 message LogResponse {}

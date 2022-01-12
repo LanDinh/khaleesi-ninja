@@ -20,30 +20,23 @@ class EventManager(models.Manager['Event']):
     errors = ''
 
     target_owner, target_owner_error = parse_uuid(
-      raw = grpc_event.target.owner.id,
+      raw  = grpc_event.target.owner.id,
       name = 'target_owner',
     )
     errors += target_owner_error
 
-    if grpc_event.action.crud_type == GrpcEvent.Action.ActionType.CUSTOM:
-      action_type = grpc_event.action.custom_type
-    else:
-      action_type = GrpcEvent.Action.ActionType.Name(grpc_event.action.crud_type)
-
     return self.create(
       # Metadata.
-      **self.model.log_metadata(metadata = grpc_event.logging_metadata, errors = errors),
+      **self.model.log_metadata(metadata = grpc_event.request_metadata, errors = errors),
       # Target.
-      target_type = grpc_event.target.type,
-      target_id = grpc_event.target.id,
+      target_type  = grpc_event.target.type,
+      target_id    = grpc_event.target.id,
       target_owner = target_owner,
-      # Origin.
-      origin_user = grpc_event.request_metadata.user.id,
-      origin_type = grpc_event.request_metadata.user.type,
       # Action.
-      action_type = action_type,
-      action_result = grpc_event.action.result,
-      action_details = grpc_event.action.details,
+      action_crud_type   = grpc_event.action.crud_type,
+      action_custom_type = grpc_event.action.custom_type,
+      action_result      = grpc_event.action.result,
+      action_details     = grpc_event.action.details,
     )
 
 
@@ -55,14 +48,11 @@ class Event(Metadata):
   target_id    = models.BigIntegerField(default = 0)
   target_owner = models.UUIDField(null = True, blank = True)
 
-  # Origin.
-  origin_user   = models.TextField(default = 'UNKNOWN')
-  origin_type   = models.IntegerField(default = 0)
-
   # Action.
-  action_type    = models.TextField(default = 'UNKNOWN')
-  action_result  = models.IntegerField(default = 0)
-  action_details = models.TextField(default = 'UNKNOWN')
+  action_crud_type   = models.IntegerField(default = 0)
+  action_custom_type = models.TextField(default = 'UNKNOWN')
+  action_result      = models.IntegerField(default = 0)
+  action_details     = models.TextField(default = 'UNKNOWN')
 
   objects = EventManager()
 
@@ -71,27 +61,23 @@ class Event(Metadata):
 
     grpc_event = GrpcEvent()
     # Request metadata.
-    grpc_event.request_metadata.user.id   = self.origin_user
-    grpc_event.request_metadata.user.type = self.origin_type
-    # Metadata.
-    grpc_event.logging_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
-    grpc_event.logging_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
-    grpc_event.logging_metadata.logger.request_id       = self.meta_logger_request_id
-    grpc_event.logging_metadata.logger.khaleesi_gate    = self.meta_logger_khaleesi_gate
-    grpc_event.logging_metadata.logger.khaleesi_service = self.meta_logger_khaleesi_service
-    grpc_event.logging_metadata.logger.grpc_service     = self.meta_logger_grpc_service
-    grpc_event.logging_metadata.logger.grpc_method      = self.meta_logger_grpc_method
+    grpc_event.request_metadata.caller.request_id       = self.meta_caller_request_id
+    grpc_event.request_metadata.caller.khaleesi_gate    = self.meta_caller_khaleesi_gate
+    grpc_event.request_metadata.caller.khaleesi_service = self.meta_caller_khaleesi_service
+    grpc_event.request_metadata.caller.grpc_service     = self.meta_caller_grpc_service
+    grpc_event.request_metadata.caller.grpc_method      = self.meta_caller_grpc_method
+    grpc_event.request_metadata.user.id   = self.meta_user_id
+    grpc_event.request_metadata.user.type = self.meta_user_type
+    grpc_event.request_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
+    grpc_event.request_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
     # Target.
-    grpc_event.target.type     = self.target_type
-    grpc_event.target.id       = self.target_id
+    grpc_event.target.type = self.target_type
+    grpc_event.target.id   = self.target_id
     if self.target_owner:
       grpc_event.target.owner.id = str(self.target_owner)
     # Action.
-    try:
-      grpc_event.action.crud_type = GrpcEvent.Action.ActionType.Value(self.action_type)
-    except ValueError:
-      grpc_event.action.crud_type = GrpcEvent.Action.ActionType.CUSTOM
-      grpc_event.action.custom_type = self.action_type
+    grpc_event.action.crud_type = self.action_crud_type  # type: ignore[assignment]
+    grpc_event.action.custom_type = self.action_custom_type
     grpc_event.action.result  = self.action_result  # type: ignore[assignment]
     grpc_event.action.details = self.action_details
 

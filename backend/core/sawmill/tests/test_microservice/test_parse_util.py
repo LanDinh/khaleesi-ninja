@@ -20,14 +20,14 @@ class ParseUtilTestCase(SimpleTestCase):
     result, error = parse_uuid(raw = str(raw), name = 'valid_uuid')
     # Assert result.
     self.assertEqual(raw, result)
-    self.assertEqual('', error)
+    self.assertEqual('' , error)
 
   def test_parse_uuid_empty(self) -> None :
     """Test empty input for parse_uuid."""
     # Prepare data.
     raw = None
     # Execute test.
-    result, error = parse_uuid(raw = raw, name = 'empty uuid')
+    result, error = parse_uuid(raw = raw, name = 'empty_uuid')
     # Assert result.
     self.assertIsNone(result)
     self.assertEqual('', error)
@@ -35,8 +35,8 @@ class ParseUtilTestCase(SimpleTestCase):
   def test_parse_uuid_invalid(self) -> None :
     """Test invalid input for parse_uuid."""
     # Prepare data.
-    name = 'invalid uuid'
-    raw = 'invalid_uuid'
+    name = 'invalid_uuid'
+    raw  = 'invalid_uuid'
     # Execute test.
     result, error = parse_uuid(raw = raw, name = name)
     # Assert result.
@@ -53,14 +53,14 @@ class ParseUtilTestCase(SimpleTestCase):
         result, error = parse_timestamp(raw = raw, name = 'valid_timestamp')
         # Assert result.
         self.assertEqual(raw.replace(tzinfo = None), result.replace(tzinfo = None))  # type: ignore[union-attr]  # pylint: disable=line-too-long
-        self.assertEqual('', error)
+        self.assertEqual(''                        , error)
 
   def test_parse_timestamp_empty(self) -> None :
-    """Test invalid input for parse_timestamp."""
+    """Test empty input for parse_timestamp."""
     # Prepare data.
     raw = None
     # Execute test.
-    result, error = parse_timestamp(raw = raw, name = 'empty timestamp')
+    result, error = parse_timestamp(raw = raw, name = 'empty_timestamp')
     # Assert result.
     self.assertEqual(datetime.min.replace(tzinfo = timezone.utc), result)
-    self.assertEqual('', error)
+    self.assertEqual(''                                         , error)

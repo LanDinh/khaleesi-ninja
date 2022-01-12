@@ -26,5 +26,5 @@ class SawyerServiceTestCase(SimpleTestCase):
     result = self.service.GetEvents(LogFilter(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.events))
-    db_events.assert_called_once_with(origin_type = User.UserType.SYSTEM)
+    db_events.assert_called_once_with(meta_user_type = User.UserType.SYSTEM)
     db_event.to_grpc_event.assert_called_once_with()

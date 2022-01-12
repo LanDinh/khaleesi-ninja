@@ -34,7 +34,7 @@ def parse_uuid(*, raw: Optional[str], name: str) -> Tuple[Optional[UUID], str]:
   )
 
 def parse_timestamp(*, raw: Optional[datetime], name: str) -> Tuple[Optional[datetime], str]:
-  """Attempt to parse UUIDs."""
+  """Attempt to parse timestamps."""
   def parser(parser_input: datetime) -> datetime :
     """Custom parser."""
     return parser_input.replace(tzinfo = timezone.utc)
