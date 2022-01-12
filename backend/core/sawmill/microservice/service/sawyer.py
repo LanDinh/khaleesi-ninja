@@ -5,6 +5,7 @@ import grpc
 
 # khaleesi-ninja.
 from khaleesi.core.service_configuration import ServiceConfiguration
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, LogFilter, EventsList
 from khaleesi.proto.core_sawmill_pb2_grpc import (
   SawyerServicer as Servicer,
@@ -19,7 +20,7 @@ class Service(Servicer):
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
     result = EventsList()
-    for event in DbEvent.objects.all():
+    for event in DbEvent.objects.filter(origin_type = User.UserType.SYSTEM):
       result.events.append(event.to_grpc_event())
     return result
 

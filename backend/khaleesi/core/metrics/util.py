@@ -13,10 +13,10 @@ from prometheus_client.metrics import MetricWrapperBase  # type: ignore[import] 
 from prometheus_client.registry import REGISTRY  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
 
 # khaleesi.ninja.
-from khaleesi.core.settings.definition import KhaleesiNinjaMetadata
+from khaleesi.core.settings.definition import Metadata
 
 
-khaleesi_settings: KhaleesiNinjaMetadata = settings.KHALEESI_NINJA['METADATA']
+khaleesi_settings: Metadata = settings.KHALEESI_NINJA['METADATA']
 server_labels = {
     'khaleesi_gate'    : khaleesi_settings['GATE'],
     'khaleesi_service' : khaleesi_settings['SERVICE'],

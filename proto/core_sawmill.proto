@@ -32,6 +32,10 @@ message Event {
       READ           = 11;
       UPDATE         = 12;
       DELETE         = 13;
+
+      // Processes.
+      START          = 20;
+      END            = 21;
     }
 
     enum ResultType {
