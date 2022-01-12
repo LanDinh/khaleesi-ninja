@@ -8,7 +8,7 @@ from itertools import product
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.metrics.requests import (OUTGOING_REQUESTS, INCOMING_REQUESTS)
+from khaleesi.core.metrics.requests import OUTGOING_REQUESTS, INCOMING_REQUESTS
 from khaleesi.core.test_util import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from tests.test_khaleesi.test_core.test_metrics.test_util import CounterMetricTestMixin
@@ -29,13 +29,13 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
   def test_inc(self) -> None :
     """Test incrementing the counter."""
     # Prepare data.
-    for status, (_, user) in product(StatusCode, User.UserType.items()):
-      with self.subTest(status = status.name, user = user):  # type: ignore[attr-defined]  # pylint: disable=no-member
+    for status, (user_label, user_type) in product(StatusCode, User.UserType.items()):
+      with self.subTest(status = status.name, user = user_label):  # type: ignore[attr-defined]  # pylint: disable=no-member
         # Execute test and assert result.
         self.execute_and_assert_counter(
-          method = partial(self.metric.inc, status = status, user = user, **self.labels),
+          method = partial(self.metric.inc, status = status, user = user_type, **self.labels),
           status = status,
-          user   = user,
+          user   = user_type,
           **self.labels
         )
 

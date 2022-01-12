@@ -31,6 +31,7 @@ class Metric(Enum):
   KHALEESI_HEALTH            = 1
   KHALEESI_OUTGOING_REQUESTS = 2
   KHALEESI_INCOMING_REQUESTS = 3
+  KHALEESI_AUDIT_EVENT       = 4
 
 
 class AbstractMetric:
