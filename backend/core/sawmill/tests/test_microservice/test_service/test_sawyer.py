@@ -5,6 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, LogFilter
 from microservice.models import Event
 from microservice.service.sawyer import Service
@@ -25,5 +26,5 @@ class SawyerServiceTestCase(SimpleTestCase):
     result = self.service.GetEvents(LogFilter(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.events))
-    db_events.assert_called_once_with()
+    db_events.assert_called_once_with(origin_type = User.UserType.SYSTEM)
     db_event.to_grpc_event.assert_called_once_with()
