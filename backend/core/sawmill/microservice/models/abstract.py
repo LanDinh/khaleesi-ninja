@@ -8,7 +8,7 @@ from typing import Dict, Any
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.proto.core_sawmill_pb2 import Metadata as GrpcMetadata
+from khaleesi.proto.core_sawmill_pb2 import LoggingMetadata
 from microservice.parse_util import parse_timestamp
 
 
@@ -31,7 +31,7 @@ class Metadata(models.Model):
   meta_logging_errors = models.TextField(blank = True)
 
   @staticmethod
-  def log_metadata(*, metadata: GrpcMetadata, errors: str) -> Dict[str, Any] :
+  def log_metadata(*, metadata: LoggingMetadata, errors: str) -> Dict[str, Any] :
     """Parse common metadata."""
     event_timestamp, event_timestamp_error = parse_timestamp(
       raw = metadata.timestamp.ToDatetime(),

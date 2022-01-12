@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "core.proto";
 
 
-message Metadata {
+message LoggingMetadata {
   google.protobuf.Timestamp         timestamp        = 1;
   google.protobuf.Timestamp         logged_timestamp = 2;
   khaleesi.core.GrpcRequestMetadata logger           = 3;
@@ -48,7 +48,7 @@ message Event {
   }
 
   khaleesi.core.RequestMetadata request_metadata = 1;
-  Metadata                      logging_metadata = 2;
+  LoggingMetadata               logging_metadata = 2;
   Target                        target           = 3;
   Action                        action           = 4;
 }

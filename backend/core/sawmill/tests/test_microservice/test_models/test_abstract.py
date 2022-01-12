@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.test_util import SimpleTestCase
-from khaleesi.proto.core_sawmill_pb2 import Metadata as GrpcMetadata
+from khaleesi.proto.core_sawmill_pb2 import LoggingMetadata as GrpcMetadata
 from microservice.models.abstract import Metadata
 
 
