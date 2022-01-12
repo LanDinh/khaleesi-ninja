@@ -100,7 +100,6 @@ class CounterMetric(AbstractMetric):
   """Counter metric."""
 
   _metric: Counter
-  _metric_in_progress: Gauge
 
   def __init__(self, *, metric_id: Metric, description: str, additional_labels: List[str]) -> None :
     """Initialize the enum metric."""
@@ -110,25 +109,10 @@ class CounterMetric(AbstractMetric):
       metric_type       = Counter,
       additional_labels = additional_labels,
     )
-    self._metric_in_progress = Gauge(
-      f'{metric_id.name.lower()}_in_progress',
-      description,
-      list(server_labels.keys()) + additional_labels,
-      registry = REGISTRY,
-    )
 
   def inc(self, **kwargs: Any) -> None :
     """Set the metric to the given value."""
     self._metric.labels(**self.labels(**kwargs)).inc()
-
-  def track_in_progress(self, **kwargs: Any) -> Any :
-    """Tracks the number of things in progress."""
-    return self._metric_in_progress.labels(**self.labels(**kwargs)).track_inprogress()
-
-  def get_in_progress_value(self, **kwargs: Any) -> int :
-    """Return the current value of the metric."""
-    # noinspection PyProtectedMember
-    return int(self._metric_in_progress.labels(**self.labels(**kwargs))._value.get())  # pylint: disable=protected-access
 
 
 EnumType = TypeVar('EnumType', bound = Enum)  # pylint: disable=invalid-name

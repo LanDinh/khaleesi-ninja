@@ -46,16 +46,3 @@ class CounterMetricTestMixin:
     # Assert result.
     new_value = self.metric.get_value(**labels)
     self.assertEqual(original_value + 1, new_value)  # type: ignore[attr-defined]  # pylint: disable=no-member
-
-  def execute_and_assert_in_progress(self, *, method: Callable[[], None], **labels: Any) -> None :
-    """Execute the increment and assert it worked."""
-    # Prepare data.
-    original_value = self.metric.get_in_progress_value(**labels)
-    # Execute tests.
-    with self.metric.track_in_progress(**labels):
-      method()
-      # Assert result.
-      in_progress_value = self.metric.get_in_progress_value(**labels)
-      self.assertEqual(original_value + 1, in_progress_value)  # type: ignore[attr-defined]  # pylint: disable=no-member
-    new_value = self.metric.get_in_progress_value(**labels)
-    self.assertEqual(original_value, new_value)  # type: ignore[attr-defined]  # pylint: disable=no-member

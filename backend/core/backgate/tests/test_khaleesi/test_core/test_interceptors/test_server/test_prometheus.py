@@ -203,4 +203,3 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         'peer_grpc_method'     : request.request_metadata.caller.grpc_method      or 'UNKNOWN',
     }
     metric.inc.assert_called_once_with(status = status, **labels)
-    metric.track_in_progress.assert_called_once_with(**labels)

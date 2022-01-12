@@ -39,18 +39,6 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           **self.labels
         )
 
-  def test_track_in_progress(self) -> None :
-    """Test tracking the in progress data."""
-    # Prepare data.
-    for _, user in User.UserType.items():
-      with self.subTest(user = user):  # type: ignore[attr-defined]  # pylint: disable=no-member
-        # Execute test and assert result.
-        self.execute_and_assert_in_progress(
-          method = partial(self.metric.track_in_progress, user = user, **self.labels),
-          user   = user,
-          **self.labels
-        )
-
 
 class OutgoingRequestsMetricTestCase(SimpleTestCase, RequestsMetricTestMixin):
   """Test the outgoing requests metric."""
