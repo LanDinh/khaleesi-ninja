@@ -161,5 +161,5 @@ class Command(BaseCommand):
       stub.LogEvent(event)
     else:
       # Send directly to the DB. Note that Events must be present in the schema!
-      from microservice.models import Event as DbEvent  # type: ignore[import]  # pylint: disable=import-error,import-outside-toplevel
+      from microservice.models import Event as DbEvent  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       DbEvent.objects.log_event(grpc_event = event)
