@@ -7,6 +7,7 @@ from __future__ import annotations
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent
 from microservice.models.abstract import Metadata
 from microservice.parse_util import parse_uuid
@@ -17,6 +18,11 @@ class EventManager(models.Manager['Event']):
 
   def log_event(self, *, grpc_event: GrpcEvent) -> Event :
     """Log a gRPC event."""
+    # If this is a server startup event, we need to do the metric logging here.
+    if grpc_event.target.type == 'core.core.server' and grpc_event.action.crud_type in \
+        [ GrpcEvent.Action.ActionType.START, GrpcEvent.Action.ActionType.END ]:
+      AUDIT_EVENT.inc(event = grpc_event)
+
     errors = ''
 
     target_owner, target_owner_error = parse_uuid(
