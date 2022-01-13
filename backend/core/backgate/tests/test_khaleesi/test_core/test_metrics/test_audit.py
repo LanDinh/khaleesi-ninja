@@ -15,13 +15,6 @@ class AuditEventMetricTestMixin(SimpleTestCase, CounterMetricTestMixin):
   """Test the audit event metric."""
 
   metric = AUDIT_EVENT
-  labels = {
-      'grpc_service'      : 'grpc-service',
-      'grpc_method'       : 'grpc-method',
-      'event'             : 'event',
-      'target'            : 'target',
-      'action_custom_type': 'action-type',
-  }
 
   def test_inc(self) -> None :
     """Test incrementing the counter."""
@@ -30,17 +23,32 @@ class AuditEventMetricTestMixin(SimpleTestCase, CounterMetricTestMixin):
       for action_label, action_type in Event.Action.ActionType.items():
         for result_label, result_type in Event.Action.ResultType.items():
           with self.subTest(user = user_label, action = action_label, result = result_label):
+            # Prepare data.
+            event = self._get_event(
+              user = user_type,
+              action_crud_type = action_type,
+              result = result_type,
+            )
             # Execute test and assert result.
             self.execute_and_assert_counter(
-              method = partial(
-                self.metric.inc,
-                user             = user_type,
-                action_crud_type = action_type,
-                result           = result_type,
-                **self.labels,
-              ),
-              user             = user_type,
-              action_crud_type = action_type,
-              result           = result_type,
-              **self.labels
+              method = partial(self.metric.inc, event = event),
+              event = event,
             )
+
+  @staticmethod
+  def _get_event(
+      *,
+      user: 'User.UserType.V',
+      action_crud_type: 'Event.Action.ActionType.V',
+      result: 'Event.Action.ResultType.V',
+  ) -> Event :
+    """Construct event."""
+    event = Event()
+    event.request_metadata.user.type           = user
+    event.request_metadata.caller.grpc_service = 'grpc-service'
+    event.request_metadata.caller.grpc_method  = 'grpc-method'
+    event.target.type = 'target'
+    event.action.crud_type   = action_crud_type
+    event.action.custom_type = 'action-type'
+    event.action.result      = result
+    return event

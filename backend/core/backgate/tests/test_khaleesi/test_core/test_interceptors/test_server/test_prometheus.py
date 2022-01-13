@@ -3,7 +3,7 @@
 # Python.
 from functools import partial
 from itertools import product
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 from unittest.mock import MagicMock, patch
 
 # gRPC.
@@ -84,20 +84,26 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(user = user_label.lower()):
         # Prepare data.
         metric.reset_mock()
-        expected_request = self._get_request(
-          user = None if request is not None else user_type,
-          **request_params
-        )
+        if request is None:
+          request_metadata = self._get_request(user = user_type, **request_params)
+          final_request = MagicMock(request_metadata = request_metadata)
+        else:
+          request_metadata = RequestMetadata()
+          final_request = request
         # Execute test.
         self.interceptor.khaleesi_intercept(
           method       = lambda *args : None,
-          request      = request if request is not None else expected_request,
+          request      = final_request,
           context      = MagicMock(),
           service_name = self.service_name,
           method_name  = self.method_name,
         )
         # Assert result.
-        self.assert_metric_call(metric = metric, request = expected_request, status = StatusCode.OK)
+        self._assert_metric_call(
+          metric           = metric,
+          request_metadata = request_metadata,
+          status           = StatusCode.OK,
+        )
 
   @patch('khaleesi.core.interceptors.server.prometheus.INCOMING_REQUESTS')
   def _execute_intercept_khaleesi_exception_test(
@@ -112,10 +118,12 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(status = status.name, user = user_label.lower()):
         # Prepare data.
         metric.reset_mock()
-        expected_request = self._get_request(
-          user = None if request is not None else user_type,
-          **request_params
-        )
+        if request is None:
+          request_metadata = self._get_request(user = user_type, **request_params)
+          final_request = MagicMock(request_metadata = request_metadata)
+        else:
+          request_metadata = RequestMetadata()
+          final_request = request
         exception = KhaleesiException(
           status          = status,
           gate            = 'gate',
@@ -132,13 +140,17 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
               lambda inner_exception, *args : _raise(inner_exception),
               exception,
             ),
-            request      = request if request is not None else expected_request,
+            request      = final_request,
             context      = MagicMock(),
             service_name = self.service_name,
             method_name  = self.method_name,
           )
         # Assert result.
-        self.assert_metric_call(metric = metric, request = expected_request, status = status)
+        self._assert_metric_call(
+          metric           = metric,
+          request_metadata = request_metadata,
+          status           = status,
+        )
 
   @patch('khaleesi.core.interceptors.server.prometheus.INCOMING_REQUESTS')
   def _execute_intercept_other_exception_test(
@@ -153,53 +165,56 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
       with self.subTest(user = user_label.lower()):
         # Prepare data.
         metric.reset_mock()
-        expected_request = self._get_request(
-          user = None if request is not None else user_type,
-          **request_params
-        )
+        if request is None:
+          request_metadata = self._get_request(user = user_type, **request_params)
+          final_request = MagicMock(request_metadata = request_metadata)
+        else:
+          request_metadata = RequestMetadata()
+          final_request = request
         # Execute test.
         with self.assertRaises(Exception):
           self.interceptor.khaleesi_intercept(
             method       = lambda *args : _raise(Exception('exception')),
-            request      = request if request is not None else expected_request,
+            request      = final_request,
             context      = MagicMock(),
             service_name = self.service_name,
             method_name  = self.method_name,
           )
         # Assert result.
-        self.assert_metric_call(
-          metric = metric,
-          request = expected_request,
-          status = StatusCode.UNKNOWN,
+        self._assert_metric_call(
+          metric           = metric,
+          request_metadata = request_metadata,
+          status           = StatusCode.UNKNOWN,
         )
 
   @staticmethod
   def _get_request(
       *,
-      user: Union[None, 'User.UserType.V'],
-      khaleesi_gate: Optional[str]    = 'khaleesi-gate',
-      khaleesi_service: Optional[str] = 'khaleesi-service',
-      grpc_service: Optional[str]     = 'grpc-service',
-      grpc_method: Optional[str]      = 'grpc-method',
-  ) -> Any :
+      user            : 'User.UserType.V' = User.UserType.UNKNOWN,
+      khaleesi_gate   : str               = 'khaleesi-gate',
+      khaleesi_service: str               = 'khaleesi-service',
+      grpc_service    : str               = 'grpc-service',
+      grpc_method     : str               = 'grpc-method',
+  ) -> RequestMetadata :
     """Helper to create the request object."""
-    request = MagicMock(request_metadata = RequestMetadata())
-    request.request_metadata.user.type = user if user is not None else User.UserType.UNKNOWN
-    request.request_metadata.caller.khaleesi_gate    = khaleesi_gate
-    request.request_metadata.caller.khaleesi_service = khaleesi_service
-    request.request_metadata.caller.grpc_service     = grpc_service
-    request.request_metadata.caller.grpc_method      = grpc_method
-    return request
+    request_metadata = RequestMetadata()
+    request_metadata.user.type = user
+    request_metadata.caller.khaleesi_gate    = khaleesi_gate
+    request_metadata.caller.khaleesi_service = khaleesi_service
+    request_metadata.caller.grpc_service     = grpc_service
+    request_metadata.caller.grpc_method      = grpc_method
+    return request_metadata
 
-  def assert_metric_call(self, *, metric: MagicMock, request: Any, status: StatusCode) -> None :
+  def _assert_metric_call(
+      self, *,
+      metric: MagicMock,
+      request_metadata: RequestMetadata,
+      status: StatusCode,
+  ) -> None :
     """Assert the metric call was correct."""
-    labels = {
-        'user'                 : request.request_metadata.user.type,
-        'grpc_service'         : self.service_name,
-        'grpc_method'          : self.method_name,
-        'peer_khaleesi_gate'   : request.request_metadata.caller.khaleesi_gate    or 'UNKNOWN',
-        'peer_khaleesi_service': request.request_metadata.caller.khaleesi_service or 'UNKNOWN',
-        'peer_grpc_service'    : request.request_metadata.caller.grpc_service     or 'UNKNOWN',
-        'peer_grpc_method'     : request.request_metadata.caller.grpc_method      or 'UNKNOWN',
-    }
-    metric.inc.assert_called_once_with(status = status, **labels)
+    metric.inc.assert_called_once_with(
+      status           = status,
+      request_metadata = request_metadata,
+      grpc_service     = self.service_name,
+      grpc_method      = self.method_name,
+    )

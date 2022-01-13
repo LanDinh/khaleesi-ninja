@@ -1,7 +1,7 @@
 """Server audit metrics."""
 
 # Python.
-from typing import Dict
+from typing import Dict, Any
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.util import CounterMetric, Metric
@@ -20,7 +20,6 @@ class AuditEventMetric(CounterMetric):
           'user',
           'grpc_service',
           'grpc_method',
-          'event',
           'target',
           'action_crud_type',
           'action_custom_type',
@@ -28,33 +27,13 @@ class AuditEventMetric(CounterMetric):
       ],
     )
 
-  def inc(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
-      self, *,
-      user              : 'User.UserType.V',
-      grpc_service      : str,
-      grpc_method       : str,
-      event             : str,
-      target            : str,
-      action_crud_type  : 'Event.Action.ActionType.V',
-      action_custom_type: str,
-      result            : 'Event.Action.ResultType.V',
-  ) -> None :
+  def inc(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""
-    super().inc(**self.without_extra_arguments(kwargs = locals()))
+    super().inc(**self._get_arguments(event = event))
 
-  def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
-      self, *,
-      user              : 'User.UserType.V',
-      grpc_service      : str,
-      grpc_method       : str,
-      event             : str,
-      target            : str,
-      action_crud_type  : 'Event.Action.ActionType.V',
-      action_custom_type: str,
-      result       : 'Event.Action.ResultType.V',
-  ) -> int :
+  def get_value(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""
-    return super().get_value(**self.without_extra_arguments(kwargs = locals()))
+    return super().get_value(**self._get_arguments(event = event))
 
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,
@@ -70,6 +49,19 @@ class AuditEventMetric(CounterMetric):
       result           = Event.Action.ResultType.Name(result).lower(),
       **additional_labels,
     )
+
+  @staticmethod
+  def _get_arguments(*, event: Event) -> Dict[str, Any] :
+    """Transform the event into arguments."""
+    return {
+        'user'              : event.request_metadata.user.type,
+        'grpc_service'      : event.request_metadata.caller.grpc_service,
+        'grpc_method'       : event.request_metadata.caller.grpc_method,
+        'target'            : event.target.type,
+        'action_crud_type'  : event.action.crud_type,
+        'action_custom_type': event.action.custom_type,
+        'result'            : event.action.result,
+    }
 
 
 AUDIT_EVENT = AuditEventMetric()
