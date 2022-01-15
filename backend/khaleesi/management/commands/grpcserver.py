@@ -71,7 +71,7 @@ class Command(BaseCommand):
           self._log_server_state_event(
             action = Event.Action.ActionType.END,
             result = Event.Action.ResultType.ERROR,
-            details = f'Server stop failed... time out instead of gracefully shutting down.',
+            details = 'Server stop failed... time out instead of gracefully shutting down.',
           )
       except Exception as stop_exception:
         self._log_server_state_event(
