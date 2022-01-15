@@ -19,7 +19,7 @@ from grpc_reflection.v1alpha import reflection
 from prometheus_client import start_http_server  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
 
 # khaleesi.ninja.
-from khaleesi.core.grpc import add_request_metadata
+from khaleesi.core.grpc.metadata import add_request_metadata
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
