@@ -69,15 +69,6 @@ class AbstractMetric:
         **{ key: value.upper() for key, value in kwargs.items() if value.startswith('unknown') },
     }
 
-  @staticmethod
-  def without_extra_arguments(*, kwargs: Dict[str, Any]) -> Dict[str, Any] :
-    """Pass on all arguments except for the self argument."""
-    return {
-        key: value
-        for key, value in kwargs.items()
-        if key != 'self' and not key.startswith('__')
-    }
-
 class GaugeMetric(AbstractMetric):
   """Gauge metric."""
 

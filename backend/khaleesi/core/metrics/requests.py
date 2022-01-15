@@ -74,7 +74,7 @@ class RequestsMetric(CounterMetric):
     )
 
   @staticmethod
-  def string_or_unknown(value: str) -> str :
+  def _string_or_unknown(value: str) -> str :
     """Either return the value, or UNKNOWN if empty."""
     if value:
       return value
@@ -86,10 +86,10 @@ class RequestsMetric(CounterMetric):
   ) -> Dict[str, Any] :
     """Transform the request metadata into arguments."""
     return {
-        'peer_khaleesi_gate'   : self.string_or_unknown(request_metadata.caller.khaleesi_gate),
-        'peer_khaleesi_service': self.string_or_unknown(request_metadata.caller.khaleesi_service),
-        'peer_grpc_service'    : self.string_or_unknown(request_metadata.caller.grpc_service),
-        'peer_grpc_method'     : self.string_or_unknown(request_metadata.caller.grpc_method),
+        'peer_khaleesi_gate'   : self._string_or_unknown(request_metadata.caller.khaleesi_gate),
+        'peer_khaleesi_service': self._string_or_unknown(request_metadata.caller.khaleesi_service),
+        'peer_grpc_service'    : self._string_or_unknown(request_metadata.caller.grpc_service),
+        'peer_grpc_method'     : self._string_or_unknown(request_metadata.caller.grpc_method),
         'user'                 : request_metadata.user.type,
     }
 
