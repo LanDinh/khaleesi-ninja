@@ -81,7 +81,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -196,7 +197,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -314,7 +316,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -327,7 +330,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "NOK: .*"
+              "options": ".*: NOK - .*"
             },
             "properties": [
               {
@@ -365,9 +368,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
           "interval": "",
-          "legendFormat": "{{`OK: {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
+          "legendFormat": "{{`{{khaleesi_version}}: OK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
           "refId": "OK"
         },
         {
@@ -376,10 +379,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`NOK: {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
+          "legendFormat": "{{`{{khaleesi_version}}: NOK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
           "refId": "NOK"
         }
       ],
@@ -429,7 +432,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -496,7 +500,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 36
       },
       "id": 6,
       "panels": [],
@@ -574,7 +578,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 19
+        "y": 37
       },
       "id": 8,
       "options": {
@@ -715,7 +719,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 19
+        "y": 37
       },
       "id": 15,
       "options": {
@@ -743,9 +747,220 @@
       ],
       "title": "Instance health errors",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "not success"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 45
+      },
+      "id": 36,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result=\"success\"}[$__rate_interval]))",
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_version}}: {{action_crud_type}} - success`}}",
+          "refId": "success"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result!=\"success\"}[$__rate_interval]))",
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_version}}: {{action_crud_type}} - {{result}}`}}",
+          "refId": "not success"
+        }
+      ],
+      "title": "Instance Start/End",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".* - error"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 45
+      },
+      "id": 43,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result!=\"success\"}[$__rate_interval]))",
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_version}}: {{action_crud_type}} - {{result}}`}}",
+          "refId": "not success"
+        }
+      ],
+      "title": "Instance Start/End Problems",
+      "type": "timeseries"
     }
   ],
-  "refresh": "5s",
+  "refresh": "",
   "schemaVersion": 34,
   "style": "dark",
   "tags": [],
@@ -778,14 +993,14 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(grpc_service)",
+        "definition": "label_values(khaleesi_incoming_requests_total, grpc_service)",
         "hide": 2,
         "includeAll": true,
         "multi": false,
         "name": "grpc_service",
         "options": [],
         "query": {
-          "query": "label_values(grpc_service)",
+          "query": "label_values(khaleesi_incoming_requests_total, grpc_service)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,

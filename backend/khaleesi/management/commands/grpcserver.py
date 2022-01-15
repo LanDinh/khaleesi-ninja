@@ -61,13 +61,18 @@ class Command(BaseCommand):
         self.stdout.write(f'Stopping gRPC server at {options["address"]}...')
         HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
         done_event = server.stop(30)
-        done_event.wait(30)
         self.stdout.write('Stop complete.')
         self._log_server_state_event(
           action = Event.Action.ActionType.END,
           result = Event.Action.ResultType.SUCCESS,
           details = 'Server stopped successfully.'
         )
+        if not done_event.wait(30):
+          self._log_server_state_event(
+            action = Event.Action.ActionType.END,
+            result = Event.Action.ResultType.ERROR,
+            details = f'Server stop failed... time out instead of gracefully shutting down.',
+          )
       except Exception as stop_exception:
         self._log_server_state_event(
           action = Event.Action.ActionType.END,
