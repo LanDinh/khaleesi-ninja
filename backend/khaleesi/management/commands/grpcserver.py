@@ -19,6 +19,7 @@ from grpc_reflection.v1alpha import reflection
 from prometheus_client import start_http_server  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
 
 # khaleesi.ninja.
+from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.grpc.metadata import add_request_metadata
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
@@ -33,7 +34,9 @@ khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 
 class Command(BaseCommand):
   """Command to start the gRPC server."""
+
   help = 'Starts the gRPC server.'
+  channel_manager = ChannelManager()
 
   def add_arguments(self, parser: CommandParser) -> None :
     parser.add_argument(
@@ -161,7 +164,7 @@ class Command(BaseCommand):
     """Log the server state."""
     event = self._server_state_event(action = action, result = result, details = details)
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
-      channel = grpc.insecure_channel(f'core-sawmill:{khaleesi_settings["GRPC"]["PORT"]}')
+      channel = self.channel_manager.get_channel(gate = 'core', service = 'sawmill')
       stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
       stub.LogEvent(event)
     else:
