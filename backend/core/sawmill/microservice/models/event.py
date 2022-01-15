@@ -8,7 +8,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.audit import AUDIT_EVENT
-from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent
+from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.abstract import Metadata
 from microservice.parse_util import parse_uuid
 
@@ -62,29 +62,21 @@ class Event(Metadata):
 
   objects = EventManager()
 
-  def to_grpc_event(self) -> GrpcEvent :
+  def to_grpc_event_response(self) -> GrpcEventResponse :
     """Map to gRPC event message."""
 
-    grpc_event = GrpcEvent()
-    # Request metadata.
-    grpc_event.request_metadata.caller.request_id       = self.meta_caller_request_id
-    grpc_event.request_metadata.caller.khaleesi_gate    = self.meta_caller_khaleesi_gate
-    grpc_event.request_metadata.caller.khaleesi_service = self.meta_caller_khaleesi_service
-    grpc_event.request_metadata.caller.grpc_service     = self.meta_caller_grpc_service
-    grpc_event.request_metadata.caller.grpc_method      = self.meta_caller_grpc_method
-    grpc_event.request_metadata.user.id   = self.meta_user_id
-    grpc_event.request_metadata.user.type = self.meta_user_type
-    grpc_event.request_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
-    grpc_event.request_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
+    grpc_event_response = GrpcEventResponse()
+    self.request_metadata_to_grpc(request_metadata = grpc_event_response.event.request_metadata)
+    self.response_metadata_to_grpc(response_metadata = grpc_event_response.response_metadata)
     # Target.
-    grpc_event.target.type = self.target_type
-    grpc_event.target.id   = self.target_id
+    grpc_event_response.event.target.type = self.target_type
+    grpc_event_response.event.target.id   = self.target_id
     if self.target_owner:
-      grpc_event.target.owner.id = str(self.target_owner)
+      grpc_event_response.event.target.owner.id = str(self.target_owner)
     # Action.
-    grpc_event.action.crud_type = self.action_crud_type  # type: ignore[assignment]
-    grpc_event.action.custom_type = self.action_custom_type
-    grpc_event.action.result  = self.action_result  # type: ignore[assignment]
-    grpc_event.action.details = self.action_details
+    grpc_event_response.event.action.crud_type = self.action_crud_type  # type: ignore[assignment]
+    grpc_event_response.event.action.custom_type = self.action_custom_type
+    grpc_event_response.event.action.result  = self.action_result  # type: ignore[assignment]
+    grpc_event_response.event.action.details = self.action_details
 
-    return grpc_event
+    return grpc_event_response

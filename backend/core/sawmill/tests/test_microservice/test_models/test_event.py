@@ -153,45 +153,45 @@ class EventTestCase(SimpleTestCase):
               action_details     = 'action_details',
             )
             # Execute test.
-            result = event.to_grpc_event()
+            result = event.to_grpc_event_response()
             # Assert result.
             self.assertEqual(
               event.meta_caller_request_id,
-              result.request_metadata.caller.request_id,
+              result.event.request_metadata.caller.request_id,
             )
             self.assertEqual(
               event.meta_caller_khaleesi_gate,
-              result.request_metadata.caller.khaleesi_gate,
+              result.event.request_metadata.caller.khaleesi_gate,
             )
             self.assertEqual(
               event.meta_caller_khaleesi_service,
-              result.request_metadata.caller.khaleesi_service,
+              result.event.request_metadata.caller.khaleesi_service,
             )
             self.assertEqual(
               event.meta_caller_grpc_service,
-              result.request_metadata.caller.grpc_service,
+              result.event.request_metadata.caller.grpc_service,
             )
             self.assertEqual(
               event.meta_caller_grpc_method,
-              result.request_metadata.caller.grpc_method,
+              result.event.request_metadata.caller.grpc_method,
             )
             self.assertEqual(
               event.meta_event_timestamp,
-              result.request_metadata.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+              result.event.request_metadata.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
             )
             self.assertEqual(
               event.meta_logged_timestamp,
-              result.request_metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+              result.response_metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
             )
-            self.assertEqual(event.meta_user_id  , result.request_metadata.user.id)
-            self.assertEqual(event.meta_user_type, result.request_metadata.user.type)
-            self.assertEqual(event.target_type      , result.target.type)
-            self.assertEqual(event.target_id        , result.target.id)
-            self.assertEqual(str(event.target_owner), result.target.owner.id)
-            self.assertEqual(event.action_crud_type  , result.action.crud_type)
-            self.assertEqual(event.action_custom_type, result.action.custom_type)
-            self.assertEqual(event.action_result     , result.action.result)
-            self.assertEqual(event.action_details    , result.action.details)
+            self.assertEqual(event.meta_user_id  , result.event.request_metadata.user.id)
+            self.assertEqual(event.meta_user_type, result.event.request_metadata.user.type)
+            self.assertEqual(event.target_type      , result.event.target.type)
+            self.assertEqual(event.target_id        , result.event.target.id)
+            self.assertEqual(str(event.target_owner), result.event.target.owner.id)
+            self.assertEqual(event.action_crud_type  , result.event.action.crud_type)
+            self.assertEqual(event.action_custom_type, result.event.action.custom_type)
+            self.assertEqual(event.action_result     , result.event.action.result)
+            self.assertEqual(event.action_details    , result.event.action.details)
 
   def test_empty_to_grpc_event(self) -> None :
     """Test that mapping to gRPC for empty events works."""
@@ -201,7 +201,7 @@ class EventTestCase(SimpleTestCase):
       meta_logged_timestamp = datetime.now(tz = timezone.utc),
     )
     # Execute test.
-    result = event.to_grpc_event()
+    result = event.to_grpc_event_response()
     # Assert result.
     self.assertIsNotNone(result)
 
@@ -214,9 +214,9 @@ class EventTestCase(SimpleTestCase):
       target_owner = 'target-owner',
     )
     # Execute test.
-    result = event.to_grpc_event()
+    result = event.to_grpc_event_response()
     # Assert result.
-    self.assertEqual(event.target_owner, result.target.owner.id)
+    self.assertEqual(event.target_owner, result.event.target.owner.id)
 
   def test_to_grpc_event_without_target_owner(self) -> None :
     """Test that mapping to gRPC works without target owners."""
@@ -226,6 +226,6 @@ class EventTestCase(SimpleTestCase):
       meta_logged_timestamp = datetime.now(tz = timezone.utc),
     )
     # Execute test.
-    result = event.to_grpc_event()
+    result = event.to_grpc_event_response()
     # Assert result.
-    self.assertEqual('', result.target.owner.id)
+    self.assertEqual('', result.event.target.owner.id)

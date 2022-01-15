@@ -9,6 +9,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.proto.core_sawmill_pb2 import ResponseMetadata
 from microservice.parse_util import parse_timestamp
 
 
@@ -57,6 +58,25 @@ class Metadata(models.Model):
         # Misc.
         'meta_logging_errors': errors,
     }
+
+  def request_metadata_to_grpc(self, *, request_metadata: RequestMetadata) -> None :
+    """Fill in the request metadata for grpc."""
+    # Time.
+    request_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
+    # Caller.
+    request_metadata.caller.request_id       = self.meta_caller_request_id
+    request_metadata.caller.khaleesi_gate    = self.meta_caller_khaleesi_gate
+    request_metadata.caller.khaleesi_service = self.meta_caller_khaleesi_service
+    request_metadata.caller.grpc_service     = self.meta_caller_grpc_service
+    request_metadata.caller.grpc_method      = self.meta_caller_grpc_method
+    # User.
+    request_metadata.user.id   = self.meta_user_id
+    request_metadata.user.type = self.meta_user_type  # type: ignore[assignment]
+
+  def response_metadata_to_grpc(self, *, response_metadata: ResponseMetadata) -> None :
+    """Fill in the request metadata for grpc."""
+    response_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
+    response_metadata.errors = self.meta_logging_errors
 
   class Meta:
     """Abstract class."""

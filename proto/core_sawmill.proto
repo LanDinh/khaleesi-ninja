@@ -2,7 +2,14 @@ syntax = "proto3";
 
 package khaleesi.core.sawmill;
 
+import "google/protobuf/timestamp.proto";
 import "core.proto";
+
+
+message ResponseMetadata {
+  google.protobuf.Timestamp logged_timestamp = 1;
+  string                    errors           = 2;
+}
 
 
 message Event {
@@ -54,12 +61,19 @@ service Lumberjack {
   rpc LogEvent (Event) returns (LogResponse);
 }
 
-message LogFilter {
 
+message EventResponse {
+  ResponseMetadata response_metadata = 1;
+  Event            event             = 2;
 }
 
 message EventsList {
-  repeated Event events = 1;
+  repeated EventResponse events = 1;
+}
+
+
+message LogFilter {
+
 }
 
 service Sawyer {

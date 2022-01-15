@@ -30,11 +30,7 @@ message GrpcCallerDetails {
 }
 
 message RequestMetadata {
-  // Set by calling service.
   GrpcCallerDetails         caller           = 1;
   User                      user             = 2;
   google.protobuf.Timestamp timestamp        = 3;
-
-  // Response-only fields.
-  google.protobuf.Timestamp logged_timestamp = 10;
 }
