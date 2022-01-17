@@ -46,7 +46,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _execute_successful_logging_test(
       self, *,
-      method: Callable[[], LogResponse],
+      method: Callable[[], Any],
       logging: MagicMock,
   ) -> None :
     """Successful call to logging method."""
@@ -59,7 +59,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _execute_logging_test_with_parsing_error(
       self, *,
-      method: Callable[[], LogResponse],
+      method: Callable[[], Any],
       logging: MagicMock,
   ) -> None :
     """Call to logging method that results in parsing errors."""
@@ -74,7 +74,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _execute_logging_test_with_fatal_error(
       self, *,
-      method: Callable[[], LogResponse],
+      method: Callable[[], Any],
       logging: MagicMock,
   ) -> None :
     """Call to logging method that results in fatal errors."""

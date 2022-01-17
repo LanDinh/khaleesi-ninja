@@ -27,10 +27,11 @@ class Service(Servicer):
 
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogResponse :
     """Log events."""
-    return self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
+    self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
+    return LogResponse()
 
   @staticmethod
-  def _handle_response(*, method: Callable[[], Metadata]) -> LogResponse :
+  def _handle_response(*, method: Callable[[], Metadata]) -> Metadata :
     """Wrap responses for logging."""
     try:
       metadata = method()
@@ -39,13 +40,13 @@ class Service(Servicer):
           public_details = '',
           private_details = metadata.meta_logging_errors,
         )
-      return LogResponse()
+      return metadata
     except KhaleesiException as exception:
       raise exception from None
     except Exception as exception:  # pylint: disable=broad-except
       raise InternalServerException(
         public_details = '',
-        private_details =f'{type(exception).__name__}: {str(exception)}',
+        private_details = f'{type(exception).__name__}: {str(exception)}',
       ) from exception
 
 
