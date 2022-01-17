@@ -1,5 +1,8 @@
 """Custom exceptions."""
 
+# Django.
+from django.conf import settings
+
 # gRPC.
 from grpc import StatusCode
 
@@ -17,12 +20,13 @@ class KhaleesiException(Exception):
       private_details: str,
   ) -> None :
     """Initialize the exception."""
-    super().__init__(public_details)
+    final_public_details = private_details if settings.DEBUG else public_details
+    super().__init__(final_public_details)
     self.status = status
     self.gate = gate
     self.service = service
     self.public_key = public_key
-    self.public_details = public_details
+    self.public_details = final_public_details
     self.private_details = private_details
 
 

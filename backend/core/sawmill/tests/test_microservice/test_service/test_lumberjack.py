@@ -66,7 +66,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     # Prepare data.
     expected_result = Metadata(meta_logging_errors ='some parsing errors')
     logging.return_value = expected_result
-    # Execute test and assert result.
+    # Execute test & assert result.
     with self.assertRaises(InvalidArgumentException) as context:
       method()
     logging.assert_called_once()
@@ -81,7 +81,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     # Prepare data.
     message = 'fatal exception'
     logging.side_effect = Exception(message)
-    # Execute test and assert result.
+    # Execute test & assert result.
     with self.assertRaises(InternalServerException) as context:
       method()
     logging.assert_called_once()

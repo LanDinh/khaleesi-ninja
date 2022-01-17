@@ -29,7 +29,7 @@ class AuditEventMetricTestMixin(SimpleTestCase, CounterMetricTestMixin):
               action_crud_type = action_type,
               result = result_type,
             )
-            # Execute test and assert result.
+            # Execute test & assert result.
             self.execute_and_assert_counter(
               method = partial(self.metric.inc, event = event),
               event = event,

@@ -30,7 +30,7 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
       with self.subTest(status = status.name, user = user_label):  # type: ignore[attr-defined]  # pylint: disable=no-member
         # Prepare data.
         request_metadata = self._get_request_metadata(user = user_type)
-        # Execute test and assert result.
+        # Execute test & assert result.
         self.execute_and_assert_counter(
           method = partial(
             self.metric.inc,

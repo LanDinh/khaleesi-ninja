@@ -60,7 +60,7 @@ class MetadataTestCase(SimpleTestCase):
 
   def test_log_metadata_appends_timezone_errors(self, timestamp: MagicMock) -> None :
     """Test timestamp errors get appended correctly."""
-    # Execute test and assert result.
+    # Execute test & assert result.
     self._execute_and_assert_append_errors_test(
       errors = [ (datetime.now(tz = timezone.utc), 'invalid event_timestamp') ],
       mock = timestamp,

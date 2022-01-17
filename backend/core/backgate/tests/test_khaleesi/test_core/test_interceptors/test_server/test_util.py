@@ -32,7 +32,7 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
           inner_service = service,
           inner_method = method,
         )
-        # Execute test and assert result.
+        # Execute test & assert result.
         self.interceptor.intercept(
           method      = lambda *args: None,
           request     = MagicMock(),
