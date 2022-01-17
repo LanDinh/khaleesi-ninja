@@ -13,12 +13,19 @@ from microservice.models import Event
 
 
 @patch('microservice.models.event.AUDIT_EVENT')
+@patch('microservice.models.event.parse_string')
 @patch('microservice.models.event.parse_uuid')
 @patch.object(Event.objects.model, 'log_metadata')
 class EventManagerTestCase(TransactionTestCase):
   """Test the event logs objects manager."""
 
-  def test_log_event(self, metadata: MagicMock, uuid: MagicMock, audit_metric: MagicMock) -> None :
+  def test_log_event(
+      self,
+      metadata: MagicMock,
+      uuid: MagicMock,
+      string: MagicMock,
+      audit_metric: MagicMock,
+  ) -> None :
     """Test logging a gRPC event."""
     for action_label, action_type in GrpcEvent.Action.ActionType.items():
       for result_label, result_type in GrpcEvent.Action.ResultType.items():
@@ -26,7 +33,8 @@ class EventManagerTestCase(TransactionTestCase):
           # Prepare data.
           metadata.reset_mock()
           metadata.return_value = {}
-          uuid.return_value = (uuid4(), '')
+          uuid.return_value = uuid4()
+          string.return_value = 'parsed-string'
           now = datetime.now(tz = timezone.utc)
           grpc_event = GrpcEvent()
           grpc_event.request_metadata.caller.request_id       = 'metadata-request-id'
@@ -50,23 +58,23 @@ class EventManagerTestCase(TransactionTestCase):
           audit_metric.inc.assert_not_called()
           metadata.assert_called_once()
           self.assertEqual(grpc_event.request_metadata, metadata.call_args.kwargs['metadata'])
-          self.assertEqual(''                         , metadata.call_args.kwargs['errors'])
-          self.assertEqual(grpc_event.target.type               , result.target_type)
+          self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
           self.assertEqual(grpc_event.target.id                 , result.target_id)
           self.assertEqual(grpc_event.action.crud_type          , result.action_crud_type)
           self.assertEqual(grpc_event.action.custom_type        , result.action_custom_type)
           self.assertEqual(grpc_event.action.result             , result.action_result)
-          self.assertEqual(grpc_event.action.details            , result.action_details)
 
   def test_log_event_empty(
       self,
       metadata: MagicMock,
       uuid: MagicMock,
+      string: MagicMock,
       audit_metric: MagicMock,
   ) -> None :
     """Test logging an empty gRPC event."""
     # Prepare data.
-    uuid.return_value = (uuid4(), '')
+    uuid.return_value = uuid4()
+    string.return_value = 'parsed-string'
     metadata.return_value = {}
     grpc_event = GrpcEvent()
     # Execute test.
@@ -74,35 +82,14 @@ class EventManagerTestCase(TransactionTestCase):
     # Assert result.
     audit_metric.inc.assert_not_called()
     metadata.assert_called_once()
-    self.assertEqual('', metadata.call_args.kwargs['errors'])
+    self.assertEqual([], metadata.call_args.kwargs['errors'])
     self.assertEqual('', result.meta_logging_errors)
-
-  def test_log_event_appends_uuid_errors(
-      self,
-      metadata: MagicMock,
-      uuid: MagicMock,
-      audit_metric: MagicMock,
-  ) -> None :
-    """Test uuid errors get appended correctly."""
-    # Prepare data.
-    errors = [ (uuid4(), 'invalid target_owner') ]
-    uuid.side_effect = errors
-    metadata.return_value = {}
-    grpc_event = GrpcEvent()
-    # Execute test.
-    Event.objects.log_event(grpc_event = grpc_event)
-    # Assert result.
-    self.assertEqual(len(errors), uuid.call_count)
-    audit_metric.inc.assert_not_called()
-    metadata.assert_called_once()
-    result_errors =  metadata.call_args.kwargs['errors']
-    for _, error in errors:
-      self.assertEqual(1, result_errors.count(error))
 
   def test_log_event_audit_event_for_server_start(
       self,
       metadata: MagicMock,
       uuid: MagicMock,
+      string: MagicMock,
       audit_metric: MagicMock,
   ) -> None :
     """Test that server starts log audit events."""
@@ -113,7 +100,8 @@ class EventManagerTestCase(TransactionTestCase):
       with self.subTest(action = GrpcEvent.Action.ActionType.Name(action)):
         # Prepare data.
         audit_metric.reset_mock()
-        uuid.return_value = (uuid4(), '')
+        uuid.return_value = uuid4()
+        string.return_value = 'parsed-string'
         metadata.return_value = {}
         grpc_event = GrpcEvent()
         grpc_event.action.crud_type = action

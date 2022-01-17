@@ -2,7 +2,7 @@
 
 # Python.
 from datetime import datetime, timezone
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 # Django.
 from django.db import models
@@ -10,7 +10,7 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import ResponseMetadata
-from microservice.parse_util import parse_timestamp
+from microservice.parse_util import parse_timestamp, parse_string
 
 
 class Metadata(models.Model):
@@ -36,33 +36,50 @@ class Metadata(models.Model):
   meta_logging_errors = models.TextField(blank = True)
 
   @staticmethod
-  def log_metadata(*, metadata: RequestMetadata, errors: str) -> Dict[str, Any] :
+  def log_metadata(*, metadata: RequestMetadata, errors: List[str]) -> Dict[str, Any] :
     """Parse common metadata."""
-    event_timestamp, event_timestamp_error = parse_timestamp(
-      raw  = metadata.timestamp.ToDatetime(),
-      name = 'event_timestamp',
-    )
-    errors += event_timestamp_error
     return {
-        # Time.
-        'meta_event_timestamp': event_timestamp,
         # Caller.
-        'meta_caller_request_id'      : metadata.caller.request_id,
-        'meta_caller_khaleesi_gate'   : metadata.caller.khaleesi_gate,
-        'meta_caller_khaleesi_service': metadata.caller.khaleesi_service,
-        'meta_caller_grpc_service'    : metadata.caller.grpc_service,
-        'meta_caller_grpc_method'     : metadata.caller.grpc_method,
+        'meta_caller_request_id': metadata.caller.request_id,
+        'meta_caller_khaleesi_gate': parse_string(
+          raw    = metadata.caller.khaleesi_gate,
+          name   = 'meta_caller_khaleesi_gate',
+          errors = errors,
+        ),
+        'meta_caller_khaleesi_service': parse_string(
+          raw    = metadata.caller.khaleesi_service,
+          name   = 'meta_caller_khaleesi_service',
+          errors = errors,
+        ),
+        'meta_caller_grpc_service': parse_string(
+          raw    = metadata.caller.grpc_service,
+          name   = 'meta_caller_grpc_service',
+          errors = errors,
+        ),
+        'meta_caller_grpc_method': parse_string(
+          raw    = metadata.caller.grpc_method,
+          name   = 'meta_caller_grpc_method',
+          errors = errors,
+        ),
         # User.
-        'meta_user_id'  : metadata.user.id,
+        'meta_user_id': parse_string(
+          raw  = metadata.user.id,
+          name = 'meta_user_id',
+          errors = errors,
+        ),
         'meta_user_type': metadata.user.type,
+        # Time.
+        'meta_event_timestamp': parse_timestamp(
+          raw    = metadata.timestamp.ToDatetime(),
+          name   = 'event_timestamp',
+          errors = errors,
+        ),
         # Misc.
-        'meta_logging_errors': errors,
+        'meta_logging_errors': '\n'.join(errors),
     }
 
   def request_metadata_to_grpc(self, *, request_metadata: RequestMetadata) -> None :
     """Fill in the request metadata for grpc."""
-    # Time.
-    request_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
     # Caller.
     request_metadata.caller.request_id       = self.meta_caller_request_id
     request_metadata.caller.khaleesi_gate    = self.meta_caller_khaleesi_gate
@@ -72,6 +89,8 @@ class Metadata(models.Model):
     # User.
     request_metadata.user.id   = self.meta_user_id
     request_metadata.user.type = self.meta_user_type  # type: ignore[assignment]
+    # Time.
+    request_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
 
   def response_metadata_to_grpc(self, *, response_metadata: ResponseMetadata) -> None :
     """Fill in the request metadata for grpc."""

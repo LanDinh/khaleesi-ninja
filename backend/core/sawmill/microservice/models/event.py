@@ -2,6 +2,7 @@
 
 # Python.
 from __future__ import annotations
+from typing import List
 
 # Django.
 from django.db import models
@@ -10,7 +11,7 @@ from django.db import models
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.abstract import Metadata
-from microservice.parse_util import parse_uuid
+from microservice.parse_util import parse_uuid, parse_string
 
 
 class EventManager(models.Manager['Event']):
@@ -23,26 +24,32 @@ class EventManager(models.Manager['Event']):
         [ GrpcEvent.Action.ActionType.START, GrpcEvent.Action.ActionType.END ]:
       AUDIT_EVENT.inc(event = grpc_event)
 
-    errors = ''
-
-    target_owner, target_owner_error = parse_uuid(
-      raw  = grpc_event.target.owner.id,
-      name = 'target_owner',
-    )
-    errors += target_owner_error
+    errors: List[str] = []
 
     return self.create(
-      # Metadata.
-      **self.model.log_metadata(metadata = grpc_event.request_metadata, errors = errors),
       # Target.
-      target_type  = grpc_event.target.type,
-      target_id    = grpc_event.target.id,
-      target_owner = target_owner,
+      target_type = parse_string(
+        raw = grpc_event.target.type,
+        name = 'target_type',
+        errors = errors,
+      ),
+      target_id = grpc_event.target.id,
+      target_owner = parse_uuid(
+        raw  = grpc_event.target.owner.id,
+        name = 'target_owner',
+        errors = errors,
+      ),
       # Action.
       action_crud_type   = grpc_event.action.crud_type,
       action_custom_type = grpc_event.action.custom_type,
       action_result      = grpc_event.action.result,
-      action_details     = grpc_event.action.details,
+      action_details = parse_string(
+        raw = grpc_event.action.details,
+        name = 'action_details',
+        errors = errors,
+      ),
+      # Metadata.
+      **self.model.log_metadata(metadata = grpc_event.request_metadata, errors = errors),
     )
 
 

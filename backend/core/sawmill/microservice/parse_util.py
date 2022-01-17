@@ -2,45 +2,40 @@
 
 # Python.
 from datetime import datetime, timezone
-from typing import Callable, Any, Tuple, Optional, TypeVar
+from functools import partial
+from typing import Callable, Any, Optional, TypeVar, List, Protocol
 from uuid import UUID
 
 
-T = TypeVar('T')  # pylint: disable=invalid-name
+T = TypeVar('T', covariant = True)  # pylint: disable=invalid-name
 
 
 def _parse_input(
     *,
-    parser: Callable[[Any], T],
-    raw: Optional[Any],
+    parser : Callable[[Any], T],
+    raw    : Optional[Any],
     default: Optional[T],
-    name: str,
-) -> Tuple[Optional[T], str] :
+    name   : str,
+    errors : List[str],
+) -> Optional[T] :
   """Attempt to parse the input."""
   try:
     if raw:
-      return parser(raw), ''
-    return default, ''
+      return parser(raw)
+    return default
   except (TypeError, ValueError) as exception:
-    return default, f'{type(exception).__name__} parsing {name}: {str(exception)}.\n'
+    errors.append(f'{type(exception).__name__} parsing {name}: {str(exception)}.')
+    return default
 
-def parse_uuid(*, raw: Optional[str], name: str) -> Tuple[Optional[UUID], str]:
-  """Attempt to parse UUIDs."""
-  return _parse_input(
-    parser = UUID,
-    raw = raw,
-    default = None,
-    name = name,
-  )
+class Parser(Protocol[T]):
+  """Signature for parsers."""
+  def __call__(self, *, raw: Optional[Any], name: str, errors: List[str]) -> Optional[T] : ...
 
-def parse_timestamp(*, raw: Optional[datetime], name: str) -> Tuple[Optional[datetime], str]:
-  """Attempt to parse timestamps."""
-  def parser(parser_input: datetime) -> datetime :
-    """Custom parser."""
-    return parser_input.replace(tzinfo = timezone.utc)
-  return _parse_input(
-    parser = parser,
-    raw = raw,
-    default = datetime.min.replace(tzinfo = timezone.utc),
-    name = name,
-  )
+
+parse_uuid: Parser[UUID] = partial(_parse_input, parser = UUID, default = None)
+parse_timestamp: Parser[datetime] = partial(
+  _parse_input,
+  parser = lambda x : x.replace(tzinfo = timezone.utc),
+  default = datetime.min.replace(tzinfo = timezone.utc),
+)
+parse_string: Parser[str] = partial(_parse_input, parser = lambda x : x, default = 'UNKNOWN')
