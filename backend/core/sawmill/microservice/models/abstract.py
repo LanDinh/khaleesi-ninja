@@ -17,7 +17,7 @@ class Metadata(models.Model):
   """Common metadata."""
 
   # Caller.
-  meta_caller_request_id       = models.TextField(default = 'UNKNOWN')
+  meta_caller_request_id       = models.BigIntegerField(default = 0)
   meta_caller_khaleesi_gate    = models.TextField(default = 'UNKNOWN')
   meta_caller_khaleesi_service = models.TextField(default = 'UNKNOWN')
   meta_caller_grpc_service     = models.TextField(default = 'UNKNOWN')

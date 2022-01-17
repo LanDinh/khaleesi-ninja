@@ -37,7 +37,7 @@ class EventManagerTestCase(TransactionTestCase):
           string.return_value = 'parsed-string'
           now = datetime.now(tz = timezone.utc)
           grpc_event = GrpcEvent()
-          grpc_event.request_metadata.caller.request_id       = 'metadata-request-id'
+          grpc_event.request_metadata.caller.request_id       = 14
           grpc_event.request_metadata.caller.khaleesi_gate    = 'metadata-khaleesi-gate'
           grpc_event.request_metadata.caller.khaleesi_service = 'metadata-khaleesi-service'
           grpc_event.request_metadata.caller.grpc_service     = 'metadata-grpc-service'
@@ -123,7 +123,7 @@ class EventTestCase(SimpleTestCase):
           with self.subTest(action = action_label, result = result_label, user = user_label):
             # Prepare data.
             event = Event(
-              meta_caller_request_id       = 'request-id',
+              meta_caller_request_id       = 14,
               meta_caller_khaleesi_gate    = 'khaleesi-gate',
               meta_caller_khaleesi_service = 'khaleesi-service',
               meta_caller_grpc_service     = 'grpc-service',

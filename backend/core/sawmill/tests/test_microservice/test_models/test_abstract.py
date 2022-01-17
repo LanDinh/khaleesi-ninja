@@ -25,7 +25,7 @@ class MetadataTestCase(SimpleTestCase):
         string.return_value    = 'parsed-string'
         grpc_metadata = GrpcMetadata()
         grpc_metadata.timestamp.FromDatetime(now)
-        grpc_metadata.caller.request_id       = 'request-id'
+        grpc_metadata.caller.request_id       = 13
         grpc_metadata.caller.khaleesi_gate    = 'khaleesi-gate'
         grpc_metadata.caller.khaleesi_service = 'khaleesi-service'
         grpc_metadata.caller.grpc_service     = 'grpc-service'

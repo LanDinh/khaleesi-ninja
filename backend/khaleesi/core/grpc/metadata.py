@@ -18,7 +18,7 @@ khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 def add_request_metadata(
     *,
     request     : Any,
-    request_id  : str,
+    request_id  : int,
     grpc_service: str,
     grpc_method : str,
     user_id     : str,
@@ -37,7 +37,7 @@ def add_request_metadata(
 def _add_request_metadata(
     *,
     request_metadata: RequestMetadata,
-    request_id      : str,
+    request_id      : int,
     grpc_service    : str,
     grpc_method     : str,
     user_id         : str,

@@ -15,7 +15,7 @@ class GrpcTestCase(SimpleTestCase):
   """Test grpc utility."""
 
   metadata = {
-      'request_id'  : 'request-id',
+      'request_id'  : 13,
       'grpc_service': 'grpc-server',
       'grpc_method' : 'grpc-method',
       'user_id'     : 'user-id',

@@ -140,7 +140,7 @@ class Command(BaseCommand):
     # Metadata.
     add_request_metadata(
       request      = event,
-      request_id   = '',  # Not initiated by a gRPC call.
+      request_id   = -1,  # Not initiated by a gRPC call.
       grpc_service = 'grpc-server',
       grpc_method  = Event.Action.ActionType.Name(action).lower(),
       user_id      = 'grpc-server',

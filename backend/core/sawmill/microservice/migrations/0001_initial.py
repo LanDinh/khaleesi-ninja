@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='Event',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('meta_caller_request_id', models.TextField(default='UNKNOWN')),
+                ('meta_caller_request_id', models.BigIntegerField(default=0)),
                 ('meta_caller_khaleesi_gate', models.TextField(default='UNKNOWN')),
                 ('meta_caller_khaleesi_service', models.TextField(default='UNKNOWN')),
                 ('meta_caller_grpc_service', models.TextField(default='UNKNOWN')),

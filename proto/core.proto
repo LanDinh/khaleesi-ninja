@@ -22,7 +22,7 @@ message User {
 }
 
 message GrpcCallerDetails {
-  string request_id       = 1;
+  int64  request_id       = 1;
   string khaleesi_gate    = 2;
   string khaleesi_service = 3;
   string grpc_service     = 4;
