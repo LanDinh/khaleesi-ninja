@@ -4,7 +4,7 @@
 from datetime import datetime
 
 # khaleesi.ninja.
-from khaleesi.proto.core_pb2 import RequestMetadata, User
+from khaleesi.proto.core_pb2 import RequestMetadata, User  # pylint: disable=unused-import
 
 
 class GrpcTestMixin:
