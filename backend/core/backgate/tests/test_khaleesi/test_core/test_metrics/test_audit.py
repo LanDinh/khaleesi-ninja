@@ -5,13 +5,13 @@ from functools import partial
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.audit import AUDIT_EVENT
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 from tests.test_khaleesi.test_core.test_metrics.test_util import CounterMetricTestMixin
 
 
-class AuditEventMetricTestMixin(SimpleTestCase, CounterMetricTestMixin):
+class AuditEventMetricTestMixin(CounterMetricTestMixin, SimpleTestCase):
   """Test the audit event metric."""
 
   metric = AUDIT_EVENT

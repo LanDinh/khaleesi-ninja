@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 from uuid import uuid4
 
 # khaleesi.ninja.
-from khaleesi.core.test_util import TransactionTestCase, SimpleTestCase
+from khaleesi.core.test_util.test_case import TransactionTestCase, SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent
 from microservice.models import Event

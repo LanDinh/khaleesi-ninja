@@ -4,7 +4,7 @@
 from unittest.mock import MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.test_util import TransactionTestCase
+from khaleesi.core.test_util.test_case import TransactionTestCase
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 from microservice.models import TestModel
 from microservice.service import Service

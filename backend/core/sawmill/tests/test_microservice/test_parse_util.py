@@ -6,7 +6,7 @@ from typing import List
 from uuid import uuid4
 
 # khaleesi.ninja.
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.parse_util import parse_uuid, parse_timestamp, parse_string
 
 

@@ -2,11 +2,11 @@
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.health import HEALTH, HealthMetricType
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from tests.test_khaleesi.test_core.test_metrics.test_util import EnumMetricTestMixin
 
 
-class HealthMetricTestCase(SimpleTestCase, EnumMetricTestMixin[HealthMetricType]):
+class HealthMetricTestCase(EnumMetricTestMixin[HealthMetricType], SimpleTestCase):
   """Test the server health metric."""
 
   metric = HEALTH

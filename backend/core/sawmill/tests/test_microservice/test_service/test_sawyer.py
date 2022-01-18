@@ -4,10 +4,10 @@
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.test_util import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import EventResponse as GrpcEventResponse, LogFilter
 from microservice.models import Event
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.service.sawyer import Service
 
 class SawyerServiceTestCase(SimpleTestCase):

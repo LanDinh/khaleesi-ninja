@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.util import ServerInterceptor
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 
 
 class PrometheusServerInterceptorTest(SimpleTestCase):

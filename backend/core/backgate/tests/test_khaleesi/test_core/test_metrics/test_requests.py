@@ -10,7 +10,7 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.requests import OUTGOING_REQUESTS, INCOMING_REQUESTS
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, RequestMetadata
 from tests.test_khaleesi.test_core.test_metrics.test_util import CounterMetricTestMixin
 
@@ -105,13 +105,13 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
     return request_metadata
 
 
-class OutgoingRequestsMetricTestCase(SimpleTestCase, RequestsMetricTestMixin):
+class OutgoingRequestsMetricTestCase(RequestsMetricTestMixin, SimpleTestCase):
   """Test the outgoing requests metric."""
 
   metric = OUTGOING_REQUESTS
 
 
-class IncomingRequestsMetricTestCase(SimpleTestCase, RequestsMetricTestMixin):
+class IncomingRequestsMetricTestCase(RequestsMetricTestMixin, SimpleTestCase):
   """Test the outgoing requests metric."""
 
   metric = INCOMING_REQUESTS

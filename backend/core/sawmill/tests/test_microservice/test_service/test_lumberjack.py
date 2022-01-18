@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.exceptions import InvalidArgumentException, InternalServerException
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import LogResponse
 from microservice.service.lumberjack import DbEvent, Service  # type: ignore[attr-defined]
 from tests.models import Metadata

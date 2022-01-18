@@ -12,7 +12,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.exceptions import KhaleesiException
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 
 

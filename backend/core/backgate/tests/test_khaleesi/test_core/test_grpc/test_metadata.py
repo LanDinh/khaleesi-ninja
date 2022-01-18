@@ -7,7 +7,7 @@ from typing import Any
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.metadata import add_request_metadata
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, RequestMetadata
 
 
@@ -41,7 +41,7 @@ class GrpcTestCase(SimpleTestCase):
   def assert_metadata(self, *, request: Any, user_type: 'User.UserType.V') -> None :
     """Asset that the metadata is as expected."""
     # Manual values.
-    self.assertEqual(request.request_metadata.caller.request_id  , self.metadata['request_id'])
+    self.assertEqual(request.request_metadata.caller.request_id  , self.request_id)
     self.assertEqual(request.request_metadata.caller.grpc_service, self.metadata['grpc_service'])
     self.assertEqual(request.request_metadata.caller.grpc_method , self.metadata['grpc_method'])
     self.assertEqual(request.request_metadata.user.id            , self.metadata['user_id'])

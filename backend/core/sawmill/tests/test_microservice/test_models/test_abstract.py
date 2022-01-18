@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.test_util import SimpleTestCase
+from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata as GrpcMetadata, User
 from microservice.models.abstract import Metadata
 
