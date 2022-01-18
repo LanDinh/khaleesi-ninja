@@ -3,6 +3,7 @@
 # Python.
 from functools import partial
 from itertools import product
+from typing import Callable
 from unittest.mock import patch, MagicMock
 
 # gGRPC.
@@ -18,6 +19,8 @@ from tests.test_khaleesi.test_core.test_metrics.test_util import CounterMetricTe
 class RequestsMetricTestMixin(CounterMetricTestMixin):
   """Test mixin for requests metrics."""
 
+  subTest: Callable  # type: ignore[type-arg]
+
   labels = {
       'grpc_service'         : 'grpc-service',
       'grpc_method'          : 'grpc-method',
@@ -27,7 +30,7 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
     """Test incrementing the counter."""
     # Prepare data.
     for status, (user_label, user_type) in product(StatusCode, User.UserType.items()):
-      with self.subTest(status = status.name, user = user_label):  # type: ignore[attr-defined]  # pylint: disable=no-member
+      with self.subTest(status = status.name, user = user_label):
         # Prepare data.
         request_metadata = self._get_request_metadata(user = user_type)
         # Execute test & assert result.
@@ -62,7 +65,7 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           ( 'empty grpc service', {'grpc_service'    : ''} ),
           ( 'empty grpc method' , {'grpc_method'     : ''} ),
       ]:
-        with self.subTest(user = user_label, status = status, test = label):  # type: ignore[attr-defined]  # pylint: disable=no-member,line-too-long
+        with self.subTest(user = user_label, status = status, test = label):
           # Prepare data.
           super_get_value.reset_mock()
           request_metadata = self._get_request_metadata(user = user_type, **request_attributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long

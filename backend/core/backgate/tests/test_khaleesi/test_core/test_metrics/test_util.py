@@ -12,12 +12,14 @@ class EnumMetricTestMixin(Generic[EnumType]):
 
   metric: EnumMetric[EnumType]
   enum_type: Type[EnumType]
+  subTest: Callable  # type: ignore[type-arg]
+  assertEqual: Callable  # type: ignore[type-arg]
 
   def test_set(self) -> None :
     """Test setting a value."""
     # Prepare data.
     for value in self.enum_type:
-      with self.subTest(value = value.name):  # type: ignore[attr-defined]  # pylint: disable=no-member
+      with self.subTest(value = value.name):
         # Execute test.
         self.metric.set(value = value)
         # Assert result.
@@ -28,14 +30,15 @@ class EnumMetricTestMixin(Generic[EnumType]):
     total = 0
     for value_counter in type(value):
       total += self.metric.get_value(value = value_counter)
-    self.assertEqual(1, self.metric.get_value(value = value))  # type: ignore[attr-defined]  # pylint: disable=no-member
-    self.assertEqual(1, total)  # type: ignore[attr-defined]  # pylint: disable=no-member
+    self.assertEqual(1, self.metric.get_value(value = value))
+    self.assertEqual(1, total)
 
 
 class CounterMetricTestMixin:
   """Helper methods for test classes for counter metrics with two labels."""
 
   metric: CounterMetric
+  assertEqual: Callable  # type: ignore[type-arg]
 
   def execute_and_assert_counter(self, *, method: Callable[[], None], **labels: Any) -> None :
     """Execute the increment and assert it worked."""
@@ -45,4 +48,4 @@ class CounterMetricTestMixin:
     method()
     # Assert result.
     new_value = self.metric.get_value(**labels)
-    self.assertEqual(original_value + 1, new_value)  # type: ignore[attr-defined]  # pylint: disable=no-member
+    self.assertEqual(original_value + 1, new_value)

@@ -11,7 +11,7 @@ from khaleesi.proto.core_sawmill_pb2 import Event
 from tests.test_khaleesi.test_core.test_metrics.test_util import CounterMetricTestMixin
 
 
-class AuditEventMetricTestMixin(CounterMetricTestMixin, SimpleTestCase):
+class AuditEventMetricTestCase(CounterMetricTestMixin, SimpleTestCase):
   """Test the audit event metric."""
 
   metric = AUDIT_EVENT
