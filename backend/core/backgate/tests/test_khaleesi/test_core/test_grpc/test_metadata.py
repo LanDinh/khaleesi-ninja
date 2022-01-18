@@ -14,8 +14,8 @@ from khaleesi.proto.core_pb2 import User, RequestMetadata
 class GrpcTestCase(SimpleTestCase):
   """Test grpc utility."""
 
+  request_id = 13
   metadata = {
-      'request_id'  : 13,
       'grpc_service': 'grpc-server',
       'grpc_method' : 'grpc-method',
       'user_id'     : 'user-id',
@@ -29,7 +29,12 @@ class GrpcTestCase(SimpleTestCase):
         request = MagicMock()
         request.request_metadata = RequestMetadata()
         # Execute test.
-        add_request_metadata(request = request, user_type = user_type, **self.metadata)
+        add_request_metadata(
+          request = request,
+          user_type = user_type,
+          request_id = self.request_id,
+          **self.metadata,
+        )
         # Assert result.
         self.assert_metadata(request = request, user_type =  user_type)
 
