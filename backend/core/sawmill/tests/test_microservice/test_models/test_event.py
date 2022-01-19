@@ -11,7 +11,7 @@ from khaleesi.core.test_util.test_case import TransactionTestCase, SimpleTestCas
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent
 from microservice.models import Event
-from microservice.test_util import model_request_metadata
+from microservice.test_util import ModelRequestMetadataMixin
 
 
 @patch('microservice.models.event.AUDIT_EVENT')
@@ -40,7 +40,7 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
             string.return_value = 'parsed-string'
             now = datetime.now(tz = timezone.utc)
             grpc_event = GrpcEvent()
-            set_request_metadata(
+            self.set_request_metadata(
               request_metadata = grpc_event.request_metadata,
               now = now,
               user = user_type,
@@ -112,7 +112,7 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
         audit_metric.inc.assert_called_once_with(event = grpc_event)
 
 
-class EventTestCase(SimpleTestCase):
+class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
   """Test the event logs models."""
 
   def test_to_grpc_event(self) -> None :
@@ -130,41 +130,16 @@ class EventTestCase(SimpleTestCase):
               action_custom_type = 'action-type',
               action_result      = result_type,
               action_details     = 'action_details',
-              **model_request_metadata(user = user_type),
+              **self.model_full_request_metadata(user = user_type),
             )
             # Execute test.
             result = event.to_grpc_event_response()
             # Assert result.
-            self.assertEqual(
-              event.meta_caller_request_id,
-              result.event.request_metadata.caller.request_id,
+            self.assert_grpc_request_metadata(
+              model = event,
+              grpc = result.event.request_metadata,
+              grpc_response = result.response_metadata,
             )
-            self.assertEqual(
-              event.meta_caller_khaleesi_gate,
-              result.event.request_metadata.caller.khaleesi_gate,
-            )
-            self.assertEqual(
-              event.meta_caller_khaleesi_service,
-              result.event.request_metadata.caller.khaleesi_service,
-            )
-            self.assertEqual(
-              event.meta_caller_grpc_service,
-              result.event.request_metadata.caller.grpc_service,
-            )
-            self.assertEqual(
-              event.meta_caller_grpc_method,
-              result.event.request_metadata.caller.grpc_method,
-            )
-            self.assertEqual(
-              event.meta_event_timestamp,
-              result.event.request_metadata.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
-            )
-            self.assertEqual(
-              event.meta_logged_timestamp,
-              result.response_metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
-            )
-            self.assertEqual(event.meta_user_id  , result.event.request_metadata.user.id)
-            self.assertEqual(event.meta_user_type, result.event.request_metadata.user.type)
             self.assertEqual(event.target_type      , result.event.target.type)
             self.assertEqual(event.target_id        , result.event.target.id)
             self.assertEqual(str(event.target_owner), result.event.target.owner.id)
@@ -176,10 +151,7 @@ class EventTestCase(SimpleTestCase):
   def test_empty_to_grpc_event(self) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
-    event = Event(
-      meta_event_timestamp  = datetime.now(tz = timezone.utc),
-      meta_logged_timestamp = datetime.now(tz = timezone.utc),
-    )
+    event = Event(**self.model_empty_request_metadata())
     # Execute test.
     result = event.to_grpc_event_response()
     # Assert result.

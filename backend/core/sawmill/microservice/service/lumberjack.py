@@ -13,12 +13,17 @@ from khaleesi.core.exceptions import (
     InternalServerException,
 )
 from khaleesi.core.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, Event, LogResponse
+from khaleesi.proto.core_sawmill_pb2 import (
+    DESCRIPTOR,
+    Event,
+    Request, LogRequestResponse,
+    LogResponse,
+)
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
     add_LumberjackServicer_to_server as add_to_server
 )
-from microservice.models import Event as DbEvent
+from microservice.models import Event as DbEvent, Request as DbRequest
 from microservice.models.abstract import Metadata
 
 
@@ -29,6 +34,16 @@ class Service(Servicer):
     """Log events."""
     self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
     return LogResponse()
+
+  def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogRequestResponse :
+    """Log requests."""
+    logged_request = self._handle_response(
+      method = lambda: DbRequest.objects.log_request(grpc_request = request),
+    )
+    response = LogRequestResponse()
+    response.request_id = logged_request.pk
+    return response
+
 
   @staticmethod
   def _handle_response(*, method: Callable[[], Metadata]) -> Metadata :

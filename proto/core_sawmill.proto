@@ -55,10 +55,22 @@ message Event {
   Action                        action           = 3;
 }
 
+
+message Request {
+  khaleesi.core.RequestMetadata   request_metadata = 1;
+  khaleesi.core.GrpcCallerDetails upstream_request = 2;
+}
+
+message LogRequestResponse {
+  int64 request_id = 1;
+}
+
+
 message LogResponse {}
 
 service Lumberjack {
-  rpc LogEvent (Event) returns (LogResponse);
+  rpc LogEvent   (Event)   returns (LogResponse);
+  rpc LogRequest (Request) returns (LogRequestResponse);
 }
 
 
@@ -72,10 +84,21 @@ message EventsList {
 }
 
 
+message RequestResponse {
+  ResponseMetadata response_metadata = 1;
+  Request          request           = 2;
+}
+
+message RequestList {
+  repeated RequestResponse requests = 1;
+}
+
+
 message LogFilter {
 
 }
 
 service Sawyer {
-  rpc GetEvents(LogFilter) returns (EventsList);
+  rpc GetEvents   (LogFilter) returns (EventsList);
+  rpc GetRequests (LogFilter) returns (RequestList);
 }

@@ -35,7 +35,8 @@ class ChannelManagerTestCase(SimpleTestCase):
       self.assertEqual(channel, result)
       grpc_channel.assert_not_called()
 
-  def test_close_all_channels(self) -> None :  # pylint: disable=no-self-use
+  @staticmethod
+  def test_close_all_channels() -> None :
     """Test all channels get closed."""
     # Prepare data.
     channel_manager = ChannelManager()

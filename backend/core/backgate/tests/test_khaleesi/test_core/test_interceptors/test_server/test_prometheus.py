@@ -56,7 +56,6 @@ class PrometheusServerInterceptorTest(SimpleTestCase):
         'grpc_method'     : '',
     })
 
-
   def _execute_intercept_tests(
       self, *,
       request: Optional[Any] = None,

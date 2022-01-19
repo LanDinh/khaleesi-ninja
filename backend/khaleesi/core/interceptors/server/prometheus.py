@@ -16,8 +16,9 @@ from khaleesi.proto.core_pb2 import RequestMetadata
 class PrometheusServerInterceptor(ServerInterceptor):
   """Interceptor to collect prometheus metrics."""
 
+  @staticmethod
   def khaleesi_intercept(  # pylint: disable=no-self-use
-      self, *,
+      *,
       method: Callable[[Any, ServicerContext], Any],
       request: Any,
       context: ServicerContext,
