@@ -47,7 +47,7 @@ test() {
 
 run() {
   python manage.py migrate --database migrate --settings khaleesi.core.settings.production
-  python manage.py grpcserver --settings khaleesi.core.settings.production
+  exec python manage.py grpcserver --settings khaleesi.core.settings.production
 }
 
 make_migrations() {
