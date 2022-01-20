@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 from typing import Any
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.metadata import add_request_metadata
+from khaleesi.core.grpc.request_metadata import add_request_metadata
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, RequestMetadata
 

@@ -17,7 +17,7 @@ class PrometheusServerInterceptor(ServerInterceptor):
   """Interceptor to collect prometheus metrics."""
 
   @staticmethod
-  def khaleesi_intercept(  # pylint: disable=no-self-use
+  def khaleesi_intercept(
       *,
       method: Callable[[Any, ServicerContext], Any],
       request: Any,

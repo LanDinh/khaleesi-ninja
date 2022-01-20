@@ -20,7 +20,7 @@ from prometheus_client import start_http_server  # type: ignore[import] # https:
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import ChannelManager
-from khaleesi.core.grpc.metadata import add_request_metadata
+from khaleesi.core.grpc.request_metadata import add_request_metadata
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
