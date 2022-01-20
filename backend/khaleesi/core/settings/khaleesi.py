@@ -35,6 +35,7 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
   GRPC = definition.Grpc(
     PORT     = cast(int, environ.get('PORT', 8000)),
     HANDLERS = [],
+    THREADS = cast(int, environ.get('THREADS', 10))
   ),
   MONITORING = definition.Monitoring(
     PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),

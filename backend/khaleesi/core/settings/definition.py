@@ -24,6 +24,7 @@ class Grpc(TypedDict):
 
   PORT     : int
   HANDLERS : List[str]
+  THREADS  : int
 
 class Monitoring(TypedDict):
   """Grpc configuration for khaleesi.ninja services."""
