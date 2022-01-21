@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.server import Server
+from khaleesi.core.settings.definition import StructuredLoggingMethod
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import Event
 
@@ -22,7 +23,7 @@ class ServerTestCase(SimpleTestCase):
     # Execute test.
     Server()
     # Assert result.
-    self.assert_result(
+    self.assert_server_state_event(
       action = Event.Action.ActionType.START,
       result = Event.Action.ResultType.SUCCESS,
       lumberjack_stub = lumberjack_stub
@@ -41,7 +42,7 @@ class ServerTestCase(SimpleTestCase):
     with self.assertRaises(Exception):
       Server()
     # Assert result.
-    self.assert_result(
+    self.assert_server_state_event(
       action = Event.Action.ActionType.START,
       result = Event.Action.ResultType.ERROR,
       lumberjack_stub = lumberjack_stub
@@ -64,7 +65,7 @@ class ServerTestCase(SimpleTestCase):
     event.set()
     server._handle_sigterm()  # pylint: disable=protected-access
     # Assert result.
-    self.assert_result(
+    self.assert_server_state_event(
       action = Event.Action.ActionType.END,
       result = Event.Action.ResultType.SUCCESS,
       lumberjack_stub = lumberjack_stub
@@ -86,7 +87,7 @@ class ServerTestCase(SimpleTestCase):
     with self.assertRaises(Exception):
       server._handle_sigterm()  # pylint: disable=protected-access
     # Assert result.
-    self.assert_result(
+    self.assert_server_state_event(
       action = Event.Action.ActionType.END,
       result = Event.Action.ResultType.ERROR,
       lumberjack_stub = lumberjack_stub
@@ -108,7 +109,7 @@ class ServerTestCase(SimpleTestCase):
     # Execute test.
     server._handle_sigterm()  # pylint: disable=protected-access
     # Assert result.
-    self.assert_result(
+    self.assert_server_state_event(
       action = Event.Action.ActionType.END,
       result = Event.Action.ResultType.WARNING,
       lumberjack_stub = lumberjack_stub
@@ -126,7 +127,21 @@ class ServerTestCase(SimpleTestCase):
     grpc_server.return_value.start.assert_called_once_with()
     grpc_server.return_value.wait_for_termination.assert_called_once_with()
 
-  def assert_result(
+  @patch('khaleesi.core.grpc.server.khaleesi_settings')
+  def test_add_invalid_handler(self, settings: MagicMock, *_: MagicMock) -> None :
+    """Test that invalid handlers raise ImportErrors."""
+    # Prepare data.
+    settings['CORE'] = { 'STRUCTURED_LOGGING_METHOD': StructuredLoggingMethod.GRPC }
+    settings['GRPC'] = {
+        'HANDLERS': 'some.invalid.import',
+        'THREADS' : 13,
+        'PORT'    : 1337,
+    }
+    # Execute test & assert result.
+    with self.assertRaises(ImportError):
+      Server()
+
+  def assert_server_state_event(
       self, *,
       action: 'Event.Action.ActionType.V',
       result: 'Event.Action.ResultType.V',
