@@ -10,9 +10,9 @@ from khaleesi.core.metrics.util import EnumMetric, EnumType, CounterMetric
 class EnumMetricTestMixin(Generic[EnumType]):
   """Helper methods for test classes for enum metrics."""
 
-  metric: EnumMetric[EnumType]
-  enum_type: Type[EnumType]
-  subTest: Callable  # type: ignore[type-arg]
+  metric     : EnumMetric[EnumType]
+  enum_type  : Type[EnumType]
+  subTest    : Callable  # type: ignore[type-arg]
   assertEqual: Callable  # type: ignore[type-arg]
 
   def test_set(self) -> None :

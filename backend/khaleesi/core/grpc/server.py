@@ -16,6 +16,7 @@ from grpc_reflection.v1alpha import reflection
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.grpc.request_metadata import add_request_metadata
+from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
@@ -38,6 +39,7 @@ class Server:
       self.channel_manager = ChannelManager()
       interceptors = [
           PrometheusServerInterceptor(),
+          LoggingServerInterceptor(channel_manager = self.channel_manager),
       ]
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
