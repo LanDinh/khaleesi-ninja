@@ -54,7 +54,7 @@ class KhaleesiCoreException(KhaleesiException):
 class InvalidArgumentException(KhaleesiCoreException):
   """Invalid arguments."""
 
-  def __init__(self, *, public_details: str, private_details: str) -> None :
+  def __init__(self, *, public_details: str = '', private_details: str) -> None :
     """Initialize the exception."""
     super().__init__(
       status = StatusCode.INVALID_ARGUMENT,
@@ -67,11 +67,11 @@ class InvalidArgumentException(KhaleesiCoreException):
 class InternalServerException(KhaleesiCoreException):
   """Internal server errors."""
 
-  def __init__(self, *, public_details: str, private_details: str) -> None :
+  def __init__(self, *, private_details: str) -> None :
     """Initialize the exception."""
     super().__init__(
       status = StatusCode.INTERNAL,
       public_key = 'internal-server-error',
-      public_details = public_details,
+      public_details = '',
       private_details = private_details,
     )

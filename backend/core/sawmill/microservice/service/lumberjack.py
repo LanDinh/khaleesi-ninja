@@ -51,16 +51,12 @@ class Service(Servicer):
     try:
       metadata = method()
       if metadata.meta_logging_errors:
-        raise InvalidArgumentException(
-          public_details = '',
-          private_details = metadata.meta_logging_errors,
-        )
+        raise InvalidArgumentException(private_details = metadata.meta_logging_errors)
       return metadata
     except KhaleesiException as exception:
       raise exception from None
     except Exception as exception:  # pylint: disable=broad-except
       raise InternalServerException(
-        public_details = '',
         private_details = f'{type(exception).__name__}: {str(exception)}',
       ) from exception
 
