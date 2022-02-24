@@ -12,7 +12,7 @@ from khaleesi.proto.core_pb2 import User, RequestMetadata
 
 
 class RequestsMetric(CounterMetric):
-  """Health metric."""
+  """Request metric."""
 
   def __init__(self, *, metric_id: Metric) -> None :
     super().__init__(
@@ -32,33 +32,21 @@ class RequestsMetric(CounterMetric):
 
   def inc(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
-      request_metadata : RequestMetadata,
-      status           : StatusCode,
-      grpc_service     : str,
-      grpc_method      : str,
+      request: RequestMetadata,
+      peer   : RequestMetadata,
+      status : StatusCode,
   ) -> None :
     """Increment the metric."""
-    super().inc(
-      status           = status,
-      grpc_service     = grpc_service,
-      grpc_method      = grpc_method,
-      **self._get_arguments(request_metadata = request_metadata),
-    )
+    super().inc(status = status, **self._get_arguments(request = request, peer = peer))
 
   def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
-      request_metadata : RequestMetadata,
-      status           : StatusCode,
-      grpc_service     : str,
-      grpc_method      : str,
+      request: RequestMetadata,
+      peer   : RequestMetadata,
+      status : StatusCode,
   ) -> int :
     """Increment the metric."""
-    return super().get_value(
-      status           = status,
-      grpc_service     = grpc_service,
-      grpc_method      = grpc_method,
-      **self._get_arguments(request_metadata = request_metadata),
-    )
+    return super().get_value(status = status, **self._get_arguments(request = request, peer = peer))
 
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,
@@ -73,24 +61,20 @@ class RequestsMetric(CounterMetric):
       **additional_labels,
     )
 
-  @staticmethod
-  def _string_or_unknown(value: str) -> str :
-    """Either return the value, or UNKNOWN if empty."""
-    if value:
-      return value
-    return 'UNKNOWN'
-
   def _get_arguments(
       self, *,
-      request_metadata: RequestMetadata,
+      request: RequestMetadata,
+      peer   : RequestMetadata,
   ) -> Dict[str, Any] :
     """Transform the request metadata into arguments."""
     return {
-        'peer_khaleesi_gate'   : self._string_or_unknown(request_metadata.caller.khaleesi_gate),
-        'peer_khaleesi_service': self._string_or_unknown(request_metadata.caller.khaleesi_service),
-        'peer_grpc_service'    : self._string_or_unknown(request_metadata.caller.grpc_service),
-        'peer_grpc_method'     : self._string_or_unknown(request_metadata.caller.grpc_method),
-        'user'                 : request_metadata.user.type,
+        'user': request.user.type,
+        'grpc_service': self.string_or_unknown(request.caller.grpc_service),
+        'grpc_method' : self.string_or_unknown(request.caller.grpc_method),
+        'peer_khaleesi_gate'   : self.string_or_unknown(peer.caller.khaleesi_gate),
+        'peer_khaleesi_service': self.string_or_unknown(peer.caller.khaleesi_service),
+        'peer_grpc_service'    : self.string_or_unknown(peer.caller.grpc_service),
+        'peer_grpc_method'     : self.string_or_unknown(peer.caller.grpc_method),
     }
 
 

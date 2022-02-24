@@ -69,6 +69,13 @@ class AbstractMetric:
         **{ key: value.upper() for key, value in kwargs.items() if value.startswith('unknown') },
     }
 
+  @staticmethod
+  def string_or_unknown(value: str) -> str :
+    """Either return the value, or UNKNOWN if empty."""
+    if value:
+      return value
+    return 'UNKNOWN'
+
 class GaugeMetric(AbstractMetric):
   """Gauge metric."""
 
