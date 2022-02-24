@@ -22,7 +22,7 @@ fi
 scripts_folder=scripts/util/refresh_tls_certificate
 letsencrypt_folder="letsencrypt"
 temp_folder="temp"
-environments_file="./scripts/data/environments"
+environments_file="./data/environments.json"
 current_date=$(date +"%Y-%m-%d")
 domain="khaleesi.ninja"
 copy_in_command=
