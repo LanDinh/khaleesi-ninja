@@ -140,9 +140,6 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
       status: StatusCode,
   ) -> None :
     """Assert the metric call was correct."""
-    metric.inc.assert_called_once_with(
-      status           = status,
-      request_metadata = request_metadata,
-      grpc_service     = self.service_name,
-      grpc_method      = self.method_name,
-    )
+    metric.inc.assert_called_once()
+    self.assertEqual(status          , metric.inc.call_args.kwargs['status'])
+    self.assertEqual(request_metadata, metric.inc.call_args.kwargs['peer'])

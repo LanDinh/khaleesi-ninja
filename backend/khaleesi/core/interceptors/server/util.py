@@ -29,6 +29,6 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
       method       = method,
       request      = request,
       context      = context,
-      service_name = self.string_or_unknown(value = service_name),
-      method_name  = self.string_or_unknown(value = method_name),
+      service_name = service_name,
+      method_name  = method_name,
     )

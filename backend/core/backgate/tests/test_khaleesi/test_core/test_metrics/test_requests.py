@@ -21,11 +21,6 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
 
   subTest: Callable  # type: ignore[type-arg]
 
-  labels = {
-      'grpc_service'         : 'grpc-service',
-      'grpc_method'          : 'grpc-method',
-  }
-
   def test_inc(self) -> None :
     """Test incrementing the counter."""
     # Prepare data.
@@ -37,20 +32,20 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
         self.execute_and_assert_counter(
           method = partial(
             self.metric.inc,
-            status = status,
-            request_metadata = request_metadata,
-            **self.labels,
+            status  = status,
+            request = request_metadata,
+            peer    = request_metadata,
           ),
-          status = status,
-          request_metadata = request_metadata,
-          **self.labels
+          status  = status,
+          request = request_metadata,
+          peer    = request_metadata,
         )
 
   @patch('khaleesi.core.metrics.requests.CounterMetric.get_value')
   def test_get_value(self, super_get_value: MagicMock) -> None :
     """Test string replacement for empty strings."""
     callee_grpc_service = 'callee-service'
-    callee_grpc_method = 'callee-method'
+    callee_grpc_method  = 'callee-method'
     for status, (user_label, user_type) in product(StatusCode, User.UserType.items()):
       for label, request_attributes in [
           ( 'full input'        , {} ),
@@ -68,24 +63,26 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
         with self.subTest(user = user_label, status = status, test = label):
           # Prepare data.
           super_get_value.reset_mock()
-          request_metadata = self._get_request_metadata(user = user_type, **request_attributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+          request = self._get_request_metadata(user = user_type, **request_attributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+          peer    = self._get_request_metadata(user = user_type, **request_attributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+          peer.caller.grpc_service = callee_grpc_service
+          peer.caller.grpc_method  = callee_grpc_method
           # Execute test.
           self.metric.get_value(
-            request_metadata = request_metadata,
-            status           = status,
-            grpc_service     = callee_grpc_service,
-            grpc_method      = callee_grpc_method,
+            status  = status,
+            request = request,
+            peer    = peer,
           )
           # Assert result.
           super_get_value.assert_called_once_with(
             status                = status,
-            grpc_service          = callee_grpc_service,
-            grpc_method           = callee_grpc_method,
             user                  = user_type,
-            peer_khaleesi_gate    = request_metadata.caller.khaleesi_gate    or 'UNKNOWN',
-            peer_khaleesi_service = request_metadata.caller.khaleesi_service or 'UNKNOWN',
-            peer_grpc_service     = request_metadata.caller.grpc_service     or 'UNKNOWN',
-            peer_grpc_method      = request_metadata.caller.grpc_method      or 'UNKNOWN',
+            grpc_service          = request.caller.grpc_service     or 'UNKNOWN',
+            grpc_method           = request.caller.grpc_method      or 'UNKNOWN',
+            peer_khaleesi_gate    = peer.caller.khaleesi_gate       or 'UNKNOWN',
+            peer_khaleesi_service = peer.caller.khaleesi_service    or 'UNKNOWN',
+            peer_grpc_service     = peer.caller.grpc_service        or 'UNKNOWN',
+            peer_grpc_method      = peer.caller.grpc_method         or 'UNKNOWN',
           )
 
 
