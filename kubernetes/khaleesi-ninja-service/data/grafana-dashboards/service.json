@@ -260,12 +260,233 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "NOK: .*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 53,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "interval": "",
+          "legendFormat": "{{`OK: {{grpc_service}}/{{grpc_method}} calling {{peer_khaleesi_gate}}`}}",
+          "refId": "OK"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`NOK: {{grpc_service}}/{{grpc_method}} calling {{peer_khaleesi_gate}}`}}",
+          "refId": "NOK"
+        }
+      ],
+      "title": "Outgoing requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "internal: .*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      },
+      "id": 54,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by(status, grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`{{status}}: {{grpc_service}}/{{grpc_method}} calling {{peer_khaleesi_gate}}`}}",
+          "refId": "NOK"
+        }
+      ],
+      "title": "Outgoing errors",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 17
       },
       "id": 17,
       "panels": [],
@@ -348,7 +569,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 10
+        "y": 18
       },
       "id": 24,
       "options": {
@@ -464,7 +685,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 10
+        "y": 18
       },
       "id": 29,
       "options": {
@@ -495,12 +716,229 @@
       "type": "timeseries"
     },
     {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*: NOK - .*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 26
+      },
+      "id": 56,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_version}}: OK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
+          "refId": "OK"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`{{khaleesi_version}}: NOK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
+          "refId": "NOK"
+        }
+      ],
+      "title": "Outgoing requests",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "internal: .*"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 26
+      },
+      "id": 57,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "exemplar": true,
+          "expr": "sum by(status, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "{{`{{status}}: {{grpc_method}} calling {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
+          "refId": "NOK"
+        }
+      ],
+      "title": "Outgoing errors",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 85
       },
       "id": 6,
       "panels": [],
@@ -578,7 +1016,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 37
+        "y": 86
       },
       "id": 8,
       "options": {
@@ -719,7 +1157,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 37
+        "y": 86
       },
       "id": 15,
       "options": {
@@ -819,7 +1257,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 45
+        "y": 94
       },
       "id": 36,
       "options": {
@@ -930,7 +1368,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 45
+        "y": 94
       },
       "id": 43,
       "options": {
@@ -993,14 +1431,14 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(khaleesi_incoming_requests_total, grpc_service)",
+        "definition": "label_values(khaleesi_incoming_requests_total{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}, grpc_service)",
         "hide": 2,
         "includeAll": true,
         "multi": false,
         "name": "grpc_service",
         "options": [],
         "query": {
-          "query": "label_values(khaleesi_incoming_requests_total, grpc_service)",
+          "query": "label_values(khaleesi_incoming_requests_total{khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}, grpc_service)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
@@ -1012,7 +1450,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
