@@ -25,6 +25,7 @@ agent metadata[
   meta_logger_grpc_service
   meta_logger_grpc_method
 ]
+
 rectangle event [
   Event
   ====
@@ -39,8 +40,19 @@ rectangle event [
   action_result
   action_details
 ]
+rectangle request [
+  Request
+  ====
+  upstream_request_id
+  ----
+  upstream_request_khaleesi_gate
+  upstream_request_khaleesi_service
+  upstream_request_grpc_service
+  upstream_request_grpc_method
+]
 
 ' ******************************************* RELATIONS ********************************************
 metadata ^-- event #darkviolet;text:darkviolet
+metadata ^-- request #darkviolet;text:darkviolet
 
 @enduml

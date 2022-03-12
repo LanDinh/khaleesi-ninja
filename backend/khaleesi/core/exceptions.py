@@ -75,3 +75,16 @@ class InternalServerException(KhaleesiCoreException):
       public_details = '',
       private_details = private_details,
     )
+
+
+class UpstreamGrpcException(KhaleesiCoreException):
+  """Internal server errors."""
+
+  def __init__(self, *, status: StatusCode, private_details: str) -> None :
+    """Initialize the exception."""
+    super().__init__(
+      status = status,
+      public_key = 'upstream-grpc-error',
+      public_details = '',
+      private_details = f'{status}: {private_details}',
+    )

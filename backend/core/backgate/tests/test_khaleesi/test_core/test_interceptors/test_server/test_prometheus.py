@@ -1,5 +1,7 @@
 """Test PrometheusServerInterceptor"""
 
+# pylint: disable=all
+
 # Python.
 from functools import partial
 from typing import Any, Dict, Optional

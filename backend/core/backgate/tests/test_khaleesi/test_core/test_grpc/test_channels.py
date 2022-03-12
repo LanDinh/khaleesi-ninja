@@ -11,13 +11,15 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 class ChannelManagerTestCase(SimpleTestCase):
   """Test the channel manager."""
 
+  @patch('khaleesi.core.grpc.channels.grpc.intercept_channel')
   @patch('khaleesi.core.grpc.channels.grpc.insecure_channel')
-  def test_get_channel(self, grpc_channel: MagicMock) -> None :
+  def test_get_channel(self, insecure: MagicMock, intercept: MagicMock) -> None :
     """Test getting a channel."""
     # Prepare data.
     channel_manager = ChannelManager()
     channel = MagicMock()
-    grpc_channel.return_value = channel
+    insecure.return_value = channel
+    intercept.return_value = channel
     gate = 'gate'
     service = 'service'
     with self.subTest(test = 'first access'):
@@ -25,15 +27,19 @@ class ChannelManagerTestCase(SimpleTestCase):
       result = channel_manager.get_channel(gate = gate, service = service)
       # Assert result.
       self.assertEqual(channel, result)
-      grpc_channel.assert_called_once_with(f'{gate}-{service}:8000')
+      insecure.assert_called_once_with(f'{gate}-{service}:8000')
+      intercept.assert_called_once()
+      self.assertEqual(channel, intercept.call_args.args[0])
     with self.subTest(test = 'second access'):
       # Prepare data.
-      grpc_channel.reset_mock()
+      insecure.reset_mock()
+      intercept.reset_mock()
       # Execute test.
       result = channel_manager.get_channel(gate = gate, service = service)
       # Assert result.
       self.assertEqual(channel, result)
-      grpc_channel.assert_not_called()
+      insecure.assert_not_called()
+      intercept.assert_not_called()
 
   @staticmethod
   def test_close_all_channels() -> None :

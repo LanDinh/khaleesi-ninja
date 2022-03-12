@@ -10,6 +10,7 @@ from django.conf import settings
 import grpc
 
 # khaleesi.ninja.
+from khaleesi.core.interceptors.client.prometheus import PrometheusClientInterceptor
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 
 
@@ -29,7 +30,8 @@ class ChannelManager:
     address = f'{gate}-{service}'
     port = khaleesi_settings["GRPC"]["PORT"]
     if not address in self.channels:
-      self.channels[address] = grpc.insecure_channel(f'{address}:{port}')
+      channel = grpc.insecure_channel(f'{address}:{port}')
+      self.channels[address] = grpc.intercept_channel(channel, PrometheusClientInterceptor())
     return self.channels[address]
 
   def close_all_channels(self) -> None :

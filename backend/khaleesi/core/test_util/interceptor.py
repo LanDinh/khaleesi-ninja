@@ -9,11 +9,9 @@ from khaleesi.core.test_util.grpc import GrpcTestMixin
 from khaleesi.proto.core_pb2 import User, RequestMetadata  # pylint: disable=unused-import
 
 
-class ServerInterceptorTestMixin(GrpcTestMixin):
-  """Server interceptor test utility."""
+class InterceptorTestMixin(GrpcTestMixin):
+  """Interceptor test utility."""
 
-  service_name = 'service-name'
-  method_name  = 'method-name'
   empty_input = {
       'khaleesi_gate'   : '',
       'khaleesi_service': '',
@@ -44,14 +42,52 @@ class ServerInterceptorTestMixin(GrpcTestMixin):
       final_request = request
     return request_metadata, final_request
 
+  # noinspection PyMethodMayBeStatic
+  def get_intercept_params(  # pylint: disable=no-self-use
+      self, *,
+      method: Callable[[], Any] = lambda *args : None,
+  ) -> Dict[str, Any] :
+    """Get parameters to pass into the interceptor."""
+    return {
+        'method' : method,
+    }
+
+class ServerInterceptorTestMixin(InterceptorTestMixin):
+  """Server interceptor test utility."""
+
+  service_name = 'service-name'
+  method_name  = 'method-name'
+
   def get_intercept_params(
       self, *,
-      method: Callable[[], None] = lambda *args : None,
+      method: Callable[[], Any] = lambda *args : None,
   ) -> Dict[str, Any] :
     """Get parameters to pass into the server interceptor."""
     return {
-        'method'      : method,
         'context'     : MagicMock(),
         'service_name': self.service_name,
         'method_name' : self.method_name,
+        **super().get_intercept_params(method = method),
+    }
+
+class ClientInterceptorTestMixin(InterceptorTestMixin):
+  """Server interceptor test utility."""
+
+  khaleesi_gate    = 'Gate'
+  khaleesi_service = 'Service'
+  grpc_service     = 'service'
+  grpc_method      = 'method'
+
+  def get_intercept_params(
+      self, *,
+      method: Callable[[], Any] = lambda *args : None,
+  ) -> Dict[str, Any] :
+    """Get parameters to pass into the server interceptor."""
+    return {
+        'call_details'     : MagicMock(),
+        'khaleesi_gate'    : self.khaleesi_gate,
+        'khaleesi_service' : self.khaleesi_service,
+        'grpc_service'     : self.grpc_service,
+        'grpc_method'      : self.grpc_method,
+        **super().get_intercept_params(method = method),
     }
