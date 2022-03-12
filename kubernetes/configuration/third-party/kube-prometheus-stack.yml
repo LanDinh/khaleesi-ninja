@@ -24,7 +24,8 @@ grafana:
       org_role: Viewer
 
 prometheus-node-exporter:
-  hostRootFsMount: false
+  hostRootFsMount:
+    enabled: false
 
 kubeScheduler:
   service:
