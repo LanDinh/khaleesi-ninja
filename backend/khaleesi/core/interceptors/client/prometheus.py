@@ -9,7 +9,7 @@ from grpc import StatusCode, Call
 from grpc_interceptor import ClientCallDetails
 
 # khaleesi.ninja.
-from khaleesi.core.exceptions import UpstreamGrpcException
+from khaleesi.core.shared.exceptions import UpstreamGrpcException
 from khaleesi.core.interceptors.client.util import ClientInterceptor
 from khaleesi.core.metrics.requests import OUTGOING_REQUESTS
 from khaleesi.proto.core_pb2 import RequestMetadata

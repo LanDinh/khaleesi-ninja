@@ -7,7 +7,7 @@ from typing import Callable, Any
 from grpc import ServicerContext, StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.exceptions import KhaleesiException
+from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.metrics.requests import INCOMING_REQUESTS
 from khaleesi.proto.core_pb2 import RequestMetadata

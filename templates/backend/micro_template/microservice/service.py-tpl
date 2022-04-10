@@ -4,7 +4,7 @@
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.service_configuration import ServiceConfiguration
+from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.{{ project_name }}_pb2 import DESCRIPTOR, SomeRequest, SomeResponse
 from khaleesi.proto.{{ project_name }}_pb2_grpc import (
     SomeStub,

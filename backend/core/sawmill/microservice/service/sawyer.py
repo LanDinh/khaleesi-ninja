@@ -4,7 +4,7 @@
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.service_configuration import ServiceConfiguration
+from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, LogFilter, EventsList, RequestList
 from khaleesi.proto.core_sawmill_pb2_grpc import (
   SawyerServicer as Servicer,

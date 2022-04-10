@@ -12,7 +12,7 @@ from khaleesi.core.exceptions import (
     InvalidArgumentException,
     InternalServerException,
 )
-from khaleesi.core.service_configuration import ServiceConfiguration
+from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
     DESCRIPTOR,
     Event,
