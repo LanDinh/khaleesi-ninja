@@ -47,7 +47,8 @@ test() {
 
 run() {
   python manage.py migrate --database migrate --settings khaleesi.core.settings.production
-  exec python manage.py grpcserver --settings khaleesi.core.settings.production
+  # exec is necessary to properly handle SIGTERM
+  exec python -u manage.py grpcserver --settings khaleesi.core.settings.production
 }
 
 make_migrations() {
