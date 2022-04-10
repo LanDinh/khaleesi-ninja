@@ -17,7 +17,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
 
   interceptor = LoggingServerInterceptor(channel_manager = MagicMock())
 
-  def test_db_logging(self) -> None :
+  @patch('khaleesi.core.interceptors.server.logging.LOGGER')
+  def test_db_logging(self, logger: MagicMock) -> None :
     """Test db logging."""
     for user_label, user_type in User.UserType.items():
       with self.subTest(user = user_label.lower()):
@@ -27,6 +28,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           **self.empty_input,
         )
+        logger.reset_mock()
         db_module = MagicMock()
         # Execute test.
         with patch.dict('sys.modules', { 'microservice.models': db_module }):
@@ -35,14 +37,25 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
             **self.get_intercept_params(),
           )
         # Assert result.
-        self._assert_logging_call(logging = db_module, request_metadata = request_metadata)
+        self._assert_logging_call(
+          logging_stub= db_module,
+          logger = logger,
+          request_metadata = request_metadata,
+        )
 
-  def _assert_logging_call(self, *, logging: MagicMock, request_metadata: RequestMetadata) -> None :
+  def _assert_logging_call(
+      self, *,
+      logging_stub: MagicMock,
+      logger: MagicMock,
+      request_metadata: RequestMetadata,
+  ) -> None :
     """Assert the metric call was correct."""
     logging_request = cast(
       LoggingRequest,
-      logging.Request.objects.log_request.call_args.kwargs['grpc_request'],
+      logging_stub.Request.objects.log_request.call_args.kwargs['grpc_request'],
     )
+    logger.debug.assert_called_once()
+    logger.info.assert_called_once()
     self.assertEqual(request_metadata.caller, logging_request.upstream_request)
     self.assertEqual(-1               , logging_request.request_metadata.caller.request_id)
     self.assertEqual('core'           , logging_request.request_metadata.caller.khaleesi_gate)

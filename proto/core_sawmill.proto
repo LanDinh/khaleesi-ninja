@@ -42,6 +42,7 @@ message Event {
       SUCCESS        = 1;
       WARNING        = 2;
       ERROR          = 3;
+      FATAL          = 4;
     }
 
     ActionType crud_type   = 1;

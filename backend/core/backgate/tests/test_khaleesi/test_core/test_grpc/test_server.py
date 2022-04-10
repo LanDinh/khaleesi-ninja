@@ -15,10 +15,16 @@ from khaleesi.proto.core_sawmill_pb2 import Event
 @patch('khaleesi.core.grpc.server.ChannelManager')
 @patch('khaleesi.core.grpc.server.server')
 @patch('khaleesi.core.grpc.server.LumberjackStub')
+@patch('khaleesi.core.grpc.server.LOGGER')
 class ServerTestCase(SimpleTestCase):
   """Test the gRPC server."""
 
-  def test_initialization_success(self, lumberjack_stub: MagicMock, *_: MagicMock) -> None :
+  def test_initialization_success(
+      self,
+      logger: MagicMock,
+      lumberjack_stub: MagicMock,
+      *_: MagicMock,
+  ) -> None :
     """Test initialization success."""
     # Execute test.
     Server()
@@ -28,9 +34,11 @@ class ServerTestCase(SimpleTestCase):
       result = Event.Action.ResultType.SUCCESS,
       lumberjack_stub = lumberjack_stub
     )
+    logger.info.assert_called_once()
 
   def test_initialization_failure(
       self,
+      logger: MagicMock,
       lumberjack_stub: MagicMock,
       grpc_server: MagicMock,
       *_: MagicMock,
@@ -44,12 +52,14 @@ class ServerTestCase(SimpleTestCase):
     # Assert result.
     self.assert_server_state_event(
       action = Event.Action.ActionType.START,
-      result = Event.Action.ResultType.ERROR,
+      result = Event.Action.ResultType.FATAL,
       lumberjack_stub = lumberjack_stub
     )
+    logger.fatal.assert_called_once()
 
   def test_sigterm_success(
       self,
+      logger: MagicMock,
       lumberjack_stub: MagicMock,
       grpc_server: MagicMock,
       channel_manager: MagicMock,
@@ -61,6 +71,7 @@ class ServerTestCase(SimpleTestCase):
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
     lumberjack_stub.reset_mock()
+    logger.reset_mock()
     # Execute test.
     event.set()
     server._handle_sigterm()  # pylint: disable=protected-access
@@ -70,10 +81,12 @@ class ServerTestCase(SimpleTestCase):
       result = Event.Action.ResultType.SUCCESS,
       lumberjack_stub = lumberjack_stub
     )
+    logger.info.assert_called_once()
     channel_manager.return_value.close_all_channels.assert_called_once_with()
 
   def test_sigterm_failure(
       self,
+      logger: MagicMock,
       lumberjack_stub: MagicMock,
       grpc_server: MagicMock,
       *_: MagicMock,
@@ -89,12 +102,14 @@ class ServerTestCase(SimpleTestCase):
     # Assert result.
     self.assert_server_state_event(
       action = Event.Action.ActionType.END,
-      result = Event.Action.ResultType.ERROR,
+      result = Event.Action.ResultType.FATAL,
       lumberjack_stub = lumberjack_stub
     )
+    logger.fatal.assert_called_once()
 
   def test_sigterm_timeout(
       self,
+      logger: MagicMock,
       lumberjack_stub: MagicMock,
       grpc_server: MagicMock,
       channel_manager: MagicMock,
@@ -111,13 +126,20 @@ class ServerTestCase(SimpleTestCase):
     # Assert result.
     self.assert_server_state_event(
       action = Event.Action.ActionType.END,
-      result = Event.Action.ResultType.WARNING,
+      result = Event.Action.ResultType.ERROR,
       lumberjack_stub = lumberjack_stub
     )
+    logger.error.assert_called_once()
     channel_manager.return_value.close_all_channels.assert_called_once_with()
 
   # noinspection PyMethodMayBeStatic,PyUnusedLocal
-  def test_start(self, lumberjack_stub: MagicMock, grpc_server: MagicMock, *_: MagicMock) -> None :  # pylint: disable=unused-argument,no-self-use
+  def test_start(  # pylint: disable=unused-argument,no-self-use
+      self,
+      logger: MagicMock,
+      lumberjack_stub: MagicMock,
+      grpc_server: MagicMock,
+      *_: MagicMock,
+  ) -> None :
     """Test that server start works correctly."""
     # Prepare data.
     server = Server()

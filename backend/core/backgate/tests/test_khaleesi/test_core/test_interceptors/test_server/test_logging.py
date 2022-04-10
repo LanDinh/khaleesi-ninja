@@ -21,7 +21,9 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     """Test intercept with metadata present."""
     for name, request_params in self.metadata_request_params:
       with self.subTest(case = name):
-        self._execute_intercept_execute_intercept_grpc_logging_test(request_params = request_params)  # pylint: disable=no-value-for-parameter
+        self._execute_intercept_execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
+          request_params = request_params,
+        )
 
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
@@ -30,10 +32,12 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
       request_params = self.empty_input,
     )
 
+  @patch('khaleesi.core.interceptors.server.logging.LOGGER')
   @patch('khaleesi.core.interceptors.server.logging.LumberjackStub')
   def _execute_intercept_execute_intercept_grpc_logging_test(
       self,
-      logging: MagicMock,
+      logging_stub: MagicMock,
+      logger: MagicMock,
       *,
       request: Optional[Any] = None,
       request_params: Dict[str, Any],
@@ -47,14 +51,27 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           **request_params,
         )
+        logging_stub.reset_mock()
+        logger.reset_mock()
         # Execute test.
         self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params())
         # Assert result.
-        self._assert_logging_call(logging = logging, request_metadata = request_metadata)
+        self._assert_logging_call(
+          logging_stub = logging_stub,
+          logger = logger,
+          request_metadata = request_metadata,
+        )
 
-  def _assert_logging_call(self, *, logging: MagicMock, request_metadata: RequestMetadata) -> None :
+  def _assert_logging_call(
+      self, *,
+      logging_stub: MagicMock,
+      logger: MagicMock,
+      request_metadata: RequestMetadata,
+  ) -> None :
     """Assert the metric call was correct."""
-    logging_request = cast(LoggingRequest, logging.return_value.LogRequest.call_args.args[0])
+    logging_request = cast(LoggingRequest, logging_stub.return_value.LogRequest.call_args.args[0])
+    logger.debug.assert_called_once()
+    logger.info.assert_called_once()
     self.assertEqual(request_metadata.caller, logging_request.upstream_request)
     self.assertEqual(-1               , logging_request.request_metadata.caller.request_id)
     self.assertEqual('core'           , logging_request.request_metadata.caller.khaleesi_gate)

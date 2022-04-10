@@ -14,6 +14,8 @@ from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.grpc.request_metadata import add_request_metadata
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
+from khaleesi.core.shared.logger import LOGGER
+from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import Request as LoggingRequest
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
@@ -60,14 +62,20 @@ class LoggingServerInterceptor(ServerInterceptor):
     logging_request.upstream_request.grpc_service     = upstream.caller.grpc_service
     logging_request.upstream_request.grpc_method      = upstream.caller.grpc_method
 
+    LOGGER.debug(message = f'{service_name}.{method_name} request started (pre-logging)')
+
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
       channel = self.channel_manager.get_channel(gate = 'core', service = 'sawmill')
       stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
-      stub.LogRequest(logging_request)
+      response = stub.LogRequest(logging_request)
+      STATE.request_id = response.request_id
     else:
       # Send directly to the DB. Note that Requests must be present in the schema!
       from microservice.models import Request as DbRequest  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
-      DbRequest.objects.log_request(grpc_request = logging_request)
+      logged_request = DbRequest.objects.log_request(grpc_request = logging_request)
+      STATE.request_id = logged_request.pk
+
+    LOGGER.info(message = f'{service_name}.{method_name} request started')
 
     response = method(request, context)
     return response

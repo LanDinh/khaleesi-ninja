@@ -24,6 +24,40 @@ INSTALLED_APPS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Logging.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'khaleesi': {
+            'format':
+              '| {levelname} | {asctime} | {thread:d} | {request_id} | {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'khaleesi_console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'khaleesi',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'khaleesi': {
+            'handlers': ['khaleesi_console'],
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+
 # khaleesi.ninja
 KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSettings(
   METADATA = definition.Metadata(
