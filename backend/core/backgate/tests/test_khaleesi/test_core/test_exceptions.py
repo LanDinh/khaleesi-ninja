@@ -7,7 +7,7 @@ from django.test import override_settings
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.exceptions import KhaleesiException
+from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.test_util.test_case import SimpleTestCase
 
 

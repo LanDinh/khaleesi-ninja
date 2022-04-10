@@ -11,7 +11,7 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.exceptions import UpstreamGrpcException
+from khaleesi.core.shared.exceptions import UpstreamGrpcException
 from khaleesi.core.interceptors.client.prometheus import PrometheusClientInterceptor
 from khaleesi.core.test_util.interceptor import ClientInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
