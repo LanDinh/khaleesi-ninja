@@ -7,7 +7,7 @@ from typing import Callable
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.exceptions import (
+from khaleesi.core.shared.exceptions import (
     KhaleesiException,
     InvalidArgumentException,
     InternalServerException,
