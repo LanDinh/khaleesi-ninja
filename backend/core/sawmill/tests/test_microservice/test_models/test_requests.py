@@ -101,7 +101,7 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
         self.assert_grpc_request_metadata(
           model = request,
           grpc = result.request.request_metadata,
-          grpc_response = result.response_metadata,
+          grpc_response = result.request_metadata,
         )
         self.assertEqual(
           request.upstream_request_request_id,

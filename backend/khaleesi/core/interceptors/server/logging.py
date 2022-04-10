@@ -25,7 +25,7 @@ khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 
 
 class LoggingServerInterceptor(ServerInterceptor):
-  """Interceptor to collect prometheus metrics."""
+  """Interceptor to log requests."""
 
   channel_manager: ChannelManager
 
@@ -41,7 +41,7 @@ class LoggingServerInterceptor(ServerInterceptor):
       service_name: str,
       method_name: str,
   ) -> Any :
-    """Log the incoming request.."""
+    """Log the incoming request."""
     if hasattr(request, 'request_metadata'):
       upstream: RequestMetadata = request.request_metadata
     else:
@@ -62,7 +62,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     logging_request.upstream_request.grpc_service     = upstream.caller.grpc_service
     logging_request.upstream_request.grpc_method      = upstream.caller.grpc_method
 
-    LOGGER.debug(message = f'{service_name}.{method_name} request started (pre-logging)')
+    LOGGER.debug(message = f'{service_name}.{method_name} request started (pre request_id)')
 
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
       channel = self.channel_manager.get_channel(gate = 'core', service = 'sawmill')

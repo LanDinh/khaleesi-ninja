@@ -74,7 +74,7 @@ class Event(Metadata):
 
     grpc_event_response = GrpcEventResponse()
     self.request_metadata_to_grpc(request_metadata = grpc_event_response.event.request_metadata)
-    self.response_metadata_to_grpc(response_metadata = grpc_event_response.response_metadata)
+    self.response_metadata_to_grpc(response_metadata = grpc_event_response.event_metadata)
     # Target.
     grpc_event_response.event.target.type = self.target_type
     grpc_event_response.event.target.id   = self.target_id

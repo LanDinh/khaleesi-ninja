@@ -138,7 +138,7 @@ class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
             self.assert_grpc_request_metadata(
               model = event,
               grpc = result.event.request_metadata,
-              grpc_response = result.response_metadata,
+              grpc_response = result.event_metadata,
             )
             self.assertEqual(event.target_type      , result.event.target.type)
             self.assertEqual(event.target_id        , result.event.target.id)

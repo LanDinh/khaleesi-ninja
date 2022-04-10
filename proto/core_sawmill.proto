@@ -76,8 +76,8 @@ service Lumberjack {
 
 
 message EventResponse {
-  ResponseMetadata response_metadata = 1;
-  Event            event             = 2;
+  ResponseMetadata event_metadata = 1;
+  Event            event          = 2;
 }
 
 message EventsList {
@@ -86,7 +86,7 @@ message EventsList {
 
 
 message RequestResponse {
-  ResponseMetadata response_metadata = 1;
+  ResponseMetadata request_metadata  = 1;
   Request          request           = 2;
 }
 

@@ -20,7 +20,7 @@ class RequestManager(models.Manager['Request']):
   """Custom model manager."""
 
   def log_request(self, *, grpc_request: GrpcRequest) -> Request :
-    """Log a gRPC event."""
+    """Log a gRPC request."""
 
     errors: List[str] = []
 
@@ -69,7 +69,7 @@ class Request(Metadata):
     grpc_request_response = GrpcRequestResponse()
     # Request metadata.
     self.request_metadata_to_grpc(request_metadata = grpc_request_response.request.request_metadata)
-    self.response_metadata_to_grpc(response_metadata = grpc_request_response.response_metadata)
+    self.response_metadata_to_grpc(response_metadata = grpc_request_response.request_metadata)
     # Upstream request.
     grpc_request_response.request.upstream_request.request_id = self.upstream_request_request_id
     grpc_request_response.request.upstream_request.khaleesi_gate = \
