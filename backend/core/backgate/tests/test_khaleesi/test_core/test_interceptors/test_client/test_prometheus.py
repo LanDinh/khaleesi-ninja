@@ -1,6 +1,6 @@
 """Test PrometheusClientInterceptor"""
 
-# pylint: disable=all
+# pylint: disable=duplicate-code
 
 # Python.
 from functools import partial
