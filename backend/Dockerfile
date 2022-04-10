@@ -25,10 +25,6 @@ RUN python -m venv .venv
 RUN ./.venv/bin/pip install --upgrade pip
 RUN ./.venv/bin/pip install -r requirements.txt
 
-# Data.
-COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
-
 ################################################################################
 #                               Development Base                               #
 ################################################################################
@@ -51,6 +47,10 @@ COPY ./mypy.ini /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./pylintrc /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./execute_develop.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
 RUN ./.venv/bin/pip install -r requirements_develop.txt
+
+# Data. Copy here instead of Base to avoid re-running pip install for dev tools.
+COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
+COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
 
 ################################################################################
 #                              Development Image                               #
@@ -104,7 +104,9 @@ ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
 COPY ./execute_production.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
 
-# Data.
+# Data. Copy here instead of Base to avoid re-running pip install for dev tools for dev image.
+COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
+COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
 RUN rm -r tests
 
 ################################################################################
