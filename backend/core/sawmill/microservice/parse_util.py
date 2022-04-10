@@ -7,17 +7,17 @@ from typing import Callable, Any, Optional, TypeVar, List, Protocol
 from uuid import UUID
 
 
-T = TypeVar('T', covariant = True)  # pylint: disable=invalid-name
+T_co = TypeVar('T_co', covariant = True)  # pylint: disable=invalid-name
 
 
 def _parse_input(
     *,
-    parser : Callable[[Any], T],
+    parser : Callable[[Any], T_co],
     raw    : Optional[Any],
-    default: Optional[T],
+    default: Optional[T_co],
     name   : str,
     errors : List[str],
-) -> Optional[T] :
+) -> Optional[T_co] :
   """Attempt to parse the input."""
   try:
     if raw:
@@ -27,9 +27,9 @@ def _parse_input(
     errors.append(f'{type(exception).__name__} parsing {name}: {str(exception)}.')
     return default
 
-class Parser(Protocol[T]):
+class Parser(Protocol[T_co]):
   """Signature for parsers."""
-  def __call__(self, *, raw: Optional[Any], name: str, errors: List[str]) -> Optional[T] : ...
+  def __call__(self, *, raw: Optional[Any], name: str, errors: List[str]) -> Optional[T_co] : ...
 
 
 parse_uuid: Parser[UUID] = partial(_parse_input, parser = UUID, default = None)
