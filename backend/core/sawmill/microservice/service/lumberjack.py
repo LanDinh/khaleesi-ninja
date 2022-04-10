@@ -15,9 +15,9 @@ from khaleesi.core.shared.exceptions import (
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
     DESCRIPTOR,
-    Event,
+    Event, ResponseRequest,
     Request, LogRequestResponse,
-    LogResponse,
+    LogStandardResponse,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
@@ -30,10 +30,10 @@ from microservice.models.abstract import Metadata
 class Service(Servicer):
   """core-sawmill service."""
 
-  def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogResponse :
+  def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
     self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
-    return LogResponse()
+    return LogStandardResponse()
 
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogRequestResponse :
     """Log requests."""
@@ -43,6 +43,11 @@ class Service(Servicer):
     response = LogRequestResponse()
     response.request_id = logged_request.pk
     return response
+
+  def LogResponse(self, request: ResponseRequest, _: grpc.ServicerContext) -> LogStandardResponse :
+    """Log request responses."""
+    self._handle_response(method = lambda: DbRequest.objects.log_response(grpc_response = request))
+    return LogStandardResponse()
 
 
   @staticmethod

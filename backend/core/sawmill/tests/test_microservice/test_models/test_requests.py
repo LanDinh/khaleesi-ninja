@@ -4,20 +4,23 @@
 from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
+# gRPC.
+from grpc import StatusCode
+
 # khaleesi.ninja.
 from khaleesi.core.test_util.grpc import GrpcTestMixin
 from khaleesi.core.test_util.test_case import TransactionTestCase, SimpleTestCase
 from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import Request as GrpcRequest
+from khaleesi.proto.core_sawmill_pb2 import Request as GrpcRequest, ResponseRequest as GrpcResponse
 from microservice.models import Request
 from microservice.test_util import ModelRequestMetadataMixin
 
 
-@patch('microservice.models.event.parse_string')
-@patch.object(Request.objects.model, 'log_metadata')
 class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the request logs objects manager."""
 
+  @patch('microservice.models.request.parse_string')
+  @patch.object(Request.objects.model, 'log_metadata')
   def test_log_request(self, metadata: MagicMock, string: MagicMock) -> None :
     """Test logging a gRPC request."""
     for user_label, user_type in User.UserType.items():
@@ -34,10 +37,10 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
           user = user_type,
         )
         grpc_request.upstream_request.request_id = 13
-        grpc_request.upstream_request.khaleesi_gate = 'upstream-khaleesi-gate'
-        grpc_request.upstream_request.khaleesi_service = 'upstream-khaleesi-service'
-        grpc_request.upstream_request.grpc_service = 'upstream-grpc-service'
-        grpc_request.upstream_request.grpc_method = 'upstream-grpc-method'
+        grpc_request.upstream_request.khaleesi_gate = string.return_value
+        grpc_request.upstream_request.khaleesi_service = string.return_value
+        grpc_request.upstream_request.grpc_service = string.return_value
+        grpc_request.upstream_request.grpc_method = string.return_value
         # Execute test.
         result = Request.objects.log_request(grpc_request = grpc_request)
         # Assert result.
@@ -65,6 +68,8 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
           result.upstream_request_grpc_method,
         )
 
+  @patch('microservice.models.event.parse_string')
+  @patch.object(Request.objects.model, 'log_metadata')
   def test_log_request_empty(self, metadata: MagicMock, string: MagicMock) -> None :
     """Test logging an empty gRPC request."""
     # Prepare data.
@@ -77,6 +82,43 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
     metadata.assert_called_once()
     self.assertEqual([], metadata.call_args.kwargs['errors'])
     self.assertEqual('', result.meta_logging_errors)
+
+  @patch('microservice.models.request.parse_timestamp')
+  @patch.object(Request.objects, 'get')
+  def test_log_response(self, _: MagicMock, timestamp: MagicMock) -> None :
+    """Test logging a gRPC request response."""
+    for status in StatusCode:
+      with self.subTest(status = status):
+        # Prepare data.
+        now = datetime.now(tz = timezone.utc)
+        timestamp.return_value = now
+        grpc_response = GrpcResponse()
+        grpc_response.request_id = 13
+        grpc_response.response.status = 1337
+        grpc_response.response.timestamp.FromDatetime(now)
+        # Execute test.
+        result = Request.objects.log_response(grpc_response = grpc_response)
+        # Assert result.
+        result.save.assert_called_once_with()  # type: ignore[attr-defined]
+        result.reset_mock()  # type: ignore[attr-defined]
+        self.assertEqual(grpc_response.response.status,    result.response_status)
+        self.assertEqual(
+          grpc_response.response.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+          result.response_event_timestamp,
+        )
+
+  @patch('microservice.models.request.parse_timestamp')
+  @patch.object(Request.objects, 'get')
+  def test_log_empty_response(self, *_: MagicMock) -> None :
+    """Test logging an empty gRPC request response."""
+    # Prepare data.
+    grpc_response = GrpcResponse()
+    # Execute test.
+    result = Request.objects.log_response(grpc_response = grpc_response)
+    # Assert result.
+    result.save.assert_called_once_with()  # type: ignore[attr-defined]
+    result.reset_mock()  # type: ignore[attr-defined]
+    self.assertIn('response status', result.response_logging_errors)
 
 
 class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
@@ -94,6 +136,10 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           upstream_request_grpc_service = '',
           upstream_request_grpc_method = '',
           **self.model_full_request_metadata(user = user_type),
+          pk = 1337,  # Must be from the DB, so it has a pk. And this needs to match the test data.
+          response_status = 42,
+          response_event_timestamp = datetime.now(tz = timezone.utc),
+          response_logged_timestamp = datetime.now(tz = timezone.utc),
         )
         # Execute test.
         result = request.to_grpc_request_response()
@@ -123,12 +169,31 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           request.upstream_request_grpc_method,
           result.request.upstream_request.grpc_method,
         )
+        self.assertEqual(
+          request.response_status,
+          result.response.status,
+        )
+        self.assertEqual(
+          request.response_event_timestamp,
+          result.response.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+        )
+        self.assertEqual(
+          request.response_logged_timestamp,
+          result.response_metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+        )
+
 
   def test_empty_to_grpc_request(self) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
-    event = Request(**self.model_empty_request_metadata())
+    request = Request(
+      **self.model_empty_request_metadata(),
+      pk = 13,  # Must be from the DB, so it has a pk.
+      # We provide default values, so they exist.
+      response_event_timestamp = datetime.now(tz = timezone.utc),
+      response_logged_timestamp = datetime.now(tz = timezone.utc),
+    )
     # Execute test.
-    result = event.to_grpc_request_response()
+    result = request.to_grpc_request_response()
     # Assert result.
     self.assertIsNotNone(result)

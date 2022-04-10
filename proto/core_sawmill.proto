@@ -66,12 +66,23 @@ message LogRequestResponse {
   int64 request_id = 1;
 }
 
+message Response {
+  int64                     status     = 2;
+  google.protobuf.Timestamp timestamp  = 3;
+}
 
-message LogResponse {}
+message ResponseRequest {
+  int64 request_id  = 1;
+  Response response = 2;
+}
+
+
+message LogStandardResponse {}
 
 service Lumberjack {
-  rpc LogEvent   (Event)   returns (LogResponse);
-  rpc LogRequest (Request) returns (LogRequestResponse);
+  rpc LogEvent    (Event)           returns  (LogStandardResponse);
+  rpc LogRequest  (Request)         returns  (LogRequestResponse);
+  rpc LogResponse (ResponseRequest) returns (LogStandardResponse);
 }
 
 
@@ -88,6 +99,8 @@ message EventsList {
 message RequestResponse {
   ResponseMetadata request_metadata  = 1;
   Request          request           = 2;
+  ResponseMetadata response_metadata = 3;
+  Response         response          = 4;
 }
 
 message RequestList {

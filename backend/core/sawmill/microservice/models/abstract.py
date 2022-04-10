@@ -71,7 +71,7 @@ class Metadata(models.Model):
         # Time.
         'meta_event_timestamp': parse_timestamp(
           raw    = metadata.timestamp.ToDatetime(),
-          name   = 'event_timestamp',
+          name   = 'timestamp',
           errors = errors,
         ),
         # Misc.

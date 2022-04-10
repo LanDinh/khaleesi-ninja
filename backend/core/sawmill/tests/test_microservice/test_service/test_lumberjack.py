@@ -33,12 +33,20 @@ class LumberjackServiceTestCase(SimpleTestCase):
     )
 
   def test_log_request(self) -> None :
-    """Test logging events."""
+    """Test logging requests."""
     self._execute_logging_tests(
       method = lambda : self.service.LogRequest(MagicMock(), MagicMock()),
       logging_object = DbRequest.objects,
       logging_method = 'log_request',
       return_value = partial(Metadata, pk = 13),
+    )
+
+  def test_log_response(self) -> None :
+    """Test logging responses."""
+    self._execute_logging_tests(
+      method = lambda : self.service.LogResponse(MagicMock(), MagicMock()),
+      logging_object = DbRequest.objects,
+      logging_method = 'log_response',
     )
 
   def _execute_logging_tests(

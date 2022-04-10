@@ -22,6 +22,7 @@ rectangle sawmill [
   ====
   log event
   log request
+  log response
 ]
 
 ' ******************************************* RELATIONS ********************************************

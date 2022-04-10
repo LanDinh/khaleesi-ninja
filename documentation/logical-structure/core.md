@@ -20,4 +20,4 @@ The different types of logs are:
 
 * `Metadata` contains metadata shared by all log types and is inherited from by all log types
 * `Event` contains information relating to actions that might require auditing 
-* 'Request' contains information regarding gRPC requests
+* `Request` contains information regarding gRPC requests and their responses
