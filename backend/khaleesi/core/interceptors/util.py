@@ -7,6 +7,14 @@ from typing import Tuple
 class Interceptor:
   """Interceptor utility."""
 
+  skip_list = [
+      '/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo',
+  ]
+
+  def skip_interceptors(self, *, raw: str) -> bool :
+    """Skip interceptors for utility provided by libraries."""
+    return raw in self.skip_list
+
   def process_method_name(self, *, raw: str) -> Tuple[str, str, str, str] :
     """Process the method name and return (service, method)."""
     parts = raw.split('/')

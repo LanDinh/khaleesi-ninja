@@ -30,3 +30,18 @@ class InterceptorTest(SimpleTestCase):
         self.assertEqual(i_service     , o_service)
         self.assertEqual(i_grpc_service, o_grpc_service)
         self.assertEqual(i_grpc_method , o_grpc_method)
+
+  def test_skip_interceptors(self) -> None :
+    """Test skipping of interceptors."""
+    for method in self.interceptor.skip_list:
+      # Prepare data & execute test.
+      result = self.interceptor.skip_interceptors(raw = method)
+      # Assert result.
+      self.assertTrue(result)
+
+  def test_dont_skip_interceptors(self) -> None :
+    """Test skipping of interceptors."""
+    # Prepare data & execute test.
+    result = self.interceptor.skip_interceptors(raw = 'some.test.Service/Method')
+    # Assert result.
+    self.assertFalse(result)

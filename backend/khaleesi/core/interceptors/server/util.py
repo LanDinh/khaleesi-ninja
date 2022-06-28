@@ -24,6 +24,9 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
       method_name: str,
   ) -> Any :
     """Intercept the method call."""
+    if self.skip_interceptors(raw = method_name):
+      return method(request_or_iterator, context)
+
     _, _, service_name, method_name = self.process_method_name(raw = method_name)
     return self.khaleesi_intercept(
       method       = method,

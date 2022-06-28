@@ -29,3 +29,19 @@ class ServerInterceptorTest(SimpleTestCase):
       context             = MagicMock(),
       method_name         = f'/khaleesi.gate.service.{service}/{method}',
     )
+
+  def test_skip_intercept(self) -> None :
+    """Test skipping of method interception."""
+    for method in self.interceptor.skip_list:
+      # Prepare data.
+      khaleesi_intercept = MagicMock()
+      self.interceptor.khaleesi_intercept = khaleesi_intercept  # type: ignore[assignment]
+      # Execute test.
+      self.interceptor.intercept(
+        method              = lambda *args: None,
+        request_or_iterator = MagicMock(),
+        context             = MagicMock(),
+        method_name         = method,
+      )
+      # Assert result.
+      khaleesi_intercept.assert_not_called()
