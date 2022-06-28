@@ -94,7 +94,7 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         timestamp.return_value = now
         grpc_response = GrpcResponse()
         grpc_response.request_id = 13
-        grpc_response.response.status = 1337
+        grpc_response.response.status = status.name
         grpc_response.response.timestamp.FromDatetime(now)
         # Execute test.
         result = Request.objects.log_response(grpc_response = grpc_response)
@@ -137,7 +137,7 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           upstream_request_grpc_method = '',
           **self.model_full_request_metadata(user = user_type),
           pk = 1337,  # Must be from the DB, so it has a pk. And this needs to match the test data.
-          response_status = 42,
+          response_status = 'OK',
           response_event_timestamp = datetime.now(tz = timezone.utc),
           response_logged_timestamp = datetime.now(tz = timezone.utc),
         )

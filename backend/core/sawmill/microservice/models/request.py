@@ -88,7 +88,7 @@ class Request(Metadata):
   upstream_request_grpc_service     = models.TextField(default = 'UNKNOWN')
   upstream_request_grpc_method      = models.TextField(default = 'UNKNOWN')
 
-  response_status           = models.IntegerField(default = -1)  # different from status 2 = UNKNOWN
+  response_status           = models.TextField(default = 'IN_PROGRESS')
   response_event_timestamp  = models.DateTimeField(
     default = datetime.min.replace(tzinfo = timezone.utc))
   response_logged_timestamp = models.DateTimeField(auto_now = True)
