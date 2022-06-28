@@ -25,6 +25,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Logging.
+# noinspection SpellCheckingInspection
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

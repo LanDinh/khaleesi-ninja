@@ -99,7 +99,6 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
         )
         # Execute test.
         with self.assertRaises(KhaleesiException):
-          # noinspection PyTypeChecker
           self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params(
             method  = partial(
               lambda inner_exception, *args : _raise(inner_exception),

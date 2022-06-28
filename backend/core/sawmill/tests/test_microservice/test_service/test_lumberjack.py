@@ -16,7 +16,6 @@ from microservice.service.lumberjack import (  # type: ignore[attr-defined]
 from tests.models import Metadata
 
 
-# noinspection PyMethodMayBeStatic
 class LumberjackServiceTestCase(SimpleTestCase):
   """Test the core-sawmill lumberjack service."""
 
@@ -96,12 +95,11 @@ class LumberjackServiceTestCase(SimpleTestCase):
     logging.assert_called_once()
     self.assertEqual(expected_result.meta_logging_errors, context.exception.private_details)
 
-  # noinspection PyUnusedLocal
   def _execute_logging_test_with_fatal_error(
       self, *,
       method: Callable[[], Any],
       logging: MagicMock,
-      return_value: Callable[[], AbstractMetadata],  # pylint: disable=unused-argument
+      _: Callable[[], AbstractMetadata],
   ) -> None :
     """Call to logging method that results in fatal errors."""
     # Prepare data.

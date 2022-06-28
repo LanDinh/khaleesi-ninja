@@ -42,7 +42,6 @@ class InterceptorTestMixin(GrpcTestMixin):
       final_request = request
     return request_metadata, final_request
 
-  # noinspection PyMethodMayBeStatic
   def get_intercept_params(
       self, *,
       method: Callable[[], Any] = lambda *args : None,

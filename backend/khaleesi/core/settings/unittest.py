@@ -38,4 +38,5 @@ DATABASES: Dict[str, Any] = {
 }
 DATABASE_ROUTERS = [ 'khaleesi.core.database_router.unittest.TestDatabaseRouter' ]
 
+# noinspection PyUnresolvedReferences
 INSTALLED_APPS.append('tests')
