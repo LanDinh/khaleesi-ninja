@@ -37,8 +37,7 @@ class Logger:
     """Fatal log."""
     logger.fatal(message, extra = self._extra())
 
-  @staticmethod
-  def _extra() -> Dict[str, str] :
+  def _extra(self) -> Dict[str, str] :
     return {
         'request_id': str(STATE.request_id) if hasattr(STATE, 'request_id') else 'system'
     }

@@ -22,8 +22,7 @@ class Interceptor:
         self.string_or_unknown(value = grpc_method),
     )
 
-  @staticmethod
-  def string_or_unknown(*, value: str) -> str :
+  def string_or_unknown(self, *, value: str) -> str :
     """Either return the value, or UNKNOWN if empty."""
     if value:
       return value

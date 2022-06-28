@@ -10,9 +10,8 @@ from khaleesi.proto.core_pb2 import RequestMetadata, User  # pylint: disable=unu
 class GrpcTestMixin:
   """gRPC test utility."""
 
-  @staticmethod
   def set_request_metadata(
-      *,
+      self, *,
       request_metadata: RequestMetadata   = RequestMetadata(),
       now             : datetime          = datetime.now(tz = timezone.utc),
       user            : 'User.UserType.V',

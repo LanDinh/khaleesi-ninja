@@ -38,4 +38,4 @@ DATABASES: Dict[str, Any] = {
 }
 DATABASE_ROUTERS = [ 'khaleesi.core.database_router.unittest.TestDatabaseRouter' ]
 
-INSTALLED_APPS.append('tests')  # type: ignore[name-defined] # pylint: disable=undefined-variable
+INSTALLED_APPS.append('tests')

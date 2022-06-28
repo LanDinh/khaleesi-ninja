@@ -20,8 +20,6 @@ from tests.models import Metadata
 class LumberjackServiceTestCase(SimpleTestCase):
   """Test the core-sawmill lumberjack service."""
 
-  # pylint: disable=no-self-use
-
   service = Service()
 
   def test_log_event(self) -> None :

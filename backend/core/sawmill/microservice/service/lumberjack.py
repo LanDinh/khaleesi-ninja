@@ -50,8 +50,7 @@ class Service(Servicer):
     return LogStandardResponse()
 
 
-  @staticmethod
-  def _handle_response(*, method: Callable[[], Metadata]) -> Metadata :
+  def _handle_response(self, *, method: Callable[[], Metadata]) -> Metadata :
     """Wrap responses for logging."""
     try:
       metadata = method()

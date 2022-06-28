@@ -27,11 +27,13 @@ khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 class LoggingServerInterceptor(ServerInterceptor):
   """Interceptor to log requests."""
 
-  channel_manager: ChannelManager
+  stub: LumberjackStub
 
   def __init__(self, *, channel_manager: ChannelManager) -> None :
     super().__init__()
-    self.channel_manager = channel_manager
+    if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
+      channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
+      self.stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
 
   def khaleesi_intercept(
       self, *,
@@ -65,9 +67,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     LOGGER.debug(message = f'{service_name}.{method_name} request started (pre request_id)')
 
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
-      channel = self.channel_manager.get_channel(gate = 'core', service = 'sawmill')
-      stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
-      response = stub.LogRequest(logging_request)
+      response = self.stub.LogRequest(request)
       STATE.request_id = response.request_id
     else:
       # Send directly to the DB. Note that Requests must be present in the schema!

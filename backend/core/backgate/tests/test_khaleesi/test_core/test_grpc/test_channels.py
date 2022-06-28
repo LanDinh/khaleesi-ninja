@@ -41,8 +41,7 @@ class ChannelManagerTestCase(SimpleTestCase):
       insecure.assert_not_called()
       intercept.assert_not_called()
 
-  @staticmethod
-  def test_close_all_channels() -> None :
+  def test_close_all_channels(self) -> None :
     """Test all channels get closed."""
     # Prepare data.
     channel_manager = ChannelManager()

@@ -107,9 +107,8 @@ class Server:
       )
       raise exception from None
 
-  @staticmethod
   def _server_state_event(
-      *,
+      self, *,
       action: 'Event.Action.ActionType.V',
       result: 'Event.Action.ResultType.V',
       details: str,

@@ -19,7 +19,7 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
   def intercept(
       self,
       method: Callable[[Any, ServicerContext], Any],
-      request: Any,
+      request_or_iterator: Any,
       context: ServicerContext,
       method_name: str,
   ) -> Any :
@@ -27,7 +27,7 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
     _, _, service_name, method_name = self.process_method_name(raw = method_name)
     return self.khaleesi_intercept(
       method       = method,
-      request      = request,
+      request      = request_or_iterator,
       context      = context,
       service_name = service_name,
       method_name  = method_name,

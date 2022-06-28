@@ -45,11 +45,10 @@ class PrometheusClientInterceptor(ClientInterceptor):
       return response
     raise UpstreamGrpcException(
       status = response.code(),
-      private_details = self.exception_details(response)
+      private_details = self.exception_details(response = response)
     )
 
-  @staticmethod
-  def exception_details(response: Call) -> str :
+  def exception_details(self, *, response: Call) -> str :
     """Return a pretty-print of the exception."""
     if hasattr(response, 'exception') and response.exception and response.exception():  # type: ignore[attr-defined]  # pylint: disable=line-too-long
       return ''.join(traceback.format_exception(response.exception()))  # type: ignore[attr-defined]

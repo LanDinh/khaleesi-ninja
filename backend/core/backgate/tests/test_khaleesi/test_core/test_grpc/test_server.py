@@ -133,7 +133,7 @@ class ServerTestCase(SimpleTestCase):
     channel_manager.return_value.close_all_channels.assert_called_once_with()
 
   # noinspection PyMethodMayBeStatic,PyUnusedLocal
-  def test_start(  # pylint: disable=unused-argument,no-self-use
+  def test_start(  # pylint: disable=unused-argument
       self,
       logger: MagicMock,
       lumberjack_stub: MagicMock,

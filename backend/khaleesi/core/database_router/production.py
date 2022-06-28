@@ -11,11 +11,11 @@ from django.db.models import Model
 class DatabaseRouter:
   """Database router to distinguish between read and write operations."""
 
-  def db_for_read(self, _model: Type[Model], **_: Any) -> str :  # pylint: disable=no-self-use
+  def db_for_read(self, _model: Type[Model], **_: Any) -> str :
     """Return the database alias for reads."""
     return 'read'
 
-  def db_for_write(self, _model: Type[Model], **_: Any) -> str :  # pylint: disable=no-self-use
+  def db_for_write(self, _model: Type[Model], **_: Any) -> str :
     """Return the database alias for writes."""
     return 'write'
 
@@ -26,5 +26,5 @@ class DatabaseRouter:
       _model_name: Optional[str] = None,
       **_: Any
   ) -> bool :
-    """Return the database alias for migrations."""  # pylint: disable=no-self-use,invalid-name
+    """Return the database alias for migrations."""  # pylint: disable=invalid-name
     return 'migrate' == db

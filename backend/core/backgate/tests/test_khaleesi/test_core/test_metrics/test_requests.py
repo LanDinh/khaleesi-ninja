@@ -86,9 +86,8 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           )
 
 
-  @staticmethod
   def _get_request_metadata(
-      *,
+      self, *,
       user            : 'User.UserType.V',
       khaleesi_gate   : str = 'khaleesi-gate',
       khaleesi_service: str = 'khaleesi-service',

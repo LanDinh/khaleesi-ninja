@@ -35,9 +35,8 @@ class AuditEventMetricTestCase(CounterMetricTestMixin, SimpleTestCase):
               event = event,
             )
 
-  @staticmethod
   def _get_event(
-      *,
+      self, *,
       user: 'User.UserType.V',
       action_crud_type: 'Event.Action.ActionType.V',
       result: 'Event.Action.ResultType.V',

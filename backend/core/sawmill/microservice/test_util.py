@@ -15,8 +15,7 @@ class ModelRequestMetadataMixin:
 
   assertEqual: Callable  # type: ignore[type-arg]
 
-  @staticmethod
-  def model_full_request_metadata(*, user: 'User.UserType.V') -> Dict[str, Any] :
+  def model_full_request_metadata(self, *, user: 'User.UserType.V') -> Dict[str, Any] :
     """Fill model request metadata for testing purposes."""
     return {
         'meta_caller_request_id'      : 1337,
@@ -30,8 +29,7 @@ class ModelRequestMetadataMixin:
         'meta_logged_timestamp'       : datetime.now(tz = timezone.utc),
     }
 
-  @staticmethod
-  def model_empty_request_metadata() -> Dict[str, datetime] :
+  def model_empty_request_metadata(self) -> Dict[str, datetime] :
     """Provide necessary model metadata to avoid NPEs."""
     return {
         'meta_event_timestamp' : datetime.now(tz = timezone.utc),

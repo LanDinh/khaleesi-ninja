@@ -8,9 +8,9 @@ from typing import TypeVar, Generic, Dict, Type, List, Any
 from django.conf import settings
 
 # Prometheus.
-from prometheus_client import Counter, Gauge  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
-from prometheus_client.metrics import MetricWrapperBase  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
-from prometheus_client.registry import REGISTRY  # type: ignore[import] # https://github.com/prometheus/client_python/issues/491 # pylint: disable=line-too-long
+from prometheus_client import Counter, Gauge
+from prometheus_client.metrics import MetricWrapperBase
+from prometheus_client.registry import REGISTRY
 
 # khaleesi.ninja.
 from khaleesi.core.settings.definition import Metadata
@@ -59,9 +59,9 @@ class AbstractMetric:
   def get_value(self, **kwargs: Any) -> int :
     """Return the current value of the metric."""
     # noinspection PyProtectedMember
-    return int(self._metric.labels(**self.labels(**kwargs))._value.get())  # pylint: disable=protected-access
+    return int(self._metric.labels(**self.labels(**kwargs))._value.get())  # type: ignore[attr-defined]  # pylint: disable=protected-access,line-too-long
 
-  def labels(self, **kwargs: str) -> Dict[str, str] :  # pylint: disable=no-self-use
+  def labels(self, **kwargs: str) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return {
         **server_labels,
@@ -69,8 +69,7 @@ class AbstractMetric:
         **{ key: value.upper() for key, value in kwargs.items() if value.startswith('unknown') },
     }
 
-  @staticmethod
-  def string_or_unknown(value: str) -> str :
+  def string_or_unknown(self, value: str) -> str :
     """Either return the value, or UNKNOWN if empty."""
     if value:
       return value

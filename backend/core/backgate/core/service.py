@@ -12,7 +12,7 @@ from khaleesi.proto.core_backgate_pb2_grpc import GateKeeperStub, GateKeeperServ
 class Service(GateKeeperServicer):
   """core-backgate service."""
 
-  def SayHello(self, request: SayHelloRequest, _: grpc.ServicerContext) -> SayHelloResponse :  # pylint: disable=invalid-name,no-self-use
+  def SayHello(self, request: SayHelloRequest, _: grpc.ServicerContext) -> SayHelloResponse :  # pylint: disable=invalid-name
     """Says hello."""
     channel = grpc.insecure_channel("core-guard:8000")
     client = GateKeeperStub(channel)  # type: ignore[no-untyped-call]

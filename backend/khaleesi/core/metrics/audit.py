@@ -50,8 +50,7 @@ class AuditEventMetric(CounterMetric):
       **additional_labels,
     )
 
-  @staticmethod
-  def _get_arguments(*, event: Event) -> Dict[str, Any] :
+  def _get_arguments(self, *, event: Event) -> Dict[str, Any] :
     """Transform the event into arguments."""
     return {
         'user'              : event.request_metadata.user.type,

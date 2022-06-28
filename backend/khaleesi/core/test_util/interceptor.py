@@ -43,7 +43,7 @@ class InterceptorTestMixin(GrpcTestMixin):
     return request_metadata, final_request
 
   # noinspection PyMethodMayBeStatic
-  def get_intercept_params(  # pylint: disable=no-self-use
+  def get_intercept_params(
       self, *,
       method: Callable[[], Any] = lambda *args : None,
   ) -> Dict[str, Any] :
