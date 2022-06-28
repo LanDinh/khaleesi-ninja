@@ -67,7 +67,7 @@ message LogRequestResponse {
 }
 
 message Response {
-  int64                     status     = 2;
+  string                    status     = 2;
   google.protobuf.Timestamp timestamp  = 3;
 }
 
