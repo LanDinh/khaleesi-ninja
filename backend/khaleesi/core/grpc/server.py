@@ -11,6 +11,9 @@ from django.utils.module_loading import import_string
 
 # gRPC.
 from grpc import server, Server as GrpcServer
+from grpc_health.v1.health import HealthServicer
+from grpc_health.v1.health_pb2 import HealthCheckResponse
+from grpc_health.v1.health_pb2_grpc import add_HealthServicer_to_server
 from grpc_reflection.v1alpha import reflection
 
 # khaleesi.ninja.
@@ -34,6 +37,7 @@ class Server:
 
   server: GrpcServer
   channel_manager: ChannelManager
+  health_servicer: HealthServicer
 
   def __init__(self) -> None :
     try:
@@ -46,6 +50,8 @@ class Server:
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
         interceptors = interceptors,  # type: ignore[arg-type]  # fixed upstream!
       )
+      self.health_servicer = HealthServicer()
+      add_HealthServicer_to_server(self.health_servicer, self.server)
       self.server.add_insecure_port(f'[::]:{khaleesi_settings["GRPC"]["PORT"]}')
       self._add_handlers()
       signal(SIGTERM, self._handle_sigterm)
@@ -54,6 +60,7 @@ class Server:
         result = Event.Action.ResultType.SUCCESS,
         details = 'Server started successfully.'
       )
+      self.health_servicer.set('', HealthCheckResponse.SERVING)  # type: ignore[arg-type]
     except Exception as exception:
       self._log_server_state_event(
         action = Event.Action.ActionType.START,
@@ -80,11 +87,14 @@ class Server:
       except ImportError as error:
         raise ImportError(f'Could not import "{handler}" for gRPC handler.') from error
     reflection.enable_server_reflection(service_names, self.server)
+    for service_name in service_names:
+      self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]
 
   def _handle_sigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""
     try:
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
+      self.health_servicer.enter_graceful_shutdown()
       done_event = self.server.stop(30)
       if done_event.wait(30):
         self._log_server_state_event(

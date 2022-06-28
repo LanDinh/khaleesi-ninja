@@ -5,6 +5,9 @@ ingress:
   path: "/khaleesi\\.(core|api)\\.backgate\\.[a-zA-Z0-9]+"
   regex_path: true
   port: "grpc-web-envoy"
+probe:
+  grpc:
+    enabled: true
 kubegres:
   enabled: true
 django:

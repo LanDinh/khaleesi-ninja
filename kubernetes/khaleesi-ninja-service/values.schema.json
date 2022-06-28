@@ -166,12 +166,30 @@
             "liveness": {
               "description": "path for the liveness probe",
               "type": "string"
+            },
+            "startup": {
+              "description": "path for the startup probe",
+              "type": "string"
             }
           },
           "required": [
             "enabled",
             "readiness",
-            "liveness"
+            "liveness",
+            "startup"
+          ]
+        },
+        "grpc": {
+          "description": "kubernetes grpc probe configuration",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "whether to use grpc probes",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled"
           ]
         }
       },

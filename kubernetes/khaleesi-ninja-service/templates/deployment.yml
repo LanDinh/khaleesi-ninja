@@ -35,15 +35,43 @@ spec:
             - name: metrics
               containerPort: 8020
             {{- end }}
-          {{- if .Values.probe.http.enabled }}
+          {{- if or .Values.probe.http.enabled .Values.probe.grpc.enabled }}
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 10
+            {{- if .Values.probe.http.enabled }}
+            httpGet:
+              path: {{ .Values.probe.http.startup }}
+              port: deployment
+            {{- end }}
+            {{- if .Values.probe.grpc.enabled }}
+            grpc:
+              port: 8000
+            {{- end }}
           readinessProbe:
+            failureThreshold: 1
+            periodSeconds: 10
+            {{- if .Values.probe.http.enabled }}
             httpGet:
               path: {{ .Values.probe.http.readiness }}
               port: deployment
+            {{- end }}
+            {{- if .Values.probe.grpc.enabled }}
+            grpc:
+              port: 8000
+            {{- end }}
           livenessProbe:
+            failureThreshold: 10
+            periodSeconds: 10
+            {{- if .Values.probe.http.enabled }}
             httpGet:
               path: {{ .Values.probe.http.liveness }}
               port: deployment
+            {{- end }}
+            {{- if .Values.probe.grpc.enabled }}
+            grpc:
+              port: 8000
+            {{- end }}
           {{- end }}
           {{- if or .Values.django.enabled .Values.kubegres.enabled }}
           env:

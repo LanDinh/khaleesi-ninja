@@ -40,7 +40,7 @@ You might want to make yourself familiar with the technologies used.
 
 The general deployment is done with:
 
-![helm badge](https://img.shields.io/badge/helm-v3.7-informational)
+![helm badge](https://img.shields.io/badge/helm-v3.8-informational)
 ![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.24-informational)
 ![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
 

@@ -36,6 +36,9 @@ probe:
     enabled: false
     readiness: "/monitoring/ready"
     liveness: "/monitoring/alive"
+    startup: "monitoring/startup"
+  grpc:
+    enabled: false
 
 nginx_prometheus_exporter:
   enabled: false

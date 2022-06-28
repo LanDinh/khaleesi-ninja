@@ -1,5 +1,8 @@
 type:
   name: "micro"
+probe:
+  grpc:
+    enabled: true
 kubegres:
   enabled: true
 django:
