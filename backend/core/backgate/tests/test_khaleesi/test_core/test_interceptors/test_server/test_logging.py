@@ -19,7 +19,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
 
   def test_intercept_with_request_metadata(self) -> None :
     """Test intercept with metadata present."""
-    self.interceptor.stub = MagicMock()
+    self.interceptor.stub.LogRequest = MagicMock()
     for name, request_params in self.metadata_request_params:
       with self.subTest(case = name):
         self._execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
@@ -28,7 +28,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
 
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
-    self.interceptor.stub = MagicMock()
+    self.interceptor.stub.LogRequest = MagicMock()
     self._execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
       request = {},
       request_params = self.empty_input,
@@ -51,7 +51,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           **request_params,
         )
-        self.interceptor.stub.reset_mock()  # type: ignore[attr-defined]
+        self.interceptor.stub.LogRequest.reset_mock()  # type: ignore[attr-defined]
         logger.reset_mock()
         # Execute test.
         self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params())

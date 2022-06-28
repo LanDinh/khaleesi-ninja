@@ -67,7 +67,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     LOGGER.debug(message = f'{service_name}.{method_name} request started (pre request_id)')
 
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
-      response = self.stub.LogRequest(request)
+      response = self.stub.LogRequest(logging_request)
       STATE.request_id = response.request_id
     else:
       # Send directly to the DB. Note that Requests must be present in the schema!
