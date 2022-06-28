@@ -15,15 +15,17 @@ from khaleesi.proto.core_sawmill_pb2 import Event
 class ServerTestCase(SimpleTestCase):
   """Test the gRPC server."""
 
-  def test_db_logging(self, *_: MagicMock) -> None :
-    """Test initialization success."""
+  def test_db_logging(self, grpc_server: MagicMock, *_: MagicMock) -> None :
+    """Test initialization failure."""
     # Prepare data.
     db_module = MagicMock()
+    grpc_server.side_effect = Exception('test')
     # Execute test.
     with patch.dict('sys.modules', { 'microservice.models': db_module }):
-      Server()
+      with self.assertRaises(Exception):
+        Server()
     # Assert result.
     db_module.Event.objects.log_event.called_once()
     event: Event = db_module.Event.objects.log_event.call_args.kwargs['grpc_event']
     self.assertEqual(event.action.crud_type, Event.Action.ActionType.START)
-    self.assertEqual(event.action.result   , Event.Action.ResultType.SUCCESS)
+    self.assertEqual(event.action.result   , Event.Action.ResultType.FATAL)

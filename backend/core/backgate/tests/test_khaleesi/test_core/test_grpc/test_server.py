@@ -19,22 +19,10 @@ from khaleesi.proto.core_sawmill_pb2 import Event
 class ServerTestCase(SimpleTestCase):
   """Test the gRPC server."""
 
-  def test_initialization_success(
-      self,
-      logger: MagicMock,
-      lumberjack_stub: MagicMock,
-      *_: MagicMock,
-  ) -> None :
+  def test_initialization_success(self, *_: MagicMock) -> None :
     """Test initialization success."""
-    # Execute test.
+    # Execute test & assert result.
     Server()
-    # Assert result.
-    self.assert_server_state_event(
-      action = Event.Action.ActionType.START,
-      result = Event.Action.ResultType.SUCCESS,
-      lumberjack_stub = lumberjack_stub
-    )
-    logger.info.assert_called_once()
 
   def test_initialization_failure(
       self,
@@ -148,6 +136,12 @@ class ServerTestCase(SimpleTestCase):
     # Assert result.
     grpc_server.return_value.start.assert_called_once_with()
     grpc_server.return_value.wait_for_termination.assert_called_once_with()
+    self.assert_server_state_event(
+      action = Event.Action.ActionType.START,
+      result = Event.Action.ResultType.SUCCESS,
+      lumberjack_stub = lumberjack_stub
+    )
+    logger.info.assert_called_once()
 
   @patch('khaleesi.core.grpc.server.khaleesi_settings')
   def test_add_invalid_handler(self, settings: MagicMock, *_: MagicMock) -> None :

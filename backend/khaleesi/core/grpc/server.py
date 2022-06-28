@@ -55,6 +55,18 @@ class Server:
       self.server.add_insecure_port(f'[::]:{khaleesi_settings["GRPC"]["PORT"]}')
       self._add_handlers()
       signal(SIGTERM, self._handle_sigterm)
+    except Exception as exception:
+      self._log_server_state_event(
+        action = Event.Action.ActionType.START,
+        result = Event.Action.ResultType.FATAL,
+        details = f'Server start failed. {type(exception).__name__}: {str(exception)}'
+      )
+      raise exception from None
+
+  def start(self) -> None :
+    """Start the server."""
+    try:
+      self.server.start()
       self._log_server_state_event(
         action = Event.Action.ActionType.START,
         result = Event.Action.ResultType.SUCCESS,
@@ -68,10 +80,6 @@ class Server:
         details = f'Server start failed. {type(exception).__name__}: {str(exception)}'
       )
       raise exception from None
-
-  def start(self) -> None :
-    """Start the server."""
-    self.server.start()
     self.server.wait_for_termination()
 
   def _add_handlers(self) -> None :
