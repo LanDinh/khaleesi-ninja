@@ -51,7 +51,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           **request_params,
         )
-        self.interceptor.stub.LogRequest.reset_mock()  # type: ignore[attr-defined]
+        self.interceptor.stub.LogRequest.reset_mock()
         logger.reset_mock()
         # Execute test.
         self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params())
