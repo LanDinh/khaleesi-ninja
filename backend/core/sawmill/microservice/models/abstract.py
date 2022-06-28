@@ -35,7 +35,8 @@ class Metadata(models.Model):
   # Misc.
   meta_logging_errors = models.TextField(blank = True)
 
-  def log_metadata(self, *, metadata: RequestMetadata, errors: List[str]) -> Dict[str, Any] :
+  @staticmethod
+  def log_metadata(*, metadata: RequestMetadata, errors: List[str]) -> Dict[str, Any] :
     """Parse common metadata."""
     return {
         # Caller.
