@@ -25,29 +25,33 @@ class RequestManager(models.Manager['Request']):
 
     errors: List[str] = []
 
+    upstream_request = {} if grpc_request is None else {
+        "upstream_request_request_id": grpc_request.upstream_request.request_id,
+        "upstream_request_khaleesi_gate": parse_string(
+          raw = grpc_request.upstream_request.khaleesi_gate,
+          name = 'upstream_request_khaleesi_gate',
+          errors = errors,
+        ),
+        "upstream_request_khaleesi_service": parse_string(
+          raw = grpc_request.upstream_request.khaleesi_service,
+          name = 'upstream_request_khaleesi_service',
+          errors = errors,
+        ),
+        "upstream_request_grpc_service": parse_string(
+          raw = grpc_request.upstream_request.grpc_service,
+          name = 'upstream_request_grpc_service',
+          errors = errors,
+        ),
+        "upstream_request_grpc_method": parse_string(
+          raw = grpc_request.upstream_request.grpc_method,
+          name = 'upstream_request_grpc_method',
+          errors = errors,
+        ),
+    }
+
     return self.create(
       # Upstream request.
-      upstream_request_request_id = grpc_request.upstream_request.request_id,
-      upstream_request_khaleesi_gate = parse_string(
-        raw = grpc_request.upstream_request.khaleesi_gate,
-        name = 'upstream_request_khaleesi_gate',
-        errors = errors,
-      ),
-      upstream_request_khaleesi_service = parse_string(
-        raw = grpc_request.upstream_request.khaleesi_service,
-        name = 'upstream_request_khaleesi_service',
-        errors = errors,
-      ),
-      upstream_request_grpc_service = parse_string(
-        raw = grpc_request.upstream_request.grpc_service,
-        name = 'upstream_request_grpc_service',
-        errors = errors,
-      ),
-      upstream_request_grpc_method = parse_string(
-        raw = grpc_request.upstream_request.grpc_method,
-        name = 'upstream_request_grpc_method',
-        errors = errors,
-      ),
+      **upstream_request,
       # Metadata.
       **self.model.log_metadata(metadata = grpc_request.request_metadata, errors = errors),
     )
