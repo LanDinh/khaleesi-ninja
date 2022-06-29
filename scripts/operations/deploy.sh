@@ -60,6 +60,7 @@ deploy_service() {
   # Most specific first, to allow more generic ones to override some values
   # (e.g. only 1 replica for development)
   echo -e "${yellow}Deploying the service...${clear_color}"
+  kubectl -n "khaleesi-ninja-${environment}" delete job "${gate}-${service}-kubegres-initialization" --ignore-not-found
   helm upgrade --install "khaleesi-ninja-${environment}-${gate}-${service}" kubernetes/khaleesi-ninja-service \
     --values "kubernetes/configuration/service/${gate}/${service}.yml" \
     --values "kubernetes/configuration/type/${type}.yml" \
