@@ -1,5 +1,8 @@
 """Test interceptor utility."""
 
+# Python.
+from unittest.mock import patch, MagicMock
+
 # khaleesi.ninja.
 from khaleesi.core.interceptors.util import Interceptor
 from khaleesi.core.test_util.test_case import SimpleTestCase
@@ -31,7 +34,8 @@ class InterceptorTest(SimpleTestCase):
         self.assertEqual(i_grpc_service, o_grpc_service)
         self.assertEqual(i_grpc_method , o_grpc_method)
 
-  def test_skip_interceptors(self) -> None :
+  @patch('khaleesi.core.interceptors.util.LOGGER')
+  def test_skip_interceptors(self, *_: MagicMock) -> None :
     """Test skipping of interceptors."""
     for method in self.interceptor.skip_list:
       # Prepare data & execute test.

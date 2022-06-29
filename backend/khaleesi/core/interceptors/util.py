@@ -3,17 +3,25 @@
 # Python.
 from typing import Tuple
 
+# khaleesi.ninja.
+from khaleesi.core.shared.logger import LOGGER
+
 
 class Interceptor:
   """Interceptor utility."""
 
   skip_list = [
       '/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo',
+      '/grpc.health.v1.Health/Check',
+      '/grpc.health.v1.Health/Watch',
   ]
 
   def skip_interceptors(self, *, raw: str) -> bool :
     """Skip interceptors for utility provided by libraries."""
-    return raw in self.skip_list
+    if raw in self.skip_list:
+      LOGGER.debug(message = f'Skip logging of {raw}')
+      return True
+    return False
 
   def process_method_name(self, *, raw: str) -> Tuple[str, str, str, str] :
     """Process the method name and return (service, method)."""

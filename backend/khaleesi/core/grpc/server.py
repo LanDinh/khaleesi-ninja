@@ -41,20 +41,24 @@ class Server:
 
   def __init__(self) -> None :
     try:
+      LOGGER.info(message = 'Initializing channel manager...')
       self.channel_manager = ChannelManager()
       interceptors = [
           PrometheusServerInterceptor(),
           LoggingServerInterceptor(channel_manager = self.channel_manager),
       ]
+      LOGGER.info(message = 'Initializing server...')
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
         interceptors = interceptors,  # type: ignore[arg-type]  # fixed upstream!
       )
+      LOGGER.info(message = 'Initializing health servicer...')
       self.health_servicer = HealthServicer()
-      add_HealthServicer_to_server(self.health_servicer, self.server)
+      LOGGER.info(message = 'Initializing configure server...')
       self.server.add_insecure_port(f'[::]:{khaleesi_settings["GRPC"]["PORT"]}')
-      self._add_handlers()
       signal(SIGTERM, self._handle_sigterm)
+      LOGGER.info(message = 'Adding service handlers...')
+      self._add_handlers()
     except Exception as exception:
       self._log_server_state_event(
         action = Event.Action.ActionType.START,
@@ -67,6 +71,7 @@ class Server:
     """Start the server."""
     try:
       self.server.start()
+      self._print_banner()
       self._log_server_state_event(
         action = Event.Action.ActionType.START,
         result = Event.Action.ResultType.SUCCESS,
@@ -87,6 +92,7 @@ class Server:
     raw_handlers = khaleesi_settings['GRPC']['HANDLERS']
     service_names = [reflection.SERVICE_NAME]
     for raw_handler in raw_handlers:
+      LOGGER.debug(message = f'Adding service handler {raw_handler}...')
       handler = f'{raw_handler}.service_configuration'
       try:
         service_configuration = import_string(handler)
@@ -94,9 +100,27 @@ class Server:
         service_names.append(service_configuration.name)
       except ImportError as error:
         raise ImportError(f'Could not import "{handler}" for gRPC handler.') from error
+    LOGGER.debug(message = 'Adding reflection service...')
     reflection.enable_server_reflection(service_names, self.server)
+    LOGGER.debug(message = 'Adding health service...')
+    add_HealthServicer_to_server(self.health_servicer, self.server)
     for service_name in service_names:
       self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]
+
+  def _print_banner(self) -> None :
+    """Print the startup banner."""
+    LOGGER.info(message = '')
+    LOGGER.info(message = '       \\****__              ____')
+    LOGGER.info(message = '         |    *****\\_      --/ *\\-__')
+    LOGGER.info(message = '         /_          (_    ./ ,/----\'')
+    LOGGER.info(message = '           \\__         (_./  /')
+    LOGGER.info(message = '              \\__           \\___----^__')
+    LOGGER.info(message = '               _/   _                  \\')
+    LOGGER.info(message = '        |    _/  __/ )\\"\\ _____         *\\')
+    LOGGER.info(message = '        |\\__/   /    ^ ^       \\____      )')
+    LOGGER.info(message = '         \\___--"                    \\_____ )')
+    LOGGER.info(message = '                                          "')
+    LOGGER.info(message = '')
 
   def _handle_sigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""

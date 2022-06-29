@@ -39,8 +39,14 @@ class Logger:
 
   def _extra(self) -> Dict[str, str] :
     return {
-        'request_id': str(STATE.request_id) if hasattr(STATE, 'request_id') else 'system'
+        'request_id': self._non_empty(name = 'request_id', default = 'system')
     }
+
+  @staticmethod
+  def _non_empty(*, name: str, default: str) -> str :
+    if hasattr(STATE, name) and getattr(STATE, name):
+      return str(getattr(STATE, name))
+    return default
 
 
 LOGGER = Logger()

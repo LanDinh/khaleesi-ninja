@@ -53,17 +53,22 @@ class LoggingServerInterceptor(ServerInterceptor):
 
     LOGGER.debug(message = f'{service_name}.{method_name} request started (pre request_id)')
     self._log_request(request = request, service_name = service_name, method_name = method_name)
-    LOGGER.info(message = f'Request {STATE.request_id} started')
+    LOGGER.info(message = f'{service_name}.{method_name} request started')
 
     response = None
     try:
       response = method(request, context)
       self._log_response(status = StatusCode.OK)
-      LOGGER.info(message = f'Request {STATE.request_id} finished successfully')
+      LOGGER.info(
+        message = f'{service_name}.{method_name} request finished successfully',
+      )
     except KhaleesiException as exception:
       self._log_response(status = exception.status)
-      LOGGER.error(message = f'Request {STATE.request_id} finished with errors')
+      LOGGER.error(
+        message = f'{service_name}.{method_name} request finished with errors',
+      )
 
+    del STATE.request_id
     return response
 
   def _log_request(

@@ -141,7 +141,6 @@ class ServerTestCase(SimpleTestCase):
       result = Event.Action.ResultType.SUCCESS,
       lumberjack_stub = lumberjack_stub
     )
-    logger.info.assert_called_once()
 
   @patch('khaleesi.core.grpc.server.khaleesi_settings')
   def test_add_invalid_handler(self, settings: MagicMock, *_: MagicMock) -> None :
