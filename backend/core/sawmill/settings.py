@@ -11,3 +11,11 @@ KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.lumberjack')
 KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.sawyer')
 
 KHALEESI_NINJA['CORE']['STRUCTURED_LOGGING_METHOD'] = definition.StructuredLoggingMethod.DATABASE
+
+
+# Cache.
+CACHES['service-registry'] = {
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'LOCATION': 'service-registry',
+    'TIMEOUT': 86400,  # type: ignore[dict-item]
+}

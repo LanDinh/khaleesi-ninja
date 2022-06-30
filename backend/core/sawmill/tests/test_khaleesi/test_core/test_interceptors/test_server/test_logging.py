@@ -76,10 +76,11 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           )
         # Execute test.
         with patch.dict('sys.modules', { 'microservice.models': db_module }):
-          self.interceptor.khaleesi_intercept(
-            request = final_request,
-            **self.get_intercept_params(method = method),
-          )
+          with self.assertRaises(KhaleesiException):
+            self.interceptor.khaleesi_intercept(
+              request = final_request,
+              **self.get_intercept_params(method = method),
+            )
         # Assert result.
         logging_response = cast(
           LoggingResponse,

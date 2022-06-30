@@ -22,6 +22,8 @@ INSTALLED_APPS = [
 
 # Database.
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# No default cache, always explicitly name the caches!
+CACHES = { 'default': { 'BACKEND': 'django.core.cache.backends.dummy.DummyCache' } }
 
 
 # Logging.

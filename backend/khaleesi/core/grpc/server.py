@@ -27,6 +27,8 @@ from khaleesi.core.shared.logger import LOGGER
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
+# noinspection PyUnresolvedReferences
+from metric_initializer import MetricInitializer
 
 
 khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
@@ -47,6 +49,8 @@ class Server:
           PrometheusServerInterceptor(),
           LoggingServerInterceptor(channel_manager = self.channel_manager),
       ]
+      LOGGER.info(message = 'Initializing metric initializer...')
+      self.metric_initializer = MetricInitializer()
       LOGGER.info(message = 'Initializing server...')
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
@@ -70,6 +74,9 @@ class Server:
   def start(self) -> None :
     """Start the server."""
     try:
+      LOGGER.info(message = 'Initializing metrics...')
+      self._initialize_metrics()
+      LOGGER.info(message = 'Starting server...')
       self.server.start()
       self._print_banner()
       self._log_server_state_event(
@@ -106,6 +113,9 @@ class Server:
     add_HealthServicer_to_server(self.health_servicer, self.server)
     for service_name in service_names:
       self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]
+
+  def _initialize_metrics(self) -> None :
+    """Initialize metrics to 0."""
 
   def _print_banner(self) -> None :
     """Print the startup banner."""

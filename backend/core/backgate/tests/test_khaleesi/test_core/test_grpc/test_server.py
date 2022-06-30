@@ -12,6 +12,7 @@ from khaleesi.proto.core_sawmill_pb2 import Event
 
 
 @patch('khaleesi.core.grpc.server.HEALTH_METRIC')
+@patch('khaleesi.core.grpc.server.MetricInitializer')
 @patch('khaleesi.core.grpc.server.ChannelManager')
 @patch('khaleesi.core.grpc.server.server')
 @patch('khaleesi.core.grpc.server.LumberjackStub')

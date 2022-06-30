@@ -67,6 +67,7 @@ class LoggingServerInterceptor(ServerInterceptor):
       LOGGER.error(
         message = f'{service_name}.{method_name} request finished with errors',
       )
+      raise exception
 
     del STATE.request_id
     return response

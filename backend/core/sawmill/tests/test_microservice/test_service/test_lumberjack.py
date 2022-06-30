@@ -21,15 +21,18 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  def test_log_event(self) -> None :
+  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
+  def test_log_event(self, service_registry: MagicMock) -> None :
     """Test logging events."""
     self._execute_logging_tests(
       method = lambda : self.service.LogEvent(MagicMock(), MagicMock()),
       logging_object = DbEvent.objects,
       logging_method = 'log_event',
     )
+    service_registry.add.assert_called()
 
-  def test_log_request(self) -> None :
+  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
+  def test_log_request(self, service_registry: MagicMock) -> None :
     """Test logging requests."""
     self._execute_logging_tests(
       method = lambda : self.service.LogRequest(MagicMock(), MagicMock()),
@@ -37,6 +40,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
       logging_method = 'log_request',
       return_value = partial(Metadata, pk = 13),
     )
+    service_registry.add.assert_called()
 
   def test_log_response(self) -> None :
     """Test logging responses."""
@@ -61,7 +65,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     ]:
       with self.subTest(test = test.__name__):
         with patch.object(logging_object, logging_method) as logging:
-          test(method = method, logging = logging,  return_value = return_value)
+          test(method = method, logging = logging,  return_value = return_value)  # type: ignore[operator]  # pylint: disable=no-value-for-parameter,line-too-long
 
   def _execute_successful_logging_test(
       self, *,
@@ -78,8 +82,11 @@ class LumberjackServiceTestCase(SimpleTestCase):
     logging.assert_called_once()
 
   # noinspection PyUnusedLocal
+  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def _execute_logging_test_with_parsing_error(
-      self, *,
+      self,
+      _: MagicMock,
+      *,
       method: Callable[[], Any],
       logging: MagicMock,
       return_value: Callable[[], AbstractMetadata],
@@ -96,8 +103,11 @@ class LumberjackServiceTestCase(SimpleTestCase):
     self.assertEqual(expected_result.meta_logging_errors, context.exception.private_details)
 
   # noinspection PyUnusedLocal
+  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def _execute_logging_test_with_fatal_error(
-      self, *,
+      self,
+      _: MagicMock,
+      *,
       method: Callable[[], Any],
       logging: MagicMock,
       return_value: Callable[[], AbstractMetadata],  # pylint: disable=unused-argument

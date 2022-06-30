@@ -69,10 +69,11 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
             private_details = '',
           )
         # Execute test.
-        self.interceptor.khaleesi_intercept(
-          request = final_request,
-          **self.get_intercept_params(method = method),
-        )
+        with self.assertRaises(KhaleesiException):
+          self.interceptor.khaleesi_intercept(
+            request = final_request,
+            **self.get_intercept_params(method = method),
+          )
         # Assert result.
         logging_response = cast(
           LoggingResponse,

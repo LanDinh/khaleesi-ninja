@@ -25,6 +25,7 @@ from khaleesi.proto.core_sawmill_pb2_grpc import (
 )
 from microservice.models import Event as DbEvent, Request as DbRequest
 from microservice.models.abstract import Metadata
+from microservice.models.service_registry import SERVICE_REGISTRY
 
 
 class Service(Servicer):
@@ -32,11 +33,13 @@ class Service(Servicer):
 
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
+    SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
     self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
     return LogStandardResponse()
 
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogRequestResponse :
     """Log requests."""
+    SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
     logged_request = self._handle_response(
       method = lambda: DbRequest.objects.log_request(grpc_request = request),
     )
@@ -55,6 +58,7 @@ class Service(Servicer):
     try:
       metadata = method()
       if metadata.meta_logging_errors:
+        # Caught by KhaleesiException and  re-raised
         raise InvalidArgumentException(private_details = metadata.meta_logging_errors)
       return metadata
     except KhaleesiException as exception:
