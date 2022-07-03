@@ -1,5 +1,8 @@
 """Test the service registry."""
 
+# Python.
+from unittest.mock import patch, MagicMock
+
 # khaleesi.ninja.
 from khaleesi.core.test_util.test_case import TransactionTestCase
 from khaleesi.proto.core_pb2 import GrpcCallerDetails
@@ -16,7 +19,8 @@ class ServiceRegistryTestCase(TransactionTestCase):
 
   fixtures = [ 'test_service_registry.json' ]
 
-  def test_add(self) -> None :
+  @patch('microservice.models.service_registry.LOGGER')
+  def test_add(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
@@ -47,13 +51,13 @@ class ServiceRegistryTestCase(TransactionTestCase):
       self._registry_contains_g_method(number = i)
 
   def _registry_contains_k_gate(self, *, number: int) -> None :
-    self.assertIsNotNone(SERVICE_REGISTRY.cache.get(f'khaleesi-gate-{number}'))
+    self.assertIsNotNone(SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{number}'])
 
   def _registry_contains_k_service(self, *, number: int) -> None :
     khaleesi_gate = min(number, 2)
     self.assertIn(
       f'khaleesi-service-{number}',
-      SERVICE_REGISTRY.cache.get(f'khaleesi-gate-{khaleesi_gate}').services,
+      SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{khaleesi_gate}'].services,
     )
 
   def _registry_contains_g_service(self, *, number: int) -> None :
@@ -61,9 +65,9 @@ class ServiceRegistryTestCase(TransactionTestCase):
     khaleesi_service = min(number, 3)
     self.assertIn(
       f'grpc-service-{number}',
-      SERVICE_REGISTRY.cache.get(
-        f'khaleesi-gate-{khaleesi_gate}',
-      ).services[f'khaleesi-service-{khaleesi_service}'].services,
+      SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{khaleesi_gate}'].services[
+        f'khaleesi-service-{khaleesi_service}'
+      ].services,
     )
 
   def _registry_contains_g_method(self, *, number: int) -> None :
@@ -72,9 +76,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_service = min(number, 4)
     self.assertIn(
       f'grpc-method-{number}',
-      SERVICE_REGISTRY.cache.get(
-        f'khaleesi-gate-{khaleesi_gate}',
-      ).services[f'khaleesi-service-{khaleesi_service}'].services[
-        f'grpc-service-{grpc_service}'
-      ].methods,
+      SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{khaleesi_gate}'].services[
+        f'khaleesi-service-{khaleesi_service}'
+      ].services[f'grpc-service-{grpc_service}'].methods,
     )

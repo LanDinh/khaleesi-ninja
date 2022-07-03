@@ -172,7 +172,7 @@ class Server:
       request      = event,
       request_id   = -1,  # Not handling a gRPC call.
       grpc_service = 'grpc-server',
-      grpc_method  = Event.Action.ActionType.Name(action).lower(),
+      grpc_method  = 'lifecycle',
       user_id      = 'grpc-server',
       user_type    = User.UserType.SYSTEM,
     )

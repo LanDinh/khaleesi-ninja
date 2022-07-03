@@ -33,16 +33,20 @@ class Service(Servicer):
 
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
-    SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
-    self._handle_response(method = lambda: DbEvent.objects.log_event(grpc_event = request))
+    def method() -> Metadata :
+      SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
+      return DbEvent.objects.log_event(grpc_event = request)
+
+    self._handle_response(method = method)
     return LogStandardResponse()
 
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogRequestResponse :
     """Log requests."""
-    SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
-    logged_request = self._handle_response(
-      method = lambda: DbRequest.objects.log_request(grpc_request = request),
-    )
+    def method() -> Metadata:
+      SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
+      return DbRequest.objects.log_request(grpc_request = request)
+
+    logged_request = self._handle_response(method = method)
     response = LogRequestResponse()
     response.request_id = logged_request.pk
     return response

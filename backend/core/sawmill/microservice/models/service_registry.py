@@ -3,7 +3,6 @@
 # Python.
 from __future__ import annotations
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import Dict, TypeVar
 
 # Django.
@@ -90,15 +89,6 @@ class GrpcMethod:
   called_by : Dict[str, KhaleesiGate] = field(default_factory = dict)
 
 
-class ServiceRegistryType(Enum):
-  """Type of entry in the service registry"""
-
-  KHALEESI_GATE    = 1
-  KHALEESI_SERVICE = 2
-  GRPC_SERVICE     = 3
-  GRPC_METHOD      = 4
-
-
 class ServiceRegistry:
   """Service registry."""
 
@@ -106,36 +96,25 @@ class ServiceRegistry:
 
   def add(self, *, caller_details: GrpcCallerDetails) -> None :
     """If the entry is not yet in the service_registry, add it."""
-    khaleesi_gate: KhaleesiGate = self.cache.get(caller_details.khaleesi_gate)
+    service_registry = self.get_service_registry()
+    khaleesi_gate = service_registry.get(caller_details.khaleesi_gate, None)
     if not khaleesi_gate:
-      self._get_or_create_entry_for_db(
-        caller_details = caller_details,
-        start = ServiceRegistryType.KHALEESI_GATE,
-      )
+      self._get_or_create_entry_for_db(caller_details = caller_details)
       return
 
     khaleesi_service = khaleesi_gate.services.get(caller_details.khaleesi_service, None)
     if not khaleesi_service:
-      self._get_or_create_entry_for_db(
-        caller_details = caller_details,
-        start = ServiceRegistryType.KHALEESI_SERVICE,
-      )
+      self._get_or_create_entry_for_db(caller_details = caller_details)
       return
 
     grpc_service = khaleesi_service.services.get(caller_details.grpc_service, None)
     if not grpc_service:
-      self._get_or_create_entry_for_db(
-        caller_details = caller_details,
-        start = ServiceRegistryType.KHALEESI_GATE,
-      )
+      self._get_or_create_entry_for_db(caller_details = caller_details)
       return
 
     grpc_method = grpc_service.methods.get(caller_details.grpc_method, None)
     if not grpc_method:
-      self._get_or_create_entry_for_db(
-        caller_details = caller_details,
-        start = ServiceRegistryType.KHALEESI_GATE,
-      )
+      self._get_or_create_entry_for_db(caller_details = caller_details)
       return
 
 
@@ -169,7 +148,7 @@ class ServiceRegistry:
       )
 
     self.cache.clear()
-    self.cache.set_many(service_registry)
+    self.cache.set('service-registry', service_registry)
 
     if settings.DEBUG:
       LOGGER.debug(message = f'Service registry reload: {len(methods)} entries')
@@ -182,50 +161,40 @@ class ServiceRegistry:
             for g_method_name, _ in g_service.methods.items():
               LOGGER.debug(message = f'                {g_method_name}')
 
+  def get_service_registry(self) -> Dict[str, KhaleesiGate] :
+    """Get the service registry."""
+    service_registry: Dict[str, KhaleesiGate] = self.cache.get('service-registry')
+    if not service_registry:
+      service_registry = {}
+      self.cache.set('service-registry', service_registry)
+    return service_registry
+
   def _get_or_create_dict_entry(self, *, data: Dict[str, T], key: str, value: T) -> T :
     if not key in data:
       data[key] = value
     return data[key]
 
-  def _get_or_create_entry_for_db(
-      self, *,
-      caller_details: GrpcCallerDetails,
-      start: ServiceRegistryType,
-  ) -> None :
+  def _get_or_create_entry_for_db(self, *, caller_details: GrpcCallerDetails) -> None :
     LOGGER.debug(
       message = 'Add new service registry entry: '
-                f'{caller_details.khaleesi_gate} {caller_details.khaleesi_gate} '
+                f'{caller_details.khaleesi_gate} {caller_details.khaleesi_service} '
                 f'{caller_details.grpc_service} {caller_details.grpc_method}')
-    create = False
 
-    khaleesi_gate = None
-    if create or start in [ServiceRegistryType.KHALEESI_GATE, ServiceRegistryType.KHALEESI_SERVICE]:
-      khaleesi_gate, _ = ServiceRegistryKhaleesiGate.objects.get_or_create(
-        name = caller_details.khaleesi_gate,
-      )
-      create = True
-
-    khaleesi_service = None
-    if create or start in [ServiceRegistryType.KHALEESI_SERVICE, ServiceRegistryType.GRPC_SERVICE]:
-      khaleesi_service, _ = ServiceRegistryKhaleesiService.objects.get_or_create(
-        name = caller_details.khaleesi_service,
-        defaults = { 'khaleesi_gate': khaleesi_gate },
-      )
-      create = True
-
-    grpc_service = None
-    if create or start in [ServiceRegistryType.GRPC_SERVICE, ServiceRegistryType.GRPC_METHOD]:
-      grpc_service, _ = ServiceRegistryGrpcService.objects.get_or_create(
-        name    = caller_details.grpc_service,
-        defaults = { 'khaleesi_service': khaleesi_service },
-      )
-      create = True
-
-    if create or start == ServiceRegistryType.GRPC_METHOD:
-      ServiceRegistryGrpcMethod.objects.get_or_create(
-        name    = caller_details.grpc_method,
-        defaults = { 'grpc_service': grpc_service },
-      )
+    khaleesi_gate, _ = ServiceRegistryKhaleesiGate.objects.get_or_create(
+      name = caller_details.khaleesi_gate,
+    )
+    khaleesi_service, _ = ServiceRegistryKhaleesiService.objects.get_or_create(
+      name          = caller_details.khaleesi_service,
+      khaleesi_gate = khaleesi_gate,
+    )
+    grpc_service, _ = ServiceRegistryGrpcService.objects.get_or_create(
+      name             = caller_details.grpc_service,
+      khaleesi_service = khaleesi_service,
+    )
+    ServiceRegistryGrpcMethod.objects.get_or_create(
+      name         = caller_details.grpc_method,
+      grpc_service = grpc_service,
+    )
 
     self.reload()
 

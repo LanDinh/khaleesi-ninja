@@ -9,6 +9,7 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import Event
 
 
+@patch('microservice.models.service_registry.LOGGER')
 @patch('khaleesi.core.grpc.server.HEALTH_METRIC')
 @patch('khaleesi.core.grpc.server.ChannelManager')
 @patch('khaleesi.core.grpc.server.LOGGER')

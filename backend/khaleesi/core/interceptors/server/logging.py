@@ -55,7 +55,6 @@ class LoggingServerInterceptor(ServerInterceptor):
     self._log_request(request = request, service_name = service_name, method_name = method_name)
     LOGGER.info(message = f'{service_name}.{method_name} request started')
 
-    response = None
     try:
       response = method(request, context)
       self._log_response(status = StatusCode.OK)
