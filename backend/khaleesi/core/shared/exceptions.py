@@ -77,6 +77,10 @@ class InternalServerException(KhaleesiCoreException):
     )
 
 
+class ProgrammingException(InternalServerException):
+  """Programming errors."""
+
+
 class UpstreamGrpcException(KhaleesiCoreException):
   """Internal server errors."""
 

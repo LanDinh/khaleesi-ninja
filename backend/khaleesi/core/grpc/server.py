@@ -75,7 +75,7 @@ class Server:
     """Start the server."""
     try:
       LOGGER.info(message = 'Initializing metrics...')
-      self._initialize_metrics()
+      self.metric_initializer.initialize_metrics()
       LOGGER.info(message = 'Starting server...')
       self.server.start()
       self._print_banner()
@@ -113,9 +113,6 @@ class Server:
     add_HealthServicer_to_server(self.health_servicer, self.server)
     for service_name in service_names:
       self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]
-
-  def _initialize_metrics(self) -> None :
-    """Initialize metrics to 0."""
 
   def _print_banner(self) -> None :
     """Print the startup banner."""

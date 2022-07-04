@@ -112,6 +112,10 @@ class CounterMetric(AbstractMetric):
     """Set the metric to the given value."""
     self._metric.labels(**self.labels(**kwargs)).inc()
 
+  def register(self, **kwargs: Any) -> None :
+    """Set the metric to the given value."""
+    self._metric.labels(**self.labels(**kwargs))
+
 
 EnumType = TypeVar('EnumType', bound = Enum)  # pylint: disable=invalid-name
 class EnumMetric(Generic[EnumType], GaugeMetric):
