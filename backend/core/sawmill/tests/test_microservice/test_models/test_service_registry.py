@@ -172,6 +172,62 @@ class ServiceRegistryTestCase(TransactionTestCase):
       ].services['grpc-service-2'].methods,
     )
 
+  def test_add_service_exit_early(self, *_: MagicMock) -> None :
+    """Test exiting early from adding services."""
+    # Prepare data.
+    caller_details = GrpcCallerDetails()
+    khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
+    khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
+    grpc_service_count     = ServiceRegistryGrpcService.objects.count()
+    grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
+    # Execute test.
+    SERVICE_REGISTRY.add_service(caller_details = caller_details)
+    # Assert result.
+    self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
+    self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
+    self.assertEqual(grpc_service_count    , ServiceRegistryGrpcService.objects.count())
+    self.assertEqual(grpc_method_count     , ServiceRegistryGrpcMethod.objects.count())
+
+  def test_add_call_exit_early_caller(self, *_: MagicMock) -> None :
+    """Test exiting early from adding services."""
+    # Prepare data.
+    caller_details = GrpcCallerDetails()
+    khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
+    khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
+    grpc_service_count     = ServiceRegistryGrpcService.objects.count()
+    grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
+    # Execute test.
+    SERVICE_REGISTRY.add_service(caller_details = caller_details, called_details = caller_details)
+    # Assert result.
+    self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
+    self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
+    self.assertEqual(grpc_service_count    , ServiceRegistryGrpcService.objects.count())
+    self.assertEqual(grpc_method_count     , ServiceRegistryGrpcMethod.objects.count())
+
+  def test_add_call_exit_early_called(self, *_: MagicMock) -> None :
+    """Test exiting early from adding services."""
+    # Prepare data.
+    caller_details = GrpcCallerDetails()
+    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
+    caller_details.khaleesi_service = 'khaleesi-service-1'
+    caller_details.grpc_service     = 'grpc-service-1'
+    caller_details.grpc_method      = 'grpc-method-1'
+    called_details = GrpcCallerDetails()
+    khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
+    khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
+    grpc_service_count     = ServiceRegistryGrpcService.objects.count()
+    grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
+    # Execute test.
+    SERVICE_REGISTRY.add_service(caller_details = caller_details, called_details = called_details)
+    # Assert result.
+    self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
+    self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
+    self.assertEqual(grpc_service_count    , ServiceRegistryGrpcService.objects.count())
+    self.assertEqual(grpc_method_count     , ServiceRegistryGrpcMethod.objects.count())
+
   def _registry_contains_k_gate(self, *, number: int) -> None :
     self.assertIsNotNone(SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{number}'])
 
