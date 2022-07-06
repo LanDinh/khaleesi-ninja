@@ -34,6 +34,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
     # Execute test.
     SERVICE_REGISTRY.add(caller_details = caller_details)
     # Assert result.
@@ -59,6 +60,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
     # Execute test.
     SERVICE_REGISTRY.add(caller_details = caller_details)
     # Assert result.
@@ -83,6 +85,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
     # Execute test.
     SERVICE_REGISTRY.add(caller_details = caller_details)
     # Assert result.
@@ -106,6 +109,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    SERVICE_REGISTRY.reload()
     # Execute test.
     SERVICE_REGISTRY.add(caller_details = caller_details)
     # Assert result.
