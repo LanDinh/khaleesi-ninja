@@ -12,16 +12,17 @@ from microservice.models.service_registry import (
   ServiceRegistryKhaleesiService,
   ServiceRegistryGrpcService,
   ServiceRegistryGrpcMethod,
+  ServiceRegistryGrpcCall,
 )
 
 
 # noinspection DuplicatedCode
+@patch('microservice.models.service_registry.LOGGER')
 class ServiceRegistryTestCase(TransactionTestCase):
   """Test the service registry."""
 
   fixtures = [ 'test_service_registry.json' ]
 
-  @patch('microservice.models.service_registry.LOGGER')
   def test_adding_khaleesi_gate(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
@@ -36,7 +37,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
     SERVICE_REGISTRY.reload()
     # Execute test.
-    SERVICE_REGISTRY.add(caller_details = caller_details)
+    SERVICE_REGISTRY.add_service(caller_details = caller_details)
     # Assert result.
     self.assertEqual(khaleesi_gate_count + 1   , ServiceRegistryKhaleesiGate.objects.count())
     self.assertEqual(khaleesi_service_count + 1, ServiceRegistryKhaleesiService.objects.count())
@@ -47,7 +48,6 @@ class ServiceRegistryTestCase(TransactionTestCase):
     ServiceRegistryGrpcService.objects.get(    name = caller_details.grpc_service)
     ServiceRegistryGrpcMethod.objects.get(     name = caller_details.grpc_method)
 
-  @patch('microservice.models.service_registry.LOGGER')
   def test_adding_khaleesi_service(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
@@ -62,7 +62,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
     SERVICE_REGISTRY.reload()
     # Execute test.
-    SERVICE_REGISTRY.add(caller_details = caller_details)
+    SERVICE_REGISTRY.add_service(caller_details = caller_details)
     # Assert result.
     self.assertEqual(khaleesi_gate_count       , ServiceRegistryKhaleesiGate.objects.count())
     self.assertEqual(khaleesi_service_count + 1, ServiceRegistryKhaleesiService.objects.count())
@@ -72,7 +72,6 @@ class ServiceRegistryTestCase(TransactionTestCase):
     ServiceRegistryGrpcService.objects.get(    name = caller_details.grpc_service)
     ServiceRegistryGrpcMethod.objects.get(     name = caller_details.grpc_method)
 
-  @patch('microservice.models.service_registry.LOGGER')
   def test_adding_grpc_service(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
@@ -87,7 +86,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
     SERVICE_REGISTRY.reload()
     # Execute test.
-    SERVICE_REGISTRY.add(caller_details = caller_details)
+    SERVICE_REGISTRY.add_service(caller_details = caller_details)
     # Assert result.
     self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
     self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
@@ -96,7 +95,6 @@ class ServiceRegistryTestCase(TransactionTestCase):
     ServiceRegistryGrpcService.objects.get(name = caller_details.grpc_service)
     ServiceRegistryGrpcMethod.objects.get( name = caller_details.grpc_method)
 
-  @patch('microservice.models.service_registry.LOGGER')
   def test_adding_grpc_method(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
@@ -111,7 +109,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
     SERVICE_REGISTRY.reload()
     # Execute test.
-    SERVICE_REGISTRY.add(caller_details = caller_details)
+    SERVICE_REGISTRY.add_service(caller_details = caller_details)
     # Assert result.
     self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
     self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
@@ -119,7 +117,39 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(grpc_method_count + 1 , ServiceRegistryGrpcMethod.objects.count())
     ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpc_method)
 
-  def test_reload(self) -> None :
+  def test_add_call(self, *_: MagicMock) -> None :
+    """Test adding a call."""
+    # Prepare data.
+    caller_details = GrpcCallerDetails()
+    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
+    caller_details.khaleesi_service = 'khaleesi-service-1'
+    caller_details.grpc_service     = 'grpc-service-1'
+    caller_details.grpc_method      = 'grpc-method-1'
+    called_details = GrpcCallerDetails()
+    called_details.khaleesi_gate    = 'khaleesi-gate-2'
+    called_details.khaleesi_service = 'khaleesi-service-3'
+    called_details.grpc_service     = 'grpc-service-3'
+    called_details.grpc_method      = 'grpc-method-3'
+    khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
+    khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
+    grpc_service_count     = ServiceRegistryGrpcService.objects.count()
+    grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
+    call_count             = ServiceRegistryGrpcCall.objects.count()
+    SERVICE_REGISTRY.reload()
+    # Execute test.
+    SERVICE_REGISTRY.add_call(caller_details = caller_details, called_details = called_details)
+    # Assert result.
+    self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
+    self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
+    self.assertEqual(grpc_service_count    , ServiceRegistryGrpcService.objects.count())
+    self.assertEqual(grpc_method_count     , ServiceRegistryGrpcMethod.objects.count())
+    self.assertEqual(call_count + 1        , ServiceRegistryGrpcCall.objects.count())
+    ServiceRegistryGrpcCall.objects.get(
+      caller__name = caller_details.grpc_method,
+      called__name = called_details.grpc_method,
+    )
+
+  def test_reload(self, *_: MagicMock) -> None :
     """Test reloading the registry."""
     # Execute test.
     SERVICE_REGISTRY.reload()
@@ -132,6 +162,15 @@ class ServiceRegistryTestCase(TransactionTestCase):
       self._registry_contains_g_service(number = i)
     for i in range(1, 6):
       self._registry_contains_g_method(number = i)
+
+    self.assertIn(
+      'grpc-method-2',
+      SERVICE_REGISTRY.cache.get('service-registry')['khaleesi-gate-1'].services[
+        'khaleesi-service-1'
+      ].services['grpc-service-1'].methods['grpc-method-1'].calls['khaleesi-gate-2'].services[
+        'khaleesi-service-2'
+      ].services['grpc-service-2'].methods,
+    )
 
   def _registry_contains_k_gate(self, *, number: int) -> None :
     self.assertIsNotNone(SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{number}'])

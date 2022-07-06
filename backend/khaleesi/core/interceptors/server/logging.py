@@ -66,7 +66,7 @@ class LoggingServerInterceptor(ServerInterceptor):
       LOGGER.error(
         message = f'{service_name}.{method_name} request finished with errors',
       )
-      raise exception
+      raise
 
     del STATE.request_id
     return response
@@ -104,9 +104,14 @@ class LoggingServerInterceptor(ServerInterceptor):
       STATE.request_id = response.request_id
     else:
       # Send directly to the DB. Note that Requests must be present in the schema!
+      from microservice.models.service_registry import SERVICE_REGISTRY  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       from microservice.models import Request as DbRequest  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       logged_request = DbRequest.objects.log_request(grpc_request = logging_request)
       STATE.request_id = logged_request.pk
+      SERVICE_REGISTRY.add_call(
+        caller_details = logging_request.upstream_request,
+        called_details = logging_request.request_metadata.caller,
+      )
 
   def _log_response(self, status: StatusCode) -> None :
     """Send the logging response to the logger."""

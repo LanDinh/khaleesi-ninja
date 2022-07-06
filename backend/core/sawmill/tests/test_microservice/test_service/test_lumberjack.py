@@ -29,7 +29,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
       logging_object = DbEvent.objects,
       logging_method = 'log_event',
     )
-    service_registry.add.assert_called()
+    service_registry.add_service.assert_called()
 
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def test_log_request(self, service_registry: MagicMock) -> None :
@@ -40,7 +40,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
       logging_method = 'log_request',
       return_value = partial(Metadata, pk = 13),
     )
-    service_registry.add.assert_called()
+    service_registry.add_call.assert_called()
 
   def test_log_response(self) -> None :
     """Test logging responses."""

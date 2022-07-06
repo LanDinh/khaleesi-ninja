@@ -108,5 +108,13 @@
       "name": "grpc-method-5",
       "grpc_service": 4
     }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcCall",
+    "pk": 1,
+    "fields": {
+      "caller": 1,
+      "called": 2
+    }
   }
 ]

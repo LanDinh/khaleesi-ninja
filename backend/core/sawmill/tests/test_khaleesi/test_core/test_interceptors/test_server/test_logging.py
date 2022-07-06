@@ -37,18 +37,24 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         )
         logger.reset_mock()
         db_module = MagicMock()
+        service_registry = MagicMock()
         # Execute test.
         with patch.dict('sys.modules', { 'microservice.models': db_module }):
-          self.interceptor.khaleesi_intercept(
-            request = final_request,
-            **self.get_intercept_params(),
-          )
+          with patch.dict(
+              'sys.modules',
+              { 'microservice.models.service_registry': service_registry },
+          ):
+            self.interceptor.khaleesi_intercept(
+              request = final_request,
+              **self.get_intercept_params(),
+            )
         # Assert result.
         self._assert_logging_call(
           logging_stub= db_module,
           logger = logger,
           request_metadata = request_metadata,
         )
+        service_registry.SERVICE_REGISTRY.add_call.assert_called()
 
   @patch('khaleesi.core.interceptors.server.logging.LOGGER')
   def test_logging_non_ok_status(self, logger: MagicMock) -> None :

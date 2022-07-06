@@ -69,7 +69,7 @@ class Server:
         result = Event.Action.ResultType.FATAL,
         details = f'Server start failed. {type(exception).__name__}: {str(exception)}'
       )
-      raise exception from None
+      raise
 
   def start(self) -> None :
     """Start the server."""
@@ -91,7 +91,7 @@ class Server:
         result = Event.Action.ResultType.FATAL,
         details = f'Server start failed. {type(exception).__name__}: {str(exception)}'
       )
-      raise exception from None
+      raise
     self.server.wait_for_termination()
 
   def _add_handlers(self) -> None :
@@ -154,7 +154,7 @@ class Server:
         result = Event.Action.ResultType.FATAL,
         details = f'Server stop failed... {type(exception).__name__}: {str(exception)}'
       )
-      raise exception from None
+      raise
 
   def _server_state_event(
       self, *,

@@ -40,7 +40,7 @@ class PrometheusServerInterceptor(ServerInterceptor):
       return response
     except KhaleesiException as exception:
       INCOMING_REQUESTS.inc(status = exception.status, request = request_metadata, peer = peer)
-      raise exception from None
-    except Exception as exception:
+      raise
+    except Exception:
       INCOMING_REQUESTS.inc(status = StatusCode.UNKNOWN, request = request_metadata, peer = peer)
-      raise exception from None
+      raise

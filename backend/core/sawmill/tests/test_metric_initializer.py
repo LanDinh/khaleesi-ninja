@@ -26,7 +26,7 @@ class MetricInitializerTestCase(SimpleTestCase):
     # Prepare data & execute test.
     MetricInitializer()
     # Assert result.
-    service_registry.add.assert_called_once()
+    service_registry.add_service.assert_called_once()
 
   def test_initialize_metrics_for_lifecycle_events(
       self,

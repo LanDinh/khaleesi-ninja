@@ -34,8 +34,9 @@ class Service(Servicer):
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
     def method() -> Metadata :
-      SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
-      return DbEvent.objects.log_event(grpc_event = request)
+      result = DbEvent.objects.log_event(grpc_event = request)
+      SERVICE_REGISTRY.add_service(caller_details = request.request_metadata.caller)
+      return result
 
     self._handle_response(method = method)
     return LogStandardResponse()
@@ -43,8 +44,12 @@ class Service(Servicer):
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogRequestResponse :
     """Log requests."""
     def method() -> Metadata:
-      SERVICE_REGISTRY.add(caller_details = request.request_metadata.caller)
-      return DbRequest.objects.log_request(grpc_request = request)
+      result = DbRequest.objects.log_request(grpc_request = request)
+      SERVICE_REGISTRY.add_call(
+        caller_details = request.upstream_request,
+        called_details = request.request_metadata.caller,
+      )
+      return result
 
     logged_request = self._handle_response(method = method)
     response = LogRequestResponse()
@@ -62,11 +67,11 @@ class Service(Servicer):
     try:
       metadata = method()
       if metadata.meta_logging_errors:
-        # Caught by KhaleesiException and  re-raised
+        # Caught by KhaleesiException and re-raised
         raise InvalidArgumentException(private_details = metadata.meta_logging_errors)
       return metadata
-    except KhaleesiException as exception:
-      raise exception from None
+    except KhaleesiException:
+      raise
     except Exception as exception:  # pylint: disable=broad-except
       raise InternalServerException(
         private_details = f'{type(exception).__name__}: {str(exception)}',

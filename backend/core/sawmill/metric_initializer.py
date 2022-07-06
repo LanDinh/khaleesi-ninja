@@ -26,7 +26,7 @@ class MetricInitializer(BaseMetricInitializer):
     caller_details.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
     caller_details.grpc_service     = 'grpc-server'
     caller_details.grpc_method      = 'lifecycle'
-    SERVICE_REGISTRY.add(caller_details = caller_details)
+    SERVICE_REGISTRY.add_service(caller_details = caller_details)
 
   def initialize_metrics(self) -> None :
     """Initialize the metrics."""
