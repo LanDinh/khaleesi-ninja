@@ -1,0 +1,41 @@
+name: tests
+on: [pull_request]
+jobs:
+  # Make data lists available across jobs for use in matrix.
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      all-services: ${{ steps.set-services.outputs.full-json }}
+      deploy-services: ${{ steps.set-services.outputs.deploy-json }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - id: set-services
+        name: Read services into matrix
+        uses: ./.github/actions/set-json-output
+        with:
+          filename: data/services.json
+
+  # Execute all tests for all services individually.
+  test-service:
+    runs-on: ubuntu-latest
+    needs: [ matrix ]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.matrix.outputs.all-services) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup protoc
+        uses: ./.github/actions/setup-protoc
+      - name: Generate protos
+        run: ./scripts/development/generate_protos.sh
+      - name: Execute the container test
+        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
+      - name: Upload coverage to codecov
+        if: ${{ always() }}
+        uses: codecov/codecov-action@v2
+        with:
+          flags: integration
+          fail_ci_if_error: true
+          directory: temp/
