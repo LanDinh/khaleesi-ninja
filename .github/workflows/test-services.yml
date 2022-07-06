@@ -1,5 +1,5 @@
 name: tests
-on: [pull_request]
+on: [ push ]
 jobs:
   # Make data lists available across jobs for use in matrix.
   matrix:
