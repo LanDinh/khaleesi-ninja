@@ -14,6 +14,7 @@ KHALEESI_NINJA['CORE']['STRUCTURED_LOGGING_METHOD'] = definition.StructuredLoggi
 
 
 # Cache.
+# noinspection SpellCheckingInspection
 CACHES['service-registry'] = {
     'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     'LOCATION': 'service-registry',

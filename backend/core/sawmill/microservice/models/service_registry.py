@@ -150,7 +150,7 @@ class ServiceRegistry:
     self.cache.clear()
     self.cache.set('service-registry', service_registry)
 
-    if settings.DEBUG:
+    if settings.DEBUG:  # pragma: no cover
       LOGGER.debug(message = f'Service registry reload: {len(methods)} entries')
       for k_gate_name, k_gate in service_registry.items():
         LOGGER.debug(message = f'    {k_gate_name}')

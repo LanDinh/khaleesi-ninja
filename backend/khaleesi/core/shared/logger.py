@@ -46,7 +46,7 @@ class Logger:
   def _non_empty(*, name: str, default: str) -> str :
     if hasattr(STATE, name) and getattr(STATE, name):
       return str(getattr(STATE, name))
-    return default
+    return default  # pragma: no cover
 
 
 LOGGER = Logger()

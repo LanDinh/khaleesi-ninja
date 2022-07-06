@@ -33,7 +33,7 @@ class AuditEventMetric(CounterMetric):
 
   def register(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""
-    super().register(**self._get_arguments(event = event))
+    super().register(**self._get_arguments(event = event))  # pragma: no cover
 
   def get_value(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""

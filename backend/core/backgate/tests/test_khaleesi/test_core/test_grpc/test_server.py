@@ -143,6 +143,28 @@ class ServerTestCase(SimpleTestCase):
       lumberjack_stub = lumberjack_stub
     )
 
+  # noinspection PyUnusedLocal
+  def test_start_failure(  # pylint: disable=unused-argument
+      self,
+      logger: MagicMock,
+      lumberjack_stub: MagicMock,
+      grpc_server: MagicMock,
+      *_: MagicMock,
+  ) -> None :
+    """Test that server start works correctly."""
+    # Prepare data.
+    server = Server()
+    grpc_server.return_value.start.side_effect = Exception('test')
+    # Execute test.
+    with self.assertRaises(Exception):
+      server.start()
+    # Assert result.
+    self.assert_server_state_event(
+      action = Event.Action.ActionType.START,
+      result = Event.Action.ResultType.FATAL,
+      lumberjack_stub = lumberjack_stub
+    )
+
   @patch('khaleesi.core.grpc.server.khaleesi_settings')
   def test_add_invalid_handler(self, settings: MagicMock, *_: MagicMock) -> None :
     """Test that invalid handlers raise ImportErrors."""

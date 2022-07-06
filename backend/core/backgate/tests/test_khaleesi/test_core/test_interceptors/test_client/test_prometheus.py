@@ -92,7 +92,7 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
           metric.reset_mock()
           response = MagicMock()
           response.code = MagicMock(return_value = code)
-          response.exception = None
+          response.exception.return_value = exception
           # Execute test.
           with self.assertRaises(UpstreamGrpcException):
             self.interceptor.khaleesi_intercept(

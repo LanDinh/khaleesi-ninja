@@ -114,7 +114,7 @@ class CounterMetric(AbstractMetric):
 
   def register(self, **kwargs: Any) -> None :
     """Set the metric to the given value."""
-    self._metric.labels(**self.labels(**kwargs))
+    self._metric.labels(**self.labels(**kwargs))  # pragma: no cover
 
 
 EnumType = TypeVar('EnumType', bound = Enum)  # pylint: disable=invalid-name

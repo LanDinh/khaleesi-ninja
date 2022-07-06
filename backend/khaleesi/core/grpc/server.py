@@ -105,7 +105,7 @@ class Server:
         service_configuration = import_string(handler)
         service_configuration.register_service(self.server)
         service_names.append(service_configuration.name)
-      except ImportError as error:
+      except ImportError as error:  # pragma: no cover
         raise ImportError(f'Could not import "{handler}" for gRPC handler.') from error
     LOGGER.debug(message = 'Adding reflection service...')
     reflection.enable_server_reflection(service_names, self.server)

@@ -76,7 +76,7 @@ class BaseMetricInitializer:
       action_custom_type: Optional[str] = None,
   ) -> None :
     if action_crud_type and action_custom_type:
-      raise ProgrammingException(
+      raise ProgrammingException(  # pragma: no cover
         private_details = 'Only one of action_crud_type and action_custom_type are allowed',
       )
     event = Event()
