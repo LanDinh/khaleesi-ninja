@@ -3,7 +3,7 @@ on:
   pull_request:
   push:
     paths:
-      - '.github.**'
+      - '.github/**'
       - 'data/**'
       - 'kubernetes/**'
       - 'scripts/**'
