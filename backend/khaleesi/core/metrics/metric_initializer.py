@@ -26,14 +26,14 @@ class EventData:
   caller: GrpcData
   target_type: str
   user_types: List['User.UserType.V'] = field(
-    default_factory = lambda: [ v.index for v in User.UserType.DESCRIPTOR.values ],  # pylint: disable=protobuf-undefined-attribute
+    default_factory = lambda: [ v for l, v in User.UserType.items() ],
   )
   action_crud_types: List['Event.Action.ActionType.V'] = field(
-    default_factory = lambda: [ v.index for v in Event.Action.ActionType.DESCRIPTOR.values ],  # pylint: disable=protobuf-undefined-attribute
+    default_factory = lambda: [ v for l, v in Event.Action.ActionType.items() ],
   )
   action_custom_types: List[str] = field(default_factory = list)
   result_types: List['Event.Action.ResultType.V'] = field(
-    default_factory = lambda: [ v.index for v in Event.Action.ResultType.DESCRIPTOR.values ],  # pylint: disable=protobuf-undefined-attribute
+    default_factory = lambda: [ v for l, v in Event.Action.ResultType.items() ],
   )
 
 

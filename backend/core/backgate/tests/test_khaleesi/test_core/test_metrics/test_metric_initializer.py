@@ -40,9 +40,9 @@ class BaseMetricInitializerTest(SimpleTestCase):
     # Execute test.
     self.metric_initializer.initialize_metrics_with_data(events = events)
     # Assert results.
-    users_count = len(User.UserType.DESCRIPTOR.values)  # pylint: disable=protobuf-undefined-attribute
-    actions_count = len(Event.Action.ActionType.DESCRIPTOR.values) + 1  # pylint: disable=protobuf-undefined-attribute
-    results_count = len(Event.Action.ResultType.DESCRIPTOR.values)  # pylint: disable=protobuf-undefined-attribute
+    users_count = len(User.UserType.items())
+    actions_count = len(Event.Action.ActionType.items()) + 1
+    results_count = len(Event.Action.ResultType.items())
     self.assertEqual(users_count * actions_count * results_count, audit_event.register.call_count)
     arguments = audit_event.register.call_args_list
     users   = set()
