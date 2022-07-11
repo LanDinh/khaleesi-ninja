@@ -12,6 +12,28 @@ metadata:
 spec:
   endpoints:
     - port: metrics
+      metricRelabelings:
+        - action: labeldrop
+          sourceLabels: []
+          regex: container
+        - action: labeldrop
+          sourceLabels: []
+          regex: endpoint
+        - action: labeldrop
+          sourceLabels: []
+          regex: instance
+        - action: labeldrop
+          sourceLabels: []
+          regex: job
+        - action: labeldrop
+          sourceLabels: []
+          regex: pod
+        - action: labeldrop
+          sourceLabels: []
+          regex: service
+        - action: labeldrop
+          sourceLabels: []
+          regex: namespace
   namespaceSelector:
     matchNames:
       - khaleesi-ninja-{{ .Values.environment.name }}
