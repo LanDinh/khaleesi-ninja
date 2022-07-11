@@ -199,7 +199,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
     SERVICE_REGISTRY.reload()
     # Execute test.
-    SERVICE_REGISTRY.add_service(caller_details = caller_details, called_details = caller_details)
+    SERVICE_REGISTRY.add_call(caller_details = caller_details, called_details = caller_details)
     # Assert result.
     self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
     self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
@@ -221,7 +221,7 @@ class ServiceRegistryTestCase(TransactionTestCase):
     grpc_method_count      = ServiceRegistryGrpcMethod.objects.count()
     SERVICE_REGISTRY.reload()
     # Execute test.
-    SERVICE_REGISTRY.add_service(caller_details = caller_details, called_details = called_details)
+    SERVICE_REGISTRY.add_call(caller_details = caller_details, called_details = called_details)
     # Assert result.
     self.assertEqual(khaleesi_gate_count   , ServiceRegistryKhaleesiGate.objects.count())
     self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
