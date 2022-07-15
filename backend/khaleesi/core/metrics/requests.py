@@ -8,6 +8,7 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.util import CounterMetric, Metric
+from khaleesi.core.shared.exceptions import ProgrammingException
 from khaleesi.proto.core_pb2 import User, RequestMetadata
 
 
@@ -56,7 +57,7 @@ class RequestsMetric(CounterMetric):
   ) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return super().labels(
-      status = status.name.lower(),
+      status = self._map_grpc_status(status = status),
       user   = User.UserType.Name(user).lower(),
       **additional_labels,
     )
@@ -76,6 +77,38 @@ class RequestsMetric(CounterMetric):
         'peer_grpc_service'    : self.string_or_unknown(peer.caller.grpc_service),
         'peer_grpc_method'     : self.string_or_unknown(peer.caller.grpc_method),
     }
+
+  def _map_grpc_status(self, *, status: StatusCode) -> str :
+    """Group status codes."""
+    if status == StatusCode.OK:
+      return 'ok'
+    if status in [
+        StatusCode.INVALID_ARGUMENT,
+        StatusCode.UNAUTHENTICATED,
+        StatusCode.PERMISSION_DENIED,
+        StatusCode.NOT_FOUND,
+    ]:
+      return 'client error'
+    if status in [ StatusCode.INTERNAL, StatusCode.UNIMPLEMENTED ]:
+      return 'server error'
+    if status in [
+        StatusCode.CANCELLED,
+        StatusCode.DEADLINE_EXCEEDED,
+        StatusCode.RESOURCE_EXHAUSTED,
+        StatusCode.UNAVAILABLE,
+    ]:
+      return 'not finished'
+    if status in [  # not used by the library nor by khaleesi.ninja.
+        StatusCode.UNKNOWN,
+        StatusCode.ALREADY_EXISTS,
+        StatusCode.FAILED_PRECONDITION,
+        StatusCode.ABORTED,
+        StatusCode.OUT_OF_RANGE,
+        StatusCode.DATA_LOSS,
+    ]:
+      return 'unknown'
+
+    raise ProgrammingException(private_details = 'Unknown gRPC status returned')
 
 
 OUTGOING_REQUESTS = RequestsMetric(metric_id = Metric.KHALEESI_OUTGOING_REQUESTS)

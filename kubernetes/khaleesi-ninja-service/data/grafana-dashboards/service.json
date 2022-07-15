@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -27,6 +30,10 @@
   "panels": [
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -35,6 +42,15 @@
       },
       "id": 10,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Requests",
       "type": "row"
     },
@@ -123,7 +139,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -133,7 +150,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`OK: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -144,7 +161,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
@@ -211,7 +228,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": "server error: .*"
             },
             "properties": [
               {
@@ -239,7 +256,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -249,7 +267,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(status, grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(status, grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{grpc_service}}/{{grpc_method}} called by {{peer_khaleesi_gate}}`}}",
@@ -344,7 +362,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -354,7 +373,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`OK: {{grpc_service}}/{{grpc_method}} calling {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -365,7 +384,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{grpc_service}}/{{grpc_method}} calling {{peer_khaleesi_gate}}`}}",
@@ -432,7 +451,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": "server error: .*"
             },
             "properties": [
               {
@@ -460,7 +479,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -470,7 +490,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(status, grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(status, grpc_service, grpc_method, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{grpc_service}}/{{grpc_method}} calling {{peer_khaleesi_gate}}`}}",
@@ -482,6 +502,10 @@
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -491,6 +515,15 @@
       "id": 17,
       "panels": [],
       "repeat": "grpc_service",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "$grpc_service requests",
       "type": "row"
     },
@@ -579,7 +612,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -589,7 +623,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: OK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
           "refId": "OK"
@@ -600,7 +634,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: NOK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
@@ -667,7 +701,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": "server error: .*"
             },
             "properties": [
               {
@@ -695,7 +729,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -705,7 +740,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(status, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(status, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
@@ -716,6 +751,10 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -796,17 +835,18 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: OK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
           "refId": "OK"
@@ -814,10 +854,10 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_version, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: NOK - {{grpc_method}} called by {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
@@ -884,7 +924,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": "server error: .*"
             },
             "properties": [
               {
@@ -912,7 +952,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -922,7 +963,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(status, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval]))",
+          "expr": "sum by(status, grpc_method, peer_khaleesi_gate, peer_khaleesi_service, peer_grpc_service, peer_grpc_method) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", grpc_service=\"$grpc_service\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{grpc_method}} calling {{peer_khaleesi_gate}}.{{peer_khaleesi_service}}.{{peer_grpc_service}}/{{peer_grpc_method}}`}}",
@@ -934,6 +975,10 @@
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -942,6 +987,15 @@
       },
       "id": 6,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Instances",
       "type": "row"
     },
@@ -1026,7 +1080,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -1167,7 +1222,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -1267,7 +1323,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -1277,7 +1334,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result=\"success\"}[$__rate_interval]))",
+          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: {{action_crud_type}} - success`}}",
           "refId": "success"
@@ -1288,7 +1345,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result!=\"success\"}[$__rate_interval]))",
+          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result!=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: {{action_crud_type}} - {{result}}`}}",
           "refId": "not success"
@@ -1378,7 +1435,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -1388,7 +1446,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result!=\"success\"}[$__rate_interval]))",
+          "expr": "sum by (khaleesi_version, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", khaleesi_service=\"{{ .Values.service.name }}\", result!=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`{{khaleesi_version}}: {{action_crud_type}} - {{result}}`}}",
           "refId": "not success"
@@ -1399,7 +1457,7 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 34,
+  "schemaVersion": 36,
   "style": "dark",
   "tags": [],
   "templating": {

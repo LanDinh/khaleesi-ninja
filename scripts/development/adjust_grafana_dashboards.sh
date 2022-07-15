@@ -52,6 +52,7 @@ echo -e "${magenta}Enter the environment:${clear_color}"
   # Replace datasource selection.
   sed -i -E "0,/.*\"selected\"/{s#(\"selected\": )false(,)#\1true\2#g}" "${file}"
   sed -i -E "s#(\"khaleesi-ninja-)${environment}(\")#\1{{ .Values.environment.name }}\2#g" "${file}"
+  sed -i -E "s#(\"uid\": \")prometheus\"#\1\${datasource}\"#g" "${file}"
   # Replace version.
   sed -i -E "s#\"version\": [0-9]*#\"version\": 1#g" "${file}"
   # Replace uid.

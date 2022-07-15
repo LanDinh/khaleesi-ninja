@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": "-- Grafana --",
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -27,6 +30,10 @@
   "panels": [
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -35,6 +42,15 @@
       },
       "id": 10,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Requests",
       "type": "row"
     },
@@ -123,7 +139,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -133,7 +150,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`OK: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -144,7 +161,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
@@ -211,7 +228,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": "server error: .*"
             },
             "properties": [
               {
@@ -239,7 +256,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -249,7 +267,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (increase(khaleesi_incoming_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{khaleesi_service}} called by {{peer_khaleesi_gate}}`}}",
@@ -344,7 +362,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -354,7 +373,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`OK: {{khaleesi_service}} calling {{peer_khaleesi_gate}}`}}",
           "refId": "OK"
@@ -365,7 +384,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`NOK: {{khaleesi_service}} calling {{peer_khaleesi_gate}}`}}",
@@ -432,7 +451,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "internal: .*"
+              "options": "server error: .*"
             },
             "properties": [
               {
@@ -460,7 +479,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -470,7 +490,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval]))",
+          "expr": "sum by(khaleesi_service, peer_khaleesi_gate, status) (increase(khaleesi_outgoing_requests_total{status!=\"ok\", khaleesi_gate=\"{{ .Values.gate.name }}\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{status}}: {{khaleesi_service}} calling {{peer_khaleesi_gate}}`}}",
@@ -482,6 +502,10 @@
     },
     {
       "collapsed": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -490,6 +514,15 @@
       },
       "id": 6,
       "panels": [],
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "refId": "A"
+        }
+      ],
       "title": "Instances",
       "type": "row"
     },
@@ -574,7 +607,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -715,7 +749,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -815,7 +850,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -825,7 +861,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_service, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", result=\"success\"}[$__rate_interval]))",
+          "expr": "sum by (khaleesi_service, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", result=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
           "interval": "",
           "legendFormat": "{{`{{khaleesi_service}}: {{action_crud_type}} - success`}}",
           "refId": "success"
@@ -836,7 +872,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_service, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", result!=\"success\"}[$__rate_interval]))",
+          "expr": "sum by (khaleesi_service, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", result!=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{khaleesi_service}}: {{action_crud_type}} - {{result}}`}}",
@@ -895,23 +931,7 @@
             ]
           }
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": ".* - error"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 8,
@@ -927,7 +947,8 @@
           "placement": "bottom"
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "targets": [
@@ -937,7 +958,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_service, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", result!=\"success\"}[$__rate_interval]))",
+          "expr": "sum by (khaleesi_service, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", khaleesi_gate=\"{{ .Values.gate.name }}\", result!=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
           "legendFormat": "{{`{{khaleesi_service}}: {{action_crud_type}} - {{result}}`}}",
@@ -949,7 +970,7 @@
     }
   ],
   "refresh": "",
-  "schemaVersion": 34,
+  "schemaVersion": 36,
   "style": "dark",
   "tags": [],
   "templating": {
