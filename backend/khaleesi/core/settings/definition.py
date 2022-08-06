@@ -19,15 +19,17 @@ class Metadata(TypedDict):
   TYPE    : ServiceType
   VERSION : str
 
+
 class Grpc(TypedDict):
-  """Grpc configuration for khaleesi.ninja services."""
+  """gRPC configuration for khaleesi.ninja services."""
 
   PORT     : int
   HANDLERS : List[str]
   THREADS  : int
 
+
 class Monitoring(TypedDict):
-  """Grpc configuration for khaleesi.ninja services."""
+  """Monitoring configuration for khaleesi.ninja services."""
 
   PORT : int
 
@@ -39,9 +41,21 @@ class StructuredLoggingMethod(Enum):
   DATABASE = 2
 
 class Core(TypedDict):
-  """Logging configuration for khaleesi.ninja services."""
+  """Core configuration for khaleesi.ninja services."""
 
   STRUCTURED_LOGGING_METHOD: StructuredLoggingMethod
+
+
+class GrpcDict(TypedDict):
+  """Dictionary representing a gRPC service."""
+
+  NAME                       : str
+  LIFECYCLE                  : str  # report changes in lifecycle for logging
+
+class Constants(TypedDict):
+  """Constants shared by everything."""
+
+  GRPC_SERVER : GrpcDict
 
 
 class KhaleesiNinjaSettings(TypedDict):
@@ -51,3 +65,4 @@ class KhaleesiNinjaSettings(TypedDict):
   GRPC       : Grpc
   MONITORING : Monitoring
   CORE       : Core
+  CONSTANTS  : Constants

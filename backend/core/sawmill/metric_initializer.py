@@ -24,8 +24,8 @@ class MetricInitializer(BaseMetricInitializer):
     caller_details = GrpcCallerDetails()
     caller_details.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']
     caller_details.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
-    caller_details.grpc_service     = 'grpc-server'
-    caller_details.grpc_method      = 'lifecycle'
+    caller_details.grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME']
+    caller_details.grpc_method      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['LIFECYCLE']
     SERVICE_REGISTRY.add_service(caller_details = caller_details)
 
   def initialize_metrics(self) -> None :
@@ -44,8 +44,8 @@ class MetricInitializer(BaseMetricInitializer):
             'caller': GrpcData(
               khaleesi_gate    = gate_name,
               khaleesi_service = service_name,
-              grpc_service     = 'grpc-server',
-              grpc_method      = 'lifecycle',
+              grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
+              grpc_method      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['LIFECYCLE'],
             ),
             'target_type' : 'core.core.server',
             'user_types'  :  [ User.UserType.SYSTEM ],

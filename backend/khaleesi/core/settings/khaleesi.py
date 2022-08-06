@@ -80,4 +80,10 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
   CORE = definition.Core(
     STRUCTURED_LOGGING_METHOD = definition.StructuredLoggingMethod.GRPC,
   ),
+  CONSTANTS = definition.Constants(
+    GRPC_SERVER = definition.GrpcDict(
+      NAME = 'grpc-server',
+      LIFECYCLE = 'lifecycle',
+    ),
+  ),
 )

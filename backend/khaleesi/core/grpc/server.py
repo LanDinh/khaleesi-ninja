@@ -168,9 +168,9 @@ class Server:
     add_request_metadata(
       request      = event,
       request_id   = -1,  # Not handling a gRPC call.
-      grpc_service = 'grpc-server',
-      grpc_method  = 'lifecycle',
-      user_id      = 'grpc-server',
+      grpc_service = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
+      grpc_method  = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['LIFECYCLE'],
+      user_id      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
       user_type    = User.UserType.SYSTEM,
     )
     # Event target.

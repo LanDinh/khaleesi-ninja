@@ -75,6 +75,7 @@ class BaseMetricInitializer:
       action_crud_type  : Optional['Event.Action.ActionType.V'] = None,
       action_custom_type: Optional[str] = None,
   ) -> None :
+    """Build the event object to register metrics."""
     if action_crud_type and action_custom_type:
       raise ProgrammingException(  # pragma: no cover
         private_details = 'Only one of action_crud_type and action_custom_type are allowed',
