@@ -10,7 +10,7 @@ from django.conf import settings
 from khaleesi.core.metrics.metric_initializer import BaseMetricInitializer, EventData, GrpcData
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import Event
+from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
 from microservice.models.service_registry import SERVICE_REGISTRY
 
 
@@ -34,6 +34,15 @@ class MetricInitializer(BaseMetricInitializer):
         *self._server_state_events(),
     ]
     super().initialize_metrics_with_data(events = events)
+
+  def requests(self) -> ServiceCallData :
+    """Fetch the data for request metrics."""
+    owner = GrpcCallerDetails()
+    owner.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']
+    owner.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
+    owner.grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME']
+    owner.grpc_method = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['INITIALIZE_REQUEST_METRICS']
+    return SERVICE_REGISTRY.get_call_data(owner = owner)
 
   def _server_state_events(self) -> List[EventData] :
     events = []

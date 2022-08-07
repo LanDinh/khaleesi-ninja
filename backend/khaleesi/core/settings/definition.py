@@ -51,6 +51,7 @@ class GrpcDict(TypedDict):
 
   NAME                       : str
   LIFECYCLE                  : str  # report changes in lifecycle for logging
+  INITIALIZE_REQUEST_METRICS : str  # fetch gRPC calls for metric initialization
 
 class Constants(TypedDict):
   """Constants shared by everything."""

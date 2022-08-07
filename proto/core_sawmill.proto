@@ -116,3 +116,13 @@ service Sawyer {
   rpc GetEvents   (LogFilter) returns (EventsList);
   rpc GetRequests (LogFilter) returns (RequestList);
 }
+
+message CallData {
+  khaleesi.core.GrpcCallerDetails          call      = 1;
+  repeated khaleesi.core.GrpcCallerDetails calls     = 2;
+  repeated khaleesi.core.GrpcCallerDetails called_by = 3;
+}
+
+message ServiceCallData {
+  repeated CallData call_list = 1;
+}

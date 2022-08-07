@@ -40,6 +40,15 @@ class RequestsMetric(CounterMetric):
     """Increment the metric."""
     super().inc(status = status, **self._get_arguments(request = request, peer = peer))
 
+  def register(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+      self, *,
+      request: RequestMetadata,
+      peer   : RequestMetadata,
+      status : StatusCode,
+  ) -> None :
+    """Increment the metric."""
+    super().register(status = status, **self._get_arguments(request = request, peer = peer))  # pragma: no cover  # pylint: disable=line-too-long
+
   def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       request: RequestMetadata,

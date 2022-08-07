@@ -84,6 +84,7 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     GRPC_SERVER = definition.GrpcDict(
       NAME = 'grpc-server',
       LIFECYCLE = 'lifecycle',
+      INITIALIZE_REQUEST_METRICS = 'initialize-request-metrics',
     ),
   ),
 )

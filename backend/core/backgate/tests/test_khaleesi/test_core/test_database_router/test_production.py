@@ -29,7 +29,7 @@ class DatabaseRouterTestCase(SimpleTestCase):
       with self.subTest(model = f'{model.__module__}.{model.__name__}'):
         # Execute test.
         result = self.database_router.db_for_write(model)
-        # Assert results
+        # Assert result.
         self.assertEqual('write', result)
 
   def test_allow_migrate(self) -> None :

@@ -44,7 +44,7 @@ class CounterMetricTestMixin:
     """Execute the increment and assert it worked."""
     # Prepare data.
     original_value = self.metric.get_value(**labels)
-    # Execute tests.
+    # Execute test.
     method()
     # Assert result.
     new_value = self.metric.get_value(**labels)

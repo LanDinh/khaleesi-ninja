@@ -11,18 +11,25 @@ from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
 from khaleesi.proto.core_sawmill_pb2 import Event
 
 
-@patch('khaleesi.core.metrics.metric_initializer.AUDIT_EVENT')
 class BaseMetricInitializerTest(SimpleTestCase):
   """Test the metric initializer."""
 
   metric_initializer = BaseMetricInitializer()
 
-  def test_force_initialization_method(self, *_: MagicMock) -> None :
+  def test_force_initialization_method(self) -> None :
     """Test all subclasses need to override the base method."""
     # Execute test & assert result.
     with self.assertRaises(ProgrammingException):
       self.metric_initializer.initialize_metrics()
 
+  def test_requests(self) -> None :
+    """Test requests."""
+    # Execute test.
+    result = self.metric_initializer.requests()
+    # Assert result.
+    self.assertEqual(0, len(result.call_list))
+
+  @patch('khaleesi.core.metrics.metric_initializer.AUDIT_EVENT')
   def test_initializing_events(self, audit_event: MagicMock) -> None :
     """Test initializing events metrics."""
     # Prepare data.
@@ -39,7 +46,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
     events = [ event_data ]
     # Execute test.
     self.metric_initializer.initialize_metrics_with_data(events = events)
-    # Assert results.
+    # Assert result.
     users_count = len(User.UserType.items())
     actions_count = len(Event.Action.ActionType.items()) + 1
     results_count = len(Event.Action.ResultType.items())
@@ -60,6 +67,22 @@ class BaseMetricInitializerTest(SimpleTestCase):
     self.assertEqual(users_count  , len(users))
     self.assertEqual(actions_count, len(crud_actions) + len(custom_actions))
     self.assertEqual(results_count, len(results))
+
+  @patch('khaleesi.core.metrics.metric_initializer.OUTGOING_REQUESTS')
+  @patch('khaleesi.core.metrics.metric_initializer.INCOMING_REQUESTS')
+  def test_initializing_requests(
+      self,
+      incoming_requests: MagicMock,
+      outgoing_requests: MagicMock,
+  ) -> None :
+    """Test initializing request metrics."""
+    # Execute test.
+    self.metric_initializer.initialize_metrics_with_data(events = [])
+    # Assert result.
+    incoming_arguments = incoming_requests.register.call_args_list
+    outgoing_arguments = outgoing_requests.register.call_args_list
+    self.assertEqual(0  , len(incoming_arguments))
+    self.assertEqual(0, len(outgoing_arguments))
 
   def assert_caller(self, *, expected: GrpcData, actual: GrpcCallerDetails) -> None :
     """Assert the caller data is correct."""

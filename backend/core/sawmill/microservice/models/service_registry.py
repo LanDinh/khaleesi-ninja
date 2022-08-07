@@ -9,9 +9,13 @@ from typing import Dict, TypeVar
 from django.core.cache import caches
 from django.db import models
 
+# gRPC.
+from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
+
 # khaleesi.ninja.
 from khaleesi.core.shared.logger import LOGGER
 from khaleesi.proto.core_pb2 import GrpcCallerDetails
+from khaleesi.proto.core_sawmill_pb2 import ServiceCallData, CallData
 
 
 class ServiceRegistryKhaleesiGate(models.Model):
@@ -200,6 +204,41 @@ class ServiceRegistry:
     self.cache.set('service-registry', service_registry)
 
     LOGGER.debug(message = f'Service registry reloaded: {len(methods)} entries, {len(calls)} calls')
+
+  def get_call_data(self, *, owner: GrpcCallerDetails) -> ServiceCallData :
+    """Get call data for the affected service."""
+    service_call_data = ServiceCallData()
+    self.add_service(caller_details = owner)
+    own_service = self.get_service_registry()[owner.khaleesi_gate].services[owner.khaleesi_service]
+
+    for service_name, service in own_service.services.items():
+      for method_name, method in service.methods.items():
+        call_data = CallData()
+        call_data.call.khaleesi_gate    = owner.khaleesi_gate
+        call_data.call.khaleesi_service = owner.khaleesi_service
+        call_data.call.grpc_service     = service_name
+        call_data.call.grpc_method      = method_name
+        self._add_data_to_call(full_list = method.calls    , result_list = call_data.calls)
+        self._add_data_to_call(full_list = method.called_by, result_list = call_data.called_by)
+        service_call_data.call_list.append(call_data)
+
+    return service_call_data
+
+  def _add_data_to_call(
+      self, *,
+      full_list: Dict[str, KhaleesiGate],
+      result_list: RepeatedCompositeFieldContainer[GrpcCallerDetails],
+  ) -> None :
+    for khaleesi_gate_name, khaleesi_gate in full_list.items():
+      for khaleesi_service_name, khaleesi_service in khaleesi_gate.services.items():
+        for grpc_service_name, grpc_service in khaleesi_service.services.items():
+          for grpc_method_name, _ in grpc_service.methods.items():
+            called = GrpcCallerDetails()
+            called.khaleesi_gate    = khaleesi_gate_name
+            called.khaleesi_service = khaleesi_service_name
+            called.grpc_service     = grpc_service_name
+            called.grpc_method      = grpc_method_name
+            result_list.append(called)
 
   def _reload_grpc_method(
       self, *,

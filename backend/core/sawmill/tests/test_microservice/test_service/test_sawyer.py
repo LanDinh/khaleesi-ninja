@@ -25,7 +25,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     db_event = MagicMock()
     db_event.to_grpc_event_response.return_value = GrpcEventResponse()
     db_events.return_value = [ db_event ]
-    # Execute tests.
+    # Execute test.
     result = self.service.GetEvents(LogFilter(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.events))
@@ -39,7 +39,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     db_request = MagicMock()
     db_request.to_grpc_request_response.return_value = GrpcRequestResponse()
     db_requests.return_value = [ db_request]
-    # Execute tests.
+    # Execute test.
     result = self.service.GetRequests(LogFilter(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.requests))

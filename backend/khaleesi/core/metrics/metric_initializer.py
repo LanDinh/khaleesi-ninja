@@ -4,11 +4,22 @@
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+# Django.
+from django.conf import settings
+
+# gRPC.
+from grpc import StatusCode
+
 # khaleesi.ninja.
 from khaleesi.core.metrics.audit import AUDIT_EVENT
+from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS, RequestsMetric
+from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import ProgrammingException
-from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import Event
+from khaleesi.proto.core_pb2 import User, RequestMetadata, GrpcCallerDetails
+from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
+
+
+khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 
 
 @dataclass
@@ -46,9 +57,68 @@ class BaseMetricInitializer:
 
   def initialize_metrics_with_data(self, *, events: List[EventData]) -> None :
     """Initialize the provided metrics."""
+    self._initialize_requests()
     self._initialize_events(events = events)
 
+  def requests(self) -> ServiceCallData :
+    """Fetch the data for request metrics."""
+    return ServiceCallData()
+
+  def _initialize_requests(self) -> None :
+    """Initialize the request metrics to 0."""
+    requests = self.requests()
+    for request in requests.call_list:
+      request_metadata = RequestMetadata()
+      self._build_request_metadata(request_metadata = request_metadata, caller = request.call)
+      if request_metadata.caller.grpc_service == \
+          khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME']:
+        user_list = [ (User.UserType.Name(User.UserType.SYSTEM), User.UserType.SYSTEM) ]
+      else:
+        user_list = User.UserType.items()
+      for _, user in user_list:
+        request_metadata.user.type = user
+        for raw_peer in request.calls:
+          self._register_request(
+            request_metadata = request_metadata,
+            raw_peer = raw_peer,
+            metric = OUTGOING_REQUESTS,
+          )
+        for raw_peer in request.called_by:
+          self._register_request(
+            request_metadata = request_metadata,
+            raw_peer = raw_peer,
+            metric = INCOMING_REQUESTS,
+          )
+
+  def _register_request(
+      self, *,
+      request_metadata: RequestMetadata,
+      raw_peer: GrpcCallerDetails,
+      metric: RequestsMetric,
+  ) -> None :
+    """Register the request to the specified metric."""
+    peer = RequestMetadata()
+    self._build_request_metadata(request_metadata = peer, caller = raw_peer)
+    if peer.caller.grpc_service == khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'] and \
+        request_metadata.user.type != User.UserType.SYSTEM:
+      return
+    for status in StatusCode:
+      metric.register(status = status, request = request_metadata, peer = peer)
+
+
+  def _build_request_metadata(
+      self, *,
+      request_metadata: RequestMetadata,
+      caller: GrpcCallerDetails,
+  ) -> None :
+    """Build the request metadata to register metrics."""
+    request_metadata.caller.khaleesi_gate    = caller.khaleesi_gate
+    request_metadata.caller.khaleesi_service = caller.khaleesi_service
+    request_metadata.caller.grpc_service     = caller.grpc_service
+    request_metadata.caller.grpc_method      = caller.grpc_method
+
   def _initialize_events(self, *, events: List[EventData]) -> None :
+    """Initialize the event metrics to 0."""
     for event_data in events:
       for user_type in event_data.user_types:
         for result_type in event_data.result_types:

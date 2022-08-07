@@ -228,6 +228,24 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(grpc_service_count    , ServiceRegistryGrpcService.objects.count())
     self.assertEqual(grpc_method_count     , ServiceRegistryGrpcMethod.objects.count())
 
+  def test_get_call_data(self, *_: MagicMock) -> None :
+    """Test fetching the call data for a given khaleesi service."""
+    # Prepare data.
+    caller_details = GrpcCallerDetails()
+    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
+    caller_details.khaleesi_service = 'khaleesi-service-1'
+    caller_details.grpc_service     = 'grpc-service-1'
+    caller_details.grpc_method      = 'grpc-method-1'
+    calls                           = 'grpc-method-2'
+    # Execute test.
+    result = SERVICE_REGISTRY.get_call_data(owner = caller_details)
+    # Assert result.
+    self.assertEqual(1, len(result.call_list))
+    self.assertEqual(1, len(result.call_list[0].calls))
+    self.assertEqual(0, len(result.call_list[0].called_by))
+    self.assertEqual(caller_details.grpc_method, result.call_list[0].call.grpc_method)
+    self.assertEqual(calls                     , result.call_list[0].calls[0].grpc_method)
+
   def _registry_contains_k_gate(self, *, number: int) -> None :
     self.assertIsNotNone(SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{number}'])
 

@@ -28,7 +28,16 @@ class MetricInitializerTestCase(SimpleTestCase):
     # Assert result.
     service_registry.add_service.assert_called_once()
 
-  def test_initialize_metrics_for_lifecycle_events(
+  def test_requests(self, service_registry: MagicMock, *_: MagicMock) -> None :
+    """Test the requests are fetched correctly."""
+    # Prepare data.
+    metric_initializer = MetricInitializer()
+    # Execute test.
+    metric_initializer.requests()
+    # Assert result.
+    service_registry.get_call_data.assert_called_once()
+
+  def test_initialize_metrics(
       self,
       service_registry: MagicMock,
       parent: MagicMock,
@@ -55,7 +64,7 @@ class MetricInitializerTestCase(SimpleTestCase):
     }
     # Execute test.
     metric_initializer.initialize_metrics()
-    # Assert result
+    # Assert result.
     parent.assert_called_once()
     arguments = parent.call_args
     start = False
