@@ -15,6 +15,21 @@ from khaleesi.proto.core_pb2 import User, RequestMetadata  # pylint: disable=unu
 khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 
 
+def add_grpc_server_system_request_metadata(
+    *,
+    request     : Any,
+    grpc_method : str,
+) -> None :
+  """Add request metadata to request protobufs."""
+  add_request_metadata(
+    request          = request,
+    request_id       = -1,  # Not handling a gRPC call.
+    grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
+    grpc_method      = khaleesi_settings['CONSTANTS']['GRPC_SERVER'][grpc_method],  # type: ignore[literal-required]  # pylint: disable=line-too-long
+    user_id          = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
+    user_type        = User.UserType.SYSTEM,
+  )
+
 def add_request_metadata(
     *,
     request     : Any,

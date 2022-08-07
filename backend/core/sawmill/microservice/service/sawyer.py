@@ -1,4 +1,4 @@
-"""core-sawmill service."""
+"""Sawyer service."""
 
 # gRPC.
 import grpc
@@ -14,7 +14,7 @@ from microservice.models import Event as DbEvent, Request as DbRequest
 
 
 class Service(Servicer):
-  """core-sawmill service."""
+  """Sawyer service."""
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""

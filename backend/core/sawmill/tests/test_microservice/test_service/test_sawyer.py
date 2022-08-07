@@ -7,8 +7,8 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
-    EventResponse as GrpcEventResponse,
-    RequestResponse as GrpcRequestResponse,
+  EventResponse as GrpcEventResponse,
+  RequestResponse as GrpcRequestResponse,
 )
 from microservice.models import Event, Request
 from microservice.service.sawyer import Service

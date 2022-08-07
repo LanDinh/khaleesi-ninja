@@ -18,13 +18,12 @@ from grpc_reflection.v1alpha import reflection
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import ChannelManager
-from khaleesi.core.grpc.request_metadata import add_request_metadata
+from khaleesi.core.grpc.request_metadata import add_grpc_server_system_request_metadata
 from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
 from khaleesi.core.shared.logger import LOGGER
-from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 # noinspection PyUnresolvedReferences
@@ -50,7 +49,7 @@ class Server:
           LoggingServerInterceptor(channel_manager = self.channel_manager),
       ]
       LOGGER.info(message = 'Initializing metric initializer...')
-      self.metric_initializer = MetricInitializer()
+      self.metric_initializer = MetricInitializer(channel_manager = self.channel_manager)
       LOGGER.info(message = 'Initializing server...')
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
@@ -165,14 +164,7 @@ class Server:
     """Create the event for logging the server state."""
     event = Event()
     # Metadata.
-    add_request_metadata(
-      request      = event,
-      request_id   = -1,  # Not handling a gRPC call.
-      grpc_service = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
-      grpc_method  = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['LIFECYCLE'],
-      user_id      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
-      user_type    = User.UserType.SYSTEM,
-    )
+    add_grpc_server_system_request_metadata(request = event, grpc_method = 'LIFECYCLE')
     # Event target.
     event.target.type = 'core.core.server'
     # Event action.

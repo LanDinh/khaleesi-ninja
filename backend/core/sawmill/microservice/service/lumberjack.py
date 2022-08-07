@@ -1,4 +1,4 @@
-"""core-sawmill service."""
+"""Lumberjack service."""
 
 # Python.
 from typing import Callable
@@ -29,7 +29,7 @@ from microservice.models.service_registry import SERVICE_REGISTRY
 
 
 class Service(Servicer):
-  """core-sawmill service."""
+  """Lumberjack service."""
 
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""

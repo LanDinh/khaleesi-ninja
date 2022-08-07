@@ -24,14 +24,14 @@ class MetricInitializerTestCase(SimpleTestCase):
   def test_init(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test initialization."""
     # Prepare data & execute test.
-    MetricInitializer()
+    MetricInitializer(channel_manager = MagicMock)  # type: ignore[arg-type]
     # Assert result.
     service_registry.add_service.assert_called_once()
 
   def test_requests(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test the requests are fetched correctly."""
     # Prepare data.
-    metric_initializer = MetricInitializer()
+    metric_initializer = MetricInitializer(channel_manager = MagicMock)  # type: ignore[arg-type]
     # Execute test.
     metric_initializer.requests()
     # Assert result.
@@ -44,7 +44,7 @@ class MetricInitializerTestCase(SimpleTestCase):
   ) -> None :
     """Test initialization of metrics."""
     # Prepare data.
-    metric_initializer    = MetricInitializer()
+    metric_initializer    = MetricInitializer(channel_manager = MagicMock)  # type: ignore[arg-type]
     khaleesi_gate_name    = 'khaleesi-gate'
     khaleesi_service_name = 'khaleesi-service'
     grpc_service_name     = 'grpc-server'

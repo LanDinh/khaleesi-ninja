@@ -7,6 +7,7 @@ from typing import List
 from django.conf import settings
 
 # khaleesi.ninja.
+from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.metrics.metric_initializer import BaseMetricInitializer, EventData, GrpcData
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
@@ -20,7 +21,8 @@ khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 class MetricInitializer(BaseMetricInitializer):
   """Collect info for initializing metrics."""
 
-  def __init__(self) -> None :
+  def __init__(self, *, channel_manager: ChannelManager) -> None :
+    super().__init__(channel_manager = channel_manager)
     caller_details = GrpcCallerDetails()
     caller_details.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']
     caller_details.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
@@ -37,12 +39,8 @@ class MetricInitializer(BaseMetricInitializer):
 
   def requests(self) -> ServiceCallData :
     """Fetch the data for request metrics."""
-    owner = GrpcCallerDetails()
-    owner.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']
-    owner.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
-    owner.grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME']
-    owner.grpc_method = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['INITIALIZE_REQUEST_METRICS']
-    return SERVICE_REGISTRY.get_call_data(owner = owner)
+    request = self.fill_requests_owner()
+    return SERVICE_REGISTRY.get_call_data(owner = request.request_metadata.caller)
 
   def _server_state_events(self) -> List[EventData] :
     events = []

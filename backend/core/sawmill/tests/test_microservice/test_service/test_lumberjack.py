@@ -10,8 +10,8 @@ from khaleesi.core.shared.exceptions import InvalidArgumentException, InternalSe
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.models.abstract import Metadata as AbstractMetadata
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]
-    Service,
-    DbEvent, DbRequest,
+  Service,
+  DbEvent, DbRequest,
 )
 from tests.models import Metadata
 

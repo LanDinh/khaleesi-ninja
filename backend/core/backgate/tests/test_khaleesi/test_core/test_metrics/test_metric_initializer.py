@@ -14,7 +14,7 @@ from khaleesi.proto.core_sawmill_pb2 import Event
 class BaseMetricInitializerTest(SimpleTestCase):
   """Test the metric initializer."""
 
-  metric_initializer = BaseMetricInitializer()
+  metric_initializer = BaseMetricInitializer(channel_manager = MagicMock())
 
   def test_force_initialization_method(self) -> None :
     """Test all subclasses need to override the base method."""
@@ -22,12 +22,15 @@ class BaseMetricInitializerTest(SimpleTestCase):
     with self.assertRaises(ProgrammingException):
       self.metric_initializer.initialize_metrics()
 
-  def test_requests(self) -> None :
+  @patch('khaleesi.core.metrics.metric_initializer.add_grpc_server_system_request_metadata')
+  def test_requests(self, add_metadata: MagicMock) -> None :
     """Test requests."""
     # Execute test.
-    result = self.metric_initializer.requests()
-    # Assert result.
-    self.assertEqual(0, len(result.call_list))
+    with patch.object(self.metric_initializer, 'stub') as stub:
+      self.metric_initializer.requests()
+      # Assert result.
+      add_metadata.assert_called_once()
+      stub.GetServiceCallData.assert_called_once()
 
   @patch('khaleesi.core.metrics.metric_initializer.AUDIT_EVENT')
   def test_initializing_events(self, audit_event: MagicMock) -> None :

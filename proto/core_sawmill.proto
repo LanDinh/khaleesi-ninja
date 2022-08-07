@@ -117,6 +117,10 @@ service Sawyer {
   rpc GetRequests (LogFilter) returns (RequestList);
 }
 
+message EmptyRequest {
+  khaleesi.core.RequestMetadata   request_metadata = 1;
+}
+
 message CallData {
   khaleesi.core.GrpcCallerDetails          call      = 1;
   repeated khaleesi.core.GrpcCallerDetails calls     = 2;
@@ -125,4 +129,8 @@ message CallData {
 
 message ServiceCallData {
   repeated CallData call_list = 1;
+}
+
+service Forester {
+  rpc GetServiceCallData (EmptyRequest) returns (ServiceCallData);
 }
