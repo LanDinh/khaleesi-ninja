@@ -165,16 +165,13 @@ class ServerTestCase(SimpleTestCase):
       lumberjack_stub = lumberjack_stub
     )
 
-  @patch('khaleesi.core.grpc.server.khaleesi_settings')
+  @patch.dict('khaleesi.core.grpc.server.khaleesi_settings', {
+      'CORE': { 'STRUCTURED_LOGGING_METHOD': StructuredLoggingMethod.GRPC },
+      'GRPC': { 'HANDLERS': [ 'some.invalid.import' ], 'THREADS': 13, 'PORT': 1337 },
+      'CONSTANTS': { 'GRPC_SERVER': { 'NAME': 'grpc-server', 'LIFECYCLE': 'lifecycle' } },
+  })
   def test_add_invalid_handler(self, settings: MagicMock, *_: MagicMock) -> None :
     """Test that invalid handlers raise ImportErrors."""
-    # Prepare data.
-    settings['CORE'] = { 'STRUCTURED_LOGGING_METHOD': StructuredLoggingMethod.GRPC }
-    settings['GRPC'] = {
-        'HANDLERS': 'some.invalid.import',
-        'THREADS' : 13,
-        'PORT'    : 1337,
-    }
     # Execute test & assert result.
     with self.assertRaises(ImportError):
       Server()
