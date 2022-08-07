@@ -170,7 +170,7 @@ class ServerTestCase(SimpleTestCase):
       'GRPC': { 'HANDLERS': [ 'some.invalid.import' ], 'THREADS': 13, 'PORT': 1337 },
       'CONSTANTS': { 'GRPC_SERVER': { 'NAME': 'grpc-server', 'LIFECYCLE': 'lifecycle' } },
   })
-  def test_add_invalid_handler(self, settings: MagicMock, *_: MagicMock) -> None :
+  def test_add_invalid_handler(self, *_: MagicMock) -> None :
     """Test that invalid handlers raise ImportErrors."""
     # Execute test & assert result.
     with self.assertRaises(ImportError):
