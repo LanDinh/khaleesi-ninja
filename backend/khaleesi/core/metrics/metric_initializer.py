@@ -63,7 +63,10 @@ class BaseMetricInitializer:
 
   def initialize_metrics(self) -> None :
     """Initialize the metrics."""
-    raise ProgrammingException(private_details = 'Need to override initialize_metrics!')
+    raise ProgrammingException(
+      private_message = 'Need to override initialize_metrics!',
+      private_details = '',
+    )
 
   def initialize_metrics_with_data(self, *, events: List[EventData]) -> None :
     """Initialize the provided metrics."""
