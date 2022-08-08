@@ -74,7 +74,8 @@ class Service(Servicer):
       raise
     except Exception as exception:  # pylint: disable=broad-except
       raise InternalServerException(
-        private_details = f'{type(exception).__name__}: {str(exception)}',
+        private_message = type(exception).__name__,
+        private_details = str(exception),
       ) from exception
 
 

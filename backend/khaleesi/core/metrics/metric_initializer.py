@@ -168,7 +168,8 @@ class BaseMetricInitializer:
     """Build the event object to register metrics."""
     if action_crud_type and action_custom_type:
       raise ProgrammingException(  # pragma: no cover
-        private_details = 'Only one of action_crud_type and action_custom_type are allowed',
+        private_message = 'Only one of action_crud_type and action_custom_type are allowed',
+        private_details = '',
       )
     event = Event()
     event.request_metadata.user.type               = user_type

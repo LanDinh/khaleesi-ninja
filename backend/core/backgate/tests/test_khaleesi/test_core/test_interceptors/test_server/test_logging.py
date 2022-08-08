@@ -61,11 +61,12 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         # noinspection PyUnusedLocal
         def method(*args: Any, **kwargs: Any) -> None :
           raise KhaleesiException(
-            status = StatusCode.INTERNAL,
-            gate = '',
-            service = '',
-            public_key = '',
-            public_details = '',
+            status          = StatusCode.INTERNAL,
+            gate            = '',
+            service         = '',
+            public_key      = '',
+            public_details  = '',
+            private_message = '',
             private_details = '',
           )
         # Execute test.

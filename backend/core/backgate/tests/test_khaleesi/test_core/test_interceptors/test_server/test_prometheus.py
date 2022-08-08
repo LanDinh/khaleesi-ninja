@@ -95,6 +95,7 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
           service         = 'service',
           public_key      = 'public-key',
           public_details  = 'public-details',
+          private_message = 'private-message',
           private_details = 'private-details',
         )
         # Execute test.

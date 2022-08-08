@@ -117,7 +117,10 @@ class RequestsMetric(CounterMetric):
     ]:
       return 'unknown'
 
-    raise ProgrammingException(private_details = 'Unknown gRPC status returned')
+    raise ProgrammingException(
+      private_message = 'Unknown gRPC status returned',
+      private_details = str(status),
+    )
 
 
 OUTGOING_REQUESTS = RequestsMetric(metric_id = Metric.KHALEESI_OUTGOING_REQUESTS)
