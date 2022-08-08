@@ -68,7 +68,10 @@ class Service(Servicer):
       metadata = method()
       if metadata.meta_logging_errors:
         # Caught by KhaleesiException and re-raised
-        raise InvalidArgumentException(private_details = metadata.meta_logging_errors)
+        raise InvalidArgumentException(
+          private_message = 'Error when parsing the metadata fields.',
+          private_details = metadata.meta_logging_errors,
+        )
       return metadata
     except KhaleesiException:
       raise

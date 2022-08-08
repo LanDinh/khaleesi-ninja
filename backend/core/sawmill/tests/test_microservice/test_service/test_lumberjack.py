@@ -120,4 +120,4 @@ class LumberjackServiceTestCase(SimpleTestCase):
     with self.assertRaises(InternalServerException) as context:
       method()
     logging.assert_called_once()
-    self.assertEqual(f'Exception: {message}', context.exception.private_details)
+    self.assertEqual(message, context.exception.private_details)
