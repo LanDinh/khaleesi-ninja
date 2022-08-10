@@ -1,5 +1,12 @@
 """Custom exceptions."""
 
+# Python.
+import json
+import traceback
+
+# Django.
+from django.conf import settings
+
 # gRPC.
 from grpc import StatusCode
 
@@ -19,13 +26,28 @@ class KhaleesiException(Exception):
   ) -> None :
     """Initialize the exception."""
     super().__init__(private_message)
-    self.status = status
-    self.gate = gate
-    self.service = service
-    self.public_key = public_key
-    self.public_details = public_details
+    self.status          = status
+    self.gate            = gate
+    self.service         = service
+    self.public_key      = public_key
+    self.public_details  = public_details
     self.private_message = private_message
     self.private_details = private_details
+
+  def to_json(self) -> str :
+    """Return a json string to encode this object."""
+    result = {
+        'status'         : self.status.name,
+        'gate'           : self.gate,
+        'service'        : self.service,
+        'public_key'     : self.public_key,
+        'public_details' : self.public_details,
+    }
+    if settings.DEBUG:
+      result['private_message'] = self.private_message
+      result['private_details'] = self.private_details
+      result['traceback'] = ''.join(traceback.format_exception(None, self, self.__traceback__))
+    return json.dumps(result)
 
 
 class KhaleesiCoreException(KhaleesiException):
@@ -92,6 +114,7 @@ class MaskingInternalServerException(InternalServerException):
       private_message = type(exception).__name__,
       private_details = str(exception),
     )
+    self.__traceback__ = exception.__traceback__
 
 
 class ProgrammingException(InternalServerException):

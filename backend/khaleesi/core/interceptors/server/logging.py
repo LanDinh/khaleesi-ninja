@@ -12,7 +12,7 @@ from grpc import ServicerContext
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import KhaleesiException
+from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.grpc.request_metadata import add_request_metadata
 from khaleesi.core.interceptors.server.util import ServerInterceptor
@@ -57,19 +57,29 @@ class LoggingServerInterceptor(ServerInterceptor):
 
     try:
       response = method(request, context)
-      self._log_response(status = StatusCode.OK)
       LOGGER.info(
         message = f'{service_name}.{method_name} request finished successfully',
       )
+      self._log_response(status = StatusCode.OK)
+      del STATE.request_id
+      return response
     except KhaleesiException as exception:
-      self._log_response(status = exception.status)
-      LOGGER.error(
-        message = f'{service_name}.{method_name} request finished with errors',
+      self._handle_exception(
+        context      = context,
+        exception    = exception,
+        service_name = service_name,
+        method_name  = method_name,
       )
       raise
-
-    del STATE.request_id
-    return response
+    except Exception as exception:
+      new_exception = MaskingInternalServerException(exception = exception)
+      self._handle_exception(
+        context      = context,
+        exception    = new_exception,
+        service_name = service_name,
+        method_name  = method_name,
+      )
+      raise
 
   def _log_request(
       self, *,
@@ -127,3 +137,19 @@ class LoggingServerInterceptor(ServerInterceptor):
       # Send directly to the DB. Note that Requests must be present in the schema!
       from microservice.models import Request as DbRequest  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       DbRequest.objects.log_response(grpc_response = logging_response)
+
+  def _handle_exception(
+      self, *,
+      context     : ServicerContext,
+      exception   : KhaleesiException,
+      service_name: str,
+      method_name : str,
+  ) -> None :
+    """Properly handle the exception."""
+    LOGGER.error(
+      message = f'{service_name}.{method_name} request finished with errors',
+    )
+    self._log_response(status = exception.status)
+    context.set_code(exception.status)
+    context.set_details(exception.to_json())
+    del STATE.request_id

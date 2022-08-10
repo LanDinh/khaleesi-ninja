@@ -69,11 +69,12 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
             private_message = '',
             private_details = '',
           )
+        context = MagicMock()
         # Execute test.
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesi_intercept(
             request = final_request,
-            **self.get_intercept_params(method = method),
+            **self.get_intercept_params(context = context, method = method),
           )
         # Assert result.
         logging_response = cast(
@@ -81,6 +82,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           self.interceptor.stub.LogResponse.call_args.args[0],
         )
         logger.error.assert_called_once()
+        context.set_code.assert_called_once()
+        context.set_details.assert_called_once()
         self.assertEqual('INTERNAL', logging_response.response.status)
 
   @patch('khaleesi.core.interceptors.server.logging.LOGGER')
@@ -103,23 +106,31 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         self.interceptor.stub.LogRequest.reset_mock()
         self.interceptor.stub.LogResponse.reset_mock()
         logger.reset_mock()
+        context = MagicMock()
         # Execute test.
-        self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params())
+        self.interceptor.khaleesi_intercept(
+          request = final_request,
+          **self.get_intercept_params(context = context),
+        )
         # Assert result.
         self._assert_logging_call(
           logger = logger,
+          context = context,
           request_metadata = request_metadata,
         )
 
   def _assert_logging_call(
       self, *,
       logger: MagicMock,
+      context: MagicMock,
       request_metadata: RequestMetadata,
   ) -> None :
     """Assert the logging calls were correct."""
     logging_request = cast(LoggingRequest, self.interceptor.stub.LogRequest.call_args.args[0])
     logging_response = cast(LoggingResponse, self.interceptor.stub.LogResponse.call_args.args[0])
     logger.debug.assert_called_once()
+    context.set_code.assert_not_called()
+    context.set_details.assert_not_called()
     self.assertEqual(2, logger.info.call_count)
     self.assertEqual(request_metadata.caller, logging_request.upstream_request)
     self.assertEqual(-1               , logging_request.request_metadata.caller.request_id)

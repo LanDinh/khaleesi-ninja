@@ -59,11 +59,12 @@ class ServerInterceptorTestMixin(InterceptorTestMixin):
 
   def get_intercept_params(
       self, *,
+      context: MagicMock = MagicMock(),
       method: Callable[[], Any] = lambda *args : None,
   ) -> Dict[str, Any] :
     """Get parameters to pass into the server interceptor."""
     return {
-        'context'     : MagicMock(),
+        'context'     : context,
         'service_name': self.service_name,
         'method_name' : self.method_name,
         **super().get_intercept_params(method = method),
