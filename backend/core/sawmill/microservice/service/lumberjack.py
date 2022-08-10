@@ -10,7 +10,7 @@ import grpc
 from khaleesi.core.shared.exceptions import (
     KhaleesiException,
     InvalidArgumentException,
-    InternalServerException,
+    MaskingInternalServerException,
 )
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
@@ -76,10 +76,7 @@ class Service(Servicer):
     except KhaleesiException:
       raise
     except Exception as exception:  # pylint: disable=broad-except
-      raise InternalServerException(
-        private_message = type(exception).__name__,
-        private_details = str(exception),
-      ) from exception
+      raise MaskingInternalServerException(exception = exception) from exception
 
 
 service_configuration = ServiceConfiguration[Service](

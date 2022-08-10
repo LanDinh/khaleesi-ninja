@@ -6,7 +6,7 @@ from typing import Callable, Any
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import InvalidArgumentException, InternalServerException
+from khaleesi.core.shared.exceptions import InvalidArgumentException, MaskingInternalServerException
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.models.abstract import Metadata as AbstractMetadata
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]
@@ -117,7 +117,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     message = 'fatal exception'
     logging.side_effect = Exception(message)
     # Execute test & assert result.
-    with self.assertRaises(InternalServerException) as context:
+    with self.assertRaises(MaskingInternalServerException) as context:
       method()
     logging.assert_called_once()
     self.assertEqual(message, context.exception.private_details)

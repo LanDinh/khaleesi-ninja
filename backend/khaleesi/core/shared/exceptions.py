@@ -83,6 +83,16 @@ class InternalServerException(KhaleesiCoreException):
       private_details = private_details,
     )
 
+class MaskingInternalServerException(InternalServerException):
+  """Mask other exceptions as internal server error."""
+
+  def __init__(self, *, exception: Exception) -> None :
+    """Initialize the exception."""
+    super().__init__(
+      private_message = type(exception).__name__,
+      private_details = str(exception),
+    )
+
 
 class ProgrammingException(InternalServerException):
   """Programming errors."""
