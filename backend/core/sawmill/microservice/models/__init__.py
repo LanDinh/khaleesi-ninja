@@ -2,6 +2,7 @@
 
 # pylint: disable=useless-import-alias
 
+from .error import Error as Error
 from .event import Event as Event
 from .request import Request as Request
 from .service_registry import (

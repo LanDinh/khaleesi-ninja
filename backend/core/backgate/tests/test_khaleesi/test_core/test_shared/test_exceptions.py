@@ -35,7 +35,7 @@ class KhaleesiExceptionTestCase(SimpleTestCase):
         # Assert result.
         self.assertIn('private_message', result)
         self.assertIn('private_details', result)
-        self.assertIn('traceback', result)
+        self.assertIn('stacktrace', result)
 
   @override_settings(DEBUG = False)
   def test_only_public_details_in_production_mode(self) -> None :
@@ -49,4 +49,4 @@ class KhaleesiExceptionTestCase(SimpleTestCase):
         # Assert result.
         self.assertNotIn('private_message', result)
         self.assertNotIn('private_details', result)
-        self.assertNotIn('traceback', result)
+        self.assertNotIn('stacktrace', result)

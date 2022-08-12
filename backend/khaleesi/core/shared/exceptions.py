@@ -46,7 +46,7 @@ class KhaleesiException(Exception):
     if settings.DEBUG:
       result['private_message'] = self.private_message
       result['private_details'] = self.private_details
-      result['traceback'] = ''.join(traceback.format_exception(None, self, self.__traceback__))
+      result['stacktrace'] = ''.join(traceback.format_exception(None, self, self.__traceback__))
     return json.dumps(result)
 
 

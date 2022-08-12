@@ -11,7 +11,9 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.models.abstract import Metadata as AbstractMetadata
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]
   Service,
-  DbEvent, DbRequest,
+  DbEvent,
+  DbRequest,
+  DbError,
 )
 from tests.models import Metadata
 
@@ -48,6 +50,14 @@ class LumberjackServiceTestCase(SimpleTestCase):
       method = lambda : self.service.LogResponse(MagicMock(), MagicMock()),
       logging_object = DbRequest.objects,
       logging_method = 'log_response',
+    )
+
+  def test_log_error(self) -> None :
+    """Test logging events."""
+    self._execute_logging_tests(
+      method = lambda : self.service.LogError(MagicMock(), MagicMock()),
+      logging_object = DbError.objects,
+      logging_method = 'log_error',
     )
 
   def _execute_logging_tests(

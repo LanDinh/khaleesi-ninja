@@ -9,8 +9,9 @@ from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
   EventResponse as GrpcEventResponse,
   RequestResponse as GrpcRequestResponse,
+  ErrorResponse as GrpcErrorResponse,
 )
-from microservice.models import Event, Request
+from microservice.models import Event, Request, Error
 from microservice.service.sawyer import Service
 
 class SawyerServiceTestCase(SimpleTestCase):
@@ -45,3 +46,17 @@ class SawyerServiceTestCase(SimpleTestCase):
     self.assertEqual(1, len(result.requests))
     db_requests.assert_called_once_with()
     db_request.to_grpc_request_response.assert_called_once_with()
+
+  @patch.object(Error.objects, 'filter')
+  def test_get_errors(self, db_errors: MagicMock) -> None :
+    """Test getting logged events."""
+    # Prepare data.
+    db_error = MagicMock()
+    db_error.to_grpc_error_response.return_value = GrpcErrorResponse()
+    db_errors.return_value = [ db_error ]
+    # Execute test.
+    result = self.service.GetErrors(LogFilter(), MagicMock())
+    # Assert result.
+    self.assertEqual(1, len(result.errors))
+    db_errors.assert_called_once_with()
+    db_error.to_grpc_error_response.assert_called_once_with()

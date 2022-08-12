@@ -81,9 +81,9 @@ class Event(Metadata):
     if self.target_owner:
       grpc_event_response.event.target.owner.id = str(self.target_owner)
     # Action.
-    grpc_event_response.event.action.crud_type = self.action_crud_type  # type: ignore[assignment]
+    grpc_event_response.event.action.crud_type   = self.action_crud_type  # type: ignore[assignment]
     grpc_event_response.event.action.custom_type = self.action_custom_type
-    grpc_event_response.event.action.result  = self.action_result  # type: ignore[assignment]
-    grpc_event_response.event.action.details = self.action_details
+    grpc_event_response.event.action.result      = self.action_result  # type: ignore[assignment]
+    grpc_event_response.event.action.details     = self.action_details
 
     return grpc_event_response

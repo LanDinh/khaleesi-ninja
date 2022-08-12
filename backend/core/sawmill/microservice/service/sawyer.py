@@ -5,12 +5,18 @@ import grpc
 
 # khaleesi-ninja.
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, LogFilter, EventsList, RequestList
+from khaleesi.proto.core_sawmill_pb2 import (
+  DESCRIPTOR,
+  LogFilter,
+  EventsList,
+  RequestList,
+  ErrorList,
+)
 from khaleesi.proto.core_sawmill_pb2_grpc import (
   SawyerServicer as Servicer,
   add_SawyerServicer_to_server as add_to_server
 )
-from microservice.models import Event as DbEvent, Request as DbRequest
+from microservice.models import Event as DbEvent, Request as DbRequest, Error as DbError
 
 
 class Service(Servicer):
@@ -24,9 +30,17 @@ class Service(Servicer):
     return result
 
   def GetRequests(self, request: LogFilter, _: grpc.ServicerContext) -> RequestList :
+    """Get logged requests."""
     result = RequestList()
     for db_request in DbRequest.objects.filter():
       result.requests.append(db_request.to_grpc_request_response())
+    return result
+
+  def GetErrors(self, request: LogFilter, _: grpc.ServicerContext) -> ErrorList :
+    """Get logged errors."""
+    result = ErrorList()
+    for db_error in DbError.objects.filter():
+      result.errors.append(db_error.to_grpc_error_response())
     return result
 
 
