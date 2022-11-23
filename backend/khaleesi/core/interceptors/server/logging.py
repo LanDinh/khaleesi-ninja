@@ -86,7 +86,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     """Finish the request."""
     del STATE.request_id
 
-  def log_request(
+  def _log_request(
       self, *,
       request: Any,
       service_name: str,
