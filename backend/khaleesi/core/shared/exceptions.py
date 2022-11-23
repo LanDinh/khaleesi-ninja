@@ -33,6 +33,7 @@ class KhaleesiException(Exception):
     self.public_details  = public_details
     self.private_message = private_message
     self.private_details = private_details
+    self.stacktrace      = ''.join(traceback.format_exception(None, self, self.__traceback__))
 
   def to_json(self) -> str :
     """Return a json string to encode this object."""
@@ -46,7 +47,7 @@ class KhaleesiException(Exception):
     if settings.DEBUG:
       result['private_message'] = self.private_message
       result['private_details'] = self.private_details
-      result['stacktrace'] = ''.join(traceback.format_exception(None, self, self.__traceback__))
+      result['stacktrace']      = self.stacktrace
     return json.dumps(result)
 
 
