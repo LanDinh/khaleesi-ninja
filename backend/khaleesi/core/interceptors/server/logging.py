@@ -61,7 +61,7 @@ class LoggingServerInterceptor(ServerInterceptor):
         message = f'{service_name}.{method_name} request finished successfully',
       )
       self._log_response(status = StatusCode.OK)
-      del STATE.request_id
+      self._finish_request()
       return response
     except KhaleesiException as exception:
       self._handle_exception(
@@ -70,18 +70,23 @@ class LoggingServerInterceptor(ServerInterceptor):
         service_name = service_name,
         method_name  = method_name,
       )
+      self._finish_request()
       raise
     except Exception as exception:
-      new_exception = MaskingInternalServerException(exception = exception)
       self._handle_exception(
         context      = context,
-        exception    = new_exception,
+        exception    = MaskingInternalServerException(exception = exception),
         service_name = service_name,
         method_name  = method_name,
       )
+      self._finish_request()
       raise
 
-  def _log_request(
+  def _finish_request(self) -> None :
+    """Finish the request."""
+    del STATE.request_id
+
+  def log_request(
       self, *,
       request: Any,
       service_name: str,
@@ -152,4 +157,3 @@ class LoggingServerInterceptor(ServerInterceptor):
     self._log_response(status = exception.status)
     context.set_code(exception.status)
     context.set_details(exception.to_json())
-    del STATE.request_id
