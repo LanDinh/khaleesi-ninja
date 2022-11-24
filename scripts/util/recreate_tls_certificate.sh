@@ -27,9 +27,12 @@ recreate_tls_certificate() {
   local environment=${1}
   local domain=${2}
 
+  echo -e "${yellow}Figuring out the new secret filename...${clear_color}"
+  current_certificate_folder=$(find "${letsencrypt_certificate_folder}" -type d -name "${domain}*" | sort -V | tail -n1)
+
   echo -e "${yellow}Updating the kubernetes secret...${clear_color}"
   kubectl delete secret tls-certificate --ignore-not-found=true -n "khaleesi-ninja-${environment}"
-  kubectl -n "khaleesi-ninja-${environment}" create secret tls tls-certificate --key "${letsencrypt_certificate_folder}/${domain}/privkey.pem" --cert "${letsencrypt_certificate_folder}/${domain}/fullchain.pem"
+  kubectl -n "khaleesi-ninja-${environment}" create secret tls tls-certificate --key "${current_certificate_folder}/privkey.pem" --cert "${current_certificate_folder}/fullchain.pem"
 }
 
 
