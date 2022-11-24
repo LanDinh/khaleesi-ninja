@@ -23,18 +23,17 @@ scripts_folder=scripts/util/refresh_tls_certificate
 letsencrypt_folder="letsencrypt"
 temp_folder="temp"
 environments_file="./data/environments.json"
-current_date=$(date +"%Y-%m-%d")
 domain="khaleesi.ninja"
 copy_in_command=
 copy_out_command=
 
 if [[ -z "${COPY_IN}" ]]; then
-    copy_in_command="cp -aR \"${letsencrypt_folder}/live\"/'*' \"${temp_folder}/\""
+    copy_in_command="cp -aR \"${letsencrypt_folder}\"/'*' \"${temp_folder}/\""
 else
     copy_in_command="${COPY_IN}"
 fi
 if [[ -z "${COPY_OUT}" ]]; then
-    copy_out_command="cp -aR \"${temp_folder}\"/'*' \"${letsencrypt_folder}//\""
+    copy_out_command="cp -aR \"${temp_folder}\"/'*' \"${letsencrypt_folder}/\""
 else
     copy_out_command="${COPY_OUT}"
 fi
@@ -59,7 +58,6 @@ valid_option() {
 refresh_tls_certificate() {
   local environment=${1}
   local domain=${2}
-  letsencrypt_certificate_folder="${letsencrypt_folder}/${current_date}/live/${domain}"
 
   echo -e "${yellow}Preparing certificate generation...${clear_color}"
   docker build ${scripts_folder} -t khaleesi-ninja/refresh_tls_certificate
@@ -75,13 +73,15 @@ refresh_tls_certificate() {
   docker run --rm -it --mount "type=bind,source=$(pwd)/temp,target=/data/" --env KHALEESI_DOMAIN="${domain}" --env KHALEESI_EMAIL="${KHALEESI_EMAIL}" "khaleesi-ninja/refresh_tls_certificate"
 
   echo -e "${yellow}Backing up letsencrypt configuration...${clear_color}"
-  mkdir -p "${letsencrypt_folder}/${current_date}"
   # shellcheck disable=SC2086
-  eval ${copy_out_command}"${current_date}"
+  eval ${copy_out_command}
+
+  echo -e "${yellow}Figuring out the new secret filename...${clear_color}"
+  current_certificate_folder=$(find "${letsencrypt_folder}/live" -type d -name "${domain}*" | sort -V | tail -n1)
 
   echo -e "${yellow}Updating the kubernetes secret...${clear_color}"
   kubectl delete secret tls-certificate --ignore-not-found=true -n "khaleesi-ninja-${environment}"
-  kubectl -n "khaleesi-ninja-${environment}" create secret tls tls-certificate --key "${letsencrypt_certificate_folder}/privkey.pem" --cert "${letsencrypt_certificate_folder}/fullchain.pem"
+  kubectl -n "khaleesi-ninja-${environment}" create secret tls tls-certificate --key "${current_certificate_folder}/privkey.pem" --cert "${current_certificate_folder}/fullchain.pem"
 }
 
 
