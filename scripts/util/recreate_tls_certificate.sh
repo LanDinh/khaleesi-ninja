@@ -18,7 +18,7 @@ fi
 
 
 # Options.
-letsencrypt_certificate_folder="letsencrypt/live/live"
+letsencrypt_certificate_folder="letsencrypt/live"
 domain="khaleesi.ninja"
 environment="${1}"
 
