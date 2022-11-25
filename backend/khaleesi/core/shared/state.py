@@ -7,13 +7,24 @@ from dataclasses import dataclass
 @dataclass
 class Request:
   """Request meta."""
-  id          : int  # pylint: disable=invalid-name
-  service_name: str
-  method_name : str
+  id          : int = -1  # pylint: disable=invalid-name
+  service_name: str = 'UNKNOWN'
+  method_name : str = 'UNKNOWN'
 
-@dataclass
-class State:
+class State(threading.local):
   """Per-request state."""
-  request: Request
 
-STATE: State = threading.local()  # type: ignore[assignment]
+  request: Request
+  user: User
+
+  def __init__(self) -> None :
+    """Set the default state."""
+    super().__init__()
+    self.reset()
+
+  def reset(self) -> None :
+    """Reset to default state."""
+    self.request = Request()
+
+
+STATE = State()

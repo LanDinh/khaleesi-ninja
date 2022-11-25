@@ -1,9 +1,16 @@
 """Provide a mock for testing."""
 
 # khaleesi.ninja.
-from khaleesi.core.shared.state import State, Request
+from khaleesi.core.shared.state import State
 
 
-TEST_STATE = State(
-  request = Request(id = 13, service_name = 'service', method_name  = 'method'),
-)
+class TestState(State):
+  """Set default values suitable for tests."""
+
+  def reset(self) -> None :
+    """Set default values suitable for tests."""
+    super().reset()
+    self.request.id           = 13
+    self.request.service_name = 'service'
+    self.request.method_name  = 'method'
+TEST_STATE = TestState()
