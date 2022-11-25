@@ -71,7 +71,6 @@ class LumberjackServiceTestCase(SimpleTestCase):
     for test in [
         self._execute_successful_logging_test,
         self._execute_logging_test_with_parsing_error,
-        self._execute_logging_test_with_fatal_error
     ]:
       with self.subTest(test = test.__name__):
         with patch.object(logging_object, logging_method) as logging:
@@ -111,23 +110,3 @@ class LumberjackServiceTestCase(SimpleTestCase):
       method()
     logging.assert_called_once()
     self.assertEqual(expected_result.meta_logging_errors, context.exception.private_details)
-
-  # noinspection PyUnusedLocal
-  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
-  def _execute_logging_test_with_fatal_error(
-      self,
-      _: MagicMock,
-      *,
-      method: Callable[[], Any],
-      logging: MagicMock,
-      return_value: Callable[[], AbstractMetadata],  # pylint: disable=unused-argument
-  ) -> None :
-    """Call to logging method that results in fatal errors."""
-    # Prepare data.
-    message = 'fatal exception'
-    logging.side_effect = Exception(message)
-    # Execute test & assert result.
-    with self.assertRaises(MaskingInternalServerException) as context:
-      method()
-    logging.assert_called_once()
-    self.assertEqual(message, context.exception.private_details)

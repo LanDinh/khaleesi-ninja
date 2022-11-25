@@ -1,7 +1,6 @@
 """Test server interceptor utility."""
 
 # Python.
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
@@ -19,16 +18,17 @@ class ServerInterceptorTest(SimpleTestCase):
     # Prepare data.
     service = 'Service'
     method  = 'Method'
-    def khaleesi_intercept(service_name: str, method_name: str, **_: Any) -> None :
-      self.assertEqual((service, method), (service_name, method_name))
+    khaleesi_intercept = MagicMock()
     self.interceptor.khaleesi_intercept = khaleesi_intercept  # type: ignore[assignment]
-    # Execute test & assert result.
+    # Execute test.
     self.interceptor.intercept(
       method              = lambda *args: None,
       request_or_iterator = MagicMock(),
       context             = MagicMock(),
       method_name         = f'/khaleesi.gate.service.{service}/{method}',
     )
+    # Assert result.
+    khaleesi_intercept.assert_called_once()
 
   @patch('khaleesi.core.interceptors.util.LOGGER')
   def test_skip_intercept(self, *_: MagicMock) -> None :

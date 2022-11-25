@@ -21,6 +21,7 @@ from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.grpc.request_metadata import add_grpc_server_system_request_metadata
 from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
+from khaleesi.core.interceptors.server.request_state import RequestStateServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
 from khaleesi.core.shared.logger import LOGGER
@@ -45,8 +46,9 @@ class Server:
       LOGGER.info(message = 'Initializing channel manager...')
       self.channel_manager = ChannelManager()
       interceptors = [
+          RequestStateServerInterceptor(),  # First.
           PrometheusServerInterceptor(),
-          LoggingServerInterceptor(channel_manager = self.channel_manager),
+          LoggingServerInterceptor(channel_manager = self.channel_manager),  # Last.
       ]
       LOGGER.info(message = 'Initializing metric initializer...')
       self.metric_initializer = MetricInitializer(channel_manager = self.channel_manager)

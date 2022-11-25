@@ -1,4 +1,4 @@
-"""Test PrometheusServerInterceptor"""
+"""Test PrometheusServerInterceptor."""
 
 # pylint: disable=duplicate-code
 
@@ -11,9 +11,10 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
+from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
+from khaleesi.core.test_util.state import TEST_STATE
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 
@@ -23,8 +24,9 @@ def _raise(exception: Exception) -> None :
   raise exception
 
 
+@patch('khaleesi.core.interceptors.server.prometheus.STATE', TEST_STATE)
 class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
-  """Test PrometheusServerInterceptor"""
+  """Test PrometheusServerInterceptor."""
 
   interceptor = PrometheusServerInterceptor()
 

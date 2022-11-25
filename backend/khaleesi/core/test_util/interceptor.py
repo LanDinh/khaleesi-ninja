@@ -54,19 +54,16 @@ class InterceptorTestMixin(GrpcTestMixin):
 class ServerInterceptorTestMixin(InterceptorTestMixin):
   """Server interceptor test utility."""
 
-  service_name = 'service-name'
-  method_name  = 'method-name'
-
   def get_intercept_params(
       self, *,
       context: MagicMock = MagicMock(),
       method: Callable[[], Any] = lambda *args : None,
+      method_name: str = '/khaleesi.gate.service.service_name/method_name',
   ) -> Dict[str, Any] :
     """Get parameters to pass into the server interceptor."""
     return {
-        'context'     : context,
-        'service_name': self.service_name,
-        'method_name' : self.method_name,
+        'context'    : context,
+        'method_name': method_name,
         **super().get_intercept_params(method = method),
     }
 

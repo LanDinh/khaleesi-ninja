@@ -69,19 +69,13 @@ class Service(Servicer):
 
   def _handle_response(self, *, method: Callable[[], Metadata]) -> Metadata :
     """Wrap responses for logging."""
-    try:
-      metadata = method()
-      if metadata.meta_logging_errors:
-        # Caught by KhaleesiException and re-raised
-        raise InvalidArgumentException(
-          private_message = 'Error when parsing the metadata fields.',
-          private_details = metadata.meta_logging_errors,
-        )
-      return metadata
-    except KhaleesiException:
-      raise
-    except Exception as exception:  # pylint: disable=broad-except
-      raise MaskingInternalServerException(exception = exception) from exception
+    metadata = method()
+    if metadata.meta_logging_errors:
+      raise InvalidArgumentException(
+        private_message = 'Error when parsing the metadata fields.',
+        private_details = metadata.meta_logging_errors,
+      )
+    return metadata
 
 
 service_configuration = ServiceConfiguration[Service](

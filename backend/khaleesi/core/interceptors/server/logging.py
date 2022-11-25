@@ -8,8 +8,7 @@ from typing import Callable, Any
 from django.conf import settings
 
 # gRPC.
-from grpc import ServicerContext
-from grpc import StatusCode
+from grpc import ServicerContext, StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
@@ -46,54 +45,37 @@ class LoggingServerInterceptor(ServerInterceptor):
       method: Callable[[Any, ServicerContext], Any],
       request: Any,
       context: ServicerContext,
-      service_name: str,
-      method_name: str,
+      **_: Any,
   ) -> Any :
     """Log the incoming request."""
 
-    LOGGER.debug(message = f'{service_name}.{method_name} request started (pre request_id)')
-    self._log_request(request = request, service_name = service_name, method_name = method_name)
-    LOGGER.info(message = f'{service_name}.{method_name} request started')
+    LOGGER.debug(message = f'{self._request_name()} request started (pre request_id)')
+    self._log_request(request = request)
+    LOGGER.info(message = f'{self._request_name()} request started')
 
     try:
       response = method(request, context)
-      LOGGER.info(
-        message = f'{service_name}.{method_name} request finished successfully',
-      )
+      LOGGER.info(message = f'{self._request_name()} request finished successfully')
       self._log_response(status = StatusCode.OK)
-      self._finish_request()
       return response
     except KhaleesiException as exception:
       self._handle_exception(
         context      = context,
         exception    = exception,
-        service_name = service_name,
-        method_name  = method_name,
       )
-      self._finish_request()
       raise
     except Exception as exception:
       new_exception = MaskingInternalServerException(exception = exception)
       self._handle_exception(
         context      = context,
         exception    = new_exception,
-        service_name = service_name,
-        method_name  = method_name,
       )
-      self._finish_request()
       raise
 
-  def _finish_request(self) -> None :
-    """Finish the request."""
-    del STATE.request_id
+  def _request_name(self) -> str :
+    return f'{STATE.request.service_name}.{STATE.request.method_name}'
 
-  def _handle_metadata(
-      self, *,
-      logging     : Any,
-      request     : Any,
-      service_name: str,
-      method_name : str,
-  ) -> None :
+  def _handle_metadata(self, *, logging : Any, request : Any) -> None :
     """Handle the metadata for the request object."""
     if hasattr(request, 'request_metadata'):
       upstream = request.request_metadata
@@ -103,8 +85,8 @@ class LoggingServerInterceptor(ServerInterceptor):
     add_request_metadata(
       request      = logging,
       request_id   = -1, # upstream request_id is in upstream part of the proto
-      grpc_service = service_name,
-      grpc_method  = method_name,
+      grpc_service = STATE.request.service_name,
+      grpc_method  = STATE.request.method_name,
       user_id      = upstream.user.id,
       user_type    = upstream.user.type,
     )
@@ -114,26 +96,21 @@ class LoggingServerInterceptor(ServerInterceptor):
     logging.upstream_request.grpc_service     = upstream.caller.grpc_service
     logging.upstream_request.grpc_method      = upstream.caller.grpc_method
 
-  def _log_request(self, *, request: Any, service_name: str, method_name: str) -> None :
+  def _log_request(self, *, request: Any) -> None :
     """Send the logging request to the logger."""
 
     logging_request = LoggingRequest()
-    self._handle_metadata(
-      logging      = logging_request,
-      request      = request,
-      service_name = service_name,
-      method_name  = method_name,
-    )
+    self._handle_metadata(logging = logging_request, request = request)
 
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
       response = self.stub.LogRequest(logging_request)
-      STATE.request_id = response.request_id
+      STATE.request.id = response.request_id
     else:
       # Send directly to the DB. Note that Requests must be present in the schema!
       from microservice.models.service_registry import SERVICE_REGISTRY  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       from microservice.models import Request as DbRequest  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       logged_request = DbRequest.objects.log_request(grpc_request = logging_request)
-      STATE.request_id = logged_request.pk
+      STATE.request.id = logged_request.pk
       SERVICE_REGISTRY.add_call(
         caller_details = logging_request.upstream_request,
         called_details = logging_request.request_metadata.caller,
@@ -143,7 +120,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     """Send the logging response to the logger."""
 
     logging_response = LoggingResponse()
-    logging_response.request_id = STATE.request_id
+    logging_response.request_id = STATE.request.id
     logging_response.response.status = status.name
     logging_response.response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 
@@ -156,15 +133,11 @@ class LoggingServerInterceptor(ServerInterceptor):
 
   def _handle_exception(
       self, *,
-      context     : ServicerContext,
-      exception   : KhaleesiException,
-      service_name: str,
-      method_name : str,
+      request   : Any,
+      context   : ServicerContext,
   ) -> None :
     """Properly handle the exception."""
-    LOGGER.error(
-      message = f'{service_name}.{method_name} request finished with errors',
-    )
+    LOGGER.error(message = f'{self._request_name()} request finished with errors')
     self._log_response(status = exception.status)
     context.set_code(exception.status)
     context.set_details(exception.to_json())

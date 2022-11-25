@@ -8,6 +8,7 @@ from grpc import ServicerContext, StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import KhaleesiException
+from khaleesi.core.shared.state import STATE
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.metrics.requests import INCOMING_REQUESTS
 from khaleesi.proto.core_pb2 import RequestMetadata
@@ -18,16 +19,15 @@ class PrometheusServerInterceptor(ServerInterceptor):
 
   def khaleesi_intercept(
       self, *,
-      method      : Callable[[Any, ServicerContext], Any],
-      request     : Any,
-      context     : ServicerContext,
-      service_name: str,
-      method_name : str,
+      method  : Callable[[Any, ServicerContext], Any],
+      request : Any,
+      context : ServicerContext,
+      **_     : Any,
   ) -> Any :
     """Collect the prometheus metrics."""
     request_metadata = RequestMetadata()
-    request_metadata.caller.grpc_service = service_name
-    request_metadata.caller.grpc_method  = method_name
+    request_metadata.caller.grpc_service = STATE.request.service_name
+    request_metadata.caller.grpc_method  = STATE.request.method_name
     if hasattr(request, 'request_metadata'):
       peer: RequestMetadata = request.request_metadata
       request_metadata.user.id   = peer.user.id

@@ -27,11 +27,9 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
     if self.skip_interceptors(raw = method_name):
       return method(request_or_iterator, context)
 
-    _, _, service_name, method_name = self.process_method_name(raw = method_name)
     return self.khaleesi_intercept(
-      method       = method,
-      request      = request_or_iterator,
-      context      = context,
-      service_name = service_name,
-      method_name  = method_name,
+      method      = method,
+      request     = request_or_iterator,
+      context     = context,
+      method_name = method_name,
     )
