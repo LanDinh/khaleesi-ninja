@@ -7,11 +7,7 @@ from typing import Callable
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.shared.exceptions import (
-    KhaleesiException,
-    InvalidArgumentException,
-    MaskingInternalServerException,
-)
+from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
     DESCRIPTOR,

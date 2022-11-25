@@ -6,7 +6,7 @@ from typing import Callable, Any
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import InvalidArgumentException, MaskingInternalServerException
+from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.models.abstract import Metadata as AbstractMetadata
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]

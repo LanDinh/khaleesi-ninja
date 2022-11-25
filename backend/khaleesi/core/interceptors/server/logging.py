@@ -133,8 +133,8 @@ class LoggingServerInterceptor(ServerInterceptor):
 
   def _handle_exception(
       self, *,
-      request   : Any,
       context   : ServicerContext,
+      exception : KhaleesiException,
   ) -> None :
     """Properly handle the exception."""
     LOGGER.error(message = f'{self._request_name()} request finished with errors')

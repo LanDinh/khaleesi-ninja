@@ -77,7 +77,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     for status in StatusCode:
       with self.subTest(status = status.name):
         # Prepare data.
-        exception = KhaleesiException(
+        current_exception = KhaleesiException(
           status          = status,
           gate            = 'gate',
           service         = 'service',
@@ -93,7 +93,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
             **self.get_intercept_params(
               method = partial(
                 lambda inner_exception, *args : _method(*args, exception = inner_exception),
-                exception),
+                current_exception),
             ),
           )
 
