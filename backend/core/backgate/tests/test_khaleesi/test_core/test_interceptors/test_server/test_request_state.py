@@ -60,8 +60,8 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     """Test the counter gets incremented."""
     # Prepare data.
     def _method(*_: Any) -> None :
-      self.assertNotEqual('UNKNOWN', STATE.request.service_name)
-      self.assertNotEqual('UNKNOWN', STATE.request.method_name)
+      self.assertNotEqual('UNKNOWN', STATE.request.grpc_service)
+      self.assertNotEqual('UNKNOWN', STATE.request.grpc_method)
     # Execute test & assert result.
     self.interceptor.khaleesi_intercept(
       request = final_request,
@@ -71,8 +71,8 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
   def _execute_intercept_khaleesi_exception_test(self, *, final_request: Any) -> None :
     """Test the counter gets incremented."""
     def _method(*_: Any, exception: Exception) -> None :
-      self.assertNotEqual('UNKNOWN', STATE.request.service_name)
-      self.assertNotEqual('UNKNOWN', STATE.request.method_name)
+      self.assertNotEqual('UNKNOWN', STATE.request.grpc_service)
+      self.assertNotEqual('UNKNOWN', STATE.request.grpc_method)
       raise exception
     for status in StatusCode:
       with self.subTest(status = status.name):
@@ -101,8 +101,8 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     """Test the counter gets incremented."""
     # Prepare data.
     def _method(*_: Any) -> None :
-      self.assertNotEqual('UNKNOWN', STATE.request.service_name)
-      self.assertNotEqual('UNKNOWN', STATE.request.method_name)
+      self.assertNotEqual('UNKNOWN', STATE.request.grpc_service)
+      self.assertNotEqual('UNKNOWN', STATE.request.grpc_method)
       raise Exception('exception')
     # Execute test & assert result.
     with self.assertRaises(Exception):
@@ -113,5 +113,5 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
 
   def _assert_clean_state(self) -> None :
     """Assert a clean state."""
-    self.assertEqual('UNKNOWN', STATE.request.service_name)
-    self.assertEqual('UNKNOWN', STATE.request.method_name)
+    self.assertEqual('UNKNOWN', STATE.request.grpc_service)
+    self.assertEqual('UNKNOWN', STATE.request.grpc_method)

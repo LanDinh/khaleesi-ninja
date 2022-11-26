@@ -25,8 +25,8 @@ class RequestStateServerInterceptor(ServerInterceptor):
     try:
       # Process request data.
       _, _, service_name, method_name = self.process_method_name(raw = method_name)
-      STATE.request.service_name = service_name
-      STATE.request.method_name  = method_name
+      STATE.request.grpc_service = service_name
+      STATE.request.grpc_method  = method_name
       # Continue execution.
       response = method(request, context)
       STATE.reset()  # Always clean up afterwards.

@@ -120,11 +120,11 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     self.assertEqual('core'   , logging_request.request_metadata.caller.khaleesi_gate)
     self.assertEqual('sawmill', logging_request.request_metadata.caller.khaleesi_service)
     self.assertEqual(
-      TEST_STATE.request.service_name,
+      TEST_STATE.request.grpc_service,
       logging_request.request_metadata.caller.grpc_service,
     )
     self.assertEqual(
-      TEST_STATE.request.method_name,
+      TEST_STATE.request.grpc_method,
       logging_request.request_metadata.caller.grpc_method,
     )
     self.assertNotEqual(-1, logging_response.request_id)

@@ -8,8 +8,8 @@ from dataclasses import dataclass
 class Request:
   """Request meta."""
   id          : int = -1  # pylint: disable=invalid-name
-  service_name: str = 'UNKNOWN'
-  method_name : str = 'UNKNOWN'
+  grpc_service: str = 'UNKNOWN'
+  grpc_method : str = 'UNKNOWN'
 
 class State(threading.local):
   """Per-request state."""
