@@ -49,7 +49,6 @@ class LoggingServerInterceptor(ServerInterceptor):
   ) -> Any :
     """Log the incoming request."""
 
-    LOGGER.debug(message = f'{self._request_name()} request started (pre request_id)')
     self._log_request(request = request)
     LOGGER.info(message = f'{self._request_name()} request started')
 

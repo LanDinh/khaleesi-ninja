@@ -113,7 +113,6 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
       LoggingResponse,
       logging_stub.Request.objects.log_response.call_args.kwargs['grpc_response'],
     )
-    logger.debug.assert_called_once()
     self.assertEqual(2, logger.info.call_count)
     self.assertEqual(request_metadata.caller, logging_request.upstream_request)
     self.assertEqual(-1       , logging_request.request_metadata.caller.request_id)

@@ -130,7 +130,6 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     """Assert the logging calls were correct."""
     logging_request = cast(LoggingRequest, self.interceptor.stub.LogRequest.call_args.args[0])
     logging_response = cast(LoggingResponse, self.interceptor.stub.LogResponse.call_args.args[0])
-    logger.debug.assert_called_once()
     context.set_code.assert_not_called()
     context.set_details.assert_not_called()
     self.assertEqual(2, logger.info.call_count)
