@@ -15,7 +15,6 @@ class State(threading.local):
   """Per-request state."""
 
   request: Request
-  user: User
 
   def __init__(self) -> None :
     """Set the default state."""
