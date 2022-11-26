@@ -11,6 +11,6 @@ class TestState(State):
     """Set default values suitable for tests."""
     super().reset()
     self.request.id           = 13
-    self.request.service_name = 'service'
-    self.request.method_name  = 'method'
+    self.request.grpc_service = 'service'
+    self.request.grpc_method  = 'method'
 TEST_STATE = TestState()
