@@ -21,7 +21,6 @@ from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_sawmill_pb2 import (
   Request as LoggingRequest,
   ResponseRequest as LoggingResponse,
-  Error as LoggingError,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
