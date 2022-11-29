@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.test_util.test_case import SimpleTestCase
+from khaleesi.proto.core_sawmill_pb2 import Request
 
 
 class ServerInterceptorTest(SimpleTestCase):
@@ -46,3 +47,22 @@ class ServerInterceptorTest(SimpleTestCase):
       )
       # Assert result.
       khaleesi_intercept.assert_not_called()
+
+  def test_get_upstream_request(self) -> None :
+    """Test if we can fetch the upstream request."""
+    # Prepare data.
+    request = Request()
+    request.request_metadata.caller.request_id = 13
+    # Execute test.
+    result = self.interceptor.get_upstream_request(request = request)
+    # Assert result.
+    self.assertEqual(request.request_metadata.caller.request_id, result.caller.request_id)
+
+
+
+  def test_get_upstream_request_fallback(self) -> None :
+    """Test if we can fetch the upstream request."""
+    # Execute test.
+    result = self.interceptor.get_upstream_request(request = object())
+    # Assert result.
+    self.assertEqual(0, result.caller.request_id)

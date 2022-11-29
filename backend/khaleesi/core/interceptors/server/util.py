@@ -1,7 +1,7 @@
 """Server interceptor utility."""
 
 # Python.
-from typing import Callable, Any
+from typing import Callable, Any, cast
 
 # gRPC.
 from grpc import ServicerContext
@@ -9,6 +9,7 @@ from grpc_interceptor import ServerInterceptor as GrpcServerInterceptor
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.util import Interceptor
+from khaleesi.proto.core_pb2 import RequestMetadata
 
 
 class ServerInterceptor(Interceptor, GrpcServerInterceptor):
@@ -33,3 +34,9 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
       context     = context,
       method_name = method_name,
     )
+
+  def get_upstream_request(self, *, request: Any) -> RequestMetadata :
+    """Get the upstream request."""
+    if hasattr(request, 'request_metadata'):
+      return cast(RequestMetadata, request.request_metadata)
+    return RequestMetadata()

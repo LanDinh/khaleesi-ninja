@@ -11,7 +11,6 @@ from grpc import StatusCode
 from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
-from khaleesi.core.test_util.state import TEST_STATE
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import (
@@ -20,7 +19,6 @@ from khaleesi.proto.core_sawmill_pb2 import (
 )
 
 
-@patch('khaleesi.core.interceptors.server.logging.STATE', TEST_STATE)
 class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCase):
   """Test LoggingServerInterceptor"""
 
@@ -115,16 +113,5 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     )
     self.assertEqual(2, logger.info.call_count)
     self.assertEqual(request_metadata.caller, logging_request.upstream_request)
-    self.assertEqual(-1       , logging_request.request_metadata.caller.request_id)
-    self.assertEqual('core'   , logging_request.request_metadata.caller.khaleesi_gate)
-    self.assertEqual('sawmill', logging_request.request_metadata.caller.khaleesi_service)
-    self.assertEqual(
-      TEST_STATE.request.grpc_service,
-      logging_request.request_metadata.caller.grpc_service,
-    )
-    self.assertEqual(
-      TEST_STATE.request.grpc_method,
-      logging_request.request_metadata.caller.grpc_method,
-    )
     self.assertNotEqual(-1, logging_response.request_id)
     self.assertEqual('OK' , logging_response.response.status)

@@ -18,10 +18,10 @@ from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
 from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.state import STATE
-from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import (
   Request as LoggingRequest,
   ResponseRequest as LoggingResponse,
+  Error as LoggingError,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
@@ -58,48 +58,27 @@ class LoggingServerInterceptor(ServerInterceptor):
       self._log_response(status = StatusCode.OK)
       return response
     except KhaleesiException as exception:
-      self._handle_exception(
-        context      = context,
-        exception    = exception,
-      )
+      self._handle_exception(context = context, exception = exception)
       raise
     except Exception as exception:
       new_exception = MaskingInternalServerException(exception = exception)
-      self._handle_exception(
-        context      = context,
-        exception    = new_exception,
-      )
-      raise
+      self._handle_exception(context = context, exception = new_exception)
+      raise new_exception from exception
 
   def _request_name(self) -> str :
-    return f'{STATE.request.service_name}.{STATE.request.method_name}'
-
-  def _handle_metadata(self, *, logging : Any, request : Any) -> None :
-    """Handle the metadata for the request object."""
-    if hasattr(request, 'request_metadata'):
-      upstream = request.request_metadata
-    else:
-      upstream = RequestMetadata()
-
-    add_request_metadata(
-      request      = logging,
-      request_id   = -1, # upstream request_id is in upstream part of the proto
-      grpc_service = STATE.request.service_name,
-      grpc_method  = STATE.request.method_name,
-      user_id      = upstream.user.id,
-      user_type    = upstream.user.type,
-    )
-    logging.upstream_request.request_id       = upstream.caller.request_id
-    logging.upstream_request.khaleesi_gate    = upstream.caller.khaleesi_gate
-    logging.upstream_request.khaleesi_service = upstream.caller.khaleesi_service
-    logging.upstream_request.grpc_service     = upstream.caller.grpc_service
-    logging.upstream_request.grpc_method      = upstream.caller.grpc_method
+    """Standardize the name for logging."""
+    return f'{STATE.request.grpc_service}.{STATE.request.grpc_method}'
 
   def _log_request(self, *, request: Any) -> None :
     """Send the logging request to the logger."""
-
+    upstream = self.get_upstream_request(request = request)
     logging_request = LoggingRequest()
-    self._handle_metadata(logging = logging_request, request = request)
+    add_request_metadata(request = logging_request)
+    logging_request.upstream_request.request_id       = upstream.caller.request_id
+    logging_request.upstream_request.khaleesi_gate    = upstream.caller.khaleesi_gate
+    logging_request.upstream_request.khaleesi_service = upstream.caller.khaleesi_service
+    logging_request.upstream_request.grpc_service     = upstream.caller.grpc_service
+    logging_request.upstream_request.grpc_method      = upstream.caller.grpc_method
 
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
       response = self.stub.LogRequest(logging_request)

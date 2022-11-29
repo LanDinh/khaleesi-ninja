@@ -10,8 +10,9 @@ from khaleesi.core.grpc.request_metadata import (
   add_request_metadata,
   add_grpc_server_system_request_metadata,
 )
+from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.test_util.test_case import SimpleTestCase
-from khaleesi.proto.core_pb2 import User, RequestMetadata
+from khaleesi.proto.core_pb2 import RequestMetadata
 
 
 class GrpcTestCase(SimpleTestCase):
@@ -30,7 +31,7 @@ class GrpcTestCase(SimpleTestCase):
     # Execute test.
     add_grpc_server_system_request_metadata(request = request, grpc_method = 'LIFECYCLE')
     # Assert result
-    self.assert_metadata(request = request, expected = expected, user_type = User.UserType.SYSTEM)
+    self.assert_metadata(request = request, expected = expected, user_type = UserType.SYSTEM)
 
   def test_add_request_metadata(self) -> None :
     """Test adding request metadata."""
@@ -40,27 +41,27 @@ class GrpcTestCase(SimpleTestCase):
     expected.caller.grpc_service = 'grpc-service'
     expected.caller.grpc_method  = 'grpc-method'
     expected.user.id             = 'user-id'
-    for user_label, user_type in User.UserType.items():
-      with self.subTest(user = user_label):
+    for user_type in UserType:
+      with self.subTest(user = user_type.name):
         request = MagicMock()
         request.request_metadata = RequestMetadata()
+        STATE.reset()
+        STATE.request.id           = expected.caller.request_id
+        STATE.request.grpc_service = expected.caller.grpc_service
+        STATE.request.grpc_method  = expected.caller.grpc_method
+        STATE.user.type = user_type
+        STATE.user.id   = expected.user.id
         # Execute test.
-        add_request_metadata(
-          request = request,
-          user_type = user_type,
-          request_id = expected.caller.request_id,
-          grpc_service = expected.caller.grpc_service,
-          grpc_method = expected.caller.grpc_method,
-          user_id = expected.user.id,
-        )
+        add_request_metadata(request = request)
         # Assert result.
         self.assert_metadata(request = request, expected = expected, user_type = user_type)
+        STATE.reset()
 
   def assert_metadata(
       self, *,
       request: Any,
       expected: RequestMetadata,
-      user_type: 'User.UserType.V',
+      user_type: UserType,
   ) -> None :
     """Asset that the metadata is as expected."""
     # Manual values.
@@ -68,7 +69,7 @@ class GrpcTestCase(SimpleTestCase):
     self.assertEqual(expected.caller.grpc_service, request.request_metadata.caller.grpc_service)
     self.assertEqual(expected.caller.grpc_method , request.request_metadata.caller.grpc_method)
     self.assertEqual(expected.user.id            , request.request_metadata.user.id)
-    self.assertEqual(user_type                   , request.request_metadata.user.type)
+    self.assertEqual(user_type                   , UserType(request.request_metadata.user.type))
     # Automatic values.
     self.assertEqual('core'    , request.request_metadata.caller.khaleesi_gate)
     self.assertEqual('backgate', request.request_metadata.caller.khaleesi_service)

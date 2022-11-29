@@ -10,7 +10,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.request_state import RequestStateServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException
-from khaleesi.core.shared.state import STATE
+from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
@@ -29,17 +29,23 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
   def test_intercept_with_request_metadata(self) -> None :
     """Test intercept with metadata present."""
     for name, request_params in self.metadata_request_params:
-      with self.subTest(case = name):
-        self._execute_intercept_tests(request_params = request_params)  # type: ignore[arg-type]
+      for user_label, user_type in User.UserType.items():
+        with self.subTest(case = name, user = user_label):
+          self._execute_intercept_tests(request_params = request_params, user_type = user_type)  # type: ignore[arg-type]  # pylint: disable=line-too-long
 
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
-    self._execute_intercept_tests(request = {}, request_params = self.empty_input)
+    self._execute_intercept_tests(
+      request = {},
+      request_params = self.empty_input,
+      user_type = User.UserType.UNKNOWN,
+    )
 
   def _execute_intercept_tests(
       self, *,
       request: Optional[Any] = None,
       request_params: Dict[str, Any],
+      user_type: int,
   ) -> None :
     """Execute all typical intercept tests."""
     for test in [
@@ -47,32 +53,35 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
         self._execute_intercept_khaleesi_exception_test,
         self._execute_intercept_other_exception_test,
     ]:
-      for user_label, user_type in User.UserType.items():
-        with self.subTest(test = test.__name__, user = user_label):
-          _, final_request = self.get_request(
-            request = request,
-            user = user_type,
-            **request_params,
-          )
-          test(final_request = final_request)  # pylint: disable=no-value-for-parameter
+      with self.subTest(test = test.__name__):
+        _, final_request = self.get_request(
+          request = request,
+          user = user_type,  # type: ignore[arg-type]
+          **request_params,
+        )
+        test(final_request = final_request, user_type = user_type)  # pylint: disable=no-value-for-parameter
 
-  def _execute_intercept_ok_test(self, *, final_request: Any) -> None :
+  def _execute_intercept_ok_test(self, *, final_request: Any, user_type: int) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
     def _method(*_: Any) -> None :
-      self.assertNotEqual('UNKNOWN', STATE.request.grpc_service)
-      self.assertNotEqual('UNKNOWN', STATE.request.grpc_method)
-    # Execute test & assert result.
+      self._assert_not_clean_state(user_type = user_type)
+    # Execute test.
     self.interceptor.khaleesi_intercept(
       request = final_request,
       **self.get_intercept_params(method = _method),
     )
+    # Assert result.
+    self._assert_clean_state()
 
-  def _execute_intercept_khaleesi_exception_test(self, *, final_request: Any) -> None :
+  def _execute_intercept_khaleesi_exception_test(
+      self, *,
+      final_request: Any,
+      user_type: int,
+  ) -> None :
     """Test the counter gets incremented."""
     def _method(*_: Any, exception: Exception) -> None :
-      self.assertNotEqual('UNKNOWN', STATE.request.grpc_service)
-      self.assertNotEqual('UNKNOWN', STATE.request.grpc_method)
+      self._assert_not_clean_state(user_type = user_type)
       raise exception
     for status in StatusCode:
       with self.subTest(status = status.name):
@@ -86,7 +95,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
           private_message = 'private-message',
           private_details = 'private-details',
         )
-        # Execute test & assert result.
+        # Execute test.
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesi_intercept(
             request = final_request,
@@ -96,22 +105,34 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
                 current_exception),
             ),
           )
+        # Assert result.
+        self._assert_clean_state()
 
-  def _execute_intercept_other_exception_test(self, *, final_request: Any) -> None :
+  def _execute_intercept_other_exception_test(self, *, final_request: Any, user_type: int) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
     def _method(*_: Any) -> None :
-      self.assertNotEqual('UNKNOWN', STATE.request.grpc_service)
-      self.assertNotEqual('UNKNOWN', STATE.request.grpc_method)
+      self._assert_not_clean_state(user_type = user_type)
       raise Exception('exception')
-    # Execute test & assert result.
+    # Execute test.
     with self.assertRaises(Exception):
       self.interceptor.khaleesi_intercept(
         request = final_request,
         **self.get_intercept_params(method = _method),
       )
+    # Assert result.
+    self._assert_clean_state()
 
   def _assert_clean_state(self) -> None :
     """Assert a clean state."""
-    self.assertEqual('UNKNOWN', STATE.request.grpc_service)
-    self.assertEqual('UNKNOWN', STATE.request.grpc_method)
+    self.assertEqual('UNKNOWN'       , STATE.request.grpc_service)
+    self.assertEqual('UNKNOWN'       , STATE.request.grpc_method)
+    self.assertEqual('UNKNOWN'       , STATE.user.id)
+    self.assertEqual(UserType.UNKNOWN, STATE.user.type)
+
+  def _assert_not_clean_state(self, *, user_type: int) -> None :
+    """Assert a clean state."""
+    self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_service)
+    self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_method)
+    self.assertNotEqual('UNKNOWN'       , STATE.user.id)
+    self.assertEqual(UserType(user_type), STATE.user.type)
