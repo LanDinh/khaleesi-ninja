@@ -21,6 +21,7 @@ from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_sawmill_pb2 import (
   Request as LoggingRequest,
   ResponseRequest as LoggingResponse,
+  Error as LoggingError,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
@@ -108,6 +109,27 @@ class LoggingServerInterceptor(ServerInterceptor):
       from microservice.models import Request as DbRequest  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
       DbRequest.objects.log_response(grpc_response = logging_response)
 
+  def _log_error(self, *, exception : KhaleesiException ) -> None :
+    """Send the logging response to the logger."""
+
+    logging_error = LoggingError()
+    add_request_metadata(request = logging_error)
+    logging_error.status          = exception.status.name
+    logging_error.gate            = exception.gate
+    logging_error.service         = exception.service
+    logging_error.public_key      = exception.public_key
+    logging_error.public_details  = exception.public_details
+    logging_error.private_message = exception.private_message
+    logging_error.private_details = exception.private_details
+    logging_error.stacktrace      = exception.stacktrace
+
+    if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
+      self.stub.LogError(logging_error)
+    else:
+      # Send directly to the DB. Note that Requests must be present in the schema!
+      from microservice.models import Error as DbError  # type: ignore[import,attr-defined]  # pylint: disable=import-error,import-outside-toplevel,no-name-in-module
+      DbError.objects.log_error(grpc_error = logging_error)
+
   def _handle_exception(
       self, *,
       context   : ServicerContext,
@@ -115,6 +137,7 @@ class LoggingServerInterceptor(ServerInterceptor):
   ) -> None :
     """Properly handle the exception."""
     LOGGER.error(message = f'{self._request_name()} request finished with errors')
+    self._log_error(exception = exception)
     self._log_response(status = exception.status)
     context.set_code(exception.status)
     context.set_details(exception.to_json())

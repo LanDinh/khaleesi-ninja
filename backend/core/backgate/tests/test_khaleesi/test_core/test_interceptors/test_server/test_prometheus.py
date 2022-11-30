@@ -3,7 +3,6 @@
 # pylint: disable=duplicate-code
 
 # Python.
-from functools import partial
 from typing import Any, Dict, Optional
 from unittest.mock import MagicMock, patch
 
@@ -13,14 +12,10 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException
+from khaleesi.core.test_util.exceptions import khaleesi_raising_method, exception_raising_method
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
-
-
-def _raise(exception: Exception) -> None :
-  """Helper to raise exceptions in lambdas."""
-  raise exception
 
 
 class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
@@ -89,22 +84,10 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
       with self.subTest(status = status.name):
         # Prepare data.
         metric.reset_mock()
-        exception = KhaleesiException(
-          status          = status,
-          gate            = 'gate',
-          service         = 'service',
-          public_key      = 'public-key',
-          public_details  = 'public-details',
-          private_message = 'private-message',
-          private_details = 'private-details',
-        )
         # Execute test.
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params(
-            method  = partial(
-              lambda inner_exception, *args : _raise(inner_exception),
-              exception,
-            ),
+            method = khaleesi_raising_method(status = status),
           ))
         # Assert result.
         self._assert_metric_call(
@@ -126,7 +109,7 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
     with self.assertRaises(Exception):
       self.interceptor.khaleesi_intercept(
         request = final_request,
-        **self.get_intercept_params(method  = lambda *args : _raise(Exception('exception'))),
+        **self.get_intercept_params(method = exception_raising_method()),
       )
     # Assert result.
     self._assert_metric_call(

@@ -11,14 +11,10 @@ from grpc import StatusCode
 from khaleesi.core.interceptors.server.request_state import RequestStateServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.state import STATE, UserType
+from khaleesi.core.test_util.exceptions import khaleesi_raising_method
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
-
-
-def _raise(exception: Exception) -> None :
-  """Helper to raise exceptions in lambdas."""
-  raise exception
 
 
 class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
@@ -80,29 +76,17 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
       user_type: int,
   ) -> None :
     """Test the counter gets incremented."""
-    def _method(*_: Any, exception: Exception) -> None :
-      self._assert_not_clean_state(user_type = user_type)
-      raise exception
     for status in StatusCode:
       with self.subTest(status = status.name):
-        # Prepare data.
-        current_exception = KhaleesiException(
-          status          = status,
-          gate            = 'gate',
-          service         = 'service',
-          public_key      = 'public-key',
-          public_details  = 'public-details',
-          private_message = 'private-message',
-          private_details = 'private-details',
-        )
         # Execute test.
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesi_intercept(
             request = final_request,
             **self.get_intercept_params(
-              method = partial(
-                lambda inner_exception, *args : _method(*args, exception = inner_exception),
-                current_exception),
+              method = khaleesi_raising_method(
+                method = partial(self._assert_not_clean_state, user_type = user_type),
+                status = status,
+              ),
             ),
           )
         # Assert result.
@@ -130,7 +114,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     self.assertEqual('UNKNOWN'       , STATE.user.id)
     self.assertEqual(UserType.UNKNOWN, STATE.user.type)
 
-  def _assert_not_clean_state(self, *, user_type: int) -> None :
+  def _assert_not_clean_state(self, *args: Any, user_type: int, **kwargs: Any) -> None :
     """Assert a clean state."""
     self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_service)
     self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_method)
