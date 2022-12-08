@@ -203,7 +203,7 @@ class ServiceRegistry:
     self.cache.clear()
     self.cache.set('service-registry', service_registry)
 
-    LOGGER.debug(message = f'Service registry reloaded: {len(methods)} entries, {len(calls)} calls')
+    LOGGER.debug(f'Service registry reloaded: {len(methods)} entries, {len(calls)} calls')
 
   def get_call_data(self, *, owner: GrpcCallerDetails) -> ServiceCallData :
     """Get call data for the affected service."""
@@ -285,9 +285,9 @@ class ServiceRegistry:
       caller_details: GrpcCallerDetails,
   ) -> ServiceRegistryGrpcMethod :
     LOGGER.debug(
-      message = 'Add new service registry entry: '
-                f'{caller_details.khaleesi_gate} {caller_details.khaleesi_service} '
-                f'{caller_details.grpc_service} {caller_details.grpc_method}')
+      'Add new service registry entry: '
+      f'{caller_details.khaleesi_gate} {caller_details.khaleesi_service} '
+      f'{caller_details.grpc_service} {caller_details.grpc_method}')
 
     khaleesi_gate, _ = ServiceRegistryKhaleesiGate.objects.get_or_create(
       name = caller_details.khaleesi_gate,

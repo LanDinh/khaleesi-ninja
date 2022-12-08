@@ -19,7 +19,7 @@ class Interceptor:
   def skip_interceptors(self, *, raw: str) -> bool :
     """Skip interceptors for utility provided by libraries."""
     if raw in self.skip_list:
-      LOGGER.debug(message = f'Skip logging of {raw}')
+      LOGGER.debug(f'Skip logging of {raw}')
       return True
     return False
 

@@ -43,26 +43,26 @@ class Server:
 
   def __init__(self) -> None :
     try:
-      LOGGER.info(message = 'Initializing channel manager...')
+      LOGGER.info('Initializing channel manager...')
       self.channel_manager = ChannelManager()
       interceptors = [
           RequestStateServerInterceptor(),  # First.
           PrometheusServerInterceptor(),
           LoggingServerInterceptor(channel_manager = self.channel_manager),  # Last.
       ]
-      LOGGER.info(message = 'Initializing metric initializer...')
+      LOGGER.info('Initializing metric initializer...')
       self.metric_initializer = MetricInitializer(channel_manager = self.channel_manager)
-      LOGGER.info(message = 'Initializing server...')
+      LOGGER.info('Initializing server...')
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
         interceptors = interceptors,  # type: ignore[arg-type]  # fixed upstream!
       )
-      LOGGER.info(message = 'Initializing health servicer...')
+      LOGGER.info('Initializing health servicer...')
       self.health_servicer = HealthServicer()
-      LOGGER.info(message = 'Initializing configure server...')
+      LOGGER.info('Initializing configure server...')
       self.server.add_insecure_port(f'[::]:{khaleesi_settings["GRPC"]["PORT"]}')
       signal(SIGTERM, self._handle_sigterm)
-      LOGGER.info(message = 'Adding service handlers...')
+      LOGGER.info('Adding service handlers...')
       self._add_handlers()
     except Exception as exception:
       self._log_server_state_event(
@@ -75,9 +75,9 @@ class Server:
   def start(self) -> None :
     """Start the server."""
     try:
-      LOGGER.info(message = 'Initializing metrics...')
+      LOGGER.info('Initializing metrics...')
       self.metric_initializer.initialize_metrics()
-      LOGGER.info(message = 'Starting server...')
+      LOGGER.info('Starting server...')
       self.server.start()
       self._print_banner()
       self._log_server_state_event(
@@ -100,7 +100,7 @@ class Server:
     raw_handlers = khaleesi_settings['GRPC']['HANDLERS']
     service_names = [reflection.SERVICE_NAME]
     for raw_handler in raw_handlers:
-      LOGGER.debug(message = f'Adding service handler {raw_handler}...')
+      LOGGER.debug(f'Adding service handler {raw_handler}...')
       handler = f'{raw_handler}.service_configuration'
       try:
         service_configuration = import_string(handler)
@@ -108,27 +108,27 @@ class Server:
         service_names.append(service_configuration.name)
       except ImportError as error:  # pragma: no cover
         raise ImportError(f'Could not import "{handler}" for gRPC handler.') from error
-    LOGGER.debug(message = 'Adding reflection service...')
+    LOGGER.debug('Adding reflection service...')
     reflection.enable_server_reflection(service_names, self.server)
-    LOGGER.debug(message = 'Adding health service...')
+    LOGGER.debug('Adding health service...')
     add_HealthServicer_to_server(self.health_servicer, self.server)
     for service_name in service_names:
       self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]
 
   def _print_banner(self) -> None :
     """Print the startup banner."""
-    LOGGER.info(message = '')
-    LOGGER.info(message = '       \\****__              ____')
-    LOGGER.info(message = '         |    *****\\_      --/ *\\-__')
-    LOGGER.info(message = '         /_          (_    ./ ,/----\'')
-    LOGGER.info(message = '           \\__         (_./  /')
-    LOGGER.info(message = '              \\__           \\___----^__')
-    LOGGER.info(message = '               _/   _                  \\')
-    LOGGER.info(message = '        |    _/  __/ )\\"\\ _____         *\\')
-    LOGGER.info(message = '        |\\__/   /    ^ ^       \\____      )')
-    LOGGER.info(message = '         \\___--"                    \\_____ )')
-    LOGGER.info(message = '                                          "')
-    LOGGER.info(message = '')
+    LOGGER.info('')
+    LOGGER.info('       \\****__              ____')
+    LOGGER.info('         |    *****\\_      --/ *\\-__')
+    LOGGER.info('         /_          (_    ./ ,/----\'')
+    LOGGER.info('           \\__         (_./  /')
+    LOGGER.info('              \\__           \\___----^__')
+    LOGGER.info('               _/   _                  \\')
+    LOGGER.info('        |    _/  __/ )\\"\\ _____         *\\')
+    LOGGER.info('        |\\__/   /    ^ ^       \\____      )')
+    LOGGER.info('         \\___--"                    \\_____ )')
+    LOGGER.info('                                          "')
+    LOGGER.info('')
 
   def _handle_sigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""
@@ -184,11 +184,11 @@ class Server:
   ) -> None :
     """Log the server state."""
     if result == Event.Action.ResultType.SUCCESS:
-      LOGGER.info(message = details)
+      LOGGER.info(details)
     elif result == Event.Action.ResultType.ERROR:
-      LOGGER.error(message = details)
+      LOGGER.error(details)
     elif result == Event.Action.ResultType.FATAL:
-      LOGGER.fatal(message = details)
+      LOGGER.fatal(details)
     event = self._server_state_event(action = action, result = result, details = details)
     if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
       channel = self.channel_manager.get_channel(gate = 'core', service = 'sawmill')

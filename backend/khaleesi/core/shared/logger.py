@@ -17,23 +17,23 @@ class Logger:
   def __init__(self) -> None :
     logging.basicConfig()
 
-  def debug(self, *, message: str) -> None :
+  def debug(self, message: str) -> None :
     """Debug log."""
     logger.debug(message, extra = self._extra())
 
-  def info(self, *, message: str) -> None :
+  def info(self, message: str) -> None :
     """Info log."""
     logger.info(message, extra = self._extra())
 
-  def warning(self, *, message: str) -> None :
+  def warning(self, message: str) -> None :
     """Warning log."""
     logger.warning(message, extra = self._extra())
 
-  def error(self, *, message: str) -> None :
+  def error(self, message: str) -> None :
     """Error log."""
     logger.error(message, extra = self._extra())
 
-  def fatal(self, *, message: str) -> None :
+  def fatal(self, message: str) -> None :
     """Fatal log."""
     logger.fatal(message, extra = self._extra())
 
