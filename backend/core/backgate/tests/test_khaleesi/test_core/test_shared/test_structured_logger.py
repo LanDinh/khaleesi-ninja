@@ -94,24 +94,24 @@ class TestStructuredLogger(SimpleTestCase):
   def test_log_error(self, logger: MagicMock) -> None :
     """Test logging an error."""
     for status in StatusCode:
-        with self.subTest(status = status.name):
-          # Prepare data.
-          self.logger.sender.reset_mock()
-          logger.reset_mock()
-          exception = default_khaleesi_exception(status = status)
-          # Perform test.
-          self.logger.log_error(exception = exception)
-          # Assert result.
-          self.logger.sender.send.assert_called_once()
-          log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
-          self.assertEqual(status.name  , log_error.status)
-          self.assertEqual(exception.gate           , log_error.gate)
-          self.assertEqual(exception.service        , log_error.service)
-          self.assertEqual(exception.public_key     , log_error.public_key)
-          self.assertEqual(exception.public_details , log_error.public_details)
-          self.assertEqual(exception.private_message, log_error.private_message)
-          self.assertEqual(exception.private_details, log_error.private_details)
-          self.assertEqual(exception.stacktrace     , log_error.stacktrace)
+      with self.subTest(status = status.name):
+        # Prepare data.
+        self.logger.sender.reset_mock()
+        logger.reset_mock()
+        exception = default_khaleesi_exception(status = status)
+        # Perform test.
+        self.logger.log_error(exception = exception)
+        # Assert result.
+        self.logger.sender.send.assert_called_once()
+        log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
+        self.assertEqual(status.name  , log_error.status)
+        self.assertEqual(exception.gate           , log_error.gate)
+        self.assertEqual(exception.service        , log_error.service)
+        self.assertEqual(exception.public_key     , log_error.public_key)
+        self.assertEqual(exception.public_details , log_error.public_details)
+        self.assertEqual(exception.private_message, log_error.private_message)
+        self.assertEqual(exception.private_details, log_error.private_details)
+        self.assertEqual(exception.stacktrace     , log_error.stacktrace)
 
   def test_log_system_event(self, logger: MagicMock) -> None :
     """Test logging an event."""

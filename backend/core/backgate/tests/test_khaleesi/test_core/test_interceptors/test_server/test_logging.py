@@ -47,30 +47,30 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     for user_label, user_type in User.UserType.items():
       for status in StatusCode:
         with self.subTest(user = user_label.lower(), status = status.name.lower()):
+          # Prepare data.
+          _, final_request = self.get_request(
+            request = {},
+            user = user_type,
+            request_params = self.empty_input,
+          )
+          self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
+          context = MagicMock()
+          STATE.reset()
           exception = default_khaleesi_exception(status = status)
-            # Prepare data.
-            _, final_request = self.get_request(
-              request = {},
-              user = user_type,
-              request_params = self.empty_input,
+          # Execute test.
+          with self.assertRaises(KhaleesiException):
+            self.interceptor.khaleesi_intercept(
+              request = final_request,
+              **self.get_intercept_params(
+                context = context,
+                method = khaleesi_raising_method(status = status, loglevel = loglevel),
+              ),
             )
-            self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
-            context = MagicMock()
-            STATE.reset()
-            # Execute test.
-            with self.assertRaises(KhaleesiException):
-              self.interceptor.khaleesi_intercept(
-                request = final_request,
-                **self.get_intercept_params(
-                  context = context,
-                  method = khaleesi_raising_method(status = status, loglevel = loglevel),
-                ),
-              )
-            # Assert result.
-            self._assert_exception_logging_call(
-              context   = context,
-              exception = exception,
-            )
+          # Assert result.
+          self._assert_exception_logging_call(
+            context   = context,
+            exception = exception,
+          )
 
   def test_logging_other_exception(self) -> None :
     """Test the counter gets incremented."""
