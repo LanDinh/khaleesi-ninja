@@ -63,7 +63,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
               request = final_request,
               **self.get_intercept_params(
                 context = context,
-                method = khaleesi_raising_method(status = status, loglevel = loglevel),
+                method = khaleesi_raising_method(status = status),
               ),
             )
           # Assert result.
