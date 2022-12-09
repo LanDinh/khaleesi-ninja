@@ -11,7 +11,6 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import UpstreamGrpcException
 from khaleesi.core.interceptors.client.prometheus import PrometheusClientInterceptor
 from khaleesi.core.test_util.interceptor import ClientInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
@@ -39,10 +38,7 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
       request_params: Dict[str, Any],
   ) -> None :
     """Execute all typical intercept tests."""
-    for test in [
-        self._execute_intercept_ok_test,
-        self._execute_intercept_not_ok_test,
-    ]:
+    for test in [ self._execute_intercept_test ]:
       for user_label, user_type in User.UserType.items():
         with self.subTest(test = test.__name__, user = user_label):
           request_metadata, final_request = self.get_request(
@@ -53,7 +49,7 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
           test(request_metadata = request_metadata, final_request = final_request)  # pylint: disable=no-value-for-parameter
 
   @patch('khaleesi.core.interceptors.client.prometheus.OUTGOING_REQUESTS')
-  def _execute_intercept_ok_test(
+  def _execute_intercept_test(
       self,
       metric: MagicMock,
       *,
@@ -61,54 +57,26 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
       final_request: Any,
   ) -> None :
     """Test the counter gets incremented."""
-    # Prepare data.
-    response = MagicMock()
-    response.code = MagicMock(return_value = StatusCode.OK)
-    # Execute test.
-    self.interceptor.khaleesi_intercept(
-      request_or_iterator = final_request,
-      **self.get_intercept_params(method = lambda *args : response),
-    )
-    # Assert result.
-    self._assert_metric_call(
-      metric           = metric,
-      request_metadata = request_metadata,
-      status           = StatusCode.OK,
-    )
-
-  @patch('khaleesi.core.interceptors.client.prometheus.OUTGOING_REQUESTS')
-  def _execute_intercept_not_ok_test(
-      self,
-      metric: MagicMock,
-      *,
-      request_metadata: RequestMetadata,
-      final_request: Any,
-  ) -> None :
-    """Test the counter gets incremented."""
-    for code in [code for code in StatusCode if code != StatusCode.OK]:
-      for exception in [None, Exception('test')]:
-        with self.subTest(code = code, exception = exception):
-          # Prepare data.
-          metric.reset_mock()
-          response = MagicMock()
-          response.code = MagicMock(return_value = code)
-          response.exception.return_value = exception
-          # Execute test.
-          with self.assertRaises(UpstreamGrpcException):
-            self.interceptor.khaleesi_intercept(
-              request_or_iterator = final_request,
-              **self.get_intercept_params(method = partial(
-                lambda inner_response, *args : inner_response,
-                response,
-              )),
-            )
-          # Assert result.
-          self._assert_metric_call(
-            metric           = metric,
-            request_metadata = request_metadata,
-            status           = code,
-          )
-
+    for code in StatusCode:
+      with self.subTest(code = code):
+        # Prepare data.
+        metric.reset_mock()
+        response = MagicMock()
+        response.code = MagicMock(return_value = code)
+        # Execute test.
+        self.interceptor.khaleesi_intercept(
+          request_or_iterator = final_request,
+          **self.get_intercept_params(method = partial(
+            lambda inner_response, *args : inner_response,
+            response,
+          )),
+        )
+        # Assert result.
+        self._assert_metric_call(
+          metric           = metric,
+          request_metadata = request_metadata,
+          status           = code,
+        )
 
   def _assert_metric_call(
       self, *,

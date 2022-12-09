@@ -1,15 +1,13 @@
 """Interceptor to collect prometheus metrics."""
 
 # Python.
-import traceback
 from typing import Callable, Any
 
 # gRPC.
-from grpc import StatusCode, Call
+from grpc import Call
 from grpc_interceptor import ClientCallDetails
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import UpstreamGrpcException
 from khaleesi.core.interceptors.client.util import ClientInterceptor
 from khaleesi.core.metrics.requests import OUTGOING_REQUESTS
 from khaleesi.proto.core_pb2 import RequestMetadata
@@ -41,15 +39,4 @@ class PrometheusClientInterceptor(ClientInterceptor):
     response: Call = method(request_or_iterator, call_details)
     OUTGOING_REQUESTS.inc(status = response.code(), request = request_metadata, peer = peer)
 
-    if response.code() == StatusCode.OK:
-      return response
-    raise UpstreamGrpcException(
-      status = response.code(),
-      private_details = self.exception_details(response = response)
-    )
-
-  def exception_details(self, *, response: Call) -> str :
-    """Return a pretty-print of the exception."""
-    if hasattr(response, 'exception') and response.exception and response.exception():  # type: ignore[attr-defined]  # pylint: disable=line-too-long
-      return ''.join(traceback.format_exception(response.exception()))  # type: ignore[attr-defined]
-    return response.details()
+    return response
