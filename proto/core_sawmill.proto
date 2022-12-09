@@ -65,13 +65,14 @@ message Request {
 message Error {
   khaleesi.core.RequestMetadata request_metadata = 1;
   string                        status           = 2;
-  string                        gate             = 3;
-  string                        service          = 4;
-  string                        public_key       = 5;
-  string                        public_details   = 6;
-  string                        private_message  = 7;
-  string                        private_details  = 8;
-  string                        stacktrace       = 9;
+  string                        loglevel         = 3;
+  string                        gate             = 4;
+  string                        service          = 5;
+  string                        public_key       = 6;
+  string                        public_details   = 7;
+  string                        private_message  = 8;
+  string                        private_details  = 9;
+  string                        stacktrace       = 10;
 }
 
 message LogRequestResponse {

@@ -31,6 +31,7 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class StructuredLogger(ABC):
   """Basic structured logger."""
 
+  # noinspection PyUnusedLocal
   def __init__(self, *, channel_manager: ChannelManager) -> None :
     """Initialization."""
 
@@ -66,9 +67,11 @@ class StructuredLogger(ABC):
 
   def log_error(self, *, exception: KhaleesiException ) -> None :
     """Log an exception."""
+    LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
     error = Error()
     add_request_metadata(request = error)
     error.status          = exception.status.name
+    error.loglevel        = exception.loglevel.name
     error.gate            = exception.gate
     error.service         = exception.service
     error.public_key      = exception.public_key
@@ -98,6 +101,7 @@ class StructuredLogger(ABC):
       LOGGER.fatal(details)
     event = Event()
     add_grpc_server_system_request_metadata(request = event, grpc_method = grpc_method)
+    # noinspection PyTypedDict
     event.target.type = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
     event.action.crud_type = action
     event.action.result    = result

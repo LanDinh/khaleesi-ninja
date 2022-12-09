@@ -10,6 +10,9 @@ from django.conf import settings
 # gRPC.
 from grpc import StatusCode
 
+# khaleesi.ninja.
+from khaleesi.core.shared.logger import LogLevel
+
 
 class KhaleesiException(Exception):
   """Base exception."""
@@ -23,6 +26,7 @@ class KhaleesiException(Exception):
       public_details : str,
       private_message: str,
       private_details: str,
+      loglevel       : LogLevel,
   ) -> None :
     """Initialize the exception."""
     super().__init__(private_message)
@@ -34,6 +38,7 @@ class KhaleesiException(Exception):
     self.private_message = private_message
     self.private_details = private_details
     self.stacktrace      = ''.join(format_exception(None, self, self.__traceback__))
+    self.loglevel        = loglevel
 
   def to_json(self) -> str :
     """Return a json string to encode this object."""
@@ -61,6 +66,7 @@ class KhaleesiCoreException(KhaleesiException):
       public_details : str,
       private_message: str,
       private_details: str,
+      loglevel       : LogLevel,
   ) -> None :
     """Initialize the exception."""
     super().__init__(
@@ -71,6 +77,7 @@ class KhaleesiCoreException(KhaleesiException):
       public_details  = public_details,
       private_message = private_message,
       private_details = private_details,
+      loglevel        = loglevel,
     )
 
 
@@ -90,13 +97,14 @@ class InvalidArgumentException(KhaleesiCoreException):
       public_details  = public_details,
       private_message = private_message,
       private_details = private_details,
+      loglevel        = LogLevel.WARNING,
     )
 
 
 class InternalServerException(KhaleesiCoreException):
   """Internal server errors."""
 
-  def __init__(self, *, private_message: str, private_details: str) -> None :
+  def __init__(self, *, private_message: str, private_details: str, loglevel: LogLevel) -> None :
     """Initialize the exception."""
     super().__init__(
       status          = StatusCode.INTERNAL,
@@ -104,6 +112,7 @@ class InternalServerException(KhaleesiCoreException):
       public_details  = '',
       private_message = private_message,
       private_details = private_details,
+      loglevel        = loglevel,
     )
 
 class MaskingInternalServerException(InternalServerException):
@@ -114,12 +123,21 @@ class MaskingInternalServerException(InternalServerException):
     super().__init__(
       private_message = type(exception).__name__,
       private_details = str(exception),
+      loglevel        = LogLevel.FATAL,
     )
     self.__traceback__ = exception.__traceback__
 
 
 class ProgrammingException(InternalServerException):
   """Programming errors."""
+
+  def __init__(self, *, private_message: str, private_details: str) -> None :
+    """Initialize the exception."""
+    super().__init__(
+      private_message = private_message,
+      private_details = private_details,
+      loglevel        = LogLevel.FATAL,
+    )
 
 
 class UpstreamGrpcException(KhaleesiCoreException):
@@ -133,4 +151,5 @@ class UpstreamGrpcException(KhaleesiCoreException):
       public_details  = '',
       private_message = f'Upstream error {status} received.',
       private_details = private_details,
+      loglevel        = LogLevel.ERROR
     )

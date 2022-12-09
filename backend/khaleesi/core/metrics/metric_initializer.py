@@ -57,6 +57,7 @@ class BaseMetricInitializer(ABC):
 
   own_name: str
 
+  # noinspection PyUnusedLocal
   def __init__(self, *, channel_manager: ChannelManager) -> None :  # pylint: disable=unused-argument
     self.own_name = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
 
@@ -185,6 +186,7 @@ class BaseMetricInitializer(ABC):
     AUDIT_EVENT.register(event = event)
 
 
+# noinspection PyAbstractClass
 class MetricInitializer(BaseMetricInitializer):
   """MetricInitializer which gets service registry data via gRPC."""
 

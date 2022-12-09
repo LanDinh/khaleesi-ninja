@@ -12,6 +12,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException
+from khaleesi.core.shared.logger import LogLevel
 from khaleesi.core.test_util.exceptions import khaleesi_raising_method, exception_raising_method
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
@@ -81,20 +82,24 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
   ) -> None :
     """Test the counter gets incremented."""
     for status in StatusCode:
-      with self.subTest(status = status.name):
-        # Prepare data.
-        metric.reset_mock()
-        # Execute test.
-        with self.assertRaises(KhaleesiException):
-          self.interceptor.khaleesi_intercept(request = final_request, **self.get_intercept_params(
-            method = khaleesi_raising_method(status = status),
-          ))
-        # Assert result.
-        self._assert_metric_call(
-          metric           = metric,
-          request_metadata = request_metadata,
-          status           = status,
-        )
+      for loglevel in LogLevel:
+        with self.subTest(status = status.name, loglevel = loglevel.name):
+          # Prepare data.
+          metric.reset_mock()
+          # Execute test.
+          with self.assertRaises(KhaleesiException):
+            self.interceptor.khaleesi_intercept(
+              request = final_request,
+              **self.get_intercept_params(
+                method = khaleesi_raising_method(status = status, loglevel = loglevel),
+              ),
+            )
+          # Assert result.
+          self._assert_metric_call(
+            metric           = metric,
+            request_metadata = request_metadata,
+            status           = status,
+          )
 
   @patch('khaleesi.core.interceptors.server.prometheus.INCOMING_REQUESTS')
   def _execute_intercept_other_exception_test(

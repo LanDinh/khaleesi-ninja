@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
+from khaleesi.core.shared.logger import LogLevel
 from khaleesi.core.shared.structured_logger import StructuredGrpcLogger, StructuredLogger
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
@@ -90,28 +91,30 @@ class TestStructuredLogger(SimpleTestCase):
     log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
     self.assertEqual(StatusCode.OK.name, log_response.response.status)
 
-
   def test_log_error(self, logger: MagicMock) -> None :
     """Test logging an error."""
     for status in StatusCode:
-      with self.subTest(status = status.name):
-        # Prepare data.
-        self.logger.sender.reset_mock()
-        logger.reset_mock()
-        exception = default_khaleesi_exception(status = status)
-        # Perform test.
-        self.logger.log_error(exception = exception)
-        # Assert result.
-        self.logger.sender.send.assert_called_once()
-        log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
-        self.assertEqual(status.name  , log_error.status)
-        self.assertEqual(exception.gate           , log_error.gate)
-        self.assertEqual(exception.service        , log_error.service)
-        self.assertEqual(exception.public_key     , log_error.public_key)
-        self.assertEqual(exception.public_details , log_error.public_details)
-        self.assertEqual(exception.private_message, log_error.private_message)
-        self.assertEqual(exception.private_details, log_error.private_details)
-        self.assertEqual(exception.stacktrace     , log_error.stacktrace)
+      for loglevel in LogLevel:
+        with self.subTest(status = status.name, loglevel = loglevel.name):
+          # Prepare data.
+          self.logger.sender.reset_mock()
+          logger.reset_mock()
+          exception = default_khaleesi_exception(status = status, loglevel = loglevel)
+          # Perform test.
+          self.logger.log_error(exception = exception)
+          # Assert result.
+          self.logger.sender.send.assert_called_once()
+          logger.log.assert_called_once()
+          log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
+          self.assertEqual(status.name              , log_error.status)
+          self.assertEqual(loglevel.name            , log_error.loglevel)
+          self.assertEqual(exception.gate           , log_error.gate)
+          self.assertEqual(exception.service        , log_error.service)
+          self.assertEqual(exception.public_key     , log_error.public_key)
+          self.assertEqual(exception.public_details , log_error.public_details)
+          self.assertEqual(exception.private_message, log_error.private_message)
+          self.assertEqual(exception.private_details, log_error.private_details)
+          self.assertEqual(exception.stacktrace     , log_error.stacktrace)
 
   def test_log_system_event(self, logger: MagicMock) -> None :
     """Test logging an event."""

@@ -49,9 +49,9 @@ class Server:
       self._init_structured_logger()
       LOGGER.info('Initializing interceptors...')
       interceptors = [
-          RequestStateServerInterceptor(),  # First.
+          RequestStateServerInterceptor(),  # Outer.
           PrometheusServerInterceptor(),
-          LoggingServerInterceptor(structured_logger = self.structured_logger),  # Last.
+          LoggingServerInterceptor(structured_logger = self.structured_logger),  # Inner.
       ]
       LOGGER.info('Initializing metric initializer...')
       self.metric_initializer = MetricInitializer(channel_manager = self.channel_manager)

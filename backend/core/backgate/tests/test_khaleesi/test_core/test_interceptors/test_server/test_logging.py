@@ -10,6 +10,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
+from khaleesi.core.shared.logger import LogLevel
 from khaleesi.core.shared.state import STATE
 from khaleesi.core.test_util.exceptions import (
   khaleesi_raising_method,
@@ -46,31 +47,32 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     """Test the counter gets incremented."""
     for user_label, user_type in User.UserType.items():
       for status in StatusCode:
-        with self.subTest(user = user_label.lower(), status = status.name.lower()):
-          # Prepare data.
-          _, final_request = self.get_request(
-            request = {},
-            user = user_type,
-            request_params = self.empty_input,
-          )
-          self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
-          context = MagicMock()
-          STATE.reset()
-          exception = default_khaleesi_exception(status = status)
-          # Execute test.
-          with self.assertRaises(KhaleesiException):
-            self.interceptor.khaleesi_intercept(
-              request = final_request,
-              **self.get_intercept_params(
-                context = context,
-                method = khaleesi_raising_method(status = status),
-              ),
+        for loglevel in LogLevel:
+          with self.subTest(user = user_label, status = status.name, loglevel = loglevel.name):
+            # Prepare data.
+            _, final_request = self.get_request(
+              request = {},
+              user = user_type,
+              request_params = self.empty_input,
             )
-          # Assert result.
-          self._assert_exception_logging_call(
-            context   = context,
-            exception = exception,
-          )
+            self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
+            context = MagicMock()
+            STATE.reset()
+            exception = default_khaleesi_exception(status = status, loglevel = loglevel)
+            # Execute test.
+            with self.assertRaises(KhaleesiException):
+              self.interceptor.khaleesi_intercept(
+                request = final_request,
+                **self.get_intercept_params(
+                  context = context,
+                  method = khaleesi_raising_method(status = status, loglevel = loglevel),
+                ),
+              )
+            # Assert result.
+            self._assert_exception_logging_call(
+              context   = context,
+              exception = exception,
+            )
 
   def test_logging_other_exception(self) -> None :
     """Test the counter gets incremented."""
@@ -162,6 +164,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     context.set_details.assert_called_once()
     self.assertEqual(exception.status         , status)
     self.assertEqual(exception.status         , logged_exception.status)
+    #self.assertEqual(exception.loglevel       , loglevel)
+    #self.assertEqual(exception.loglevel       , logged_exception.loglevel)
     self.assertEqual(exception.gate           , logged_exception.gate)
     self.assertEqual(exception.service        , logged_exception.service)
     self.assertEqual(exception.public_key     , logged_exception.public_key)
