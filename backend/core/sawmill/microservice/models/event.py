@@ -6,12 +6,17 @@ from typing import List
 
 # Django.
 from django.db import models
+from django.conf import settings
 
 # khaleesi.ninja.
 from khaleesi.core.metrics.audit import AUDIT_EVENT
+from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.abstract import Metadata
 from microservice.parse_util import parse_uuid, parse_string
+
+
+khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
 
 
 class EventManager(models.Manager['Event']):
@@ -20,7 +25,9 @@ class EventManager(models.Manager['Event']):
   def log_event(self, *, grpc_event: GrpcEvent) -> Event :
     """Log a gRPC event."""
     # If this is a server startup event, we need to do the metric logging here.
-    if grpc_event.target.type == 'core.core.server' and grpc_event.action.crud_type in \
+    if grpc_event.target.type == \
+        khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['LIFECYCLE']['TARGET'] \
+        and grpc_event.action.crud_type in \
         [ GrpcEvent.Action.ActionType.START, GrpcEvent.Action.ActionType.END ]:
       AUDIT_EVENT.inc(event = grpc_event)
 

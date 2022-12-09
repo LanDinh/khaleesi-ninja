@@ -1,7 +1,7 @@
 """Metric utility."""
 
 # khaleesi.ninja.
-from khaleesi.core.metrics.metric_initializer import BaseMetricInitializer
+from khaleesi.core.metrics.metric_initializer import MetricInitializer as BaseMetricInitializer
 
 
 class MetricInitializer(BaseMetricInitializer):

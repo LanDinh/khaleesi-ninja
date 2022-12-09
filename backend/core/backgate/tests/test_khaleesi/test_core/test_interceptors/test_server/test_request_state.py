@@ -27,7 +27,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     for name, request_params in self.metadata_request_params:
       for user_label, user_type in User.UserType.items():
         with self.subTest(case = name, user = user_label):
-          self._execute_intercept_tests(request_params = request_params, user_type = user_type)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+          self._execute_intercept_tests(request_params = request_params, user_type = user_type)
 
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""

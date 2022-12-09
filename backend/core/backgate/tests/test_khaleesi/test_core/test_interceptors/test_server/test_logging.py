@@ -2,7 +2,7 @@
 
 # Python.
 from typing import Any, Dict, Optional, cast
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 # gRPC.
 from grpc import StatusCode
@@ -20,22 +20,15 @@ from khaleesi.core.test_util.exceptions import (
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
-from khaleesi.proto.core_sawmill_pb2 import (
-  Request as LoggingRequest,
-  ResponseRequest as LoggingResponse,
-  Error as LoggingError,
-)
 
 
 class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCase):
   """Test LoggingServerInterceptor"""
 
-  interceptor = LoggingServerInterceptor(channel_manager = MagicMock())
+  interceptor = LoggingServerInterceptor(structured_logger = MagicMock())
 
   def test_intercept_with_request_metadata(self) -> None :
     """Test intercept with metadata present."""
-    self.interceptor.stub.LogRequest = MagicMock()
-    self.interceptor.stub.LogResponse = MagicMock()
     for name, request_params in self.metadata_request_params:
       with self.subTest(case = name):
         self._execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
@@ -44,49 +37,42 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
 
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
-    self.interceptor.stub.LogRequest = MagicMock()
-    self.interceptor.stub.LogResponse = MagicMock()
     self._execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
       request = {},
       request_params = self.empty_input,
     )
 
-  @patch('khaleesi.core.interceptors.server.logging.LOGGER')
-  def test_logging_khaleesi_exception(self, logger: MagicMock) -> None :
+  def test_logging_khaleesi_exception(self) -> None :
     """Test the counter gets incremented."""
     for user_label, user_type in User.UserType.items():
       for status in StatusCode:
         with self.subTest(user = user_label.lower(), status = status.name.lower()):
-          # Prepare data.
-          _, final_request = self.get_request(
-            request = {},
-            user = user_type,
-            request_params = self.empty_input,
-          )
-          self.interceptor.stub.LogRequest.reset_mock()
-          self.interceptor.stub.LogResponse.reset_mock()
-          logger.reset_mock()
-          context = MagicMock()
-          STATE.reset()
           exception = default_khaleesi_exception(status = status)
-          # Execute test.
-          with self.assertRaises(KhaleesiException):
-            self.interceptor.khaleesi_intercept(
-              request = final_request,
-              **self.get_intercept_params(
-                context = context,
-                method = khaleesi_raising_method(status = status),
-              ),
+            # Prepare data.
+            _, final_request = self.get_request(
+              request = {},
+              user = user_type,
+              request_params = self.empty_input,
             )
-          # Assert result.
-          self._assert_exception_logging_call(
-            logger    = logger,
-            context   = context,
-            exception = exception,
-          )
+            self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
+            context = MagicMock()
+            STATE.reset()
+            # Execute test.
+            with self.assertRaises(KhaleesiException):
+              self.interceptor.khaleesi_intercept(
+                request = final_request,
+                **self.get_intercept_params(
+                  context = context,
+                  method = khaleesi_raising_method(status = status, loglevel = loglevel),
+                ),
+              )
+            # Assert result.
+            self._assert_exception_logging_call(
+              context   = context,
+              exception = exception,
+            )
 
-  @patch('khaleesi.core.interceptors.server.logging.LOGGER')
-  def test_logging_other_exception(self, logger: MagicMock) -> None :
+  def test_logging_other_exception(self) -> None :
     """Test the counter gets incremented."""
     for user_label, user_type in User.UserType.items():
       with self.subTest(user = user_label.lower()):
@@ -96,9 +82,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           request_params = self.empty_input,
         )
-        self.interceptor.stub.LogRequest.reset_mock()
-        self.interceptor.stub.LogResponse.reset_mock()
-        logger.reset_mock()
+        self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
         context = MagicMock()
         STATE.reset()
         exception = MaskingInternalServerException(exception = default_exception())
@@ -113,16 +97,12 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           )
         # Assert result.
         self._assert_exception_logging_call(
-          logger    = logger,
           context   = context,
           exception = exception,
         )
 
-  @patch('khaleesi.core.interceptors.server.logging.LOGGER')
   def _execute_intercept_grpc_logging_test(
-      self,
-      logger: MagicMock,
-      *,
+      self, *,
       request: Optional[Any] = None,
       request_params: Dict[str, Any],
   ) -> None :
@@ -135,9 +115,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           **request_params,
         )
-        self.interceptor.stub.LogRequest.reset_mock()
-        self.interceptor.stub.LogResponse.reset_mock()
-        logger.reset_mock()
+        self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
         context = MagicMock()
         STATE.reset()
         # Execute test.
@@ -147,52 +125,47 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         )
         # Assert result.
         self._assert_logging_call(
-          logger = logger,
           context = context,
           request_metadata = request_metadata,
         )
 
-  def _assert_logging_call(
-      self, *,
-      logger          : MagicMock,
-      context         : MagicMock,
-      request_metadata: RequestMetadata,
-  ) -> None :
+  def _assert_logging_call(self, *, context: MagicMock, request_metadata: RequestMetadata) -> None :
     """Assert the logging calls were correct."""
-    logging_request = cast(LoggingRequest, self.interceptor.stub.LogRequest.call_args.args[0])
-    logging_response = cast(LoggingResponse, self.interceptor.stub.LogResponse.call_args.args[0])
+    upstream_request = cast(
+      RequestMetadata,
+      self.interceptor.structured_logger.log_request.call_args.kwargs['upstream_request'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
+    )
+    status = cast(
+      StatusCode,
+      self.interceptor.structured_logger.log_response.call_args.kwargs['status'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
+    )
     context.set_code.assert_not_called()
     context.set_details.assert_not_called()
-    self.assertEqual(2, logger.info.call_count)
-    self.assertEqual(request_metadata.caller, logging_request.upstream_request)
-    self.assertEqual(-1                     , logging_request.request_metadata.caller.request_id)
-    self.assertNotEqual(-1                  , logging_response.request_id)
-    self.assertEqual('OK'                   , logging_response.response.status)
+    self.assertEqual(request_metadata.caller, upstream_request.caller)
+    self.assertEqual(StatusCode.OK          , status)
 
   def _assert_exception_logging_call(
       self, *,
-      logger   : MagicMock,
       context  : MagicMock,
       exception: KhaleesiException,
   ) -> None :
     """Assert the logging calls were correct."""
-    logging_response = cast(
-      LoggingResponse,
-      self.interceptor.stub.LogResponse.call_args.args[0],
+    status = cast(
+      StatusCode,
+      self.interceptor.structured_logger.log_response.call_args.kwargs['status'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
     )
-    logging_error = cast(
-      LoggingError,
-      self.interceptor.stub.LogError.call_args.args[0],
+    logged_exception = cast(
+      KhaleesiException,
+      self.interceptor.structured_logger.log_error.call_args.kwargs['exception'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
     )
-    logger.error.assert_called_once()
     context.set_code.assert_called_once()
     context.set_details.assert_called_once()
-    self.assertEqual(exception.status.name    , logging_response.response.status)
-    self.assertEqual(exception.status.name    , logging_error.status)
-    self.assertEqual(exception.gate           , logging_error.gate)
-    self.assertEqual(exception.service        , logging_error.service)
-    self.assertEqual(exception.public_key     , logging_error.public_key)
-    self.assertEqual(exception.public_details , logging_error.public_details)
-    self.assertEqual(exception.private_message, logging_error.private_message)
-    self.assertEqual(exception.private_details, logging_error.private_details)
-    self.assertIsNotNone(logging_error.stacktrace)
+    self.assertEqual(exception.status         , status)
+    self.assertEqual(exception.status         , logged_exception.status)
+    self.assertEqual(exception.gate           , logged_exception.gate)
+    self.assertEqual(exception.service        , logged_exception.service)
+    self.assertEqual(exception.public_key     , logged_exception.public_key)
+    self.assertEqual(exception.public_details , logged_exception.public_details)
+    self.assertEqual(exception.private_message, logged_exception.private_message)
+    self.assertEqual(exception.private_details, logged_exception.private_details)
+    self.assertIsNotNone(logged_exception.stacktrace)

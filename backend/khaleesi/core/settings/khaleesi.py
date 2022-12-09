@@ -71,20 +71,27 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
   ),
   GRPC = definition.Grpc(
     PORT     = cast(int, environ.get('PORT', 8000)),
+    THREADS  = cast(int, environ.get('THREADS', 10)),
+    SERVER_METHOD_NAMES = definition.GrpcServerMethodNames(
+      SERVICE_NAME = 'grpc-server',
+      USER_ID      = 'grpc-server',
+      LIFECYCLE = definition.GrpcEventMethodNames(
+        METHOD = 'lifecycle',
+        TARGET = 'core.core.server'
+      ),
+      INITIALIZE_REQUEST_METRICS = definition.GrpcEventMethodNames(
+        METHOD = 'initialize-request-metrics',
+        TARGET = '',
+      ),
+    ),
+    INTERCEPTORS = definition.GrpcInterceptors(
+      LOGGING_SERVER_INTERCEPTOR = definition.GrpcLoggingServerInterceptor(
+        STRUCTURED_LOGGER = 'khaleesi.core.shared.structured_logger.StructuredGrpcLogger',
+      ),
+    ),
     HANDLERS = [],
-    THREADS = cast(int, environ.get('THREADS', 10))
   ),
   MONITORING = definition.Monitoring(
     PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),
-  ),
-  CORE = definition.Core(
-    STRUCTURED_LOGGING_METHOD = definition.StructuredLoggingMethod.GRPC,
-  ),
-  CONSTANTS = definition.Constants(
-    GRPC_SERVER = definition.GrpcDict(
-      NAME = 'grpc-server',
-      LIFECYCLE = 'lifecycle',
-      INITIALIZE_REQUEST_METRICS = 'initialize-request-metrics',
-    ),
   ),
 )

@@ -11,7 +11,7 @@ from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.metrics.metric_initializer import BaseMetricInitializer, EventData, GrpcData
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
+from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData, EmptyRequest
 from microservice.models.service_registry import SERVICE_REGISTRY
 
 
@@ -23,11 +23,13 @@ class MetricInitializer(BaseMetricInitializer):
 
   def __init__(self, *, channel_manager: ChannelManager) -> None :
     super().__init__(channel_manager = channel_manager)
+    # No gRPC call is executed for the gRPC lifecycle methods, so we need to manually add them.
     caller_details = GrpcCallerDetails()
     caller_details.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']
     caller_details.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
-    caller_details.grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME']
-    caller_details.grpc_method      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['LIFECYCLE']
+    caller_details.grpc_service = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
+    caller_details.grpc_method  = \
+        khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['LIFECYCLE']['METHOD']
     SERVICE_REGISTRY.add_service(caller_details = caller_details)
 
   def initialize_metrics(self) -> None :
@@ -37,9 +39,8 @@ class MetricInitializer(BaseMetricInitializer):
     ]
     super().initialize_metrics_with_data(events = events)
 
-  def requests(self) -> ServiceCallData :
+  def get_service_call_data(self, *, request: EmptyRequest) -> ServiceCallData :
     """Fetch the data for request metrics."""
-    request = self.fill_requests_owner()
     return SERVICE_REGISTRY.get_call_data(owner = request.request_metadata.caller)
 
   def _server_state_events(self) -> List[EventData] :
@@ -51,10 +52,10 @@ class MetricInitializer(BaseMetricInitializer):
             'caller': GrpcData(
               khaleesi_gate    = gate_name,
               khaleesi_service = service_name,
-              grpc_service     = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
-              grpc_method      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['LIFECYCLE'],
+              grpc_service     = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME'],
+              grpc_method = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['LIFECYCLE']['METHOD'],
             ),
-            'target_type' : 'core.core.server',
+            'target_type' : khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['LIFECYCLE']['TARGET'],
             'user_types'  :  [ User.UserType.SYSTEM ],
         }
         events.append(EventData(

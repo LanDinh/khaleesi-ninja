@@ -1,7 +1,7 @@
 """Interceptor test utility."""
 
 # Python.
-from typing import Optional, Any, Tuple, Dict, Callable
+from typing import Optional, Any, Tuple, Dict, Callable, List
 from unittest.mock import MagicMock
 
 # khaleesi.ninja.
@@ -18,7 +18,7 @@ class InterceptorTestMixin(GrpcTestMixin):
       'grpc_service'    : '',
       'grpc_method'     : '',
   }
-  metadata_request_params = [
+  metadata_request_params: List[Tuple[str, Dict[str, Any]]] = [
       ( 'full input'            , {} ),
       ( 'empty khaleesi_gate'   , { 'khaleesi_gate'   : '' } ),
       ( 'empty khaleesi_service', { 'khaleesi_service': '' } ),

@@ -4,23 +4,27 @@
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.metrics.metric_initializer import BaseMetricInitializer, EventData, GrpcData
-from khaleesi.core.shared.exceptions import ProgrammingException
+from khaleesi.core.metrics.metric_initializer import (
+  MetricInitializer as BaseMetricInitializer,
+  EventData,
+  GrpcData,
+)
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
 from khaleesi.proto.core_sawmill_pb2 import Event
 
 
+class MetricInitializer(BaseMetricInitializer):
+  """Test subclass."""
+
+  def initialize_metrics(self) -> None :
+    """Initialize the metrics."""
+
+
 class BaseMetricInitializerTest(SimpleTestCase):
   """Test the metric initializer."""
 
-  metric_initializer = BaseMetricInitializer(channel_manager = MagicMock())
-
-  def test_force_initialization_method(self) -> None :
-    """Test all subclasses need to override the base method."""
-    # Execute test & assert result.
-    with self.assertRaises(ProgrammingException):
-      self.metric_initializer.initialize_metrics()
+  metric_initializer = MetricInitializer(channel_manager = MagicMock())
 
   @patch('khaleesi.core.metrics.metric_initializer.add_grpc_server_system_request_metadata')
   def test_requests(self, add_metadata: MagicMock) -> None :

@@ -1,6 +1,7 @@
 """Metric utility."""
 
 # Python.
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List, Optional, cast
 
@@ -15,7 +16,7 @@ from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.grpc.request_metadata import add_grpc_server_system_request_metadata
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS, RequestsMetric
-from khaleesi.core.settings.definition import KhaleesiNinjaSettings, StructuredLoggingMethod
+from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import ProgrammingException
 from khaleesi.proto.core_pb2 import User, RequestMetadata, GrpcCallerDetails
 from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData, EmptyRequest
@@ -51,41 +52,35 @@ class EventData:
   )
 
 
-class BaseMetricInitializer:
+class BaseMetricInitializer(ABC):
   """Collect info for initializing metrics."""
 
-  stub: ForesterStub
+  own_name: str
 
-  def __init__(self, *, channel_manager: ChannelManager) -> None :
-    if khaleesi_settings['CORE']['STRUCTURED_LOGGING_METHOD'] == StructuredLoggingMethod.GRPC:
-      channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
-      self.stub = ForesterStub(channel)  # type: ignore[no-untyped-call]
+  def __init__(self, *, channel_manager: ChannelManager) -> None :  # pylint: disable=unused-argument
+    self.own_name = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
 
+  @abstractmethod
   def initialize_metrics(self) -> None :
     """Initialize the metrics."""
-    raise ProgrammingException(
-      private_message = 'Need to override initialize_metrics!',
-      private_details = '',
-    )
 
   def initialize_metrics_with_data(self, *, events: List[EventData]) -> None :
     """Initialize the provided metrics."""
     self._initialize_requests()
     self._initialize_events(events = events)
 
-  def fill_requests_owner(self) -> EmptyRequest :
-    """Get the owner data to fetch call data."""
+  @abstractmethod
+  def get_service_call_data(self, *, request: EmptyRequest) -> ServiceCallData :
+    """Fetch service registry data."""
+
+  def requests(self) -> ServiceCallData :
+    """Fetch the data for request metrics."""
     request = EmptyRequest()
     add_grpc_server_system_request_metadata(
       request      = request,
       grpc_method  = 'INITIALIZE_REQUEST_METRICS',
     )
-    return request
-
-  def requests(self) -> ServiceCallData :
-    """Fetch the data for request metrics."""
-    request = self.fill_requests_owner()
-    return cast(ServiceCallData, self.stub.GetServiceCallData(request))
+    return self.get_service_call_data(request = request)
 
   def _initialize_requests(self) -> None :
     """Initialize the request metrics to 0."""
@@ -93,8 +88,7 @@ class BaseMetricInitializer:
     for request in requests.call_list:
       request_metadata = RequestMetadata()
       self._build_request_metadata(request_metadata = request_metadata, caller = request.call)
-      if request_metadata.caller.grpc_service == \
-          khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME']:
+      if request_metadata.caller.grpc_service == self.own_name:
         user_list = [ (User.UserType.Name(User.UserType.SYSTEM), User.UserType.SYSTEM) ]
       else:
         user_list = User.UserType.items()
@@ -122,7 +116,7 @@ class BaseMetricInitializer:
     """Register the request to the specified metric."""
     peer = RequestMetadata()
     self._build_request_metadata(request_metadata = peer, caller = raw_peer)
-    if peer.caller.grpc_service == khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'] and \
+    if peer.caller.grpc_service == self.own_name and \
         request_metadata.user.type != User.UserType.SYSTEM:
       return
     for status in StatusCode:
@@ -189,3 +183,18 @@ class BaseMetricInitializer:
       event.action.custom_type = action_custom_type
 
     AUDIT_EVENT.register(event = event)
+
+
+class MetricInitializer(BaseMetricInitializer):
+  """MetricInitializer which gets service registry data via gRPC."""
+
+  stub    : ForesterStub
+
+  def __init__(self, *, channel_manager: ChannelManager) -> None :
+    super().__init__(channel_manager = channel_manager)
+    channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
+    self.stub = ForesterStub(channel)  # type: ignore[no-untyped-call]
+
+  def get_service_call_data(self, *, request: EmptyRequest) -> ServiceCallData :
+    """Fetch the data for request metrics."""
+    return cast(ServiceCallData, self.stub.GetServiceCallData(request))

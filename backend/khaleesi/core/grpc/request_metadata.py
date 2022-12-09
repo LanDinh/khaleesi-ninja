@@ -25,9 +25,9 @@ def add_grpc_server_system_request_metadata(
   _add_request_metadata(
     request      = request,
     request_id   = -1,  # Not handling a gRPC call.
-    grpc_service = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
-    grpc_method  = khaleesi_settings['CONSTANTS']['GRPC_SERVER'][grpc_method],  # type: ignore[literal-required]  # pylint: disable=line-too-long
-    user_id      = khaleesi_settings['CONSTANTS']['GRPC_SERVER']['NAME'],
+    grpc_service = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME'],
+    grpc_method  = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['METHOD'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
+    user_id      = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['USER_ID'],
     user_type    = UserType.SYSTEM,
   )
 

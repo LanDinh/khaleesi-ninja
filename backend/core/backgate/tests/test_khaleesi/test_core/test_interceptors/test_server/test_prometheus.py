@@ -27,7 +27,7 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
     """Test intercept with metadata present."""
     for name, request_params in self.metadata_request_params:
       with self.subTest(case = name):
-        self._execute_intercept_tests(request_params = request_params)  # type: ignore[arg-type]
+        self._execute_intercept_tests(request_params = request_params)
 
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
