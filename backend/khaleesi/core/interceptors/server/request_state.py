@@ -2,6 +2,7 @@
 
 # Python.
 from typing import Callable, Any
+from uuid import uuid4
 
 # gRPC.
 from grpc import ServicerContext
@@ -24,12 +25,13 @@ class RequestStateServerInterceptor(ServerInterceptor):
     """Handle the state of requests."""
     STATE.reset()  # Always start with a clean state.
     try:
+      STATE.request.id = str(uuid4())
       # Process request data.
       _, _, service_name, method_name = self.process_method_name(raw = method_name)
-      upstream = self.get_upstream_request(request = request)
-
       STATE.request.grpc_service = service_name
       STATE.request.grpc_method  = method_name
+
+      upstream = self.get_upstream_request(request = request)
       STATE.user.id   = upstream.user.id
       STATE.user.type = UserType(upstream.user.type)
 

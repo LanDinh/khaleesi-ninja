@@ -34,7 +34,7 @@ LOGGING = {
     'formatters': {
         'khaleesi': {
             'format':
-              '| {levelname: >8} | {asctime} | {thread:d} | {request_id: <6} | {message}',
+              '| {levelname: >8} | {asctime} | {thread:d} | {request_id: <36} | {message}',
             'style': '{',
         },
     },

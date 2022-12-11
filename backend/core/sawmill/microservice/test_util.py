@@ -18,7 +18,7 @@ class ModelRequestMetadataMixin:
   def model_full_request_metadata(self, *, user: 'User.UserType.V') -> Dict[str, Any] :
     """Fill model request metadata for testing purposes."""
     return {
-        'meta_caller_request_id'      : 1337,
+        'meta_caller_request_id'      : '1337',
         'meta_caller_khaleesi_gate'   : 'khaleesi-gate',
         'meta_caller_khaleesi_service': 'khaleesi-service',
         'meta_caller_grpc_service'    : 'grpc-service',

@@ -24,7 +24,7 @@ class GrpcTestCase(SimpleTestCase):
     request = MagicMock()
     request.request_metadata = RequestMetadata()
     expected = RequestMetadata()
-    expected.caller.request_id   = -1
+    expected.caller.request_id   = 'grpc-server-request-id'
     expected.caller.grpc_service = 'grpc-server'
     expected.caller.grpc_method  = 'lifecycle'
     expected.user.id             = 'grpc-server'
@@ -37,7 +37,7 @@ class GrpcTestCase(SimpleTestCase):
     """Test adding request metadata."""
     # Prepare data.
     expected = RequestMetadata()
-    expected.caller.request_id   = 13
+    expected.caller.request_id   = 'request-id'
     expected.caller.grpc_service = 'grpc-service'
     expected.caller.grpc_method  = 'grpc-method'
     expected.user.id             = 'user-id'

@@ -50,7 +50,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.logger.sender.reset_mock()
     logger.reset_mock()
     upstream_request = RequestMetadata()
-    upstream_request.caller.request_id       = 13
+    upstream_request.caller.request_id       = 'request-id'
     upstream_request.caller.khaleesi_gate    = 'khaleesi-gate'
     upstream_request.caller.khaleesi_service = 'khaleesi-service'
     upstream_request.caller.grpc_service     = 'grpc-service'

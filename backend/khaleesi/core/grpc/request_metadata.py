@@ -24,7 +24,7 @@ def add_grpc_server_system_request_metadata(
   """Add request metadata to request protobufs."""
   _add_request_metadata(
     request      = request,
-    request_id   = -1,  # Not handling a gRPC call.
+    request_id   = 'system',
     grpc_service = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME'],
     grpc_method  = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['METHOD'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
     user_id      = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['USER_ID'],
@@ -45,7 +45,7 @@ def add_request_metadata(*, request : Any) -> None :
 def _add_request_metadata(
     *,
     request     : Any,
-    request_id  : int,
+    request_id  : str,
     grpc_service: str,
     grpc_method : str,
     user_id     : str,

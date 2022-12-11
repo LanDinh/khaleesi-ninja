@@ -52,7 +52,7 @@ class ServerInterceptorTest(SimpleTestCase):
     """Test if we can fetch the upstream request."""
     # Prepare data.
     request = Request()
-    request.request_metadata.caller.request_id = 13
+    request.request_metadata.caller.request_id = 'request-id'
     # Execute test.
     result = self.interceptor.get_upstream_request(request = request)
     # Assert result.

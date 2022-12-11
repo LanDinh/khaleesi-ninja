@@ -26,7 +26,11 @@ class RequestManager(models.Manager['Request']):
     errors: List[str] = []
 
     upstream_request = {} if grpc_request is None else {
-        "upstream_request_request_id": grpc_request.upstream_request.request_id,
+        "upstream_request_request_id": parse_string(
+          raw = grpc_request.upstream_request.request_id,
+          name = 'upstream_request_request_id',
+          errors = errors,
+        ),
         "upstream_request_khaleesi_gate": parse_string(
           raw = grpc_request.upstream_request.khaleesi_gate,
           name = 'upstream_request_khaleesi_gate',
@@ -61,11 +65,15 @@ class RequestManager(models.Manager['Request']):
 
     errors: List[str] = []
 
-    request = self.get(pk = grpc_response.request_id)
+    request = self.get(
+      meta_caller_request_id = grpc_response.request_id,
+      response_status = 'IN_PROGRESS',
+    )
     if grpc_response.response.status:
       request.response_status = grpc_response.response.status
     else:
       errors.append('response status is missing')
+      request.response_status = 'UNKNOWN'
     response_timestamp =  parse_timestamp(
       raw    = grpc_response.response.timestamp.ToDatetime(),
       name   = 'timestamp',
@@ -82,7 +90,7 @@ class RequestManager(models.Manager['Request']):
 class Request(Metadata):
   """Request logs."""
 
-  upstream_request_request_id       = models.BigIntegerField(default = 0)
+  upstream_request_request_id       = models.TextField(default = 'UNKNOWN')
   upstream_request_khaleesi_gate    = models.TextField(default = 'UNKNOWN')
   upstream_request_khaleesi_service = models.TextField(default = 'UNKNOWN')
   upstream_request_grpc_service     = models.TextField(default = 'UNKNOWN')
@@ -103,9 +111,7 @@ class Request(Metadata):
     # Request metadata.
     self.request_metadata_to_grpc(request_metadata = grpc_request_response.request.request_metadata)
     self.response_metadata_to_grpc(response_metadata = grpc_request_response.request_metadata)
-    # In the case of requests, the request_id is in the pk. Other log types use this to associate
-    # with the correct request.
-    grpc_request_response.request.request_metadata.caller.request_id = self.pk
+    grpc_request_response.request.request_metadata.caller.request_id = self.meta_caller_request_id
     # Upstream request.
     grpc_request_response.request.upstream_request.request_id = self.upstream_request_request_id
     grpc_request_response.request.upstream_request.khaleesi_gate = \

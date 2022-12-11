@@ -21,7 +21,7 @@ class GrpcTestMixin:
       grpc_method     : str               = 'metadata-grpc-method',
   ) -> RequestMetadata :
     """Fill gRPC request metadata for testing purposes."""
-    request_metadata.caller.request_id       = 1337
+    request_metadata.caller.request_id       = '1337'
     request_metadata.caller.khaleesi_gate    = khaleesi_gate
     request_metadata.caller.khaleesi_service = khaleesi_service
     request_metadata.caller.grpc_service     = grpc_service

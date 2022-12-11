@@ -36,7 +36,7 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
           now = now,
           user = user_type,
         )
-        grpc_request.upstream_request.request_id = 13
+        grpc_request.upstream_request.request_id = string.return_value
         grpc_request.upstream_request.khaleesi_gate = string.return_value
         grpc_request.upstream_request.khaleesi_service = string.return_value
         grpc_request.upstream_request.grpc_service = string.return_value
@@ -93,7 +93,7 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         now = datetime.now(tz = timezone.utc)
         timestamp.return_value = now
         grpc_response = GrpcResponse()
-        grpc_response.request_id = 13
+        grpc_response.request_id = 'request-id'
         grpc_response.response.status = status.name
         grpc_response.response.timestamp.FromDatetime(now)
         # Execute test.
@@ -130,7 +130,7 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
       with self.subTest(user = user_label):
         # Prepare data.
         request = Request(
-          upstream_request_request_id = 13,
+          upstream_request_request_id = '',
           upstream_request_khaleesi_gate = '',
           upstream_request_khaleesi_service = '',
           upstream_request_grpc_service = '',

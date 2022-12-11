@@ -4,7 +4,6 @@
 from datetime import datetime, timezone
 from functools import partial
 from typing import Callable, Any, Optional, TypeVar, List, Protocol
-from uuid import UUID
 
 
 T_co = TypeVar('T_co', covariant = True)  # pylint: disable=invalid-name
@@ -32,7 +31,6 @@ class Parser(Protocol[T_co]):
   def __call__(self, *, raw: Optional[Any], name: str, errors: List[str]) -> Optional[T_co] : ...
 
 
-parse_uuid: Parser[UUID] = partial(_parse_input, parser = UUID, default = None)
 parse_timestamp: Parser[datetime] = partial(
   _parse_input,
   parser = lambda x : x.replace(tzinfo = timezone.utc),

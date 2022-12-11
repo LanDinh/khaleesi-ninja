@@ -61,15 +61,7 @@ class Logger:
     logger.fatal(message, extra = self._extra())
 
   def _extra(self) -> Dict[str, str] :
-    return {
-        'request_id': self._non_empty(name = 'request_id', default = 'system')
-    }
-
-  @staticmethod
-  def _non_empty(*, name: str, default: str) -> str :
-    if hasattr(STATE, name) and getattr(STATE, name):
-      return str(getattr(STATE, name))
-    return default  # pragma: no cover
+    return { 'request_id': STATE.request.id }
 
 
 LOGGER = Logger()

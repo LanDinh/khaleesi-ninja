@@ -37,6 +37,7 @@ class StructuredLogger(ABC):
 
   def log_request(self, *, upstream_request: RequestMetadata) -> None :
     """Log a microservice request."""
+    LOGGER.info(f'{STATE.request.grpc_service}.{STATE.request.grpc_method} request started')
     request = Request()
     add_request_metadata(request = request)
     request.upstream_request.request_id       = upstream_request.caller.request_id
@@ -45,7 +46,6 @@ class StructuredLogger(ABC):
     request.upstream_request.grpc_service     = upstream_request.caller.grpc_service
     request.upstream_request.grpc_method      = upstream_request.caller.grpc_method
     self.send_log_request(request = request)
-    LOGGER.info(f'{STATE.request.grpc_service}.{STATE.request.grpc_method} request started')
 
   def log_response(self, status: StatusCode) -> None :
     """Log a microservice response."""
@@ -137,8 +137,7 @@ class StructuredGrpcLogger(StructuredLogger):
 
   def send_log_request(self, *, request: Request) -> None :
     """Send the log request to the logging facility."""
-    response = self.stub.LogRequest(request)
-    STATE.request.id = response.request_id
+    self.stub.LogRequest(request)
 
   def send_log_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""

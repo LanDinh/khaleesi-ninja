@@ -13,7 +13,7 @@ from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.abstract import Metadata
-from microservice.parse_util import parse_uuid, parse_string
+from microservice.parse_util import parse_string
 
 
 khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
@@ -40,8 +40,12 @@ class EventManager(models.Manager['Event']):
         name = 'target_type',
         errors = errors,
       ),
-      target_id = grpc_event.target.id,
-      target_owner = parse_uuid(
+      target_id = parse_string(
+        raw  = grpc_event.target.id,
+        name = 'target_id',
+        errors = errors,
+      ),
+      target_owner = parse_string(
         raw  = grpc_event.target.owner.id,
         name = 'target_owner',
         errors = errors,
@@ -65,8 +69,8 @@ class Event(Metadata):
 
   # Target.
   target_type  = models.TextField(default = 'UNKNOWN')
-  target_id    = models.BigIntegerField(default = 0)
-  target_owner = models.UUIDField(null = True, blank = True)
+  target_id    = models.TextField(default = 'UNKNOWN')
+  target_owner = models.TextField(default = 'UNKNOWN')
 
   # Action.
   action_crud_type   = models.IntegerField(default = 0)
@@ -85,8 +89,7 @@ class Event(Metadata):
     # Target.
     grpc_event_response.event.target.type = self.target_type
     grpc_event_response.event.target.id   = self.target_id
-    if self.target_owner:
-      grpc_event_response.event.target.owner.id = str(self.target_owner)
+    grpc_event_response.event.target.owner.id = self.target_owner
     # Action.
     grpc_event_response.event.action.crud_type   = self.action_crud_type  # type: ignore[assignment]
     grpc_event_response.event.action.custom_type = self.action_custom_type

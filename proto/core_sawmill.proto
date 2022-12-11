@@ -16,7 +16,7 @@ message Event {
 
   message Target {
     string             type  = 1;
-    int64              id    = 2;
+    string             id    = 2;
     khaleesi.core.User owner = 3;
   }
 
@@ -75,9 +75,6 @@ message Error {
   string                        stacktrace       = 10;
 }
 
-message LogRequestResponse {
-  int64 request_id = 1;
-}
 
 message Response {
   string                    status     = 2;
@@ -85,8 +82,8 @@ message Response {
 }
 
 message ResponseRequest {
-  int64 request_id  = 1;
-  Response response = 2;
+  string   request_id = 1;
+  Response response   = 2;
 }
 
 
@@ -94,7 +91,7 @@ message LogStandardResponse {}
 
 service Lumberjack {
   rpc LogEvent    (Event)           returns (LogStandardResponse);
-  rpc LogRequest  (Request)         returns (LogRequestResponse);
+  rpc LogRequest  (Request)         returns (LogStandardResponse);
   rpc LogResponse (ResponseRequest) returns (LogStandardResponse);
   rpc LogError    (Error)           returns (LogStandardResponse);
 }

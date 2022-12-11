@@ -10,10 +10,8 @@ import grpc
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
-    DESCRIPTOR,
-    Error, Event, ResponseRequest,
-    Request, LogRequestResponse,
-    LogStandardResponse,
+    DESCRIPTOR, LogStandardResponse,
+    Error, Event, ResponseRequest, Request,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
@@ -34,10 +32,9 @@ class Service(Servicer):
       SERVICE_REGISTRY.add_service(caller_details = request.request_metadata.caller)
       return result
 
-    self._handle_response(method = method)
-    return LogStandardResponse()
+    return self._handle_response(method = method)
 
-  def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogRequestResponse :
+  def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log requests."""
     def method() -> Metadata:
       result = DbRequest.objects.log_request(grpc_request = request)
@@ -47,23 +44,20 @@ class Service(Servicer):
       )
       return result
 
-    logged_request = self._handle_response(method = method)
-    response = LogRequestResponse()
-    response.request_id = logged_request.pk
-    return response
+    return self._handle_response(method = method)
 
   def LogResponse(self, request: ResponseRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log request responses."""
-    self._handle_response(method = lambda: DbRequest.objects.log_response(grpc_response = request))
-    return LogStandardResponse()
+    return self._handle_response(
+      method = lambda: DbRequest.objects.log_response(grpc_response = request),
+    )
 
   def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log errors."""
-    self._handle_response(method = lambda: DbError.objects.log_error(grpc_error = request))
-    return LogStandardResponse()
+    return self._handle_response(method = lambda: DbError.objects.log_error(grpc_error = request))
 
 
-  def _handle_response(self, *, method: Callable[[], Metadata]) -> Metadata :
+  def _handle_response(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :
     """Wrap responses for logging."""
     metadata = method()
     if metadata.meta_logging_errors:
@@ -71,7 +65,7 @@ class Service(Servicer):
         private_message = 'Error when parsing the metadata fields.',
         private_details = metadata.meta_logging_errors,
       )
-    return metadata
+    return LogStandardResponse()
 
 
 service_configuration = ServiceConfiguration[Service](

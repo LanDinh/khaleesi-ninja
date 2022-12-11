@@ -22,7 +22,7 @@ class UserType(Enum):
 @dataclass
 class Request:
   """Request meta."""
-  id          : int = -1  # pylint: disable=invalid-name
+  id          : str = 'system'  # pylint: disable=invalid-name
   grpc_service: str = 'UNKNOWN'
   grpc_method : str = 'UNKNOWN'
 
