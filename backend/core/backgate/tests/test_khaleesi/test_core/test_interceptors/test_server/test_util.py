@@ -65,4 +65,4 @@ class ServerInterceptorTest(SimpleTestCase):
     # Execute test.
     result = self.interceptor.get_upstream_request(request = object())
     # Assert result.
-    self.assertEqual(0, result.caller.request_id)
+    self.assertEqual('', result.caller.request_id)

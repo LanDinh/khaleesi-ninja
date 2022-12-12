@@ -24,14 +24,14 @@ class GrpcTestCase(SimpleTestCase):
     request = MagicMock()
     request.request_metadata = RequestMetadata()
     expected = RequestMetadata()
-    expected.caller.request_id   = 'grpc-server-request-id'
+    expected.caller.request_id   = 'system'
     expected.caller.grpc_service = 'grpc-server'
     expected.caller.grpc_method  = 'lifecycle'
     expected.user.id             = 'grpc-server'
     # Execute test.
     add_grpc_server_system_request_metadata(request = request, grpc_method = 'LIFECYCLE')
     # Assert result
-    self.assert_metadata(request = request, expected = expected, user_type = UserType.SYSTEM)
+    self._assert_metadata(request = request, expected = expected, user_type = UserType.SYSTEM)
 
   def test_add_request_metadata(self) -> None :
     """Test adding request metadata."""
@@ -54,10 +54,10 @@ class GrpcTestCase(SimpleTestCase):
         # Execute test.
         add_request_metadata(request = request)
         # Assert result.
-        self.assert_metadata(request = request, expected = expected, user_type = user_type)
+        self._assert_metadata(request = request, expected = expected, user_type = user_type)
         STATE.reset()
 
-  def assert_metadata(
+  def _assert_metadata(
       self, *,
       request: Any,
       expected: RequestMetadata,
