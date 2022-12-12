@@ -39,20 +39,14 @@ class LoggingServerInterceptor(ServerInterceptor):
       self.structured_logger.log_response(status = StatusCode.OK)
       return response
     except KhaleesiException as exception:
-      self._handle_exception(context = context, exception = exception)
+      self._handle_exception(exception = exception)
       raise
     except Exception as exception:
       new_exception = MaskingInternalServerException(exception = exception)
-      self._handle_exception(context = context, exception = new_exception)
+      self._handle_exception(exception = new_exception)
       raise new_exception from exception
 
-  def _handle_exception(
-      self, *,
-      context   : ServicerContext,
-      exception : KhaleesiException,
-  ) -> None :
+  def _handle_exception(self, *, exception: KhaleesiException) -> None :
     """Properly handle the exception."""
     self.structured_logger.log_error(exception = exception)
     self.structured_logger.log_response(status = exception.status)
-    context.set_code(exception.status)
-    context.set_details(exception.to_json())

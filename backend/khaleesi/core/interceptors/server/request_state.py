@@ -9,13 +9,14 @@ from grpc import ServicerContext
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.util import ServerInterceptor
+from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import STATE, UserType
 
 
 class RequestStateServerInterceptor(ServerInterceptor):
   """Interceptor to handle state of requests."""
 
-  def khaleesi_intercept(
+  def khaleesi_intercept(  # pylint: disable=inconsistent-return-statements
       self, *,
       method: Callable[[Any, ServicerContext], Any],
       request: Any,
@@ -39,6 +40,17 @@ class RequestStateServerInterceptor(ServerInterceptor):
       response = method(request, context)
       STATE.reset()  # Always clean up afterwards.
       return response
-    except Exception:
-      STATE.reset()  # Always clean up afterwards.
-      raise
+    except KhaleesiException as exception:
+      self._handle_exception(context = context, exception = exception)
+    except Exception as exception:  # pylint: disable=broad-except
+      new_exception = MaskingInternalServerException(exception = exception)
+      self._handle_exception(context = context, exception = new_exception)
+
+  def _handle_exception(
+      self, *,
+      context  : ServicerContext,
+      exception: KhaleesiException,
+  ) -> None :
+    """Properly handle the exception."""
+    STATE.reset()  # Always clean up afterwards.
+    context.abort(code = exception.status, details = exception.to_json())

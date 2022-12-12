@@ -12,7 +12,7 @@ from khaleesi.core.shared.logger import LogLevel
 from khaleesi.core.shared.structured_logger import StructuredGrpcLogger, StructuredLogger
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import Request, ResponseRequest, Error, Event
 
 
@@ -59,7 +59,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.logger.log_request(upstream_request = upstream_request)
     # Assert result.
     self.logger.sender.send.assert_called_once()
-    logger.info.assert_called_once()
+    self.assertEqual(2, logger.info.call_count)
     log_request = cast(Request, self.logger.sender.send.call_args.kwargs['request'])
     self.assertEqual(upstream_request.caller, log_request.upstream_request)
 
@@ -104,7 +104,7 @@ class TestStructuredLogger(SimpleTestCase):
           self.logger.log_error(exception = exception)
           # Assert result.
           self.logger.sender.send.assert_called_once()
-          logger.log.assert_called_once()
+          self.assertEqual(2, logger.log.call_count)
           log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
           self.assertEqual(status.name              , log_error.status)
           self.assertEqual(loglevel.name            , log_error.loglevel)
@@ -122,28 +122,39 @@ class TestStructuredLogger(SimpleTestCase):
     details = 'details'
     for action_label, action_type in Event.Action.ActionType.items():
       for result_label, result_type in Event.Action.ResultType.items():
-        with self.subTest(action = action_label, result = result_label):
-          # Prepare data.
-          self.logger.sender.reset_mock()
-          logger.reset_mock()
-          # Perform test.
-          self.logger.log_system_event(
-            grpc_method = method,
-            action      = action_type,
-            result      = result_type,
-            details     = details,
-          )
-          # Assert result.
-          self.logger.sender.send.assert_called_once()
-          self.assertEqual(
-            1,
-            logger.info.call_count + logger.warning.call_count + logger.error.call_count
-            + logger.fatal.call_count,
-          )
-          log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
-          self.assertEqual(action_type, log_event.action.crud_type)
-          self.assertEqual(result_type, log_event.action.result)
-          self.assertEqual(details    , log_event.action.details)
+        for user_label, user_type in User.UserType.items():
+          with self.subTest(action = action_label, result = result_label, user = user_label):
+            # Prepare data.
+            self.logger.sender.reset_mock()
+            logger.reset_mock()
+            owner      = User()
+            owner.type = user_type
+            owner.id   = 'user'
+            target = 'target'
+            # Perform test.
+            self.logger.log_system_event(
+              grpc_method = method,
+              target      = target,
+              owner       = owner,
+              action      = action_type,
+              result      = result_type,
+              details     = details,
+            )
+            # Assert result.
+            self.logger.sender.send.assert_called_once()
+            self.assertEqual(
+              1,
+              logger.info.call_count + logger.warning.call_count + logger.error.call_count
+              + logger.fatal.call_count,
+            )
+            log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
+            self.assertEqual(target     , log_event.target.id)
+            self.assertEqual(target     , log_event.target.id)
+            self.assertEqual(owner.id   , log_event.target.owner.id)
+            self.assertEqual(owner.type , log_event.target.owner.type)
+            self.assertEqual(action_type, log_event.action.crud_type)
+            self.assertEqual(result_type, log_event.action.result)
+            self.assertEqual(details    , log_event.action.details)
 
 
 class TestStructuredGrpcLogger(SimpleTestCase):

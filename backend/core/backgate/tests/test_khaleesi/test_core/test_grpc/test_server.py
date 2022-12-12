@@ -12,6 +12,7 @@ from django.utils.module_loading import import_string
 from khaleesi.core.grpc.server import Server
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.test_util.test_case import SimpleTestCase
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 
 
@@ -215,5 +216,6 @@ class ServerTestCase(SimpleTestCase):
     structured_logger.log_system_event.assert_called_once()
     kwargs = structured_logger.log_system_event.call_args.kwargs
     self.assertEqual(kwargs['grpc_method'], 'LIFECYCLE')
+    self.assertEqual(kwargs['owner'].type , User.UserType.SYSTEM)
     self.assertEqual(kwargs['action']     , action)
     self.assertEqual(kwargs['result']     , result)

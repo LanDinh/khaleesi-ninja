@@ -56,7 +56,6 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
               request_params = self.empty_input,
             )
             self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
-            context = MagicMock()
             STATE.reset()
             exception = default_khaleesi_exception(status = status, loglevel = loglevel)
             # Execute test.
@@ -64,15 +63,11 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
               self.interceptor.khaleesi_intercept(
                 request = final_request,
                 **self.get_intercept_params(
-                  context = context,
                   method = khaleesi_raising_method(status = status, loglevel = loglevel),
                 ),
               )
             # Assert result.
-            self._assert_exception_logging_call(
-              context   = context,
-              exception = exception,
-            )
+            self._assert_exception_logging_call(loglevel = loglevel, exception = exception)
 
   def test_logging_other_exception(self) -> None :
     """Test the counter gets incremented."""
@@ -85,23 +80,16 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           request_params = self.empty_input,
         )
         self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
-        context = MagicMock()
         STATE.reset()
         exception = MaskingInternalServerException(exception = default_exception())
         # Execute test.
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesi_intercept(
             request = final_request,
-            **self.get_intercept_params(
-              context = context,
-              method = exception_raising_method(exception = exception),
-            ),
+            **self.get_intercept_params(method = exception_raising_method(exception = exception)),
           )
         # Assert result.
-        self._assert_exception_logging_call(
-          context   = context,
-          exception = exception,
-        )
+        self._assert_exception_logging_call(loglevel = LogLevel.FATAL, exception = exception)
 
   def _execute_intercept_grpc_logging_test(
       self, *,
@@ -148,8 +136,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
 
   def _assert_exception_logging_call(
       self, *,
-      context  : MagicMock,
       exception: KhaleesiException,
+      loglevel : LogLevel,
   ) -> None :
     """Assert the logging calls were correct."""
     status = cast(
@@ -160,12 +148,10 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
       KhaleesiException,
       self.interceptor.structured_logger.log_error.call_args.kwargs['exception'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
     )
-    context.set_code.assert_called_once()
-    context.set_details.assert_called_once()
     self.assertEqual(exception.status         , status)
     self.assertEqual(exception.status         , logged_exception.status)
-    #self.assertEqual(exception.loglevel       , loglevel)
-    #self.assertEqual(exception.loglevel       , logged_exception.loglevel)
+    self.assertEqual(exception.loglevel       , loglevel)
+    self.assertEqual(exception.loglevel       , logged_exception.loglevel)
     self.assertEqual(exception.gate           , logged_exception.gate)
     self.assertEqual(exception.service        , logged_exception.service)
     self.assertEqual(exception.public_key     , logged_exception.public_key)

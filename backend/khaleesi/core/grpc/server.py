@@ -25,6 +25,7 @@ from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricTy
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.structured_logger import StructuredLogger
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences
 from metric_initializer import MetricInitializer
@@ -179,9 +180,14 @@ class Server:
       details: str,
   ) -> None :
     """Log the server state."""
+    user = User()
+    user.type = User.UserType.SYSTEM
+    user.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
     self.structured_logger.log_system_event(
       grpc_method = 'LIFECYCLE',
-      action = action,
-      result = result,
-      details = details,
+      target      = '<pod ID>',
+      owner       = user,
+      action      = action,
+      result      = result,
+      details     = details,
     )

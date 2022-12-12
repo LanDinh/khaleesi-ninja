@@ -37,8 +37,12 @@ class KhaleesiException(Exception):
     self.public_details  = public_details
     self.private_message = private_message
     self.private_details = private_details
-    self.stacktrace      = ''.join(format_exception(None, self, self.__traceback__))
     self.loglevel        = loglevel
+
+  @property
+  def stacktrace(self) -> str :
+    """Return the stacktrace of the exception."""
+    return ''.join(format_exception(None, self, self.__traceback__))
 
   def to_json(self) -> str :
     """Return a json string to encode this object."""

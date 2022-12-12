@@ -3,9 +3,6 @@
 # Python.
 from typing import Tuple
 
-# khaleesi.ninja.
-from khaleesi.core.shared.logger import LOGGER
-
 
 class Interceptor:
   """Interceptor utility."""
@@ -18,10 +15,7 @@ class Interceptor:
 
   def skip_interceptors(self, *, raw: str) -> bool :
     """Skip interceptors for utility provided by libraries."""
-    if raw in self.skip_list:
-      LOGGER.debug(f'Skip logging of {raw}')
-      return True
-    return False
+    return raw in self.skip_list
 
   def process_method_name(self, *, raw: str) -> Tuple[str, str, str, str] :
     """Process the method name and return (service, method)."""

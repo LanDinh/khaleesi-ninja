@@ -28,15 +28,18 @@ class LoggingClientInterceptor(ClientInterceptor):
       grpc_method        : str,
   ) -> Any :
     """Log data."""
-    LOGGER.info(f'Calling {khaleesi_gate}.{khaleesi_service}{grpc_service}.{grpc_method}...')
+    LOGGER.info(f'Calling {khaleesi_gate}-{khaleesi_service}: {grpc_service}.{grpc_method}...')
 
     response: Call = method(request_or_iterator, call_details)
 
     if response.code() == StatusCode.OK:
-      LOGGER.info(f'Call to {khaleesi_gate}.{khaleesi_service}{grpc_service}.{grpc_method} was ok.')
+      LOGGER.info(
+        f'Call to {khaleesi_gate}-{khaleesi_service}: {grpc_service}.{grpc_method} was ok.'
+      )
       return response
     LOGGER.warning(
-      f'Call to {khaleesi_gate}.{khaleesi_service}{grpc_service}.{grpc_method} was not ok.',
+      f'Call to {khaleesi_gate}-{khaleesi_service}: {grpc_service}.{grpc_method} '
+      f'returned {response.code()}.'
     )
     raise UpstreamGrpcException(
       status = response.code(),

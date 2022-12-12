@@ -3,13 +3,13 @@
 # Python.
 from functools import partial
 from typing import Optional, Any, Dict
+from unittest.mock import MagicMock
 
 # gRPC.
 from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.request_state import RequestStateServerInterceptor
-from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.logger import LogLevel
 from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.test_util.exceptions import khaleesi_raising_method
@@ -77,38 +77,43 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
       user_type: int,
   ) -> None :
     """Test the counter gets incremented."""
+    context = MagicMock()
     for status in StatusCode:
       for loglevel in LogLevel:
         with self.subTest(status = status.name, loglevel = loglevel.name):
+          # Prepare data.
+          context.reset_mock()
           # Execute test.
-          with self.assertRaises(KhaleesiException):
-            self.interceptor.khaleesi_intercept(
-              request = final_request,
-              **self.get_intercept_params(
-                method = khaleesi_raising_method(
-                  method   = partial(self._assert_not_clean_state, user_type = user_type),
-                  status   = status,
-                  loglevel = loglevel,
-                ),
+          self.interceptor.khaleesi_intercept(
+            request = final_request,
+            **self.get_intercept_params(
+              context = context,
+              method  = khaleesi_raising_method(
+                method   = partial(self._assert_not_clean_state, user_type = user_type),
+                status   = status,
+                loglevel = loglevel,
               ),
-            )
+            ),
+          )
           # Assert result.
           self._assert_clean_state()
+          context.abort.assert_called_once()
 
   def _execute_intercept_other_exception_test(self, *, final_request: Any, user_type: int) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
+    context = MagicMock()
     def _method(*_: Any) -> None :
       self._assert_not_clean_state(user_type = user_type)
       raise Exception('exception')
     # Execute test.
-    with self.assertRaises(Exception):
-      self.interceptor.khaleesi_intercept(
-        request = final_request,
-        **self.get_intercept_params(method = _method),
-      )
+    self.interceptor.khaleesi_intercept(
+      request = final_request,
+      **self.get_intercept_params(context = context, method = _method),
+    )
     # Assert result.
     self._assert_clean_state()
+    context.abort.assert_called_once()
 
   def _assert_clean_state(self) -> None :
     """Assert a clean state."""
