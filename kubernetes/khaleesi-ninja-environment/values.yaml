@@ -3,6 +3,8 @@ prometheus:
   replicas: 1
   retention: 20d
   ingress: false
+grafana:
+  ingress: false
 alertmanager:
   name: kube-prometheus-kube-prome-alertmanager
   namespace: khaleesi-monitoring
