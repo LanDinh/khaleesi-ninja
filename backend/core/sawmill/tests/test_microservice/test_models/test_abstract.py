@@ -36,7 +36,7 @@ class MetadataTestCase(SimpleTestCase):
         # Execute test.
         result = Metadata.log_metadata(metadata = grpc_metadata, errors = [ initial_error ])
         # Assert result.
-        self.assertEqual(now                            , result['meta_event_timestamp'])
+        self.assertEqual(now                            , result['meta_reported_timestamp'])
         self.assertEqual(user_type                      , result['meta_user_type'])
         self.assertEqual(initial_error                  , result['meta_logging_errors'])
 

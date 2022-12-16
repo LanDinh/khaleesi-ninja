@@ -3,6 +3,7 @@ syntax = "proto3";
 package khaleesi.core.sawmill;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "core.proto";
 
 
@@ -109,10 +110,12 @@ message EventsList {
 
 
 message RequestResponse {
-  ResponseMetadata request_metadata  = 1;
-  Request          request           = 2;
-  ResponseMetadata response_metadata = 3;
-  Response         response          = 4;
+  ResponseMetadata         request_metadata  = 1;
+  Request                  request           = 2;
+  ResponseMetadata         response_metadata = 3;
+  Response                 response          = 4;
+  google.protobuf.Duration reported_duration = 10;
+  google.protobuf.Duration logged_duration   = 11;
 }
 
 message RequestList {

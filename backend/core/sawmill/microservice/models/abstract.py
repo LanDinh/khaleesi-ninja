@@ -33,7 +33,7 @@ class Metadata(models.Model):
   meta_user_type = models.IntegerField(default = 0)
 
   # Time.
-  meta_event_timestamp  = models.DateTimeField(
+  meta_reported_timestamp  = models.DateTimeField(
     default = datetime.min.replace(tzinfo = timezone.utc))
   meta_logged_timestamp = models.DateTimeField(auto_now_add = True)
 
@@ -79,7 +79,7 @@ class Metadata(models.Model):
         ),
         'meta_user_type': metadata.user.type,
         # Time.
-        'meta_event_timestamp': parse_timestamp(
+        'meta_reported_timestamp': parse_timestamp(
           raw    = metadata.timestamp.ToDatetime(),
           name   = 'timestamp',
           errors = errors,
@@ -100,7 +100,7 @@ class Metadata(models.Model):
     request_metadata.user.id   = self.meta_user_id
     request_metadata.user.type = self.meta_user_type  # type: ignore[assignment]
     # Time.
-    request_metadata.timestamp.FromDatetime(self.meta_event_timestamp)
+    request_metadata.timestamp.FromDatetime(self.meta_reported_timestamp)
 
   def response_metadata_to_grpc(self, *, response_metadata: ResponseMetadata) -> None :
     """Fill in the request metadata for grpc."""

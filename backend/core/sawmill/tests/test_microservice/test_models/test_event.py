@@ -38,8 +38,8 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
             grpc_event = GrpcEvent()
             self.set_request_metadata(
               request_metadata = grpc_event.request_metadata,
-              now = now,
-              user = user_type,
+              now              = now,
+              user             = user_type,
             )
             grpc_event.target.type        = 'target-type'
             grpc_event.target.id          = 'target-id'
@@ -150,9 +150,9 @@ class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
     """Test that mapping to gRPC works with target owners."""
     # Prepare data.
     event = Event(
-      meta_event_timestamp  = datetime.now(tz = timezone.utc),
-      meta_logged_timestamp = datetime.now(tz = timezone.utc),
-      target_owner = 'target-owner',
+      meta_reported_timestamp  = datetime.now(tz = timezone.utc),
+      meta_logged_timestamp    = datetime.now(tz = timezone.utc),
+      target_owner             = 'target-owner',
     )
     # Execute test.
     result = event.to_grpc_event_response()

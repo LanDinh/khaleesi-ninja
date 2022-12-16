@@ -1,7 +1,7 @@
 """Test the request logs."""
 
 # Python.
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from unittest.mock import patch, MagicMock
 
 # gRPC.
@@ -67,6 +67,10 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
           grpc_request.upstream_request.grpc_method,
           result.upstream_request_grpc_method,
         )
+        self.assertTrue(result.is_in_progress)
+        self.assertEqual('IN_PROGRESS', result.response_status)
+        self.assertEqual(timedelta(0), result.logged_duration)
+        self.assertEqual(timedelta(0), result.reported_duration)
 
   @patch('microservice.models.event.parse_string')
   @patch.object(Request.objects.model, 'log_metadata')
@@ -82,43 +86,70 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
     metadata.assert_called_once()
     self.assertEqual([], metadata.call_args.kwargs['errors'])
     self.assertEqual('', result.meta_logging_errors)
+    self.assertTrue(result.is_in_progress)
+    self.assertEqual('IN_PROGRESS', result.response_status)
+    self.assertEqual(timedelta(0), result.logged_duration)
+    self.assertEqual(timedelta(0), result.reported_duration)
 
   @patch('microservice.models.request.parse_timestamp')
   @patch.object(Request.objects, 'get')
-  def test_log_response(self, _: MagicMock, timestamp: MagicMock) -> None :
+  def test_log_response(self, request_mock: MagicMock, timestamp: MagicMock) -> None :
     """Test logging a gRPC request response."""
     for status in StatusCode:
       with self.subTest(status = status):
         # Prepare data.
-        now = datetime.now(tz = timezone.utc)
+        now = datetime.now(tz = timezone.utc) + timedelta(days = 1)
         timestamp.return_value = now
-        grpc_response = GrpcResponse()
-        grpc_response.request_id = 'request-id'
+        request_mock.reset_mock()
+        request = Request(
+          meta_logged_timestamp = datetime.now(tz = timezone.utc),
+          meta_reported_timestamp = datetime.now(tz = timezone.utc),
+          # Logged timestamps get created at save time, which we mock.
+          response_logged_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
+        )
+        request.save = MagicMock()  # type: ignore[assignment]
+        request_mock.return_value = request
+        grpc_response                 = GrpcResponse()
+        grpc_response.request_id      = 'request-id'
         grpc_response.response.status = status.name
         grpc_response.response.timestamp.FromDatetime(now)
         # Execute test.
         result = Request.objects.log_response(grpc_response = grpc_response)
         # Assert result.
         result.save.assert_called_once_with()  # type: ignore[attr-defined]
-        result.reset_mock()  # type: ignore[attr-defined]
-        self.assertEqual(grpc_response.response.status,    result.response_status)
+        self.assertEqual(grpc_response.response.status, result.response_status)
         self.assertEqual(
           grpc_response.response.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
-          result.response_event_timestamp,
+          result.response_reported_timestamp,
         )
+        self.assertFalse(result.is_in_progress)
+        self.assertLess(timedelta(0), result.logged_duration)
+        self.assertLess(timedelta(0), result.reported_duration)
 
   @patch('microservice.models.request.parse_timestamp')
   @patch.object(Request.objects, 'get')
-  def test_log_empty_response(self, *_: MagicMock) -> None :
+  def test_log_empty_response(self, request_mock: MagicMock, timestamp: MagicMock) -> None :
     """Test logging an empty gRPC request response."""
     # Prepare data.
+    timestamp.return_value = datetime.min.replace(tzinfo = timezone.utc)
+    request_mock.reset_mock()
+    request = Request(
+      meta_logged_timestamp = datetime.now(tz = timezone.utc),
+      meta_reported_timestamp = datetime.now(tz = timezone.utc),
+      # Logged timestamps get created at save time, which we mock.
+      response_logged_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
+    )
+    request.save = MagicMock()  # type: ignore[assignment]
+    request_mock.return_value = request
     grpc_response = GrpcResponse()
     # Execute test.
     result = Request.objects.log_response(grpc_response = grpc_response)
     # Assert result.
     result.save.assert_called_once_with()  # type: ignore[attr-defined]
-    result.reset_mock()  # type: ignore[attr-defined]
     self.assertIn('response status', result.response_logging_errors)
+    self.assertFalse(result.is_in_progress)
+    self.assertLess(timedelta(0), result.logged_duration)
+    self.assertEqual(timedelta(0), result.reported_duration)
 
 
 class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
@@ -138,8 +169,8 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           **self.model_full_request_metadata(user = user_type),
           pk = 1337,  # Must be from the DB, so it has a pk. And this needs to match the test data.
           response_status = 'OK',
-          response_event_timestamp = datetime.now(tz = timezone.utc),
-          response_logged_timestamp = datetime.now(tz = timezone.utc),
+          response_reported_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
+          response_logged_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
         )
         # Execute test.
         result = request.to_grpc_request_response()
@@ -174,13 +205,15 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           result.response.status,
         )
         self.assertEqual(
-          request.response_event_timestamp,
+          request.response_reported_timestamp,
           result.response.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
         )
         self.assertEqual(
           request.response_logged_timestamp,
           result.response_metadata.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
         )
+        self.assertLess(0, result.logged_duration.nanos)
+        self.assertLess(0, result.reported_duration.nanos)
 
 
   def test_empty_to_grpc_request(self) -> None :
@@ -190,10 +223,12 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
       **self.model_empty_request_metadata(),
       pk = 13,  # Must be from the DB, so it has a pk.
       # We provide default values, so they exist.
-      response_event_timestamp = datetime.now(tz = timezone.utc),
-      response_logged_timestamp = datetime.now(tz = timezone.utc),
+      response_reported_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
+      response_logged_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
     )
     # Execute test.
     result = request.to_grpc_request_response()
     # Assert result.
     self.assertIsNotNone(result)
+    self.assertEqual(0, result.logged_duration.nanos)
+    self.assertEqual(0, result.reported_duration.nanos)

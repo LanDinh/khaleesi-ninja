@@ -2,7 +2,7 @@
 
 # Python.
 from __future__ import annotations
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List
 
 # Django.
@@ -80,7 +80,7 @@ class RequestManager(models.Manager['Request']):
       errors = errors,
     )
     if response_timestamp:
-      request.response_event_timestamp = response_timestamp
+      request.response_reported_timestamp = response_timestamp
     request.response_logging_errors = '\n'.join(errors)
     request.save()
 
@@ -96,13 +96,34 @@ class Request(Metadata):
   upstream_request_grpc_service     = models.TextField(default = 'UNKNOWN')
   upstream_request_grpc_method      = models.TextField(default = 'UNKNOWN')
 
-  response_status           = models.TextField(default = 'IN_PROGRESS')
-  response_event_timestamp  = models.DateTimeField(
+  response_status             = models.TextField(default = 'IN_PROGRESS')
+  response_reported_timestamp = models.DateTimeField(
     default = datetime.min.replace(tzinfo = timezone.utc))
-  response_logged_timestamp = models.DateTimeField(auto_now = True)
-  response_logging_errors   = models.TextField(blank = True)
+  response_logged_timestamp   = models.DateTimeField(auto_now = True)
+  response_logging_errors     = models.TextField(blank = True)
 
   objects = RequestManager()
+
+  @property
+  def is_in_progress(self) -> bool :
+    """Check if the request is still in progress."""
+    return self.response_status == 'IN_PROGRESS'
+
+  @property
+  def reported_duration(self) -> timedelta :
+    """Get the reported duration."""
+    if self.is_in_progress or \
+        self.meta_reported_timestamp == datetime.min.replace(tzinfo = timezone.utc) or \
+        self.response_reported_timestamp == datetime.min.replace(tzinfo = timezone.utc):
+      return timedelta()
+    return self.response_reported_timestamp - self.meta_reported_timestamp
+
+  @property
+  def logged_duration(self) -> timedelta :
+    """Get the logged duration."""
+    if self.is_in_progress:
+      return timedelta()
+    return self.response_logged_timestamp - self.meta_logged_timestamp
 
   def to_grpc_request_response(self) -> GrpcRequestResponse :
     """Map to gRPC event message."""
@@ -126,7 +147,10 @@ class Request(Metadata):
       self.response_logged_timestamp,
     )
     grpc_request_response.response_metadata.errors = self.response_logging_errors
-    grpc_request_response.response.timestamp.FromDatetime(self.response_event_timestamp)
+    grpc_request_response.response.timestamp.FromDatetime(self.response_reported_timestamp)
     grpc_request_response.response.status = self.response_status
+    # Durations.
+    grpc_request_response.logged_duration.FromTimedelta(self.logged_duration)
+    grpc_request_response.reported_duration.FromTimedelta(self.reported_duration)
 
     return grpc_request_response

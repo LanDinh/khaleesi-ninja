@@ -26,15 +26,15 @@ class ModelRequestMetadataMixin:
         'meta_caller_grpc_method'     : 'grpc-method',
         'meta_user_id'                : 'origin-user',
         'meta_user_type'              : user,
-        'meta_event_timestamp'        : datetime.now(tz = timezone.utc),
+        'meta_reported_timestamp'     : datetime.now(tz = timezone.utc),
         'meta_logged_timestamp'       : datetime.now(tz = timezone.utc),
     }
 
   def model_empty_request_metadata(self) -> Dict[str, datetime] :
     """Provide necessary model metadata to avoid NPEs."""
     return {
-        'meta_event_timestamp' : datetime.now(tz = timezone.utc),
-        'meta_logged_timestamp': datetime.now(tz = timezone.utc),
+        'meta_reported_timestamp': datetime.now(tz = timezone.utc),
+        'meta_logged_timestamp'  : datetime.now(tz = timezone.utc),
     }
 
   def assert_grpc_request_metadata(
@@ -52,7 +52,7 @@ class ModelRequestMetadataMixin:
     self.assertEqual(model.meta_user_id  , grpc.user.id)
     self.assertEqual(model.meta_user_type, grpc.user.type)
     self.assertEqual(
-      model.meta_event_timestamp,
+      model.meta_reported_timestamp,
       grpc.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
     self.assertEqual(
