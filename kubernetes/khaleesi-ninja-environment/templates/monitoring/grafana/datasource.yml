@@ -16,4 +16,4 @@ data:
       type: prometheus
       access: proxy
       orgId: 1
-      url: http://prometheus-operated.khaleesi-ninja-{{ .Values.environment.name }}-monitoring.svc:9090
+      url: http://prometheus-operated.khaleesi-ninja-{{ .Values.environment.name }}-monitoring.svc:9090/prometheus

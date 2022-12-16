@@ -19,7 +19,7 @@ grafana:
         khaleesi_folder: kubernetes
   grafana.ini:
     server:
-      root_url: http://localhost:3000/grafana
+      root_url: https://localhost/grafana
       serve_from_sub_path: true
     auth.anonymous:
       enabled: true
