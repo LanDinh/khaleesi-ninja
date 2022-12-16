@@ -8,6 +8,7 @@ import grpc
 
 # khaleesi-ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
+from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
     DESCRIPTOR, LogStandardResponse,
@@ -28,33 +29,41 @@ class Service(Servicer):
   def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
     def method() -> Metadata :
-      result = DbEvent.objects.log_event(grpc_event = request)
+      LOGGER.info('Adding service to service registry.')
       SERVICE_REGISTRY.add_service(caller_details = request.request_metadata.caller)
+      LOGGER.info('Saving the event to the database.')
+      result = DbEvent.objects.log_event(grpc_event = request)
       return result
 
     return self._handle_response(method = method)
 
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log requests."""
-    def method() -> Metadata:
-      result = DbRequest.objects.log_request(grpc_request = request)
+    def method() -> Metadata :
+      LOGGER.info('Adding call to service registry.')
       SERVICE_REGISTRY.add_call(
         caller_details = request.upstream_request,
         called_details = request.request_metadata.caller,
       )
+      LOGGER.info('Saving the request to the database.')
+      result = DbRequest.objects.log_request(grpc_request = request)
       return result
 
     return self._handle_response(method = method)
 
   def LogResponse(self, request: ResponseRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log request responses."""
-    return self._handle_response(
-      method = lambda: DbRequest.objects.log_response(grpc_response = request),
-    )
+    def method() -> Metadata :
+      LOGGER.info('Saving the response to the database.')
+      return DbRequest.objects.log_response(grpc_response = request)
+    return self._handle_response(method = method)
 
   def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log errors."""
-    return self._handle_response(method = lambda: DbError.objects.log_error(grpc_error = request))
+    def method() -> Metadata :
+      LOGGER.info('Saving the error to the database.')
+      return DbError.objects.log_error(grpc_error = request)
+    return self._handle_response(method = method)
 
 
   def _handle_response(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :

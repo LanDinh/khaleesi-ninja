@@ -4,6 +4,7 @@
 import grpc
 
 # khaleesi-ninja.
+from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
@@ -25,6 +26,7 @@ class Service(Servicer):
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
     result = EventsList()
+    LOGGER.info('Getting all events.')
     for event in DbEvent.objects.filter():
       result.events.append(event.to_grpc_event_response())
     return result
@@ -32,6 +34,7 @@ class Service(Servicer):
   def GetRequests(self, request: LogFilter, _: grpc.ServicerContext) -> RequestList :
     """Get logged requests."""
     result = RequestList()
+    LOGGER.info('Getting all requests.')
     for db_request in DbRequest.objects.filter():
       result.requests.append(db_request.to_grpc_request_response())
     return result
@@ -39,6 +42,7 @@ class Service(Servicer):
   def GetErrors(self, request: LogFilter, _: grpc.ServicerContext) -> ErrorList :
     """Get logged errors."""
     result = ErrorList()
+    LOGGER.info('Getting all errors.')
     for db_error in DbError.objects.filter():
       result.errors.append(db_error.to_grpc_error_response())
     return result
