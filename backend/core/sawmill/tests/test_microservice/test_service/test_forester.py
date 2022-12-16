@@ -15,7 +15,7 @@ class ForesterServiceTestCase(SimpleTestCase):
   service = Service()
 
   @patch('microservice.service.forester.SERVICE_REGISTRY')
-  def test_get_service_call_data(self, service_registry: MagicMock) -> None :
+  def test_get_service_call_data(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test getting service call data."""
     # Execute test.
     self.service.GetServiceCallData(EmptyRequest(), MagicMock())

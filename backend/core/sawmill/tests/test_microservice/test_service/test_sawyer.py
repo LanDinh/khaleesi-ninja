@@ -14,14 +14,14 @@ from khaleesi.proto.core_sawmill_pb2 import (
 from microservice.models import Event, Request, Error
 from microservice.service.sawyer import Service
 
-@patch('microservice.service.db_events.LOGGER')
+@patch('microservice.service.sawyer.LOGGER')
 class SawyerServiceTestCase(SimpleTestCase):
   """Test the core-sawmill sawyer service."""
 
   service = Service()
 
   @patch.object(Event.objects, 'filter')
-  def test_get_events(self, db_events: MagicMock) -> None :
+  def test_get_events(self, db_events: MagicMock, *_: MagicMock) -> None :
     """Test getting logged events."""
     # Prepare data.
     db_event = MagicMock()
@@ -35,7 +35,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     db_event.to_grpc_event_response.assert_called_once_with()
 
   @patch.object(Request.objects, 'filter')
-  def test_get_requests(self, db_requests: MagicMock) -> None :
+  def test_get_requests(self, db_requests: MagicMock, *_: MagicMock) -> None :
     """Test getting logged requests."""
     # Prepare data.
     db_request = MagicMock()
@@ -49,7 +49,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     db_request.to_grpc_request_response.assert_called_once_with()
 
   @patch.object(Error.objects, 'filter')
-  def test_get_errors(self, db_errors: MagicMock) -> None :
+  def test_get_errors(self, db_errors: MagicMock, *_: MagicMock) -> None :
     """Test getting logged events."""
     # Prepare data.
     db_error = MagicMock()

@@ -25,7 +25,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
   service = Service()
 
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
-  def test_log_event(self, service_registry: MagicMock) -> None :
+  def test_log_event(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test logging events."""
     self._execute_logging_tests(
       method = lambda : self.service.LogEvent(MagicMock(), MagicMock()),
@@ -35,7 +35,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     service_registry.add_service.assert_called()
 
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
-  def test_log_request(self, service_registry: MagicMock) -> None :
+  def test_log_request(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test logging requests."""
     self._execute_logging_tests(
       method = lambda : self.service.LogRequest(MagicMock(), MagicMock()),
@@ -45,7 +45,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
     )
     service_registry.add_call.assert_called()
 
-  def test_log_response(self) -> None :
+  def test_log_response(self, *_: MagicMock) -> None :
     """Test logging responses."""
     self._execute_logging_tests(
       method = lambda : self.service.LogResponse(MagicMock(), MagicMock()),
@@ -53,7 +53,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
       logging_method = 'log_response',
     )
 
-  def test_log_error(self) -> None :
+  def test_log_error(self, *_: MagicMock) -> None :
     """Test logging events."""
     self._execute_logging_tests(
       method = lambda : self.service.LogError(MagicMock(), MagicMock()),
