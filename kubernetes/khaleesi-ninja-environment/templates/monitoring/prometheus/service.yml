@@ -13,7 +13,7 @@ spec:
     environment: {{ .Values.environment.name }}
     infrastructure: prometheus
   ports:
-    - name: metrics
+    - name: webui
       protocol: TCP
       port: 8000
       targetPort: 9090

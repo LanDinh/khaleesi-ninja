@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: prometheus
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+spec:
+  type: ExternalName
+  externalName: prometheus.khaleesi-ninja-{{ .Values.environment.name }}-monitoring.svc.cluster.local
+  ports:
+    - name: webui
+      protocol: TCP
+      port: 8000

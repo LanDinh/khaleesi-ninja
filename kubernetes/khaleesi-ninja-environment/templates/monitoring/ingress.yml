@@ -1,0 +1,39 @@
+{{- if or .Values.prometheus.ingress .Values.grafana.ingress }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: monitoring
+  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  labels:
+    khaleesi-ninja: monitoring
+    environment: {{ .Values.environment.name }}
+    infrastructure: monitoring
+spec:
+  ingressClassName: ingress-class-{{ .Values.environment.name }}
+  tls:
+    - secretName: tls-certificate
+      hosts:
+      - monitoring.{{ .Values.environment.domain }}
+  rules:
+    - host: monitoring.{{ .Values.environment.domain }}
+      http:
+        paths:
+          {{- if .Values.prometheus.ingress }}
+          - path: /prometheus
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus
+                port:
+                  name: webui
+          {{- end }}
+          {{- if .Values.grafana.ingress }}
+          - path: /grafana
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  name: webui
+          {{- end }}
+{{- end }}

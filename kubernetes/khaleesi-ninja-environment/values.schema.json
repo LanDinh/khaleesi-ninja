@@ -68,23 +68,37 @@
           "description": "amount of time to keep metric data",
           "type": "string"
         },
-        "routePrefix": {
-          "description": "prometheus route prefix",
-          "type": "string"
+        "ingress": {
+          "description": "prometheus accessibility outside the cluster",
+          "type": "boolean"
         }
       },
       "required": [
         "version",
         "replicas",
         "retention",
-        "routePrefix"
+        "ingress"
+      ]
+    },
+    "grafana": {
+      "description": "grafana configuration",
+      "type": "object",
+      "properties": {
+        "ingress": {
+          "description": "prometheus accessibility outside the cluster",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "ingress"
       ]
     }
   },
   "required": [
     "environment",
     "alertmanager",
-    "prometheus"
+    "prometheus",
+    "grafana"
   ],
   "title": "Values",
   "type": "object"

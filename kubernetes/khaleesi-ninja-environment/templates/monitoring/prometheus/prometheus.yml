@@ -20,7 +20,10 @@ spec:
   paused: false
   replicas: {{ .Values.prometheus.replicas }}
   retention: {{ .Values.prometheus.retention }}
-  routePrefix: {{ .Values.prometheus.routePrefix }}
+  {{- if .Values.prometheus.ingress }}
+  externalUrl: https://monitoring.{{ .Values.environment.domain }}/prometheus/
+  routePrefix: /prometheus
+  {{- end }}
   ruleSelector:
     matchLabels:
       app: kube-prometheus-stack
