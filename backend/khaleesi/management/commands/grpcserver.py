@@ -15,7 +15,7 @@ from khaleesi.core.grpc.server import Server
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 
 
-khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class Command(BaseCommand):

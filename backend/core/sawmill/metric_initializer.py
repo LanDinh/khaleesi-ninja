@@ -15,7 +15,7 @@ from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData, EmptyRequest
 from microservice.models.service_registry import SERVICE_REGISTRY
 
 
-khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class MetricInitializer(BaseMetricInitializer):

@@ -68,6 +68,7 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     SERVICE = environ['KHALEESI_SERVICE'],
     TYPE    = definition.ServiceType.MICRO,
     VERSION = environ['KHALEESI_VERSION'],
+    POD_ID  = environ['HOSTNAME'],
   ),
   GRPC = definition.Grpc(
     PORT     = cast(int, environ.get('PORT', 8000)),

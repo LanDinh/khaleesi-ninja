@@ -16,7 +16,7 @@ from microservice.models.abstract import Metadata
 from microservice.parse_util import parse_string
 
 
-khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class EventManager(models.Manager['Event']):

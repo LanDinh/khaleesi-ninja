@@ -8,6 +8,7 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import EmptyRequest
 from microservice.service.forester import Service
 
+@patch('microservice.service.forester.LOGGER')
 class ForesterServiceTestCase(SimpleTestCase):
   """Test the core-sawmill forester service."""
 

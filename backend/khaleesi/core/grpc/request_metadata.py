@@ -13,7 +13,7 @@ from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.proto.core_pb2 import RequestMetadata
 
 
-khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 def add_grpc_server_system_request_metadata(

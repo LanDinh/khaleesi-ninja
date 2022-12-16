@@ -18,3 +18,4 @@ class Metadata(TypedDict):
   SERVICE : str
   TYPE    : ServiceType
   VERSION : str
+  POD_ID  : str

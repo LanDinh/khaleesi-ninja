@@ -14,6 +14,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
 from microservice.models import Event, Request, Error
 from microservice.service.sawyer import Service
 
+@patch('microservice.service.db_events.LOGGER')
 class SawyerServiceTestCase(SimpleTestCase):
   """Test the core-sawmill sawyer service."""
 

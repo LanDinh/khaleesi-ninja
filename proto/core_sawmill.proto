@@ -9,6 +9,7 @@ import "core.proto";
 message ResponseMetadata {
   google.protobuf.Timestamp logged_timestamp = 1;
   string                    errors           = 2;
+  string                    pod_id           = 3;
 }
 
 

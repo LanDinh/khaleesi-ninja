@@ -5,12 +5,17 @@ from datetime import datetime, timezone
 from typing import Dict, Any, List
 
 # Django.
+from django.conf import settings
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import ResponseMetadata
 from microservice.parse_util import parse_timestamp, parse_string
+
+
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class Metadata(models.Model):
@@ -33,6 +38,7 @@ class Metadata(models.Model):
   meta_logged_timestamp = models.DateTimeField(auto_now_add = True)
 
   # Misc.
+  meta_pod_id         = models.TextField(default = khaleesi_settings['METADATA']['POD_ID'])
   meta_logging_errors = models.TextField(blank = True)
 
   @staticmethod
@@ -100,6 +106,7 @@ class Metadata(models.Model):
     """Fill in the request metadata for grpc."""
     response_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
     response_metadata.errors = self.meta_logging_errors
+    response_metadata.pod_id = self.meta_pod_id
 
   class Meta:
     """Abstract class."""

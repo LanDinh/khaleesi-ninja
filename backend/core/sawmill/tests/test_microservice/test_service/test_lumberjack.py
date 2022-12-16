@@ -18,6 +18,7 @@ from microservice.service.lumberjack import (  # type: ignore[attr-defined]
 from tests.models import Metadata
 
 
+@patch('microservice.service.lumberjack.LOGGER')
 class LumberjackServiceTestCase(SimpleTestCase):
   """Test the core-sawmill lumberjack service."""
 

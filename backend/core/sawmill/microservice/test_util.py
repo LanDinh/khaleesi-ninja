@@ -2,6 +2,7 @@
 
 # Python.
 from datetime import datetime, timezone
+from os import environ
 from typing import Dict, Any, Callable
 
 # khaleesi.ninja.
@@ -58,3 +59,4 @@ class ModelRequestMetadataMixin:
       model.meta_logged_timestamp,
       grpc_response.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
+    self.assertEqual(model.meta_pod_id, environ['HOSTNAME'])

@@ -23,7 +23,7 @@ from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2_grpc import ForesterStub
 
 
-khaleesi_settings: KhaleesiNinjaSettings  = settings.KHALEESI_NINJA
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 @dataclass
