@@ -184,10 +184,11 @@ class Server:
     user.type = User.UserType.SYSTEM
     user.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
     self.structured_logger.log_system_event(
-      grpc_method = 'LIFECYCLE',
-      target      = khaleesi_settings['METADATA']['POD_ID'],
-      owner       = user,
-      action      = action,
-      result      = result,
-      details     = details,
+      grpc_method        = 'LIFECYCLE',
+      target             = khaleesi_settings['METADATA']['POD_ID'],
+      owner              = user,
+      action             = action,
+      result             = result,
+      details            = details,
+      logger_send_metric = True,
     )

@@ -123,38 +123,46 @@ class TestStructuredLogger(SimpleTestCase):
     for action_label, action_type in Event.Action.ActionType.items():
       for result_label, result_type in Event.Action.ResultType.items():
         for user_label, user_type in User.UserType.items():
-          with self.subTest(action = action_label, result = result_label, user = user_label):
-            # Prepare data.
-            self.logger.sender.reset_mock()
-            logger.reset_mock()
-            owner      = User()
-            owner.type = user_type
-            owner.id   = 'user'
-            target = 'target'
-            # Perform test.
-            self.logger.log_system_event(
-              grpc_method = method,
-              target      = target,
-              owner       = owner,
-              action      = action_type,
-              result      = result_type,
-              details     = details,
-            )
-            # Assert result.
-            self.logger.sender.send.assert_called_once()
-            self.assertEqual(
-              1,
-              logger.info.call_count + logger.warning.call_count + logger.error.call_count
-              + logger.fatal.call_count,
-            )
-            log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
-            self.assertEqual(target     , log_event.target.id)
-            self.assertEqual(target     , log_event.target.id)
-            self.assertEqual(owner.id   , log_event.target.owner.id)
-            self.assertEqual(owner.type , log_event.target.owner.type)
-            self.assertEqual(action_type, log_event.action.crud_type)
-            self.assertEqual(result_type, log_event.action.result)
-            self.assertEqual(details    , log_event.action.details)
+          for logger_send_metric in [True, False]:
+            with self.subTest(
+                action = action_label,
+                result = result_label,
+                user = user_label,
+                logger_send_metric = logger_send_metric,
+            ):
+              # Prepare data.
+              self.logger.sender.reset_mock()
+              logger.reset_mock()
+              owner      = User()
+              owner.type = user_type
+              owner.id   = 'user'
+              target = 'target'
+              # Perform test.
+              self.logger.log_system_event(
+                grpc_method        = method,
+                target             = target,
+                owner              = owner,
+                action             = action_type,
+                result             = result_type,
+                details            = details,
+                logger_send_metric = logger_send_metric,
+              )
+              # Assert result.
+              self.logger.sender.send.assert_called_once()
+              self.assertEqual(
+                1,
+                logger.info.call_count + logger.warning.call_count + logger.error.call_count
+                + logger.fatal.call_count,
+              )
+              log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
+              self.assertEqual(target            , log_event.target.id)
+              self.assertEqual(target            , log_event.target.id)
+              self.assertEqual(owner.id          , log_event.target.owner.id)
+              self.assertEqual(owner.type        , log_event.target.owner.type)
+              self.assertEqual(action_type       , log_event.action.crud_type)
+              self.assertEqual(result_type       , log_event.action.result)
+              self.assertEqual(details           , log_event.action.details)
+              self.assertEqual(logger_send_metric, log_event.logger_send_metric)
 
 
 class TestStructuredGrpcLogger(SimpleTestCase):

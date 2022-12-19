@@ -91,12 +91,13 @@ class StructuredLogger(ABC):
 
   def log_system_event(
       self, *,
-      grpc_method: str,
-      target     : str,
-      owner      : User,
-      action     : 'Event.Action.ActionType.V',
-      result     : 'Event.Action.ResultType.V',
-      details    : str,
+      grpc_method       : str,
+      target            : str,
+      owner             : User,
+      action            : 'Event.Action.ActionType.V',
+      result            : 'Event.Action.ResultType.V',
+      details           : str,
+      logger_send_metric: bool,
   ) -> None :
     """Log an event."""
     target_type = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
@@ -118,13 +119,14 @@ class StructuredLogger(ABC):
     event = Event()
     add_grpc_server_system_request_metadata(request = event, grpc_method = grpc_method)
     # noinspection PyTypedDict
-    event.target.type       = target_type
-    event.target.id         = target
-    event.target.owner.id   = owner.id
-    event.target.owner.type = owner.type
-    event.action.crud_type  = action
-    event.action.result     = result
-    event.action.details    = details
+    event.target.type        = target_type
+    event.target.id          = target
+    event.target.owner.id    = owner.id
+    event.target.owner.type  = owner.type
+    event.action.crud_type   = action
+    event.action.result      = result
+    event.action.details     = details
+    event.logger_send_metric = logger_send_metric
 
     self.send_log_event(event = event)
 

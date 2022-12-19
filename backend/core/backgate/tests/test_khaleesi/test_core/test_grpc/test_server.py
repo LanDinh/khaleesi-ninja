@@ -215,7 +215,8 @@ class ServerTestCase(SimpleTestCase):
     """Assert the result."""
     structured_logger.log_system_event.assert_called_once()
     kwargs = structured_logger.log_system_event.call_args.kwargs
-    self.assertEqual(kwargs['grpc_method'], 'LIFECYCLE')
-    self.assertEqual(kwargs['owner'].type , User.UserType.SYSTEM)
-    self.assertEqual(kwargs['action']     , action)
-    self.assertEqual(kwargs['result']     , result)
+    self.assertEqual(kwargs['grpc_method']       , 'LIFECYCLE')
+    self.assertEqual(kwargs['owner'].type        , User.UserType.SYSTEM)
+    self.assertEqual(kwargs['action']            , action)
+    self.assertEqual(kwargs['result']            , result)
+    self.assertEqual(kwargs['logger_send_metric'], True)

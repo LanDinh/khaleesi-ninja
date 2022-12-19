@@ -53,9 +53,10 @@ message Event {
     string     details     = 4;
   }
 
-  khaleesi.core.RequestMetadata request_metadata = 1;
-  Target                        target           = 2;
-  Action                        action           = 3;
+  khaleesi.core.RequestMetadata request_metadata   = 1;
+  Target                        target             = 2;
+  Action                        action             = 3;
+  bool                          logger_send_metric = 10;
 }
 
 

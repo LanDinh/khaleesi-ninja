@@ -29,35 +29,46 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
     for action_label, action_type in GrpcEvent.Action.ActionType.items():
       for result_label, result_type in GrpcEvent.Action.ResultType.items():
         for user_label, user_type in User.UserType.items():
-          with self.subTest(action = action_label, result = result_label, user = user_label):
-            # Prepare data.
-            metadata.reset_mock()
-            metadata.return_value = {}
-            string.return_value = 'parsed-string'
-            now = datetime.now(tz = timezone.utc)
-            grpc_event = GrpcEvent()
-            self.set_request_metadata(
-              request_metadata = grpc_event.request_metadata,
-              now              = now,
-              user             = user_type,
-            )
-            grpc_event.target.type        = 'target-type'
-            grpc_event.target.id          = 'target-id'
-            grpc_event.target.owner.id    = 'target-owner'
-            grpc_event.action.crud_type   = action_type
-            grpc_event.action.custom_type = 'action-type'
-            grpc_event.action.result      = result_type
-            grpc_event.action.details     = 'action-description'
-            # Execute test.
-            result = Event.objects.log_event(grpc_event = grpc_event)
-            # Assert result.
-            audit_metric.inc.assert_not_called()
-            metadata.assert_called_once()
-            self.assertEqual(grpc_event.request_metadata  , metadata.call_args.kwargs['metadata'])
-            self.assertEqual([]                           , metadata.call_args.kwargs['errors'])
-            self.assertEqual(grpc_event.action.crud_type  , result.action_crud_type)
-            self.assertEqual(grpc_event.action.custom_type, result.action_custom_type)
-            self.assertEqual(grpc_event.action.result     , result.action_result)
+          for log_event_metric in [True, False]:
+            with self.subTest(
+                action = action_label,
+                result = result_label,
+                user = user_label,
+                log_event_metric = log_event_metric,
+            ):
+              # Prepare data.
+              audit_metric.reset_mock()
+              metadata.reset_mock()
+              metadata.return_value = {}
+              string.return_value = 'parsed-string'
+              now = datetime.now(tz = timezone.utc)
+              grpc_event = GrpcEvent()
+              self.set_request_metadata(
+                request_metadata = grpc_event.request_metadata,
+                now              = now,
+                user             = user_type,
+              )
+              grpc_event.target.type        = 'target-type'
+              grpc_event.target.id          = 'target-id'
+              grpc_event.target.owner.id    = 'target-owner'
+              grpc_event.action.crud_type   = action_type
+              grpc_event.action.custom_type = 'action-type'
+              grpc_event.action.result      = result_type
+              grpc_event.action.details     = 'action-description'
+              grpc_event.logger_send_metric = log_event_metric
+              # Execute test.
+              result = Event.objects.log_event(grpc_event = grpc_event)
+              # Assert result.
+              metadata.assert_called_once()
+              self.assertEqual(grpc_event.request_metadata  , metadata.call_args.kwargs['metadata'])
+              self.assertEqual([]                           , metadata.call_args.kwargs['errors'])
+              self.assertEqual(grpc_event.action.crud_type  , result.action_crud_type)
+              self.assertEqual(grpc_event.action.custom_type, result.action_custom_type)
+              self.assertEqual(grpc_event.action.result     , result.action_result)
+              if log_event_metric:
+                audit_metric.inc.assert_called_once()
+              else:
+                audit_metric.inc.assert_not_called()
 
   def test_log_event_empty(
       self,
@@ -77,30 +88,6 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
     metadata.assert_called_once()
     self.assertEqual([], metadata.call_args.kwargs['errors'])
     self.assertEqual('', result.meta_logging_errors)
-
-  def test_log_event_audit_event_for_server_start(
-      self,
-      metadata: MagicMock,
-      string: MagicMock,
-      audit_metric: MagicMock,
-  ) -> None :
-    """Test that server starts log audit events."""
-    for action in [
-        GrpcEvent.Action.ActionType.START,
-        GrpcEvent.Action.ActionType.END,
-    ]:
-      with self.subTest(action = GrpcEvent.Action.ActionType.Name(action)):
-        # Prepare data.
-        audit_metric.reset_mock()
-        string.return_value = 'parsed-string'
-        metadata.return_value = {}
-        grpc_event = GrpcEvent()
-        grpc_event.action.crud_type = action
-        grpc_event.target.type = 'core.core.server'
-        # Execute test.
-        Event.objects.log_event(grpc_event = grpc_event)
-        # Assert result.
-        audit_metric.inc.assert_called_once_with(event = grpc_event)
 
 
 class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):

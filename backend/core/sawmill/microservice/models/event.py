@@ -24,11 +24,7 @@ class EventManager(models.Manager['Event']):
 
   def log_event(self, *, grpc_event: GrpcEvent) -> Event :
     """Log a gRPC event."""
-    # If this is a server startup event, we need to do the metric logging here.
-    if grpc_event.target.type == \
-        khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['LIFECYCLE']['TARGET'] \
-        and grpc_event.action.crud_type in \
-        [ GrpcEvent.Action.ActionType.START, GrpcEvent.Action.ActionType.END ]:
+    if grpc_event.logger_send_metric:
       AUDIT_EVENT.inc(event = grpc_event)
 
     errors: List[str] = []
