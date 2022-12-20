@@ -11,6 +11,7 @@ from django.conf import settings
 # khaleesi.ninja.
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.abstract import Metadata
 from microservice.parse_util import parse_string
@@ -41,15 +42,16 @@ class EventManager(models.Manager['Event']):
         name = 'target_id',
         errors = errors,
       ),
-      target_owner = parse_string(
+      target_owner_id = parse_string(
         raw  = grpc_event.target.owner.id,
         name = 'target_owner',
         errors = errors,
       ),
+      target_owner_type = User.UserType.Name(grpc_event.target.owner.type),
       # Action.
-      action_crud_type   = grpc_event.action.crud_type,
+      action_crud_type   = GrpcEvent.Action.ActionType.Name(grpc_event.action.crud_type),
       action_custom_type = grpc_event.action.custom_type,
-      action_result      = grpc_event.action.result,
+      action_result      = GrpcEvent.Action.ResultType.Name(grpc_event.action.result),
       action_details = parse_string(
         raw = grpc_event.action.details,
         name = 'action_details',
@@ -64,14 +66,15 @@ class Event(Metadata):
   """Event logs."""
 
   # Target.
-  target_type  = models.TextField(default = 'UNKNOWN')
-  target_id    = models.TextField(default = 'UNKNOWN')
-  target_owner = models.TextField(default = 'UNKNOWN')
+  target_type       = models.TextField(default = 'UNKNOWN')
+  target_id         = models.TextField(default = 'UNKNOWN')
+  target_owner_id   = models.TextField(default = 'UNKNOWN')
+  target_owner_type = models.TextField(default = 'UNKNOWN')
 
   # Action.
-  action_crud_type   = models.IntegerField(default = 0)
+  action_crud_type   = models.TextField(default = 'UNKNOWN_ACTION')
   action_custom_type = models.TextField(default = 'UNKNOWN')
-  action_result      = models.IntegerField(default = 0)
+  action_result      = models.TextField(default = 'UNKNOWN_RESULT')
   action_details     = models.TextField(default = 'UNKNOWN')
 
   objects = EventManager()
@@ -85,11 +88,14 @@ class Event(Metadata):
     # Target.
     grpc_event_response.event.target.type = self.target_type
     grpc_event_response.event.target.id   = self.target_id
-    grpc_event_response.event.target.owner.id = self.target_owner
+    grpc_event_response.event.target.owner.id = self.target_owner_id
+    grpc_event_response.event.target.owner.type = User.UserType.Value(self.target_owner_type)
     # Action.
-    grpc_event_response.event.action.crud_type   = self.action_crud_type  # type: ignore[assignment]
+    grpc_event_response.event.action.crud_type =\
+        GrpcEvent.Action.ActionType.Value(self.action_crud_type)
     grpc_event_response.event.action.custom_type = self.action_custom_type
-    grpc_event_response.event.action.result      = self.action_result  # type: ignore[assignment]
-    grpc_event_response.event.action.details     = self.action_details
+    grpc_event_response.event.action.result =\
+        GrpcEvent.Action.ResultType.Value(self.action_result)
+    grpc_event_response.event.action.details = self.action_details
 
     return grpc_event_response
