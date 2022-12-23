@@ -119,7 +119,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     """Assert a clean state."""
     self.assertEqual('UNKNOWN'       , STATE.request.grpc_service)
     self.assertEqual('UNKNOWN'       , STATE.request.grpc_method)
-    self.assertEqual('UNKNOWN'       , STATE.user.id)
+    self.assertEqual('UNKNOWN'       , STATE.user.user_id)
     self.assertEqual(UserType.UNKNOWN, STATE.user.type)
 
   # noinspection PyUnusedLocal
@@ -127,5 +127,5 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     """Assert a clean state."""
     self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_service)
     self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_method)
-    self.assertNotEqual('UNKNOWN'       , STATE.user.id)
+    self.assertNotEqual('UNKNOWN'       , STATE.user.user_id)
     self.assertEqual(UserType(user_type), STATE.user.type)

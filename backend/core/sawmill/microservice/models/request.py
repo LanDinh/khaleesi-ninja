@@ -132,7 +132,6 @@ class Request(Metadata):
     # Request metadata.
     self.request_metadata_to_grpc(request_metadata = grpc_request_response.request.request_metadata)
     self.response_metadata_to_grpc(response_metadata = grpc_request_response.request_metadata)
-    grpc_request_response.request.request_metadata.caller.request_id = self.meta_caller_request_id
     # Upstream request.
     grpc_request_response.request.upstream_request.request_id = self.upstream_request_request_id
     grpc_request_response.request.upstream_request.khaleesi_gate = \

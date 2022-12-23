@@ -22,15 +22,15 @@ class UserType(Enum):
 @dataclass
 class Request:
   """Request meta."""
-  id          : str = 'system'  # pylint: disable=invalid-name
+  request_id  : str = 'system'
   grpc_service: str = 'UNKNOWN'
   grpc_method : str = 'UNKNOWN'
 
 @dataclass
 class User:
   """User data."""
-  id  : str      = 'UNKNOWN'  # pylint: disable=invalid-name
-  type: UserType = UserType.UNKNOWN
+  user_id: str      = 'UNKNOWN'
+  type   : UserType = UserType.UNKNOWN
 
 class State(threading.local):
   """Per-request state."""

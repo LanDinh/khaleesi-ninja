@@ -46,11 +46,11 @@ class GrpcTestCase(SimpleTestCase):
         request = MagicMock()
         request.request_metadata = RequestMetadata()
         STATE.reset()
-        STATE.request.id           = expected.caller.request_id
+        STATE.request.request_id   = expected.caller.request_id
         STATE.request.grpc_service = expected.caller.grpc_service
         STATE.request.grpc_method  = expected.caller.grpc_method
-        STATE.user.type = user_type
-        STATE.user.id   = expected.user.id
+        STATE.user.type    = user_type
+        STATE.user.user_id = expected.user.id
         # Execute test.
         add_request_metadata(request = request)
         # Assert result.

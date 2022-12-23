@@ -38,7 +38,7 @@ class StructuredLogger(ABC):
   def log_request(self, *, upstream_request: RequestMetadata) -> None :
     """Log a microservice request."""
     LOGGER.info(
-      f'User {STATE.user.id} started request '
+      f'User {STATE.user.user_id} started request '
       f'{STATE.request.grpc_service}.{STATE.request.grpc_method}.'
     )
     LOGGER.info(f'Upstream request {upstream_request.caller.request_id} caller data: '
@@ -63,8 +63,8 @@ class StructuredLogger(ABC):
     else:
       LOGGER.warning(f'Request finished with error code {status.name}.')
 
-    response = ResponseRequest()
-    response.request_id = STATE.request.id
+    response                 = ResponseRequest()
+    response.request_id      = STATE.request.request_id
     response.response.status = status.name
     response.response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 

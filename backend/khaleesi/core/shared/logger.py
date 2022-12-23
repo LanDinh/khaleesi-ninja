@@ -61,7 +61,7 @@ class Logger:
     logger.fatal(message, extra = self._extra())
 
   def _extra(self) -> Dict[str, str] :
-    return { 'request_id': STATE.request.id }
+    return { 'request_id': STATE.request.request_id }
 
 
 LOGGER = Logger()

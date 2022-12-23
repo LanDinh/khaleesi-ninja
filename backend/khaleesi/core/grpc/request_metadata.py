@@ -34,12 +34,12 @@ def add_grpc_server_system_request_metadata(
 def add_request_metadata(*, request : Any) -> None :
   """Add request metadata to request protobufs."""
   _add_request_metadata(
-    request      = request,
-    request_id   = STATE.request.id,
-    grpc_service = STATE.request.grpc_service,
-    grpc_method  = STATE.request.grpc_method,
-    user_id      = STATE.user.id,
-    user_type    = STATE.user.type,
+    request             = request,
+    request_id          = STATE.request.request_id,
+    grpc_service        = STATE.request.grpc_service,
+    grpc_method         = STATE.request.grpc_method,
+    user_id             = STATE.user.user_id,
+    user_type           = STATE.user.type,
   )
 
 def _add_request_metadata(

@@ -32,8 +32,7 @@ class Service(Servicer):
       LOGGER.info('Adding service to service registry.')
       SERVICE_REGISTRY.add_service(caller_details = request.request_metadata.caller)
       LOGGER.info('Saving the event to the database.')
-      result = DbEvent.objects.log_event(grpc_event = request)
-      return result
+      return DbEvent.objects.log_event(grpc_event = request)
 
     return self._handle_response(method = method)
 
@@ -46,8 +45,7 @@ class Service(Servicer):
         called_details = request.request_metadata.caller,
       )
       LOGGER.info('Saving the request to the database.')
-      result = DbRequest.objects.log_request(grpc_request = request)
-      return result
+      return DbRequest.objects.log_request(grpc_request = request)
 
     return self._handle_response(method = method)
 
