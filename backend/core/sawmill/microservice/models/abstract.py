@@ -22,11 +22,12 @@ class Metadata(models.Model):
   """Common metadata."""
 
   # Caller.
-  meta_caller_request_id       = models.TextField(default = 'UNKNOWN')
-  meta_caller_khaleesi_gate    = models.TextField(default = 'UNKNOWN')
-  meta_caller_khaleesi_service = models.TextField(default = 'UNKNOWN')
-  meta_caller_grpc_service     = models.TextField(default = 'UNKNOWN')
-  meta_caller_grpc_method      = models.TextField(default = 'UNKNOWN')
+  meta_caller_backgate_request_id = models.TextField(default = 'UNKNOWN')
+  meta_caller_request_id          = models.TextField(default = 'UNKNOWN')
+  meta_caller_khaleesi_gate       = models.TextField(default = 'UNKNOWN')
+  meta_caller_khaleesi_service    = models.TextField(default = 'UNKNOWN')
+  meta_caller_grpc_service        = models.TextField(default = 'UNKNOWN')
+  meta_caller_grpc_method         = models.TextField(default = 'UNKNOWN')
 
   # User.
   meta_user_id   = models.TextField(default = 'UNKNOWN')
@@ -45,6 +46,12 @@ class Metadata(models.Model):
   def log_metadata(*, metadata: RequestMetadata, errors: List[str]) -> Dict[str, Any] :
     """Parse common metadata."""
     return {
+        # Caller.
+        'meta_caller_backgate_request_id': parse_string(
+          raw    = metadata.caller.backgate_request_id,
+          name   = 'meta_caller_backgate_request_id',
+          errors = errors,
+        ),
         # Caller.
         'meta_caller_request_id': parse_string(
           raw    = metadata.caller.request_id,
@@ -91,11 +98,12 @@ class Metadata(models.Model):
   def request_metadata_to_grpc(self, *, request_metadata: RequestMetadata) -> None :
     """Fill in the request metadata for grpc."""
     # Caller.
-    request_metadata.caller.request_id       = self.meta_caller_request_id
-    request_metadata.caller.khaleesi_gate    = self.meta_caller_khaleesi_gate
-    request_metadata.caller.khaleesi_service = self.meta_caller_khaleesi_service
-    request_metadata.caller.grpc_service     = self.meta_caller_grpc_service
-    request_metadata.caller.grpc_method      = self.meta_caller_grpc_method
+    request_metadata.caller.backgate_request_id = self.meta_caller_backgate_request_id
+    request_metadata.caller.request_id          = self.meta_caller_request_id
+    request_metadata.caller.khaleesi_gate       = self.meta_caller_khaleesi_gate
+    request_metadata.caller.khaleesi_service    = self.meta_caller_khaleesi_service
+    request_metadata.caller.grpc_service        = self.meta_caller_grpc_service
+    request_metadata.caller.grpc_method         = self.meta_caller_grpc_method
     # User.
     request_metadata.user.id   = self.meta_user_id
     request_metadata.user.type = self.meta_user_type  # type: ignore[assignment]

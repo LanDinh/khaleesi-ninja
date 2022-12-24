@@ -24,7 +24,10 @@ class MetricInitializer(BaseMetricInitializer):
 class BaseMetricInitializerTest(SimpleTestCase):
   """Test the metric initializer."""
 
-  metric_initializer = MetricInitializer(channel_manager = MagicMock())
+  metric_initializer = MetricInitializer(
+    channel_manager = MagicMock(),
+    backgate_request_id = 'backgate-request',
+  )
 
   @patch('khaleesi.core.metrics.metric_initializer.add_grpc_server_system_request_metadata')
   def test_requests(self, add_metadata: MagicMock) -> None :

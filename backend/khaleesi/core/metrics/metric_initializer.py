@@ -56,10 +56,12 @@ class BaseMetricInitializer(ABC):
   """Collect info for initializing metrics."""
 
   own_name: str
+  backgate_request_id: str
 
   # noinspection PyUnusedLocal
-  def __init__(self, *, channel_manager: ChannelManager) -> None :  # pylint: disable=unused-argument
+  def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :  # pylint: disable=unused-argument,line-too-long
     self.own_name = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
+    self.backgate_request_id = backgate_request_id
 
   @abstractmethod
   def initialize_metrics(self) -> None :
@@ -78,8 +80,9 @@ class BaseMetricInitializer(ABC):
     """Fetch the data for request metrics."""
     request = EmptyRequest()
     add_grpc_server_system_request_metadata(
-      request      = request,
-      grpc_method  = 'INITIALIZE_REQUEST_METRICS',
+      request             = request,
+      backgate_request_id = self.backgate_request_id,
+      grpc_method         = 'INITIALIZE_REQUEST_METRICS',
     )
     return self.get_service_call_data(request = request)
 
@@ -192,8 +195,8 @@ class MetricInitializer(BaseMetricInitializer):
 
   stub    : ForesterStub
 
-  def __init__(self, *, channel_manager: ChannelManager) -> None :
-    super().__init__(channel_manager = channel_manager)
+  def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :
+    super().__init__(channel_manager = channel_manager, backgate_request_id = backgate_request_id)
     channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
     self.stub = ForesterStub(channel)  # type: ignore[no-untyped-call]
 

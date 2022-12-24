@@ -167,7 +167,6 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           upstream_request_grpc_service = '',
           upstream_request_grpc_method = '',
           **self.model_full_request_metadata(user = user_type),
-          pk = 1337,  # Must be from the DB, so it has a pk. And this needs to match the test data.
           response_status = 'OK',
           response_reported_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
           response_logged_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
@@ -221,7 +220,6 @@ class RequestTestCase(ModelRequestMetadataMixin, SimpleTestCase):
     # Prepare data.
     request = Request(
       **self.model_empty_request_metadata(),
-      pk = 13,  # Must be from the DB, so it has a pk.
       # We provide default values, so they exist.
       response_reported_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),
       response_logged_timestamp = datetime.now(tz = timezone.utc) + timedelta(days = 1),

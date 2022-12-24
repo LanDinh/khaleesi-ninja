@@ -24,12 +24,17 @@ class GrpcTestCase(SimpleTestCase):
     request = MagicMock()
     request.request_metadata = RequestMetadata()
     expected = RequestMetadata()
-    expected.caller.request_id   = 'system'
-    expected.caller.grpc_service = 'grpc-server'
-    expected.caller.grpc_method  = 'lifecycle'
-    expected.user.id             = 'grpc-server'
+    expected.caller.backgate_request_id = 'backgate-request'
+    expected.caller.request_id          = 'system'
+    expected.caller.grpc_service        = 'grpc-server'
+    expected.caller.grpc_method         = 'lifecycle'
+    expected.user.id                    = 'grpc-server'
     # Execute test.
-    add_grpc_server_system_request_metadata(request = request, grpc_method = 'LIFECYCLE')
+    add_grpc_server_system_request_metadata(
+      request             = request,
+      grpc_method         = 'LIFECYCLE',
+      backgate_request_id = 'backgate-request'
+    )
     # Assert result
     self._assert_metadata(request = request, expected = expected, user_type = UserType.SYSTEM)
 
@@ -37,18 +42,20 @@ class GrpcTestCase(SimpleTestCase):
     """Test adding request metadata."""
     # Prepare data.
     expected = RequestMetadata()
-    expected.caller.request_id   = 'request-id'
-    expected.caller.grpc_service = 'grpc-service'
-    expected.caller.grpc_method  = 'grpc-method'
-    expected.user.id             = 'user-id'
+    expected.caller.backgate_request_id = 'backgate-request'
+    expected.caller.request_id          = 'request-id'
+    expected.caller.grpc_service        = 'grpc-service'
+    expected.caller.grpc_method         = 'grpc-method'
+    expected.user.id                    = 'user-id'
     for user_type in UserType:
       with self.subTest(user = user_type.name):
         request = MagicMock()
         request.request_metadata = RequestMetadata()
         STATE.reset()
-        STATE.request.request_id   = expected.caller.request_id
-        STATE.request.grpc_service = expected.caller.grpc_service
-        STATE.request.grpc_method  = expected.caller.grpc_method
+        STATE.request.backgate_request_id = expected.caller.backgate_request_id
+        STATE.request.request_id          = expected.caller.request_id
+        STATE.request.grpc_service        = expected.caller.grpc_service
+        STATE.request.grpc_method         = expected.caller.grpc_method
         STATE.user.type    = user_type
         STATE.user.user_id = expected.user.id
         # Execute test.
@@ -65,6 +72,10 @@ class GrpcTestCase(SimpleTestCase):
   ) -> None :
     """Asset that the metadata is as expected."""
     # Manual values.
+    self.assertEqual(
+      expected.caller.backgate_request_id,
+      request.request_metadata.caller.backgate_request_id,
+    )
     self.assertEqual(expected.caller.request_id  , request.request_metadata.caller.request_id)
     self.assertEqual(expected.caller.grpc_service, request.request_metadata.caller.grpc_service)
     self.assertEqual(expected.caller.grpc_method , request.request_metadata.caller.grpc_method)

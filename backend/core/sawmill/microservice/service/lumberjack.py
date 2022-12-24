@@ -11,14 +11,19 @@ from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
-    DESCRIPTOR, LogStandardResponse,
-    Error, Event, ResponseRequest, Request,
+    DESCRIPTOR, LogStandardResponse, EmptyRequest,
+    Error, Event, ResponseRequest, Request, BackgateRequest,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
     add_LumberjackServicer_to_server as add_to_server
 )
-from microservice.models import Event as DbEvent, Request as DbRequest, Error as DbError
+from microservice.models import (
+  Event as DbEvent,
+  Request as DbRequest,
+  Error as DbError,
+  BackgateRequest as DbBackgateRequest,
+)
 from microservice.models.abstract import Metadata
 from microservice.models.service_registry import SERVICE_REGISTRY
 
@@ -34,6 +39,28 @@ class Service(Servicer):
       LOGGER.info('Saving the event to the database.')
       return DbEvent.objects.log_event(grpc_event = request)
 
+    return self._handle_response(method = method)
+
+  def LogBackgateRequest(
+      self,
+      request: BackgateRequest,
+      _: grpc.ServicerContext,
+  ) -> LogStandardResponse :
+    """Log backgate request."""
+    def method() -> Metadata :
+      LOGGER.info('Saving the backgate request to the database.')
+      return DbBackgateRequest.objects.log_backgate_request(grpc_backgate_request = request)
+    return self._handle_response(method = method)
+
+  def LogSystemBackgateRequest(
+      self,
+      request: EmptyRequest,
+      _: grpc.ServicerContext,
+  ) -> LogStandardResponse :
+    """Log backgate request."""
+    def method() -> Metadata :
+      LOGGER.info('Saving the backgate request to the database.')
+      return DbBackgateRequest.objects.log_system_backgate_request(grpc_backgate_request = request)
     return self._handle_response(method = method)
 
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogStandardResponse :

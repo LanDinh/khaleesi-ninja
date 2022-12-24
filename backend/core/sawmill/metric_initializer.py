@@ -21,8 +21,8 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class MetricInitializer(BaseMetricInitializer):
   """Collect info for initializing metrics."""
 
-  def __init__(self, *, channel_manager: ChannelManager) -> None :
-    super().__init__(channel_manager = channel_manager)
+  def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :
+    super().__init__(channel_manager = channel_manager, backgate_request_id = backgate_request_id)
     # No gRPC call is executed for the gRPC lifecycle methods, so we need to manually add them.
     caller_details = GrpcCallerDetails()
     caller_details.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']

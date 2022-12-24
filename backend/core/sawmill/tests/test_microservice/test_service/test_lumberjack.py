@@ -1,19 +1,18 @@
 """Test the core-sawmill lumberjack service."""
 
 # Python.
-from functools import partial
 from typing import Callable, Any
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.test_util.test_case import SimpleTestCase
-from microservice.models.abstract import Metadata as AbstractMetadata
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]
   Service,
   DbEvent,
   DbRequest,
   DbError,
+  DbBackgateRequest,
 )
 from tests.models import Metadata
 
@@ -34,6 +33,22 @@ class LumberjackServiceTestCase(SimpleTestCase):
     )
     service_registry.add_service.assert_called()
 
+  def test_log_backgate_request(self, *_: MagicMock) -> None :
+    """Test logging requests."""
+    self._execute_logging_tests(
+      method = lambda : self.service.LogBackgateRequest(MagicMock(), MagicMock()),
+      logging_object = DbBackgateRequest.objects,
+      logging_method = 'log_backgate_request',
+    )
+
+  def test_log_system_backgate_request(self, *_: MagicMock) -> None :
+    """Test logging system backgate requests."""
+    self._execute_logging_tests(
+      method = lambda : self.service.LogSystemBackgateRequest(MagicMock(), MagicMock()),
+      logging_object = DbBackgateRequest.objects,
+      logging_method = 'log_system_backgate_request',
+    )
+
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def test_log_request(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test logging requests."""
@@ -41,7 +56,6 @@ class LumberjackServiceTestCase(SimpleTestCase):
       method = lambda : self.service.LogRequest(MagicMock(), MagicMock()),
       logging_object = DbRequest.objects,
       logging_method = 'log_request',
-      return_value = partial(Metadata, pk = 13),
     )
     service_registry.add_call.assert_called()
 
@@ -66,7 +80,6 @@ class LumberjackServiceTestCase(SimpleTestCase):
       method: Callable[[], Any],
       logging_object: Any,
       logging_method: str,
-      return_value: Callable[[], AbstractMetadata] = Metadata,
   ) -> None :
     """Execute all typical logging tests."""
     for test in [
@@ -75,17 +88,16 @@ class LumberjackServiceTestCase(SimpleTestCase):
     ]:
       with self.subTest(test = test.__name__):
         with patch.object(logging_object, logging_method) as logging:
-          test(method = method, logging = logging,  return_value = return_value)  # type: ignore[operator]  # pylint: disable=no-value-for-parameter,line-too-long
+          test(method = method, logging = logging)  # type: ignore[operator]  # pylint: disable=no-value-for-parameter
 
   def _execute_successful_logging_test(
       self, *,
       method: Callable[[], Any],
       logging: MagicMock,
-      return_value: Callable[[], AbstractMetadata],
   ) -> None :
     """Successful call to logging method."""
     # Prepare data.
-    logging.return_value = return_value()
+    logging.return_value = Metadata()
     # Execute test.
     method()
     # Assert result.
@@ -99,11 +111,10 @@ class LumberjackServiceTestCase(SimpleTestCase):
       *,
       method: Callable[[], Any],
       logging: MagicMock,
-      return_value: Callable[[], AbstractMetadata],
   ) -> None :
     """Call to logging method that results in parsing errors."""
     # Prepare data.
-    expected_result = return_value()
+    expected_result = Metadata()
     expected_result.meta_logging_errors = 'some parsing errors'
     logging.return_value = expected_result
     # Execute test & assert result.

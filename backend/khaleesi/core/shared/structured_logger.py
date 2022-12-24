@@ -21,7 +21,7 @@ from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import RequestMetadata, User
-from khaleesi.proto.core_sawmill_pb2 import Request, ResponseRequest, Error, Event
+from khaleesi.proto.core_sawmill_pb2 import Request, ResponseRequest, Error, Event, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
 
@@ -89,15 +89,30 @@ class StructuredLogger(ABC):
 
     self.send_log_error(error = error)
 
+  def log_system_backgate_request(self, *, backgate_request_id: str) -> None :
+    """Log a backgate request for system requests."""
+    LOGGER.info(
+      f'Backgate request {backgate_request_id} started.'
+    )
+    backgate_request = EmptyRequest()
+    add_grpc_server_system_request_metadata(
+      request             = backgate_request,
+      grpc_method         = 'BACKGATE_LOGGING',
+      backgate_request_id = backgate_request_id,
+    )
+
+    self.send_log_system_backgate_request(backgate_request = backgate_request)
+
   def log_system_event(
       self, *,
-      grpc_method       : str,
-      target            : str,
-      owner             : User,
-      action            : 'Event.Action.ActionType.V',
-      result            : 'Event.Action.ResultType.V',
-      details           : str,
-      logger_send_metric: bool,
+      backgate_request_id: str,
+      grpc_method        : str,
+      target             : str,
+      owner              : User,
+      action             : 'Event.Action.ActionType.V',
+      result             : 'Event.Action.ResultType.V',
+      details            : str,
+      logger_send_metric : bool,
   ) -> None :
     """Log an event."""
     target_type = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
@@ -117,7 +132,11 @@ class StructuredLogger(ABC):
       LOGGER.fatal(log_string)
 
     event = Event()
-    add_grpc_server_system_request_metadata(request = event, grpc_method = grpc_method)
+    add_grpc_server_system_request_metadata(
+      request             = event,
+      grpc_method         = grpc_method,
+      backgate_request_id = backgate_request_id,
+    )
     # noinspection PyTypedDict
     event.target.type        = target_type
     event.target.id          = target
@@ -129,6 +148,10 @@ class StructuredLogger(ABC):
     event.logger_send_metric = logger_send_metric
 
     self.send_log_event(event = event)
+
+  @abstractmethod
+  def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
+    """Send the backgate log request to the logging facility."""
 
   @abstractmethod
   def send_log_request(self, *, request: Request) -> None :
@@ -156,6 +179,10 @@ class StructuredGrpcLogger(StructuredLogger):
     super().__init__(channel_manager = channel_manager)
     channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
     self.stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
+
+  def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
+    """Send the log request to the logging facility."""
+    self.stub.LogSystemBackgateRequest(backgate_request)
 
   def send_log_request(self, *, request: Request) -> None :
     """Send the log request to the logging facility."""

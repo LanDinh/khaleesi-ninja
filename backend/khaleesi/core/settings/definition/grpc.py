@@ -16,8 +16,9 @@ class GrpcServerMethodNames(TypedDict):
 
   SERVICE_NAME              : str
   USER_ID                   : str
-  LIFECYCLE                 : GrpcEventMethodNames  # report changes in lifecycle for logging
-  INITIALIZE_REQUEST_METRICS: GrpcEventMethodNames  # fetch gRPC calls for metric initialization
+  BACKGATE_LOGGING          : GrpcEventMethodNames  # log backgate requests initiated by the system.
+  LIFECYCLE                 : GrpcEventMethodNames  # report changes in lifecycle for logging.
+  INITIALIZE_REQUEST_METRICS: GrpcEventMethodNames  # fetch gRPC calls for metric initialization.
 
 
 class GrpcLoggingServerInterceptor(TypedDict):

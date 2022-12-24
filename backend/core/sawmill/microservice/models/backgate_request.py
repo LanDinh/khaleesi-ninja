@@ -1,0 +1,129 @@
+"""Request logs."""
+
+# Python.
+from __future__ import annotations
+from typing import List
+
+# Django.
+from django.db import models
+
+# khaleesi.ninja.
+from khaleesi.proto.core_sawmill_pb2 import (
+    BackgateRequest as GrpcBackgateRequest, BackgateRequestResponse as GrpcBackgateRequestResponse,
+    EmptyRequest,
+)
+from microservice.models.abstract import Metadata
+from microservice.parse_util import parse_string
+
+
+class BackgateRequestManager(models.Manager['BackgateRequest']):
+  """Custom model manager."""
+
+  def log_backgate_request(self, *, grpc_backgate_request: GrpcBackgateRequest) -> BackgateRequest :
+    """Log a gRPC backgate request."""
+
+    errors: List[str] = []
+
+    language_header = parse_string(
+      raw    = grpc_backgate_request.language_header,
+      name   = 'language_header',
+      errors = errors,
+    )
+    useragent = parse_string(
+      raw    = grpc_backgate_request.useragent,
+      name   = 'useragent',
+      errors = errors,
+    )
+    ip = parse_string(raw = grpc_backgate_request.ip, name = 'ip', errors = errors)  # pylint: disable=invalid-name
+
+    return self.create(
+      # khaleesi.ninja.
+      type = GrpcBackgateRequestResponse.RequestType.Name(
+        GrpcBackgateRequestResponse.RequestType.USER,
+      ),
+      language = parse_string(
+        raw = grpc_backgate_request.language,
+        name = 'language',
+        errors = errors,
+      ),
+      device_id = parse_string(
+        raw = grpc_backgate_request.device_id,
+        name = 'device_id',
+        errors = errors,
+      ),
+      # Http.
+      language_header = language_header,
+      ip = ip,
+      useragent = useragent,
+      # Processed.
+      # Metadata.
+      **self.model.log_metadata(metadata = grpc_backgate_request.request_metadata, errors = errors),
+    )
+
+  def log_system_backgate_request(self, *, grpc_backgate_request: EmptyRequest) -> BackgateRequest :
+    """Log a gRPC backgate request."""
+
+    errors: List[str] = []
+
+    return self.create(
+      # khaleesi.ninja.
+      type = GrpcBackgateRequestResponse.RequestType.Name(
+        GrpcBackgateRequestResponse.RequestType.SYSTEM,
+      ),
+      # Metadata.
+      **self.model.log_metadata(metadata = grpc_backgate_request.request_metadata, errors = errors),
+    )
+
+
+class BackgateRequest(Metadata):
+  """Backgate request logs."""
+
+  # khaleesi.ninja.
+  type      = models.TextField(default = 'UNKNOWN')
+  language  = models.TextField(default = 'UNKNOWN')
+  device_id = models.TextField(default = 'UNKNOWN')
+
+  # HTTP.
+  language_header = models.TextField(default = 'UNKNOWN')
+  ip              = models.TextField(default = 'UNKNOWN')
+  useragent       = models.TextField(default = 'UNKNOWN')
+
+  # Processed.
+  geolocation     = models.TextField(default = 'UNKNOWN')
+  browser         = models.TextField(default = 'UNKNOWN')
+  rendering_agent = models.TextField(default = 'UNKNOWN')
+  os              = models.TextField(default = 'UNKNOWN')
+  device_type     = models.TextField(default = 'UNKNOWN')
+
+  objects = BackgateRequestManager()
+
+  def to_grpc_backgate_request_response(self) -> GrpcBackgateRequestResponse :
+    """Map to gRPC backgate request message."""
+
+    grpc_backgate_request_response = GrpcBackgateRequestResponse()
+    # Request metadata.
+    self.request_metadata_to_grpc(
+      request_metadata = grpc_backgate_request_response.request.request_metadata,
+    )
+    self.response_metadata_to_grpc(
+      response_metadata = grpc_backgate_request_response.request_metadata,
+    )
+
+    # khaleesi.ninja.
+    grpc_backgate_request_response.request.language  = self.language
+    grpc_backgate_request_response.request.device_id = self.device_id
+
+    # HTTP.
+    grpc_backgate_request_response.request.language_header = self.language_header
+    grpc_backgate_request_response.request.ip              = self.ip
+    grpc_backgate_request_response.request.useragent       = self.useragent
+
+    # Processed.
+    grpc_backgate_request_response.type = GrpcBackgateRequestResponse.RequestType.Value(self.type)
+    grpc_backgate_request_response.geolocation     = self.geolocation
+    grpc_backgate_request_response.browser         = self.browser
+    grpc_backgate_request_response.rendering_agent = self.rendering_agent
+    grpc_backgate_request_response.os              = self.os
+    grpc_backgate_request_response.device_type     = self.device_type
+
+    return grpc_backgate_request_response

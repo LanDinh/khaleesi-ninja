@@ -27,6 +27,7 @@ khaleesi_ninja_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class ServerTestCase(SimpleTestCase):
   """Test the gRPC server."""
 
+  @patch('khaleesi.core.shared.structured_logger.LOGGER')
   def test_initialization_success(self, *_: MagicMock) -> None :
     """Test initialization success."""
     # Execute test & assert result.
@@ -139,6 +140,7 @@ class ServerTestCase(SimpleTestCase):
     # Assert result.
     grpc_server.return_value.start.assert_called_once_with()
     grpc_server.return_value.wait_for_termination.assert_called_once_with()
+    structured_logger.log_system_backgate_request.assert_called_once()
     self._assert_server_state_event(
       action            = Event.Action.ActionType.START,
       result            = Event.Action.ResultType.SUCCESS,
@@ -173,7 +175,11 @@ class ServerTestCase(SimpleTestCase):
           'PORT': 1337,
           'SERVER_METHOD_NAMES': {
               'SERVICE_NAME': 'grpc-server',
-              'USER_ID': 'grpc-server',
+              'USER_ID'     : 'grpc-server',
+              'BACKGATE_LOGGING': {
+                  'METHOD': 'backgate-logging',
+                  'TARGET': '',
+              },
               'LIFECYCLE': {
                   'METHOD': 'lifecycle',
                   'TARGET': 'core.core.server',

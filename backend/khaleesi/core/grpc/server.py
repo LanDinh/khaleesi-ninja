@@ -4,6 +4,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from signal import signal, SIGTERM
 from typing import Any
+from uuid import uuid4
 
 # Django.
 from django.conf import settings
@@ -41,6 +42,7 @@ class Server:
   channel_manager: ChannelManager
   health_servicer: HealthServicer
   structured_logger: StructuredLogger
+  lifetime_backgate_request_id: str
 
   def __init__(self) -> None :
     try:
@@ -55,7 +57,10 @@ class Server:
           LoggingServerInterceptor(structured_logger = self.structured_logger),  # Inner.
       ]
       LOGGER.info('Initializing metric initializer...')
-      self.metric_initializer = MetricInitializer(channel_manager = self.channel_manager)
+      self.metric_initializer = MetricInitializer(
+        channel_manager = self.channel_manager,
+        backgate_request_id = self.lifetime_backgate_request_id,
+      )
       LOGGER.info('Initializing server...')
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
@@ -97,6 +102,8 @@ class Server:
         details = f'Server start failed. {type(exception).__name__}: {str(exception)}'
       )
       raise
+    # Use a different backgate request for termination.
+    self.lifetime_backgate_request_id = str(uuid4())
     self.server.wait_for_termination()
 
   def _init_add_handlers(self) -> None :
@@ -130,6 +137,10 @@ class Server:
       )
     except ImportError as error:  # pragma: no cover
       raise ImportError(f'Could not import "{structured_logger}" as structured logger.') from error
+    self.lifetime_backgate_request_id = str(uuid4())
+    self.structured_logger.log_system_backgate_request(
+      backgate_request_id = self.lifetime_backgate_request_id,
+    )
 
   def _print_banner(self) -> None :
     """Print the startup banner."""
@@ -184,11 +195,12 @@ class Server:
     user.type = User.UserType.SYSTEM
     user.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
     self.structured_logger.log_system_event(
-      grpc_method        = 'LIFECYCLE',
-      target             = khaleesi_settings['METADATA']['POD_ID'],
-      owner              = user,
-      action             = action,
-      result             = result,
-      details            = details,
-      logger_send_metric = True,
+      backgate_request_id = self.lifetime_backgate_request_id,
+      grpc_method         = 'LIFECYCLE',
+      target              = khaleesi_settings['METADATA']['POD_ID'],
+      owner               = user,
+      action              = action,
+      result              = result,
+      details             = details,
+      logger_send_metric  = True,
     )

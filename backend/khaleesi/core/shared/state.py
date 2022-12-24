@@ -22,9 +22,10 @@ class UserType(Enum):
 @dataclass
 class Request:
   """Request meta."""
-  request_id  : str = 'system'
-  grpc_service: str = 'UNKNOWN'
-  grpc_method : str = 'UNKNOWN'
+  backgate_request_id: str = 'UNKNOWN'
+  request_id         : str = 'system'
+  grpc_service       : str = 'UNKNOWN'
+  grpc_method        : str = 'UNKNOWN'
 
 @dataclass
 class User:

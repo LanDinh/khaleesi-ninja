@@ -22,15 +22,16 @@ message User {
 }
 
 message GrpcCallerDetails {
-  string request_id       = 1;
-  string khaleesi_gate    = 2;
-  string khaleesi_service = 3;
-  string grpc_service     = 4;
-  string grpc_method      = 5;
+  string backgate_request_id = 1;
+  string request_id          = 2;
+  string khaleesi_gate       = 3;
+  string khaleesi_service    = 4;
+  string grpc_service        = 5;
+  string grpc_method         = 6;
 }
 
 message RequestMetadata {
-  GrpcCallerDetails         caller           = 1;
-  User                      user             = 2;
-  google.protobuf.Timestamp timestamp        = 3;
+  GrpcCallerDetails         caller              = 2;
+  User                      user                = 3;
+  google.protobuf.Timestamp timestamp           = 4;
 }

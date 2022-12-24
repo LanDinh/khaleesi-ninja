@@ -60,6 +60,20 @@ message Event {
 }
 
 
+message BackgateRequest {
+  // Metadata.
+  khaleesi.core.RequestMetadata request_metadata = 1;
+
+  // khaleesi.ninja.
+  string language  = 10;
+  string device_id = 11;
+
+  // HTTP.
+  string language_header = 20;
+  string ip              = 21;
+  string useragent       = 22;
+}
+
 message Request {
   khaleesi.core.RequestMetadata   request_metadata = 1;
   khaleesi.core.GrpcCallerDetails upstream_request = 2;
@@ -80,8 +94,8 @@ message Error {
 
 
 message Response {
-  string                    status     = 2;
-  google.protobuf.Timestamp timestamp  = 3;
+  string                    status     = 1;
+  google.protobuf.Timestamp timestamp  = 2;
 }
 
 message ResponseRequest {
@@ -93,10 +107,12 @@ message ResponseRequest {
 message LogStandardResponse {}
 
 service Lumberjack {
-  rpc LogEvent    (Event)           returns (LogStandardResponse);
-  rpc LogRequest  (Request)         returns (LogStandardResponse);
-  rpc LogResponse (ResponseRequest) returns (LogStandardResponse);
-  rpc LogError    (Error)           returns (LogStandardResponse);
+  rpc LogEvent                 (Event)           returns (LogStandardResponse);
+  rpc LogRequest               (Request)         returns (LogStandardResponse);
+  rpc LogResponse              (ResponseRequest) returns (LogStandardResponse);
+  rpc LogError                 (Error)           returns (LogStandardResponse);
+  rpc LogBackgateRequest       (BackgateRequest) returns (LogStandardResponse);
+  rpc LogSystemBackgateRequest (EmptyRequest)    returns (LogStandardResponse);
 }
 
 
@@ -110,11 +126,37 @@ message EventsList {
 }
 
 
+message BackgateRequestResponse {
+  ResponseMetadata request_metadata = 1;
+  BackgateRequest  request          = 2;
+
+  enum RequestType {
+    UNKNOWN = 0;
+    USER    = 1;
+    SYSTEM  = 2;
+  }
+
+  // Processed data.
+  RequestType type            = 10;
+  string      geolocation     = 11;
+  string      browser         = 12;
+  string      rendering_agent = 13;
+  string      os              = 14;
+  string      device_type     = 15;
+}
+
+message BackgateRequestList {
+  repeated BackgateRequestResponse requests = 1;
+}
+
+
 message RequestResponse {
   ResponseMetadata         request_metadata  = 1;
   Request                  request           = 2;
   ResponseMetadata         response_metadata = 3;
   Response                 response          = 4;
+
+  // Processed data.
   google.protobuf.Duration reported_duration = 10;
   google.protobuf.Duration logged_duration   = 11;
 }
@@ -138,9 +180,10 @@ message LogFilter {
 }
 
 service Sawyer {
-  rpc GetEvents   (LogFilter) returns (EventsList);
-  rpc GetRequests (LogFilter) returns (RequestList);
-  rpc GetErrors   (LogFilter) returns (ErrorList);
+  rpc GetEvents           (LogFilter) returns (EventsList);
+  rpc GetRequests         (LogFilter) returns (RequestList);
+  rpc GetErrors           (LogFilter) returns (ErrorList);
+  rpc GetBackgateRequests (LogFilter) returns (BackgateRequestList);
 }
 
 message EmptyRequest {
