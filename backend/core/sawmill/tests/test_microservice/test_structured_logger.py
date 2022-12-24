@@ -25,6 +25,16 @@ class TestStructuredDbLogger(SimpleTestCase):
       grpc_backgate_request = request,
     )
 
+  @patch('microservice.structured_logger.DbBackgateRequest')
+  def test_send_log_backgate_response(self, db_backgate_request: MagicMock) -> None :
+    """Test sending a log request."""
+    # Prepare data.
+    response = MagicMock()
+    # Perform test.
+    self.logger.send_log_backgate_response(response = response)
+    # Assert result.
+    db_backgate_request.objects.log_response.assert_called_once_with(grpc_response = response)
+
   @patch('microservice.structured_logger.SERVICE_REGISTRY')
   @patch('microservice.structured_logger.DbRequest')
   def test_send_log_request(self, db_request: MagicMock, service_registry: MagicMock) -> None :

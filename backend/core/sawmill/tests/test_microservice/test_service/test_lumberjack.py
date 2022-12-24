@@ -49,6 +49,14 @@ class LumberjackServiceTestCase(SimpleTestCase):
       logging_method = 'log_system_backgate_request',
     )
 
+  def test_log_backgate_response(self, *_: MagicMock) -> None :
+    """Test logging responses."""
+    self._execute_logging_tests(
+      method = lambda : self.service.LogBackgateRequestResponse(MagicMock(), MagicMock()),
+      logging_object = DbBackgateRequest.objects,
+      logging_method = 'log_response',
+    )
+
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def test_log_request(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test logging requests."""

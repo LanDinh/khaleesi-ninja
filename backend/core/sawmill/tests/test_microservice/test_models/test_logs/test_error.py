@@ -17,7 +17,7 @@ from microservice.models import Error
 from microservice.test_util import ModelRequestMetadataMixin
 
 
-@patch('microservice.models.event.parse_string')
+@patch('microservice.models.logs.event.parse_string')
 @patch.object(Error.objects.model, 'log_metadata')
 class ErrorManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the error logs objects manager."""

@@ -25,6 +25,10 @@ class StructuredTestLogger(StructuredLogger):
     """Send the log request to the logging facility."""
     self.sender.send(request = backgate_request)
 
+  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+    """Send the log request to the logging facility."""
+    self.sender.send(response = response)
+
   def send_log_request(self, *, request: Request) -> None :
     """Send the log request to the logging facility."""
     self.sender.send(request = request)
@@ -80,6 +84,34 @@ class TestStructuredLogger(SimpleTestCase):
     logger.info.assert_called_once()
     log_request = cast(EmptyRequest, self.logger.sender.send.call_args.kwargs['request'])
     self.assertEqual(backgate_request_id, log_request.request_metadata.caller.backgate_request_id)
+
+  def test_log_not_ok_backgate_response(self, logger: MagicMock) -> None :
+    """Test logging a response."""
+    for status in [s for s in StatusCode if s != StatusCode.OK]:
+      with self.subTest(status = status.name):
+        # Prepare data.
+        self.logger.sender.reset_mock()
+        logger.reset_mock()
+        # Perform test.
+        self.logger.log_backgate_response(status = status)
+        # Assert result.
+        self.logger.sender.send.assert_called_once()
+        logger.warning.assert_called_once()
+        log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        self.assertEqual(status.name, log_response.response.status)
+
+  def test_log_ok_backgate_response(self, logger: MagicMock) -> None :
+    """Test logging a response."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    # Perform test.
+    self.logger.log_backgate_response(status = StatusCode.OK)
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called_once()
+    log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    self.assertEqual(StatusCode.OK.name, log_response.response.status)
 
   def test_log_not_ok_response(self, logger: MagicMock) -> None :
     """Test logging a response."""
@@ -202,6 +234,15 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     self.logger.send_log_system_backgate_request(backgate_request = MagicMock())
     # Assert result.
     self.logger.stub.LogSystemBackgateRequest.assert_called_once()
+
+  def test_send_log_backgate_response(self) -> None :
+    """Test sending a log request."""
+    # Prepare data.
+    self.logger.stub.LogBackgateRequestResponse = MagicMock()
+    # Perform test.
+    self.logger.send_log_backgate_response(response = MagicMock())
+    # Assert result.
+    self.logger.stub.LogBackgateRequestResponse.assert_called_once()
 
   def test_send_log_request(self) -> None :
     """Test sending a log request."""

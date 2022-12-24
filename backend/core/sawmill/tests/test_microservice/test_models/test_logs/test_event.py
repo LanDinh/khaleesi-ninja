@@ -13,8 +13,8 @@ from microservice.models import Event
 from microservice.test_util import ModelRequestMetadataMixin
 
 
-@patch('microservice.models.event.AUDIT_EVENT')
-@patch('microservice.models.event.parse_string')
+@patch('microservice.models.logs.event.AUDIT_EVENT')
+@patch('microservice.models.logs.event.parse_string')
 @patch.object(Event.objects.model, 'log_metadata')
 class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the event logs objects manager."""

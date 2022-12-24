@@ -19,6 +19,10 @@ class StructuredDbLogger(StructuredLogger):
     """Send the log request to the logging facility."""
     DbBackgateRequest.objects.log_system_backgate_request(grpc_backgate_request = backgate_request)
 
+  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+    """Send the log response to the logging facility."""
+    DbBackgateRequest.objects.log_response(grpc_response = response)
+
   def send_log_request(self, *, request: Request) -> None :
     """Send the log request to the logging facility."""
     DbRequest.objects.log_request(grpc_request = request)

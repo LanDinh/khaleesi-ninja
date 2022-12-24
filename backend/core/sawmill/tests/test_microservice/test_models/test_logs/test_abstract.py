@@ -7,11 +7,11 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata as GrpcMetadata, User
-from microservice.models.abstract import Metadata
+from microservice.models.logs.abstract import Metadata
 
 
-@patch('microservice.models.abstract.parse_string')
-@patch('microservice.models.abstract.parse_timestamp')
+@patch('microservice.models.logs.abstract.parse_string')
+@patch('microservice.models.logs.abstract.parse_timestamp')
 class MetadataTestCase(SimpleTestCase):
   """Test the parse utility."""
 

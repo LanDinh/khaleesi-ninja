@@ -24,7 +24,7 @@ from microservice.models import (
   Error as DbError,
   BackgateRequest as DbBackgateRequest,
 )
-from microservice.models.abstract import Metadata
+from microservice.models.logs.abstract import Metadata
 from microservice.models.service_registry import SERVICE_REGISTRY
 
 
@@ -61,6 +61,17 @@ class Service(Servicer):
     def method() -> Metadata :
       LOGGER.info('Saving the backgate request to the database.')
       return DbBackgateRequest.objects.log_system_backgate_request(grpc_backgate_request = request)
+    return self._handle_response(method = method)
+
+  def LogBackgateRequestResponse(
+      self,
+      request: ResponseRequest,
+      _: grpc.ServicerContext,
+  ) -> LogStandardResponse :
+    """Log request responses."""
+    def method() -> Metadata :
+      LOGGER.info('Saving the backgate response to the database.')
+      return DbBackgateRequest.objects.log_response(grpc_response = request)
     return self._handle_response(method = method)
 
   def LogRequest(self, request: Request, _: grpc.ServicerContext) -> LogStandardResponse :

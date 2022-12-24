@@ -226,3 +226,4 @@ class ServerTestCase(SimpleTestCase):
     self.assertEqual(kwargs['action']            , action)
     self.assertEqual(kwargs['result']            , result)
     self.assertEqual(kwargs['logger_send_metric'], True)
+    structured_logger.log_backgate_response.assert_called_once()

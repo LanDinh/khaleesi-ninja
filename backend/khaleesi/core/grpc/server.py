@@ -11,7 +11,7 @@ from django.conf import settings
 from django.utils.module_loading import import_string
 
 # gRPC.
-from grpc import server, Server as GrpcServer
+from grpc import server, Server as GrpcServer, StatusCode
 from grpc_health.v1.health import HealthServicer
 from grpc_health.v1.health_pb2 import HealthCheckResponse
 from grpc_health.v1.health_pb2_grpc import add_HealthServicer_to_server
@@ -203,4 +203,8 @@ class Server:
       result              = result,
       details             = details,
       logger_send_metric  = True,
+    )
+    self.structured_logger.log_backgate_response(
+      backgate_request_id = self.lifetime_backgate_request_id,
+      status = StatusCode.OK if result == Event.Action.ResultType.SUCCESS else StatusCode.INTERNAL,
     )

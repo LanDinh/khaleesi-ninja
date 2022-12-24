@@ -23,7 +23,7 @@ def _parse_input(
       return parser(raw)
     return default
   except (TypeError, ValueError) as exception:
-    errors.append(f'{type(exception).__name__} parsing {name}: {str(exception)}.')
+    errors.append(f'{type(exception).__name__} parsing {name}: {str(exception)}.\n')
     return default
 
 class Parser(Protocol[T_co]):

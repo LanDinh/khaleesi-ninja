@@ -9,10 +9,12 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.proto.core_sawmill_pb2 import (
-    BackgateRequest as GrpcBackgateRequest, BackgateRequestResponse as GrpcBackgateRequestResponse,
-    EmptyRequest,
+  BackgateRequest as GrpcBackgateRequest,
+  BackgateRequestResponse as GrpcBackgateRequestResponse,
+  EmptyRequest,
+  ResponseRequest as GrpcResponse,
 )
-from microservice.models.abstract import Metadata
+from microservice.models.logs.abstract_response import ResponseMetadata
 from microservice.parse_util import parse_string
 
 
@@ -74,8 +76,18 @@ class BackgateRequestManager(models.Manager['BackgateRequest']):
       **self.model.log_metadata(metadata = grpc_backgate_request.request_metadata, errors = errors),
     )
 
+  def log_response(self, *, grpc_response: GrpcResponse) -> BackgateRequest :
+    """Log a gRPC backgate response."""
+    request = self.get(
+      meta_caller_backgate_request_id = grpc_response.request_id,
+      meta_response_status = 'IN_PROGRESS',
+    )
+    request.log_response(grpc_response = grpc_response.response)
+    request.save()
+    return request
 
-class BackgateRequest(Metadata):
+
+class BackgateRequest(ResponseMetadata):
   """Backgate request logs."""
 
   # khaleesi.ninja.
@@ -101,12 +113,20 @@ class BackgateRequest(Metadata):
     """Map to gRPC backgate request message."""
 
     grpc_backgate_request_response = GrpcBackgateRequestResponse()
+
     # Request metadata.
     self.request_metadata_to_grpc(
       request_metadata = grpc_backgate_request_response.request.request_metadata,
     )
     self.response_metadata_to_grpc(
       response_metadata = grpc_backgate_request_response.request_metadata,
+    )
+
+    # Response.
+    self.response_to_grpc(
+      metadata = grpc_backgate_request_response.response_metadata,
+      response = grpc_backgate_request_response.response,
+      processed = grpc_backgate_request_response.processed_response,
     )
 
     # khaleesi.ninja.

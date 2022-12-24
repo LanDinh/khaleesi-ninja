@@ -33,7 +33,8 @@ class RequestStateServerInterceptor(ServerInterceptor):
       STATE.request.grpc_method  = method_name
 
       upstream = self.get_upstream_request(request = request)
-      STATE.user.user_id = upstream.user.id
+      if upstream.user.id:
+        STATE.user.user_id = upstream.user.id
       STATE.user.type    = UserType(upstream.user.type)
 
       # Continue execution.

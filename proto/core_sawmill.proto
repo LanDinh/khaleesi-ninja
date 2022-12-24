@@ -107,12 +107,13 @@ message ResponseRequest {
 message LogStandardResponse {}
 
 service Lumberjack {
-  rpc LogEvent                 (Event)           returns (LogStandardResponse);
-  rpc LogRequest               (Request)         returns (LogStandardResponse);
-  rpc LogResponse              (ResponseRequest) returns (LogStandardResponse);
-  rpc LogError                 (Error)           returns (LogStandardResponse);
-  rpc LogBackgateRequest       (BackgateRequest) returns (LogStandardResponse);
-  rpc LogSystemBackgateRequest (EmptyRequest)    returns (LogStandardResponse);
+  rpc LogEvent                   (Event)           returns (LogStandardResponse);
+  rpc LogRequest                 (Request)         returns (LogStandardResponse);
+  rpc LogResponse                (ResponseRequest) returns (LogStandardResponse);
+  rpc LogError                   (Error)           returns (LogStandardResponse);
+  rpc LogBackgateRequest         (BackgateRequest) returns (LogStandardResponse);
+  rpc LogSystemBackgateRequest   (EmptyRequest)    returns (LogStandardResponse);
+  rpc LogBackgateRequestResponse (ResponseRequest) returns (LogStandardResponse);
 }
 
 
@@ -126,9 +127,17 @@ message EventsList {
 }
 
 
+message ProcessedResponse {
+  google.protobuf.Duration reported_duration = 1;
+  google.protobuf.Duration logged_duration   = 2;
+}
+
+
 message BackgateRequestResponse {
-  ResponseMetadata request_metadata = 1;
-  BackgateRequest  request          = 2;
+  ResponseMetadata request_metadata  = 1;
+  BackgateRequest  request           = 2;
+  ResponseMetadata response_metadata = 3;
+  Response         response          = 4;
 
   enum RequestType {
     UNKNOWN = 0;
@@ -137,12 +146,13 @@ message BackgateRequestResponse {
   }
 
   // Processed data.
-  RequestType type            = 10;
-  string      geolocation     = 11;
-  string      browser         = 12;
-  string      rendering_agent = 13;
-  string      os              = 14;
-  string      device_type     = 15;
+  RequestType              type               = 10;
+  ProcessedResponse        processed_response = 11;
+  string                   geolocation        = 20;
+  string                   browser            = 21;
+  string                   rendering_agent    = 22;
+  string                   os                 = 23;
+  string                   device_type        = 24;
 }
 
 message BackgateRequestList {
@@ -151,14 +161,11 @@ message BackgateRequestList {
 
 
 message RequestResponse {
-  ResponseMetadata         request_metadata  = 1;
-  Request                  request           = 2;
-  ResponseMetadata         response_metadata = 3;
-  Response                 response          = 4;
-
-  // Processed data.
-  google.protobuf.Duration reported_duration = 10;
-  google.protobuf.Duration logged_duration   = 11;
+  ResponseMetadata         request_metadata   = 1;
+  Request                  request            = 2;
+  ResponseMetadata         response_metadata  = 3;
+  Response                 response           = 4;
+  ProcessedResponse        processed_response = 5;
 }
 
 message RequestList {

@@ -38,10 +38,10 @@ class StructuredLogger(ABC):
   def log_request(self, *, upstream_request: RequestMetadata) -> None :
     """Log a microservice request."""
     LOGGER.info(
-      f'User {STATE.user.user_id} started request '
+      f'User "{STATE.user.user_id}" started request '
       f'{STATE.request.grpc_service}.{STATE.request.grpc_method}.'
     )
-    LOGGER.info(f'Upstream request {upstream_request.caller.request_id} caller data: '
+    LOGGER.info(f'Upstream request "{upstream_request.caller.request_id}" caller data: '
       f'{upstream_request.caller.khaleesi_gate}-{upstream_request.caller.khaleesi_service}: '
       f'{upstream_request.caller.grpc_service}.{upstream_request.caller.grpc_method}'
     )
@@ -56,18 +56,13 @@ class StructuredLogger(ABC):
 
     self.send_log_request(request = request)
 
-  def log_response(self, status: StatusCode) -> None :
+  def log_response(self, *, status: StatusCode) -> None :
     """Log a microservice response."""
-    if status == StatusCode.OK:
-      LOGGER.info('Request finished successfully.')
-    else:
-      LOGGER.warning(f'Request finished with error code {status.name}.')
-
-    response                 = ResponseRequest()
-    response.request_id      = STATE.request.request_id
-    response.response.status = status.name
-    response.response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
-
+    response = self._log_response_object(
+      status = status,
+      request_id = STATE.request.request_id,
+      request_name = 'Request',
+    )
     self.send_log_response(response = response)
 
   def log_error(self, *, exception: KhaleesiException ) -> None :
@@ -92,7 +87,7 @@ class StructuredLogger(ABC):
   def log_system_backgate_request(self, *, backgate_request_id: str) -> None :
     """Log a backgate request for system requests."""
     LOGGER.info(
-      f'Backgate request {backgate_request_id} started.'
+      f'Backgate request "{backgate_request_id}" started.'
     )
     backgate_request = EmptyRequest()
     add_grpc_server_system_request_metadata(
@@ -102,6 +97,19 @@ class StructuredLogger(ABC):
     )
 
     self.send_log_system_backgate_request(backgate_request = backgate_request)
+
+  def log_backgate_response(
+      self, *,
+      status: StatusCode,
+      backgate_request_id: str = STATE.request.backgate_request_id,
+  ) -> None :
+    """Log a microservice backgate response."""
+    response = self._log_response_object(
+      status = status,
+      request_id = backgate_request_id,
+      request_name = f'Backgate request "{backgate_request_id}"',
+    )
+    self.send_log_backgate_response(response = response)
 
   def log_system_event(
       self, *,
@@ -117,7 +125,7 @@ class StructuredLogger(ABC):
     """Log an event."""
     target_type = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
     log_string = \
-      f'Event targeting {target_type}: {target} owned by {owner.id}. '\
+      f'Event targeting "{target_type}": "{target}" owned by "{owner.id}". '\
       f'{Event.Action.ActionType.Name(action)} with result {Event.Action.ResultType.Name(result)}.'
 
     if result == Event.Action.ResultType.SUCCESS:
@@ -149,9 +157,32 @@ class StructuredLogger(ABC):
 
     self.send_log_event(event = event)
 
+  def _log_response_object(
+      self, *,
+      status: StatusCode,
+      request_id: str,
+      request_name: str,
+  ) -> ResponseRequest :
+    """Text log a response and return the response object."""
+    if status == StatusCode.OK:
+      LOGGER.info(f'{request_name} finished successfully.')
+    else:
+      LOGGER.warning(f'{request_name} finished with error code {status.name}.')
+
+    response                 = ResponseRequest()
+    response.request_id      = request_id
+    response.response.status = status.name
+    response.response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
+
+    return response
+
   @abstractmethod
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
     """Send the backgate log request to the logging facility."""
+
+  @abstractmethod
+  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+    """Send the log response to the logging facility."""
 
   @abstractmethod
   def send_log_request(self, *, request: Request) -> None :
@@ -183,6 +214,10 @@ class StructuredGrpcLogger(StructuredLogger):
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
     """Send the log request to the logging facility."""
     self.stub.LogSystemBackgateRequest(backgate_request)
+
+  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+    """Send the log response to the logging facility."""
+    self.stub.LogBackgateRequestResponse(response)
 
   def send_log_request(self, *, request: Request) -> None :
     """Send the log request to the logging facility."""

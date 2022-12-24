@@ -1,4 +1,4 @@
-"""core-sawmill abstract models."""
+"""core-sawmill abstract logs models."""
 
 # Python.
 from datetime import datetime, timezone
@@ -52,7 +52,6 @@ class Metadata(models.Model):
           name   = 'meta_caller_backgate_request_id',
           errors = errors,
         ),
-        # Caller.
         'meta_caller_request_id': parse_string(
           raw    = metadata.caller.request_id,
           name   = 'meta_caller_request_id',
