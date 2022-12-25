@@ -185,7 +185,11 @@ class ServerTestCase(SimpleTestCase):
           'INTERCEPTORS': {
               'STRUCTURED_LOGGER': {
                   'NAME': 'khaleesi.core.shared.structured_logger.StructuredGrpcLogger'
-              }
+              },
+              'REQUEST_STATE': {
+                  'NAME':
+                    'khaleesi.core.interceptors.server.request_state.RequestStateServerInterceptor'
+              },
           }
       },
   })

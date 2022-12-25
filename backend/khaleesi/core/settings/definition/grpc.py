@@ -29,6 +29,7 @@ class GrpcInterceptors(TypedDict):
   """Interceptor configuration."""
 
   STRUCTURED_LOGGER: GrpcServerInterceptor
+  REQUEST_STATE    : GrpcServerInterceptor
 
 
 class Grpc(TypedDict):

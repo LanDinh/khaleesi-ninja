@@ -21,7 +21,7 @@ from khaleesi.proto.core_pb2 import User
 class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
   """Test RequestStateServerInterceptor."""
 
-  interceptor = RequestStateServerInterceptor()
+  interceptor = RequestStateServerInterceptor(structured_logger = MagicMock())
 
   def test_intercept_with_request_metadata(self) -> None :
     """Test intercept with metadata present."""

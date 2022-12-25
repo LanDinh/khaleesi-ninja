@@ -3,7 +3,7 @@
 # Python.
 from concurrent.futures import ThreadPoolExecutor
 from signal import signal, SIGTERM
-from typing import Any
+from typing import Any, List
 from uuid import uuid4
 
 # Django.
@@ -21,7 +21,7 @@ from grpc_reflection.v1alpha import reflection
 from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
-from khaleesi.core.interceptors.server.request_state import RequestStateServerInterceptor
+from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.logger import LOGGER
@@ -38,10 +38,11 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class Server:
   """The gRPC server."""
 
-  server: GrpcServer
-  channel_manager: ChannelManager
-  health_servicer: HealthServicer
-  structured_logger: StructuredLogger
+  server                      : GrpcServer
+  channel_manager             : ChannelManager
+  health_servicer             : HealthServicer
+  structured_logger           : StructuredLogger
+  interceptors                : List[ServerInterceptor]
   lifetime_backgate_request_id: str
 
   def __init__(self) -> None :
@@ -51,11 +52,7 @@ class Server:
       LOGGER.info('Initializing structured logger...')
       self._init_structured_logger()
       LOGGER.info('Initializing interceptors...')
-      interceptors = [
-          RequestStateServerInterceptor(),  # Outer.
-          PrometheusServerInterceptor(),
-          LoggingServerInterceptor(structured_logger = self.structured_logger),  # Inner.
-      ]
+      self._init_interceptors()
       LOGGER.info('Initializing metric initializer...')
       self.metric_initializer = MetricInitializer(
         channel_manager = self.channel_manager,
@@ -64,7 +61,7 @@ class Server:
       LOGGER.info('Initializing server...')
       self.server = server(
         ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
-        interceptors = interceptors,  # type: ignore[arg-type]  # fixed upstream!
+        interceptors = self.interceptors,  # type: ignore[arg-type]  # fixed upstream!
       )
       LOGGER.info('Initializing health servicer...')
       self.health_servicer = HealthServicer()
@@ -141,6 +138,22 @@ class Server:
       backgate_request_id = self.lifetime_backgate_request_id,
       grpc_method         = 'LIFECYCLE',
     )
+
+  def _init_interceptors(self) -> None :
+    """Initialize the interceptors."""
+    raw_request_state = khaleesi_settings['GRPC']['INTERCEPTORS']['REQUEST_STATE']['NAME']
+    LOGGER.debug(f'Adding request state interceptor {raw_request_state}...')
+    try:
+      request_state_interceptor = import_string(raw_request_state)(
+        structured_logger = self.structured_logger,
+      )
+    except ImportError as error:  # pragma: no cover
+      raise ImportError(f'Could not import "{raw_request_state}" as interceptor.') from error
+    self.interceptors = [
+      request_state_interceptor,  # Outer.
+      PrometheusServerInterceptor(),
+      LoggingServerInterceptor(structured_logger = self.structured_logger),  # Inner.
+    ]
 
   def _print_banner(self) -> None :
     """Print the startup banner."""

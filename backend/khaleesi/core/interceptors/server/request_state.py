@@ -16,6 +16,9 @@ from khaleesi.core.shared.state import STATE, UserType
 class RequestStateServerInterceptor(ServerInterceptor):
   """Interceptor to handle state of requests."""
 
+  def __init__(self, *, structured_logger: StructuredLogger) -> None :
+    """Initialize the RequestStateServerInterceptor."""
+
   def khaleesi_intercept(  # pylint: disable=inconsistent-return-statements
       self, *,
       method: Callable[[Any, ServicerContext], Any],
