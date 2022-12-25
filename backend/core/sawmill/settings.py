@@ -7,7 +7,7 @@ from khaleesi.core.settings.khaleesi import  *  # pylint: disable=wildcard-impor
 
 
 INSTALLED_APPS.append('microservice')
-KHALEESI_NINJA['GRPC']['INTERCEPTORS']['LOGGING_SERVER_INTERCEPTOR']['STRUCTURED_LOGGER'] = \
+KHALEESI_NINJA['GRPC']['INTERCEPTORS']['STRUCTURED_LOGGER']['NAME'] = \
   'microservice.structured_logger.StructuredDbLogger'
 KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.forester')
 KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.lumberjack')

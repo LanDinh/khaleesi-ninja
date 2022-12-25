@@ -128,8 +128,7 @@ class Server:
 
   def _init_structured_logger(self) -> None :
     """Attempt to import the structured logger from string representations."""
-    structured_logger = \
-        khaleesi_settings['GRPC']['INTERCEPTORS']['LOGGING_SERVER_INTERCEPTOR']['STRUCTURED_LOGGER']
+    structured_logger = khaleesi_settings['GRPC']['INTERCEPTORS']['STRUCTURED_LOGGER']['NAME']
     LOGGER.debug(f'Adding structured logger {structured_logger}...')
     try:
       self.structured_logger = import_string(structured_logger)(

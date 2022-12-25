@@ -21,15 +21,15 @@ class GrpcServerMethodNames(TypedDict):
   INITIALIZE_REQUEST_METRICS: GrpcEventMethodNames  # fetch gRPC calls for metric initialization.
 
 
-class GrpcLoggingServerInterceptor(TypedDict):
+class GrpcServerInterceptor(TypedDict):
   """Configuration for the logging server interceptor."""
 
-  STRUCTURED_LOGGER: str
+  NAME: str
 
 class GrpcInterceptors(TypedDict):
   """Interceptor configuration."""
 
-  LOGGING_SERVER_INTERCEPTOR: GrpcLoggingServerInterceptor
+  STRUCTURED_LOGGER: GrpcServerInterceptor
 
 
 class Grpc(TypedDict):

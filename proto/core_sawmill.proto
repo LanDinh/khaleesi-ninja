@@ -183,7 +183,7 @@ message ErrorList {
 
 
 message LogFilter {
-
+  khaleesi.core.RequestMetadata request_metadata = 1;
 }
 
 service Sawyer {

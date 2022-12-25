@@ -4,7 +4,7 @@ from .base import KhaleesiNinjaSettings as KhaleesiNinjaSettings  # pylint: disa
 from .grpc import (  # pylint: disable=useless-import-alias
   Grpc as Grpc,
   GrpcInterceptors as GrpcInterceptors,
-  GrpcLoggingServerInterceptor as GrpcLoggingServerInterceptor,
+  GrpcServerInterceptor as GrpcServerInterceptor,
   GrpcServerMethodNames as GrpcServerMethodNames,
   GrpcEventMethodNames as GrpcEventMethodNames,
 )
