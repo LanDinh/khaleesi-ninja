@@ -84,7 +84,7 @@ class StructuredLogger(ABC):
 
     self.send_log_error(error = error)
 
-  def log_system_backgate_request(self, *, backgate_request_id: str) -> None :
+  def log_system_backgate_request(self, *, backgate_request_id: str, grpc_method: str) -> None :
     """Log a backgate request for system requests."""
     LOGGER.info(
       f'Backgate request "{backgate_request_id}" started.'
@@ -92,10 +92,9 @@ class StructuredLogger(ABC):
     backgate_request = EmptyRequest()
     add_grpc_server_system_request_metadata(
       request             = backgate_request,
-      grpc_method         = 'BACKGATE_LOGGING',
+      grpc_method         = grpc_method,
       backgate_request_id = backgate_request_id,
     )
-
     self.send_log_system_backgate_request(backgate_request = backgate_request)
 
   def log_backgate_response(

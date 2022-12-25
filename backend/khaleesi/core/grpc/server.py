@@ -139,6 +139,7 @@ class Server:
     self.lifetime_backgate_request_id = str(uuid4())
     self.structured_logger.log_system_backgate_request(
       backgate_request_id = self.lifetime_backgate_request_id,
+      grpc_method         = 'LIFECYCLE',
     )
 
   def _print_banner(self) -> None :

@@ -76,10 +76,6 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     SERVER_METHOD_NAMES = definition.GrpcServerMethodNames(
       SERVICE_NAME = 'grpc-server',
       USER_ID      = 'grpc-server',
-      BACKGATE_LOGGING = definition.GrpcEventMethodNames(
-        METHOD = 'log-system-backgate',
-        TARGET = '',
-      ),
       LIFECYCLE = definition.GrpcEventMethodNames(
         METHOD = 'lifecycle',
         TARGET = 'core.core.server'

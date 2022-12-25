@@ -176,10 +176,6 @@ class ServerTestCase(SimpleTestCase):
           'SERVER_METHOD_NAMES': {
               'SERVICE_NAME': 'grpc-server',
               'USER_ID'     : 'grpc-server',
-              'BACKGATE_LOGGING': {
-                  'METHOD': 'backgate-logging',
-                  'TARGET': '',
-              },
               'LIFECYCLE': {
                   'METHOD': 'lifecycle',
                   'TARGET': 'core.core.server',
