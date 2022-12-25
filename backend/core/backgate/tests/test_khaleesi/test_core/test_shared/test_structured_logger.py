@@ -78,7 +78,10 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     backgate_request_id = 'backgate-request'
     # Perform test.
-    self.logger.log_system_backgate_request(backgate_request_id = backgate_request_id)
+    self.logger.log_system_backgate_request(
+      backgate_request_id = backgate_request_id,
+      grpc_method = 'LIFECYCLE',
+    )
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()

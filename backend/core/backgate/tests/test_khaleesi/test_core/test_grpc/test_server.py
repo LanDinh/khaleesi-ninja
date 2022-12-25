@@ -183,8 +183,8 @@ class ServerTestCase(SimpleTestCase):
           },
           'HANDLERS': [ 'some.invalid.import' ],
           'INTERCEPTORS': {
-              'LOGGING_SERVER_INTERCEPTOR': {
-                  'STRUCTURED_LOGGER': 'khaleesi.core.shared.structured_logger.StructuredGrpcLogger'
+              'STRUCTURED_LOGGER': {
+                  'NAME': 'khaleesi.core.shared.structured_logger.StructuredGrpcLogger'
               }
           }
       },
