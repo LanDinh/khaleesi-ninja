@@ -33,18 +33,18 @@ class EventManager(models.Manager['Event']):
     return self.create(
       # Target.
       target_type = parse_string(
-        raw = grpc_event.target.type,
-        name = 'target_type',
+        raw    = grpc_event.target.type,
+        name   = 'target_type',
         errors = errors,
       ),
       target_id = parse_string(
-        raw  = grpc_event.target.id,
-        name = 'target_id',
+        raw    = grpc_event.target.id,
+        name   = 'target_id',
         errors = errors,
       ),
       target_owner_id = parse_string(
-        raw  = grpc_event.target.owner.id,
-        name = 'target_owner',
+        raw    = grpc_event.target.owner.id,
+        name   = 'target_owner',
         errors = errors,
       ),
       target_owner_type = User.UserType.Name(grpc_event.target.owner.type),
@@ -53,8 +53,8 @@ class EventManager(models.Manager['Event']):
       action_custom_type = grpc_event.action.custom_type,
       action_result      = GrpcEvent.Action.ResultType.Name(grpc_event.action.result),
       action_details = parse_string(
-        raw = grpc_event.action.details,
-        name = 'action_details',
+        raw    = grpc_event.action.details,
+        name   = 'action_details',
         errors = errors,
       ),
       # Metadata.

@@ -134,9 +134,9 @@ class BackgateRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         request.log_response = MagicMock()  # type: ignore[assignment]
         request_mock.reset_mock()
         request_mock.return_value = request
-        grpc_response                 = GrpcBackgateResponseRequest()
-        grpc_response.request_id      = 'request-id'
-        grpc_response.response.status = status.name
+        grpc_response                     = GrpcBackgateResponseRequest()
+        grpc_response.backgate_request_id = 'request-id'
+        grpc_response.response.status     = status.name
         grpc_response.response.timestamp.FromDatetime(request.meta_response_logged_timestamp)
         # Execute test.
         result = BackgateRequest.objects.log_response(grpc_response = grpc_response)
