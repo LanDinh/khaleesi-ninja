@@ -6,7 +6,7 @@ from uuid import uuid4
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.request_state import BaseRequestStateServerInterceptor
 from khaleesi.core.shared.state import STATE
-from khaleesi.core.shared.structured_logger import StructuredLogger
+from khaleesi.core.logging.structured_logger import StructuredLogger
 from khaleesi.proto.core_pb2 import RequestMetadata
 
 

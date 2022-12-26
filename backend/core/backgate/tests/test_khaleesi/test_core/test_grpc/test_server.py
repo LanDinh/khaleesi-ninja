@@ -28,7 +28,7 @@ khaleesi_ninja_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class ServerTestCase(SimpleTestCase):
   """Test the gRPC server."""
 
-  @patch('khaleesi.core.shared.structured_logger.LOGGER')
+  @patch('khaleesi.core.logging.structured_logger.LOGGER')
   def test_initialization_success(self, *_: MagicMock) -> None :
     """Test initialization success."""
     # Execute test & assert result.
@@ -186,7 +186,7 @@ class ServerTestCase(SimpleTestCase):
           'HANDLERS': [ 'some.invalid.import' ],
           'INTERCEPTORS': {
               'STRUCTURED_LOGGER': {
-                  'NAME': 'khaleesi.core.shared.structured_logger.StructuredGrpcLogger'
+                  'NAME': 'khaleesi.core.logging.structured_logger.StructuredGrpcLogger'
               },
               'REQUEST_STATE': {
                   'NAME':
@@ -195,7 +195,7 @@ class ServerTestCase(SimpleTestCase):
           }
       },
   })
-  @patch('khaleesi.core.shared.structured_logger.LOGGER')
+  @patch('khaleesi.core.logging.structured_logger.LOGGER')
   def test_add_invalid_handler(self, *_: MagicMock) -> None :
     """Test that invalid handlers raise ImportErrors."""
     # Execute test & assert result.

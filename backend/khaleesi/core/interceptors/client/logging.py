@@ -11,7 +11,7 @@ from grpc_interceptor import ClientCallDetails
 # khaleesi.ninja.
 from khaleesi.core.interceptors.client.util import ClientInterceptor
 from khaleesi.core.shared.exceptions import UpstreamGrpcException
-from khaleesi.core.shared.logger import LOGGER
+from khaleesi.core.logging.text_logger import LOGGER
 
 
 class LoggingClientInterceptor(ClientInterceptor):

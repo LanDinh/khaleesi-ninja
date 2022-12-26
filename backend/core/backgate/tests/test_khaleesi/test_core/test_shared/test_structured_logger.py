@@ -8,8 +8,8 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.logger import LogLevel
-from khaleesi.core.shared.structured_logger import StructuredGrpcLogger, StructuredLogger
+from khaleesi.core.logging.text_logger import LogLevel
+from khaleesi.core.logging.structured_logger import StructuredGrpcLogger, StructuredLogger
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
@@ -57,7 +57,7 @@ class StructuredTestLogger(StructuredLogger):
     self.sender.send(event = event)
 
 
-@patch('khaleesi.core.shared.structured_logger.LOGGER')
+@patch('khaleesi.core.logging.structured_logger.LOGGER')
 class TestStructuredLogger(SimpleTestCase):
   """Test the structured logger."""
 

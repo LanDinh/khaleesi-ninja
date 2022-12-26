@@ -9,7 +9,7 @@ from grpc import ServicerContext, StatusCode
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.interceptors.server.util import ServerInterceptor
-from khaleesi.core.shared.structured_logger import StructuredLogger
+from khaleesi.core.logging.structured_logger import StructuredLogger
 
 
 class LoggingServerInterceptor(ServerInterceptor):

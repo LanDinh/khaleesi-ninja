@@ -13,7 +13,7 @@ from django.db import models
 from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
 
 # khaleesi.ninja.
-from khaleesi.core.shared.logger import LOGGER
+from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.proto.core_pb2 import GrpcCallerDetails
 from khaleesi.proto.core_sawmill_pb2 import ServiceCallData, CallData
 

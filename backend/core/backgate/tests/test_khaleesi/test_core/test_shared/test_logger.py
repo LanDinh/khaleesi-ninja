@@ -4,11 +4,11 @@
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.shared.logger import LOGGER, LogLevel
+from khaleesi.core.logging.text_logger import LOGGER, LogLevel
 from khaleesi.core.test_util.test_case import SimpleTestCase
 
 
-@patch('khaleesi.core.shared.logger.logger')
+@patch('khaleesi.core.logging.text_logger.logger')
 class LoggerTestCase(SimpleTestCase):
   """Test the global logger."""
 

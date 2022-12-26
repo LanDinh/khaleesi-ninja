@@ -12,7 +12,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException
-from khaleesi.core.shared.logger import LogLevel
+from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.test_util.exceptions import khaleesi_raising_method, exception_raising_method
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase

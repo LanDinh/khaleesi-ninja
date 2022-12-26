@@ -13,7 +13,7 @@ from khaleesi.core.interceptors.server.request_state import (
   BaseRequestStateServerInterceptor,
   RequestStateServerInterceptor,
 )
-from khaleesi.core.shared.logger import LogLevel
+from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.test_util.exceptions import khaleesi_raising_method
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin

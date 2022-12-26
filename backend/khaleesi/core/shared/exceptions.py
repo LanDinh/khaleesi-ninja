@@ -11,7 +11,7 @@ from django.conf import settings
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.logger import LogLevel
+from khaleesi.core.logging.text_logger import LogLevel
 
 
 class KhaleesiException(Exception):

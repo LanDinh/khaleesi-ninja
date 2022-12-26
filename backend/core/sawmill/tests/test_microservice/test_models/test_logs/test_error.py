@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.logger import LogLevel
+from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.test_util.grpc import GrpcTestMixin
 from khaleesi.core.test_util.test_case import TransactionTestCase, SimpleTestCase
 from khaleesi.proto.core_pb2 import User

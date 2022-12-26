@@ -4,7 +4,7 @@
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.shared.logger import LOGGER
+from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,

@@ -10,7 +10,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
-from khaleesi.core.shared.logger import LogLevel
+from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.shared.state import STATE
 from khaleesi.core.test_util.exceptions import (
   khaleesi_raising_method,

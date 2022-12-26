@@ -24,8 +24,8 @@ from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterce
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
-from khaleesi.core.shared.logger import LOGGER
-from khaleesi.core.shared.structured_logger import StructuredLogger
+from khaleesi.core.logging.text_logger import LOGGER
+from khaleesi.core.logging.structured_logger import StructuredLogger
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences

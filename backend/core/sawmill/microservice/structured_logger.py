@@ -1,7 +1,7 @@
 """Structured logger using gRPC."""
 
 # khaleesi.ninja.
-from khaleesi.core.shared.structured_logger import StructuredLogger
+from khaleesi.core.logging.structured_logger import StructuredLogger
 from khaleesi.proto.core_sawmill_pb2 import (
   Request,
   ResponseRequest,

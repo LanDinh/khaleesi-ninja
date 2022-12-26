@@ -9,7 +9,7 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import KhaleesiException
-from khaleesi.core.shared.logger import LogLevel
+from khaleesi.core.logging.text_logger import LogLevel
 
 
 def _raise(*args: Any, exception: Exception, method: Callable, **kwargs: Any) -> None :  # type: ignore[type-arg] # pylint: disable=line-too-long
