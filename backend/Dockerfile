@@ -24,6 +24,7 @@ COPY ./manage.py /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 RUN python -m venv .venv
 RUN ./.venv/bin/pip install --upgrade pip
 RUN ./.venv/bin/pip install -r requirements.txt
+RUN ./.venv/bin/pip install -r /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/requirements.txt
 
 ################################################################################
 #                               Development Base                               #

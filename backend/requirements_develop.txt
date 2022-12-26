@@ -5,4 +5,5 @@ mypy==0.961
 pylint==2.14.3
 pylint-django==2.5.3
 pylint-protobuf==0.20.2
+sql-metadata==2.6.0
 types-protobuf==3.19.22
