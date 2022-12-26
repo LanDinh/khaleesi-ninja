@@ -13,7 +13,14 @@ from khaleesi.core.shared.structured_logger import StructuredGrpcLogger, Structu
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
-from khaleesi.proto.core_sawmill_pb2 import Request, ResponseRequest, Error, Event, EmptyRequest
+from khaleesi.proto.core_sawmill_pb2 import (
+  Request,
+  ResponseRequest,
+  Error,
+  Event,
+  EmptyRequest,
+  BackgateRequest,
+)
 
 
 class StructuredTestLogger(StructuredLogger):
@@ -22,6 +29,10 @@ class StructuredTestLogger(StructuredLogger):
   sender = MagicMock()
 
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
+    """Send the log request to the logging facility."""
+    self.sender.send(request = backgate_request)
+
+  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None :
     """Send the log request to the logging facility."""
     self.sender.send(request = backgate_request)
 
@@ -71,7 +82,7 @@ class TestStructuredLogger(SimpleTestCase):
     log_request = cast(Request, self.logger.sender.send.call_args.kwargs['request'])
     self.assertEqual(upstream_request.caller, log_request.upstream_request)
 
-  def test_log_backgate_request(self, logger: MagicMock) -> None :
+  def test_log_system_backgate_request(self, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -87,6 +98,18 @@ class TestStructuredLogger(SimpleTestCase):
     logger.info.assert_called_once()
     log_request = cast(EmptyRequest, self.logger.sender.send.call_args.kwargs['request'])
     self.assertEqual(backgate_request_id, log_request.request_metadata.caller.backgate_request_id)
+
+  def test_log_backgate_request(self, logger: MagicMock) -> None :
+    """Test logging a request."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    # Perform test.
+    self.logger.log_backgate_request()
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called_once()
+    cast(EmptyRequest, self.logger.sender.send.call_args.kwargs['request'])
 
   def test_log_not_ok_backgate_response(self, logger: MagicMock) -> None :
     """Test logging a response."""
@@ -237,6 +260,15 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     self.logger.send_log_system_backgate_request(backgate_request = MagicMock())
     # Assert result.
     self.logger.stub.LogSystemBackgateRequest.assert_called_once()
+
+  def test_send_log_backgate_request(self) -> None :
+    """Test sending a log request."""
+    # Prepare data.
+    self.logger.stub.LogBackgateRequest = MagicMock()
+    # Perform test.
+    self.logger.send_log_backgate_request(backgate_request = MagicMock())
+    # Assert result.
+    self.logger.stub.LogBackgateRequest.assert_called_once()
 
   def test_send_log_backgate_response(self) -> None :
     """Test sending a log request."""

@@ -2,7 +2,14 @@
 
 # khaleesi.ninja.
 from khaleesi.core.shared.structured_logger import StructuredLogger
-from khaleesi.proto.core_sawmill_pb2 import Request, ResponseRequest, Error, Event, EmptyRequest
+from khaleesi.proto.core_sawmill_pb2 import (
+  Request,
+  ResponseRequest,
+  Error,
+  Event,
+  EmptyRequest,
+  BackgateRequest,
+)
 from microservice.models.service_registry import SERVICE_REGISTRY
 from microservice.models import (
   Request as DbRequest,
@@ -18,6 +25,10 @@ class StructuredDbLogger(StructuredLogger):
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
     """Send the log request to the logging facility."""
     DbBackgateRequest.objects.log_system_backgate_request(grpc_backgate_request = backgate_request)
+
+  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None:
+    """Send the log request to the logging facility."""
+    DbBackgateRequest.objects.log_backgate_request(grpc_backgate_request = backgate_request)
 
   def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""

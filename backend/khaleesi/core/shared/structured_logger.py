@@ -21,7 +21,14 @@ from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.logger import LOGGER
 from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import RequestMetadata, User
-from khaleesi.proto.core_sawmill_pb2 import Request, ResponseRequest, Error, Event, EmptyRequest
+from khaleesi.proto.core_sawmill_pb2 import (
+  Request,
+  ResponseRequest,
+  Error,
+  Event,
+  EmptyRequest,
+  BackgateRequest,
+)
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
 
@@ -96,6 +103,16 @@ class StructuredLogger(ABC):
       backgate_request_id = backgate_request_id,
     )
     self.send_log_system_backgate_request(backgate_request = backgate_request)
+
+  def log_backgate_request(self) -> None :
+    """Log a backgate request for system requests."""
+    LOGGER.info(
+      f'Backgate request "{STATE.request.backgate_request_id}" started.'
+    )
+    backgate_request = BackgateRequest()
+    add_request_metadata(request = backgate_request)
+    self.send_log_backgate_request(backgate_request = backgate_request)
+
 
   def log_backgate_response(
       self, *,
@@ -180,6 +197,10 @@ class StructuredLogger(ABC):
     """Send the backgate log request to the logging facility."""
 
   @abstractmethod
+  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None :
+    """Send the backgate log request to the logging facility."""
+
+  @abstractmethod
   def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
 
@@ -213,6 +234,10 @@ class StructuredGrpcLogger(StructuredLogger):
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
     """Send the log request to the logging facility."""
     self.stub.LogSystemBackgateRequest(backgate_request)
+
+  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None:
+    """Send the log request to the logging facility."""
+    self.stub.LogBackgateRequest(backgate_request)
 
   def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
