@@ -9,6 +9,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   Event,
   EmptyRequest,
   BackgateRequest,
+  BackgateResponseRequest,
 )
 from microservice.models.service_registry import SERVICE_REGISTRY
 from microservice.models import (
@@ -30,7 +31,7 @@ class StructuredDbLogger(StructuredLogger):
     """Send the log request to the logging facility."""
     DbBackgateRequest.objects.log_backgate_request(grpc_backgate_request = backgate_request)
 
-  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
     """Send the log response to the logging facility."""
     DbBackgateRequest.objects.log_response(grpc_response = response)
 

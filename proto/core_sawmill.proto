@@ -98,6 +98,11 @@ message Response {
   google.protobuf.Timestamp timestamp  = 2;
 }
 
+message BackgateResponseRequest {
+  string         backgate_request_id = 1;
+  Response       response            = 2;
+}
+
 message ResponseRequest {
   string   request_id = 1;
   Response response   = 2;
@@ -107,13 +112,13 @@ message ResponseRequest {
 message LogStandardResponse {}
 
 service Lumberjack {
-  rpc LogEvent                   (Event)           returns (LogStandardResponse);
-  rpc LogRequest                 (Request)         returns (LogStandardResponse);
-  rpc LogResponse                (ResponseRequest) returns (LogStandardResponse);
-  rpc LogError                   (Error)           returns (LogStandardResponse);
-  rpc LogBackgateRequest         (BackgateRequest) returns (LogStandardResponse);
-  rpc LogSystemBackgateRequest   (EmptyRequest)    returns (LogStandardResponse);
-  rpc LogBackgateRequestResponse (ResponseRequest) returns (LogStandardResponse);
+  rpc LogEvent                   (Event)                   returns (LogStandardResponse);
+  rpc LogRequest                 (Request)                 returns (LogStandardResponse);
+  rpc LogResponse                (ResponseRequest)         returns (LogStandardResponse);
+  rpc LogError                   (Error)                   returns (LogStandardResponse);
+  rpc LogBackgateRequest         (BackgateRequest)         returns (LogStandardResponse);
+  rpc LogSystemBackgateRequest   (EmptyRequest)            returns (LogStandardResponse);
+  rpc LogBackgateRequestResponse (BackgateResponseRequest) returns (LogStandardResponse);
 }
 
 

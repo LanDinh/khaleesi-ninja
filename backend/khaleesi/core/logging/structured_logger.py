@@ -28,6 +28,8 @@ from khaleesi.proto.core_sawmill_pb2 import (
   Event,
   EmptyRequest,
   BackgateRequest,
+  BackgateResponseRequest,
+  Response,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
@@ -65,10 +67,12 @@ class StructuredLogger(ABC):
 
   def log_response(self, *, status: StatusCode) -> None :
     """Log a microservice response."""
-    response = self._log_response_object(
-      status = status,
-      request_id = STATE.request.request_id,
+    response = ResponseRequest()
+    response.request_id = STATE.request.request_id
+    self._log_response_object(
+      status       = status,
       request_name = 'Request',
+      response     = response.response
     )
     self.send_log_response(response = response)
 
@@ -113,17 +117,18 @@ class StructuredLogger(ABC):
     add_request_metadata(request = backgate_request)
     self.send_log_backgate_request(backgate_request = backgate_request)
 
-
   def log_backgate_response(
       self, *,
       status: StatusCode,
       backgate_request_id: str = STATE.request.backgate_request_id,
   ) -> None :
     """Log a microservice backgate response."""
-    response = self._log_response_object(
-      status = status,
-      request_id = backgate_request_id,
+    response = BackgateResponseRequest()
+    response.backgate_request_id = backgate_request_id
+    self._log_response_object(
+      status       = status,
       request_name = f'Backgate request "{backgate_request_id}"',
+      response     = response.response
     )
     self.send_log_backgate_response(response = response)
 
@@ -176,8 +181,8 @@ class StructuredLogger(ABC):
   def _log_response_object(
       self, *,
       status: StatusCode,
-      request_id: str,
       request_name: str,
+      response: Response,
   ) -> ResponseRequest :
     """Text log a response and return the response object."""
     if status == StatusCode.OK:
@@ -185,10 +190,8 @@ class StructuredLogger(ABC):
     else:
       LOGGER.warning(f'{request_name} finished with error code {status.name}.')
 
-    response                 = ResponseRequest()
-    response.request_id      = request_id
-    response.response.status = status.name
-    response.response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
+    response.status = status.name
+    response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 
     return response
 
@@ -201,7 +204,7 @@ class StructuredLogger(ABC):
     """Send the backgate log request to the logging facility."""
 
   @abstractmethod
-  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
     """Send the log response to the logging facility."""
 
   @abstractmethod
@@ -239,7 +242,7 @@ class StructuredGrpcLogger(StructuredLogger):
     """Send the log request to the logging facility."""
     self.stub.LogBackgateRequest(backgate_request)
 
-  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
     """Send the log response to the logging facility."""
     self.stub.LogBackgateRequestResponse(response)
 

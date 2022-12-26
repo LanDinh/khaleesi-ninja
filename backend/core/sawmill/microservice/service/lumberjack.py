@@ -12,7 +12,7 @@ from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
     DESCRIPTOR, LogStandardResponse, EmptyRequest,
-    Error, Event, ResponseRequest, Request, BackgateRequest,
+    Error, Event, ResponseRequest, Request, BackgateRequest, BackgateResponseRequest,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
@@ -65,7 +65,7 @@ class Service(Servicer):
 
   def LogBackgateRequestResponse(
       self,
-      request: ResponseRequest,
+      request: BackgateResponseRequest,
       _: grpc.ServicerContext,
   ) -> LogStandardResponse :
     """Log request responses."""

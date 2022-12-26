@@ -14,7 +14,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   BackgateRequest as GrpcBackgateRequest,
   EmptyRequest as GrpcEmptyRequest,
   BackgateRequestResponse as GrpcBackgateResponse,
-  ResponseRequest as GrpcResponse,
+  BackgateResponseRequest as GrpcBackgateResponseRequest,
 )
 from microservice.models import BackgateRequest
 from microservice.test_util import ModelResponseMetadataMixin
@@ -134,7 +134,7 @@ class BackgateRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         request.log_response = MagicMock()  # type: ignore[assignment]
         request_mock.reset_mock()
         request_mock.return_value = request
-        grpc_response                 = GrpcResponse()
+        grpc_response                 = GrpcBackgateResponseRequest()
         grpc_response.request_id      = 'request-id'
         grpc_response.response.status = status.name
         grpc_response.response.timestamp.FromDatetime(request.meta_response_logged_timestamp)
@@ -152,7 +152,7 @@ class BackgateRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
     request.log_response = MagicMock()  # type: ignore[assignment]
     request_mock.reset_mock()
     request_mock.return_value = request
-    grpc_response = GrpcResponse()
+    grpc_response = GrpcBackgateResponseRequest()
     # Execute test.
     result = BackgateRequest.objects.log_response(grpc_response = grpc_response)
     # Assert result.
