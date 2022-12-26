@@ -18,7 +18,7 @@ from khaleesi.core.grpc.request_metadata import (
 )
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException
-from core.logging.text_logger import LOGGER
+from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import (
