@@ -1,6 +1,7 @@
 """Interceptor to handle state of requests."""
 
 # Python.
+from abc import ABC, abstractmethod
 from typing import Callable, Any
 from uuid import uuid4
 
@@ -12,9 +13,10 @@ from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.shared.structured_logger import StructuredLogger
+from khaleesi.proto.core_pb2 import RequestMetadata
 
 
-class RequestStateServerInterceptor(ServerInterceptor):
+class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
   """Interceptor to handle state of requests."""
 
   def __init__(self, *, structured_logger: StructuredLogger) -> None :
@@ -37,6 +39,7 @@ class RequestStateServerInterceptor(ServerInterceptor):
       STATE.request.grpc_method  = method_name
 
       upstream = self.get_upstream_request(request = request)
+      self.set_backgate_request_id(upstream = upstream)
       if upstream.user.id:
         STATE.user.user_id = upstream.user.id
       STATE.user.type    = UserType(upstream.user.type)
@@ -51,6 +54,10 @@ class RequestStateServerInterceptor(ServerInterceptor):
       new_exception = MaskingInternalServerException(exception = exception)
       self._handle_exception(context = context, exception = new_exception)
 
+  @abstractmethod
+  def set_backgate_request_id(self, *, upstream: RequestMetadata) -> None :
+    """Set the backgate request id."""
+
   def _handle_exception(
       self, *,
       context  : ServicerContext,
@@ -59,3 +66,12 @@ class RequestStateServerInterceptor(ServerInterceptor):
     """Properly handle the exception."""
     STATE.reset()  # Always clean up afterwards.
     context.abort(code = exception.status, details = exception.to_json())
+
+
+class RequestStateServerInterceptor(BaseRequestStateServerInterceptor):
+  """RequestStateServerInterceptor that reads the ID from the request metadata."""
+
+  def set_backgate_request_id(self, *, upstream: RequestMetadata) -> None :
+    """Set the backgate request id."""
+    if upstream.caller.backgate_request_id:
+      STATE.request.backgate_request_id = upstream.caller.backgate_request_id

@@ -9,19 +9,32 @@ from unittest.mock import MagicMock
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.interceptors.server.request_state import RequestStateServerInterceptor
+from khaleesi.core.interceptors.server.request_state import (
+  BaseRequestStateServerInterceptor,
+  RequestStateServerInterceptor,
+)
 from khaleesi.core.shared.logger import LogLevel
 from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.test_util.exceptions import khaleesi_raising_method
 from khaleesi.core.test_util.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase
-from khaleesi.proto.core_pb2 import User
+from khaleesi.proto.core_pb2 import User, RequestMetadata
 
 
-class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
+class RequestStateServerTestInterceptor(BaseRequestStateServerInterceptor):
+  """Subclass to test base functionality."""
+
+  mock = MagicMock()
+
+  def set_backgate_request_id(self, *, upstream: RequestMetadata) -> None :
+    """Set the backgate request."""
+    self.mock()
+
+
+class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
   """Test RequestStateServerInterceptor."""
 
-  interceptor = RequestStateServerInterceptor(structured_logger = MagicMock())
+  interceptor = RequestStateServerTestInterceptor(structured_logger = MagicMock())
 
   def test_intercept_with_request_metadata(self) -> None :
     """Test intercept with metadata present."""
@@ -61,6 +74,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
   def _execute_intercept_ok_test(self, *, final_request: Any, user_type: int) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
+    self.interceptor.mock.reset_mock()
     def _method(*_: Any) -> None :
       self._assert_not_clean_state(user_type = user_type)
     # Execute test.
@@ -70,6 +84,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     )
     # Assert result.
     self._assert_clean_state()
+    self.interceptor.mock.assert_called_once()
 
   def _execute_intercept_khaleesi_exception_test(
       self, *,
@@ -82,6 +97,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
       for loglevel in LogLevel:
         with self.subTest(status = status.name, loglevel = loglevel.name):
           # Prepare data.
+          self.interceptor.mock.reset_mock()
           context.reset_mock()
           # Execute test.
           self.interceptor.khaleesi_intercept(
@@ -97,12 +113,14 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
           )
           # Assert result.
           self._assert_clean_state()
+          self.interceptor.mock.assert_called_once()
           context.abort.assert_called_once()
 
   def _execute_intercept_other_exception_test(self, *, final_request: Any, user_type: int) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
     context = MagicMock()
+    self.interceptor.mock.reset_mock()
     def _method(*_: Any) -> None :
       self._assert_not_clean_state(user_type = user_type)
       raise Exception('exception')
@@ -114,6 +132,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     # Assert result.
     self._assert_clean_state()
     context.abort.assert_called_once()
+    self.interceptor.mock.assert_called_once()
 
   def _assert_clean_state(self) -> None :
     """Assert a clean state."""
@@ -129,3 +148,29 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     self.assertNotEqual('UNKNOWN'       , STATE.request.grpc_method)
     self.assertNotEqual('UNKNOWN'       , STATE.user.user_id)
     self.assertEqual(UserType(user_type), STATE.user.type)
+
+
+class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
+  """Test RequestStateServerInterceptor."""
+
+  interceptor = RequestStateServerInterceptor(structured_logger = MagicMock())
+
+  def test_set_backgate_request_id_with_request_metadata(self) -> None :
+    """Test setting the backgate request id."""
+    for name, request_params in self.metadata_request_params:
+      for user_label, user_type in User.UserType.items():
+        with self.subTest(case = name, user = user_label):
+          # Prepare data.
+          request_metadata, _ = self.get_request(
+            request = None,
+            user = user_type,
+            **request_params,
+          )
+          STATE.reset()
+          # Execute test.
+          self.interceptor.set_backgate_request_id(upstream = request_metadata)
+          # Assert result.
+          self.assertEqual(
+            request_metadata.caller.backgate_request_id,
+            STATE.request.backgate_request_id,
+          )
