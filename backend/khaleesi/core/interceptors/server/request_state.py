@@ -11,6 +11,7 @@ from grpc import ServicerContext
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import STATE, UserType
+from khaleesi.core.shared.structured_logger import StructuredLogger
 
 
 class RequestStateServerInterceptor(ServerInterceptor):

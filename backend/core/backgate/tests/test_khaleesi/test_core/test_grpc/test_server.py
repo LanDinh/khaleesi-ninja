@@ -2,6 +2,7 @@
 
 # Python.
 import threading
+from typing import List
 from unittest.mock import patch, MagicMock
 
 # Django.
@@ -43,7 +44,7 @@ class ServerTestCase(SimpleTestCase):
     """Test initialization failure."""
     # Prepare data.
     grpc_server.side_effect = Exception('test')
-    structured_logger = self._mock_import_string(import_string_mock = import_string_mock)
+    return_values = self._mock_import_string(import_string_mock = import_string_mock)
     # Execute test.
     with self.assertRaises(Exception):
       Server()
@@ -51,7 +52,7 @@ class ServerTestCase(SimpleTestCase):
     self._assert_server_state_event(
       action            = Event.Action.ActionType.START,
       result            = Event.Action.ResultType.FATAL,
-      structured_logger = structured_logger
+      structured_logger = return_values[0],
     )
 
   @patch('khaleesi.core.grpc.server.import_string')
@@ -63,7 +64,7 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Test sigterm success."""
     # Prepare data.
-    structured_logger = self._mock_import_string(import_string_mock = import_string_mock)
+    return_values = self._mock_import_string(import_string_mock = import_string_mock)
     server = Server()
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
@@ -74,7 +75,7 @@ class ServerTestCase(SimpleTestCase):
     self._assert_server_state_event(
       action            = Event.Action.ActionType.END,
       result            = Event.Action.ResultType.SUCCESS,
-      structured_logger = structured_logger,
+      structured_logger = return_values[0],
     )
     channel_manager.return_value.close_all_channels.assert_called_once_with()
 
@@ -87,7 +88,7 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Test sigterm failure."""
     # Prepare data.
-    structured_logger = self._mock_import_string(import_string_mock = import_string_mock)
+    return_values = self._mock_import_string(import_string_mock = import_string_mock)
     server = Server()
     grpc_server.return_value.stop.side_effect = Exception('test')
     # Execute test.
@@ -97,7 +98,7 @@ class ServerTestCase(SimpleTestCase):
     self._assert_server_state_event(
       action            = Event.Action.ActionType.END,
       result            = Event.Action.ResultType.FATAL,
-      structured_logger = structured_logger,
+      structured_logger = return_values[0],
     )
 
   @patch('khaleesi.core.grpc.server.import_string')
@@ -110,7 +111,7 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Test sigterm timeout."""
     # Prepare data.
-    structured_logger = self._mock_import_string(import_string_mock = import_string_mock)
+    return_values = self._mock_import_string(import_string_mock = import_string_mock)
     server = Server()
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
@@ -120,7 +121,7 @@ class ServerTestCase(SimpleTestCase):
     self._assert_server_state_event(
       action            = Event.Action.ActionType.END,
       result            = Event.Action.ResultType.ERROR,
-      structured_logger = structured_logger,
+      structured_logger = return_values[0],
     )
     channel_manager.return_value.close_all_channels.assert_called_once_with()
 
@@ -133,7 +134,8 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Test that server start works correctly."""
     # Prepare data.
-    structured_logger = self._mock_import_string(import_string_mock = import_string_mock)
+    return_values = self._mock_import_string(import_string_mock = import_string_mock)
+    structured_logger = return_values[0]
     server = Server()
     # Execute test.
     server.start()
@@ -144,7 +146,7 @@ class ServerTestCase(SimpleTestCase):
     self._assert_server_state_event(
       action            = Event.Action.ActionType.START,
       result            = Event.Action.ResultType.SUCCESS,
-      structured_logger = structured_logger,
+      structured_logger = return_values[0],
     )
 
   @patch('khaleesi.core.grpc.server.import_string')
@@ -156,7 +158,7 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Test that server start fails correctly."""
     # Prepare data.
-    structured_logger = self._mock_import_string(import_string_mock = import_string_mock)
+    return_values = self._mock_import_string(import_string_mock = import_string_mock)
     server = Server()
     grpc_server.return_value.start.side_effect = Exception('test')
     # Execute test.
@@ -166,7 +168,7 @@ class ServerTestCase(SimpleTestCase):
     self._assert_server_state_event(
       action            = Event.Action.ActionType.START,
       result            = Event.Action.ResultType.FATAL,
-      structured_logger = structured_logger,
+      structured_logger = return_values[0],
     )
 
   @patch.dict('khaleesi.core.grpc.server.khaleesi_settings', {
@@ -200,16 +202,17 @@ class ServerTestCase(SimpleTestCase):
     with self.assertRaises(ImportError):
       Server()
 
-  def _mock_import_string(self, *, import_string_mock: MagicMock) -> MagicMock :
+  def _mock_import_string(self, *, import_string_mock: MagicMock) -> List[MagicMock] :
     """Return the structured logger, but don't mock the handlers."""
     structured_logger = MagicMock()
+    request_state_interceptor = MagicMock()
     import_string_mock.side_effect = \
-      [ lambda **kwargs: structured_logger ] + \
+      [ lambda **kwargs: structured_logger, lambda **kwargs: request_state_interceptor ] + \
       [
           import_string(f'{handler}.service_configuration')
           for handler in khaleesi_ninja_settings['GRPC']['HANDLERS']
       ]
-    return structured_logger
+    return [ structured_logger, request_state_interceptor ]
 
 
   def _assert_server_state_event(
