@@ -183,7 +183,7 @@ class StructuredLogger(ABC):
       status: StatusCode,
       request_name: str,
       response: Response,
-  ) -> ResponseRequest :
+  ) -> None :
     """Text log a response and return the response object."""
     if status == StatusCode.OK:
       LOGGER.info(f'{request_name} finished successfully.')
@@ -192,8 +192,6 @@ class StructuredLogger(ABC):
 
     response.status = status.name
     response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
-
-    return response
 
   @abstractmethod
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
