@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 import grpc
 
 # khaleesi.ninja.
-from core.service import Service
+from microservice.service.service import Service
 from khaleesi.core.test_util.test_case import TransactionTestCase
 from khaleesi.proto.core_backgate_pb2 import SayHelloRequest
 

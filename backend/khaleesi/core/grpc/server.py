@@ -29,7 +29,7 @@ from khaleesi.core.shared.structured_logger import StructuredLogger
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences
-from metric_initializer import MetricInitializer
+from microservice.metric_initializer import MetricInitializer
 
 
 khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA

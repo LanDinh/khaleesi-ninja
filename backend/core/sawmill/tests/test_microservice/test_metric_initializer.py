@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
-from metric_initializer import MetricInitializer
+from microservice.metric_initializer import MetricInitializer
 from microservice.models.service_registry import (
   KhaleesiGate,
   KhaleesiService,
@@ -16,8 +16,8 @@ from microservice.models.service_registry import (
 )
 
 
-@patch('metric_initializer.BaseMetricInitializer.initialize_metrics_with_data')
-@patch('metric_initializer.SERVICE_REGISTRY')
+@patch('microservice.metric_initializer.BaseMetricInitializer.initialize_metrics_with_data')
+@patch('microservice.metric_initializer.SERVICE_REGISTRY')
 class MetricInitializerTestCase(SimpleTestCase):
   """Test the metric initializer."""
 
