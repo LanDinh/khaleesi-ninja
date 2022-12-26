@@ -20,6 +20,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   Event,
   EmptyRequest,
   BackgateRequest,
+  BackgateResponseRequest,
 )
 
 
@@ -36,7 +37,7 @@ class StructuredTestLogger(StructuredLogger):
     """Send the log request to the logging facility."""
     self.sender.send(request = backgate_request)
 
-  def send_log_backgate_response(self, *, response: ResponseRequest) -> None :
+  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
     """Send the log request to the logging facility."""
     self.sender.send(response = response)
 
