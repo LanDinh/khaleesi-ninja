@@ -79,6 +79,19 @@ message Request {
   khaleesi.core.GrpcCallerDetails upstream_request = 2;
 }
 
+message Query {
+  string id         = 1;
+  string raw        = 2;
+
+  google.protobuf.Timestamp start = 10;
+  google.protobuf.Timestamp end   = 11;
+}
+
+message Queries {
+  khaleesi.core.RequestMetadata request_metadata = 1;
+  repeated Query                queries          = 2;
+}
+
 message Error {
   khaleesi.core.RequestMetadata request_metadata = 1;
   string                        status           = 2;
@@ -129,6 +142,22 @@ message EventResponse {
 
 message EventsList {
   repeated EventResponse events = 1;
+}
+
+message QueryResponse {
+  khaleesi.core.RequestMetadata query_request_metadata  = 1;
+  ResponseMetadata              query_response_metadata = 2;
+  Query                         query                   = 3;
+
+  string                   normalized        = 10;
+  repeated string          tables            = 11;
+  repeated string          columns           = 12;
+  google.protobuf.Duration reported_duration = 20;
+
+}
+
+message QueryList{
+  repeated QueryResponse queries = 1;
 }
 
 
