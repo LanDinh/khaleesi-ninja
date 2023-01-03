@@ -62,10 +62,10 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
         self.assertEqual(''             , result[1].columns)
         self.assertEqual(timedelta(days = 1), result[0].reported_duration)
         self.assertEqual(2, metadata.call_count)
-        self.assertEqual(queries.request_metadata, metadata.call_args_list[0].kwargs['metadata'])
-        self.assertEqual(queries.request_metadata, metadata.call_args_list[1].kwargs['metadata'])
-        self.assertEqual([]                      , metadata.call_args_list[0].kwargs['errors'])
-        self.assertEqual([]                      , metadata.call_args_list[1].kwargs['errors'])
+        self.assertEqual(request_metadata, metadata.call_args_list[0].kwargs['metadata'])
+        self.assertEqual(request_metadata, metadata.call_args_list[1].kwargs['metadata'])
+        self.assertEqual([]              , metadata.call_args_list[0].kwargs['errors'])
+        self.assertEqual([]              , metadata.call_args_list[1].kwargs['errors'])
 
   def test_log_queries_empty(self, *_: MagicMock) -> None :
     """Test logging queries."""
