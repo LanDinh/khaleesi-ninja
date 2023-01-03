@@ -41,8 +41,16 @@ class QueryManager(models.Manager['Query']):
         normalized     = parser.generalize,
         tables         = ','.join(parser.tables),
         columns        = ','.join(parser.columns),
-        reported_start = parse_timestamp(raw = grpc_query.id, name = 'start', errors = errors),
-        reported_end   = parse_timestamp(raw = grpc_query.id, name = 'end', errors = errors),
+        reported_start = parse_timestamp(
+          raw = grpc_query.start.ToDatetime(),
+          name = 'start',
+          errors = errors,
+        ),
+        reported_end = parse_timestamp(
+          raw = grpc_query.end.ToDatetime(),
+          name = 'end',
+          errors = errors,
+        ),
         **self.model.log_metadata(metadata = metadata, errors = errors)
       )
       new_queries.append(query)
