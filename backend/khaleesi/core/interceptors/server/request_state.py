@@ -10,6 +10,7 @@ from grpc import ServicerContext
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.util import ServerInterceptor
+from khaleesi.core.logging.query_logger import query_logger
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import STATE, UserType
 from khaleesi.core.logging.structured_logger import StructuredLogger
@@ -32,22 +33,23 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
     """Handle the state of requests."""
     STATE.reset()  # Always start with a clean state.
     try:
-      STATE.request.request_id = str(uuid4())
-      # Process request data.
-      _, _, service_name, method_name = self.process_method_name(raw = method_name)
-      STATE.request.grpc_service = service_name
-      STATE.request.grpc_method  = method_name
+      with query_logger():
+        STATE.request.request_id = str(uuid4())
+        # Process request data.
+        _, _, service_name, method_name = self.process_method_name(raw = method_name)
+        STATE.request.grpc_service = service_name
+        STATE.request.grpc_method  = method_name
 
-      upstream = self.get_upstream_request(request = request)
-      self.set_backgate_request_id(upstream = upstream)
-      if upstream.user.id:
-        STATE.user.user_id = upstream.user.id
-      STATE.user.type    = UserType(upstream.user.type)
+        upstream = self.get_upstream_request(request = request)
+        self.set_backgate_request_id(upstream = upstream)
+        if upstream.user.id:
+          STATE.user.user_id = upstream.user.id
+        STATE.user.type    = UserType(upstream.user.type)
 
-      # Continue execution.
-      response = method(request, context)
-      STATE.reset()  # Always clean up afterwards.
-      return response
+        # Continue execution.
+        response = method(request, context)
+        STATE.reset()  # Always clean up afterwards.
+        return response
     except KhaleesiException as exception:
       self._handle_exception(context = context, exception = exception)
     except Exception as exception:  # pylint: disable=broad-except

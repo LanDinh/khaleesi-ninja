@@ -3,7 +3,7 @@
 # Python.
 from functools import partial
 from typing import Optional, Any, Dict
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # gRPC.
 from grpc import StatusCode
@@ -71,7 +71,14 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
         )
         test(final_request = final_request, user_type = user_type)  # pylint: disable=no-value-for-parameter
 
-  def _execute_intercept_ok_test(self, *, final_request: Any, user_type: int) -> None :
+  @patch('khaleesi.core.interceptors.server.request_state.query_logger')
+  def _execute_intercept_ok_test(
+      self,
+      query_logger: MagicMock,
+      *,
+      final_request: Any,
+      user_type: int,
+  ) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
     self.interceptor.mock.reset_mock()
@@ -85,9 +92,13 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
     # Assert result.
     self._assert_clean_state()
     self.interceptor.mock.assert_called_once()
+    query_logger.assert_called_once()
 
+  @patch('khaleesi.core.interceptors.server.request_state.query_logger')
   def _execute_intercept_khaleesi_exception_test(
-      self, *,
+      self,
+      query_logger: MagicMock,
+      *,
       final_request: Any,
       user_type: int,
   ) -> None :
@@ -98,6 +109,7 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
         with self.subTest(status = status.name, loglevel = loglevel.name):
           # Prepare data.
           self.interceptor.mock.reset_mock()
+          query_logger.reset_mock()
           context.reset_mock()
           # Execute test.
           self.interceptor.khaleesi_intercept(
@@ -115,8 +127,16 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
           self._assert_clean_state()
           self.interceptor.mock.assert_called_once()
           context.abort.assert_called_once()
+          query_logger.assert_called_once()
 
-  def _execute_intercept_other_exception_test(self, *, final_request: Any, user_type: int) -> None :
+  @patch('khaleesi.core.interceptors.server.request_state.query_logger')
+  def _execute_intercept_other_exception_test(
+      self,
+      query_logger: MagicMock,
+      *,
+      final_request: Any,
+      user_type: int,
+  ) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
     context = MagicMock()
@@ -133,6 +153,7 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
     self._assert_clean_state()
     context.abort.assert_called_once()
     self.interceptor.mock.assert_called_once()
+    query_logger.assert_called_once()
 
   def _assert_clean_state(self) -> None :
     """Assert a clean state."""
