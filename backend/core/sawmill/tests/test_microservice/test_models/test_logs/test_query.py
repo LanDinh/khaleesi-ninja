@@ -45,16 +45,16 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
         queries = GrpcQueries()
         queries.queries.add()
         queries.queries.add()
-        metadata = RequestMetadata()
+        request_metadata = RequestMetadata()
         self.set_request_metadata(
-          request_metadata = metadata,
+          request_metadata = request_metadata,
           now              = start,
           user             = user_type,
         )
         # Execute test.
         result = Query.objects.log_queries(
           queries = queries.queries,
-          metadata = metadata,
+          metadata = request_metadata,
         )
         # Assert result.
         self.assertEqual(2, len(result))
