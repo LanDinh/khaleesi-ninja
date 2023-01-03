@@ -10,7 +10,7 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 
 @patch('khaleesi.core.logging.text_logger.logger')
 class LoggerTestCase(SimpleTestCase):
-  """Test the global logger."""
+  """Test the text logger."""
 
   logger = LOGGER
   message = 'test'

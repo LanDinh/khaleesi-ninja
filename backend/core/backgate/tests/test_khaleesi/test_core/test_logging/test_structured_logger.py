@@ -1,6 +1,7 @@
 """Test the structured logger."""
 
 # Python.
+from datetime import datetime, timezone
 from typing import cast
 from unittest.mock import MagicMock, patch
 
@@ -166,8 +167,11 @@ class TestStructuredLogger(SimpleTestCase):
     ids = [ 'id0', 'id1', 'id2', ]
     STATE.reset()
     STATE.queries = {
-        'one' : [ Query(query_id = ids[0], raw = 'raw') ],
-        'two' : [ Query(query_id = ids[1], raw = 'raw'), Query(query_id = ids[2], raw = 'raw') ],
+        'one' : [ Query(query_id = ids[0], raw = 'raw', start = datetime.now(tz = timezone.utc)) ],
+        'two' : [
+            Query(query_id = ids[1], raw = 'raw', start = datetime.now(tz = timezone.utc)),
+            Query(query_id = ids[2], raw = 'raw', start = datetime.now(tz = timezone.utc)),
+        ],
         'zero': [],
     }
     # Perform test.

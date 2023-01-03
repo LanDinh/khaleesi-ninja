@@ -43,7 +43,7 @@ class Query:
   """Query data."""
   query_id  : str
   raw       : str
-  start     : datetime = field(default_factory = datetime.now)
+  start     : datetime
   end       : datetime = datetime.max.replace(tzinfo = timezone.utc)
 
 class State(threading.local):
