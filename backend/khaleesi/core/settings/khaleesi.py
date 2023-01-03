@@ -62,7 +62,7 @@ LOGGING = {
 }
 
 
-# khaleesi.ninja
+# khaleesi.ninja.
 KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSettings(
   METADATA = definition.Metadata(
     GATE    = environ['KHALEESI_GATE'],
@@ -74,6 +74,7 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
   GRPC = definition.Grpc(
     PORT     = cast(int, environ.get('PORT', 8000)),
     THREADS  = cast(int, environ.get('THREADS', 10)),
+    SHUTDOWN_GRACE_SECS = 30,
     SERVER_METHOD_NAMES = definition.GrpcServerMethodNames(
       SERVICE_NAME = 'grpc-server',
       USER_ID      = 'grpc-server',

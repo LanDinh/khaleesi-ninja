@@ -40,3 +40,6 @@ DATABASE_ROUTERS = [ 'khaleesi.core.database_router.unittest.TestDatabaseRouter'
 
 # noinspection PyUnresolvedReferences
 INSTALLED_APPS.append('tests')
+
+# khaleesi.ninja.
+KHALEESI_NINJA['GRPC']['SHUTDOWN_GRACE_SECS'] = 1

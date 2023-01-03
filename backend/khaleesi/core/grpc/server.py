@@ -176,7 +176,7 @@ class Server:
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
       self.health_servicer.enter_graceful_shutdown()
       done_event = self.server.stop(30)
-      if done_event.wait(30):
+      if done_event.wait(khaleesi_settings['GRPC']['SHUTDOWN_GRACE_SECS']):
         self._log_server_state_event(
           action = Event.Action.ActionType.END,
           result = Event.Action.ResultType.SUCCESS,

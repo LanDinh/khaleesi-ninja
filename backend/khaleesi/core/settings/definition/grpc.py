@@ -37,6 +37,7 @@ class Grpc(TypedDict):
 
   PORT               : int
   THREADS            : int
+  SHUTDOWN_GRACE_SECS: int
   SERVER_METHOD_NAMES: GrpcServerMethodNames
   HANDLERS           : List[str]
   INTERCEPTORS       : GrpcInterceptors
