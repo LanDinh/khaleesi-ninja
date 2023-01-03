@@ -15,6 +15,7 @@ USE_TZ = True
 
 
 # Installed apps.
+# noinspection PyUnresolvedReferences
 INSTALLED_APPS = [
   'khaleesi',  # custom commands.
   'microservice',  # code for microservices.

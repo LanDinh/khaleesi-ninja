@@ -7,6 +7,7 @@ from typing import Any
 # khaleesi.ninja.
 from khaleesi.core.logging.text_logger import StdoutWriter, StderrWriter
 from khaleesi.core.test_util.test_case import SimpleTestCase
+# noinspection PyProtectedMember
 from khaleesi.management.commands._base import BaseCommand
 
 

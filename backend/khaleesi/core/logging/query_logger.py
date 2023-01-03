@@ -54,5 +54,6 @@ def query_logger() -> Generator[Dict[str, QueryLogger], None, None] :
     for alias in connections:
       logger = QueryLogger(alias = alias)
       query_loggers[alias] = logger
+      # noinspection PyTypeChecker
       stack.enter_context(connections[alias].execute_wrapper(logger))
     yield query_loggers

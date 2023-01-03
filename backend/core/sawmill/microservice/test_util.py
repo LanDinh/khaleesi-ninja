@@ -80,6 +80,7 @@ class ModelResponseMetadataMixin(ModelRequestMetadataMixin):
 
   assertLess: Callable  # type: ignore[type-arg]
 
+  # noinspection PyMethodOverriding
   def model_full_request_metadata(  # type: ignore[override]  # pylint: disable=arguments-differ
       self, *,
       user  : 'User.UserType.V',

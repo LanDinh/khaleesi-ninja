@@ -20,6 +20,7 @@ from khaleesi.proto.core_pb2 import RequestMetadata
 class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
   """Interceptor to handle state of requests."""
 
+  # noinspection PyUnusedLocal
   def __init__(self, *, structured_logger: StructuredLogger) -> None :
     """Initialize the RequestStateServerInterceptor."""
 
