@@ -64,4 +64,21 @@ class Logger:
     return { 'request_id': STATE.request.request_id }
 
 
+class StdoutWriter(Logger):
+  """For management commands, until https://code.djangoproject.com/ticket/21429 is fixed."""
+
+  def write(self, message: str) -> None :
+    """Write output."""
+    self.info(message)
+
+class StderrWriter(Logger):
+  """For management commands, until https://code.djangoproject.com/ticket/21429 is fixed."""
+
+  def write(self, message: str) -> None :
+    """Write output."""
+    self.error(message)
+
+
 LOGGER = Logger()
+STDOUT_WRITER = StdoutWriter()
+STDERR_WRITER = StderrWriter()

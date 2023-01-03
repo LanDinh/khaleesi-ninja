@@ -15,10 +15,10 @@ class GrpcServerTestCase(SimpleTestCase):
 
   command = Command()
 
-  def test_handle(self, server: MagicMock, metrics_server: MagicMock) -> None :
+  def test_khaleesi_handle(self, server: MagicMock, metrics_server: MagicMock) -> None :
     """Test the handle method."""
     # Execute test.
-    self.command.handle()
+    self.command.khaleesi_handle()
     # Assert result.
     server.return_value.start.assert_called_once_with()
     metrics_server.assert_called_once()
