@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from khaleesi.core.test_util.grpc import GrpcTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase, TransactionTestCase
-from khaleesi.proto.core_pb2 import User
+from khaleesi.proto.core_pb2 import User, RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import ResponseRequest as GrpcQueries
 from microservice.models import Query
 from microservice.test_util import ModelRequestMetadataMixin
@@ -45,15 +45,16 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
         queries = GrpcQueries()
         queries.queries.add()
         queries.queries.add()
+        metadata = RequestMetadata()
         self.set_request_metadata(
-          request_metadata = queries.request_metadata,
+          request_metadata = metadata,
           now              = start,
           user             = user_type,
         )
         # Execute test.
         result = Query.objects.log_queries(
           queries = queries.queries,
-          metadata = queries.request_metadata,
+          metadata = metadata,
         )
         # Assert result.
         self.assertEqual(2, len(result))
@@ -68,12 +69,10 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
 
   def test_log_queries_empty(self, *_: MagicMock) -> None :
     """Test logging queries."""
-    # Prepare data.
-    queries = GrpcQueries()
     # Execute test.
     result = Query.objects.log_queries(
-      queries = queries.queries,
-      metadata = queries.request_metadata,
+      queries = GrpcQueries().queries,
+      metadata = RequestMetadata(),
     )
     # Assert result.
     self.assertEqual(0, len(result))
