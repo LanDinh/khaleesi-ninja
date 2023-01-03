@@ -112,8 +112,9 @@ message BackgateResponseRequest {
 }
 
 message ResponseRequest {
-  string   request_id = 1;
-  Response response   = 2;
+  string         request_id = 1;
+  Response       response   = 2;
+  repeated Query queries    = 3;
 }
 
 
