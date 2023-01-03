@@ -2,8 +2,13 @@
 
 # Python.
 import threading
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from enum import Enum
+from typing import List, Dict
+
+# Django.
+from django.db import connections
 
 
 class UserType(Enum):
@@ -33,11 +38,20 @@ class User:
   user_id: str      = 'UNKNOWN'
   type   : UserType = UserType.UNKNOWN
 
+@dataclass
+class Query:
+  """Query data."""
+  query_id  : str
+  raw       : str
+  start     : datetime = field(default_factory = datetime.now)
+  end       : datetime = datetime.max.replace(tzinfo = timezone.utc)
+
 class State(threading.local):
   """Per-request state."""
 
   request: Request
-  user: User
+  user   : User
+  queries: Dict[str, List[Query]]
 
   def __init__(self) -> None :
     """Set the default state."""
@@ -47,7 +61,10 @@ class State(threading.local):
   def reset(self) -> None :
     """Reset to default state."""
     self.request = Request()
-    self.user = User()
+    self.user    = User()
+    self.queries = {}
+    for connection in connections:
+      self.queries[connection] = []
 
 
 STATE = State()

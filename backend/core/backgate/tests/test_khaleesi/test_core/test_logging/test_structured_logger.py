@@ -8,8 +8,9 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.logging.structured_logger import StructuredGrpcLogger, StructuredLogger
+from khaleesi.core.logging.text_logger import LogLevel
+from khaleesi.core.shared.state import STATE, Query
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
@@ -147,6 +148,7 @@ class TestStructuredLogger(SimpleTestCase):
         # Prepare data.
         self.logger.sender.reset_mock()
         logger.reset_mock()
+        STATE.reset()
         # Perform test.
         self.logger.log_response(status = status)
         # Assert result.
@@ -154,19 +156,30 @@ class TestStructuredLogger(SimpleTestCase):
         logger.warning.assert_called_once()
         log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
         self.assertEqual(status.name, log_response.response.status)
+        self.assertEqual(0, len(log_response.queries))
 
   def test_log_ok_response(self, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
+    ids = [ 'id0', 'id1', 'id2', ]
+    STATE.reset()
+    STATE.queries = {
+        'one' : [ Query(query_id = ids[0], raw = 'raw') ],
+        'two' : [ Query(query_id = ids[1], raw = 'raw'), Query(query_id = ids[2], raw = 'raw') ],
+        'zero': [],
+    }
     # Perform test.
     self.logger.log_response(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
-    logger.info.assert_called_once()
+    logger.info.assert_called()
     log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
     self.assertEqual(StatusCode.OK.name, log_response.response.status)
+    self.assertEqual(3, len(log_response.queries))
+    for query_id in ids:
+      self.assertIn(query_id, [ query.id for query in log_response.queries ])
 
   def test_log_error(self, logger: MagicMock) -> None :
     """Test logging an error."""

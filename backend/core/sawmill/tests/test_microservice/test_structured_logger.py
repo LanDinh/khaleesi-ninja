@@ -59,8 +59,9 @@ class TestStructuredDbLogger(SimpleTestCase):
     db_request.objects.log_request.assert_called_once_with(grpc_request = request)
     service_registry.add_call.assert_called_once()
 
+  @patch('microservice.structured_logger.DbQuery')
   @patch('microservice.structured_logger.DbRequest')
-  def test_send_log_response(self, db_request: MagicMock) -> None :
+  def test_send_log_response(self, db_request: MagicMock, db_query: MagicMock) -> None :
     """Test sending a log request."""
     # Prepare data.
     response = MagicMock()
@@ -68,6 +69,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     self.logger.send_log_response(response = response)
     # Assert result.
     db_request.objects.log_response.assert_called_once_with(grpc_response = response)
+    db_query.objects.log_queries.assert_called_once()
 
   @patch('microservice.structured_logger.DbError')
   def test_send_log_error(self, db_error: MagicMock) -> None :

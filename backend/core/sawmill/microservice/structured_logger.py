@@ -17,6 +17,7 @@ from microservice.models import (
   Error as DbError,
   Event as DbEvent,
   BackgateRequest as DbBackgateRequest,
+  Query as DbQuery,
 )
 
 
@@ -45,7 +46,11 @@ class StructuredDbLogger(StructuredLogger):
 
   def send_log_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
-    DbRequest.objects.log_response(grpc_response = response)
+    result = DbRequest.objects.log_response(grpc_response = response)
+    DbQuery.objects.log_queries(
+      queries = response.queries,
+      metadata = result.to_grpc_request_response().request.request_metadata,
+    )
 
   def send_log_error(self, *, error: Error) -> None :
     """Send the log error to the logging facility."""

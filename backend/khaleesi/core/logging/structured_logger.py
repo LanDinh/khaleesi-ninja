@@ -8,6 +8,7 @@ from datetime import timezone, datetime
 from django.conf import settings
 
 # gRPC.
+from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
 from grpc import StatusCode
 
 # khaleesi.ninja.
@@ -30,6 +31,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   BackgateRequest,
   BackgateResponseRequest,
   Response,
+  Query,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import LumberjackStub
 
@@ -74,6 +76,7 @@ class StructuredLogger(ABC):
       request_name = 'Request',
       response     = response.response
     )
+    self._log_queries(queries = response.queries)
     self.send_log_response(response = response)
 
   def log_error(self, *, exception: KhaleesiException ) -> None :
@@ -177,6 +180,19 @@ class StructuredLogger(ABC):
     event.logger_send_metric = logger_send_metric
 
     self.send_log_event(event = event)
+
+  def _log_queries(self, *, queries: RepeatedCompositeFieldContainer[Query]) -> None :
+    """Attach queries to the gRPC object."""
+    count = 0
+    for _, state_queries in STATE.queries.items():
+      for query in state_queries:
+        grpc_query     = queries.add()
+        grpc_query.id  = query.query_id
+        grpc_query.raw = query.raw
+        grpc_query.start.FromDatetime(query.start)
+        grpc_query.end.FromDatetime(query.end)
+        count += 1
+    LOGGER.info(f'Reporting {count} queries.')
 
   def _log_response_object(
       self, *,
