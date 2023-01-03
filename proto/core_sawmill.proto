@@ -221,6 +221,7 @@ service Sawyer {
   rpc GetRequests         (LogFilter) returns (RequestList);
   rpc GetErrors           (LogFilter) returns (ErrorList);
   rpc GetBackgateRequests (LogFilter) returns (BackgateRequestList);
+  rpc GetQueries          (LogFilter) returns (QueryList);
 }
 
 message EmptyRequest {

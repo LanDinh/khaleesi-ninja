@@ -11,8 +11,15 @@ from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
-    DESCRIPTOR, LogStandardResponse, EmptyRequest,
-    Error, Event, ResponseRequest, Request, BackgateRequest, BackgateResponseRequest,
+  DESCRIPTOR,
+  LogStandardResponse,
+  EmptyRequest,
+  Error,
+  Event,
+  ResponseRequest,
+  Request,
+  BackgateRequest,
+  BackgateResponseRequest,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
@@ -23,6 +30,7 @@ from microservice.models import (
   Request as DbRequest,
   Error as DbError,
   BackgateRequest as DbBackgateRequest,
+  Query as DbQuery,
 )
 from microservice.models.logs.abstract import Metadata
 from microservice.models.service_registry import SERVICE_REGISTRY
@@ -91,7 +99,15 @@ class Service(Servicer):
     """Log request responses."""
     def method() -> Metadata :
       LOGGER.info('Saving the response to the database.')
-      return DbRequest.objects.log_response(grpc_response = request)
+      result = DbRequest.objects.log_response(grpc_response = request)
+      LOGGER.info('Saving the queries to the database.')
+      queries = DbQuery.objects.log_queries(
+        queries = request.queries,
+        metadata = result.to_grpc_request_response().request.request_metadata,
+      )
+      for query in queries:
+        result.meta_logging_errors += query.meta_logging_errors
+      return result
     return self._handle_response(method = method)
 
   def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :

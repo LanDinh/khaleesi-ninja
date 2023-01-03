@@ -13,6 +13,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   RequestList,
   ErrorList,
   BackgateRequestList,
+  QueryList,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
   SawyerServicer as Servicer,
@@ -23,6 +24,7 @@ from microservice.models import (
   Request as DbRequest,
   Error as DbError,
   BackgateRequest as DbBackgateRequest,
+  Query as DbQuery,
 )
 
 
@@ -51,6 +53,14 @@ class Service(Servicer):
     LOGGER.info('Getting all requests.')
     for db_request in DbRequest.objects.filter():
       result.requests.append(db_request.to_grpc_request_response())
+    return result
+
+  def GetQueries(self, request: LogFilter, _: grpc.ServicerContext) -> QueryList :
+    """Get logged queries."""
+    result = QueryList()
+    LOGGER.info('Getting all queries.')
+    for db_query in DbQuery.objects.filter():
+      result.queries.append(db_query.to_grpc_query_response())
     return result
 
   def GetErrors(self, request: LogFilter, _: grpc.ServicerContext) -> ErrorList :

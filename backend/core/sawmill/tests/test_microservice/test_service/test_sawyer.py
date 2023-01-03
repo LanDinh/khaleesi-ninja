@@ -11,8 +11,9 @@ from khaleesi.proto.core_sawmill_pb2 import (
   RequestResponse as GrpcRequestResponse,
   ErrorResponse as GrpcErrorResponse,
   BackgateRequestResponse as GrpcBackgateResponse,
+  QueryResponse as GrpcQueryResponse
 )
-from microservice.models import Event, Request, Error, BackgateRequest
+from microservice.models import Event, Request, Error, BackgateRequest, Query
 from microservice.service.sawyer import Service
 
 @patch('microservice.service.sawyer.LOGGER')
@@ -62,6 +63,20 @@ class SawyerServiceTestCase(SimpleTestCase):
     self.assertEqual(1, len(result.requests))
     db_requests.assert_called_once_with()
     db_request.to_grpc_request_response.assert_called_once_with()
+
+  @patch.object(Query.objects, 'filter')
+  def test_get_queries(self, db_queries: MagicMock, *_: MagicMock) -> None :
+    """Test getting logged requests."""
+    # Prepare data.
+    db_query = MagicMock()
+    db_query.to_grpc_query_response.return_value = GrpcQueryResponse()
+    db_queries.return_value = [ db_query ]
+    # Execute test.
+    result = self.service.GetQueries(LogFilter(), MagicMock())
+    # Assert result.
+    self.assertEqual(1, len(result.queries))
+    db_queries.assert_called_once_with()
+    db_query.to_grpc_query_response.assert_called_once_with()
 
   @patch.object(Error.objects, 'filter')
   def test_get_errors(self, db_errors: MagicMock, *_: MagicMock) -> None :

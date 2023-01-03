@@ -13,6 +13,7 @@ from microservice.service.lumberjack import (  # type: ignore[attr-defined]
   DbRequest,
   DbError,
   DbBackgateRequest,
+  DbQuery,
 )
 from tests.models import Metadata
 
@@ -69,11 +70,17 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def test_log_response(self, *_: MagicMock) -> None :
     """Test logging responses."""
-    self._execute_logging_tests(
-      method = lambda : self.service.LogResponse(MagicMock(), MagicMock()),
-      logging_object = DbRequest.objects,
-      logging_method = 'log_response',
-    )
+    with patch.object(DbRequest.objects, 'log_response') as logging_request:
+      with patch.object(DbQuery.objects, 'log_queries') as logging_query:
+        # Prepare data.
+        logging_request.return_value = DbRequest()
+        logging_request.return_value.to_grpc_request_response = MagicMock()
+        logging_query.return_value = [ DbQuery() ]
+        # Execute test.
+        self.service.LogResponse(MagicMock(), MagicMock())
+        # Assert result.
+        logging_request.assert_called_once()
+        logging_query.assert_called_once()
 
   def test_log_error(self, *_: MagicMock) -> None :
     """Test logging events."""
