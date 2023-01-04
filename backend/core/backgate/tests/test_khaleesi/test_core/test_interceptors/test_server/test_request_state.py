@@ -12,6 +12,7 @@ from grpc import StatusCode
 from khaleesi.core.interceptors.server.request_state import (
   BaseRequestStateServerInterceptor,
   RequestStateServerInterceptor,
+  instantiate_request_state_interceptor
 )
 from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.shared.state import STATE, UserType
@@ -34,7 +35,7 @@ class RequestStateServerTestInterceptor(BaseRequestStateServerInterceptor):
 class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
   """Test RequestStateServerInterceptor."""
 
-  interceptor = RequestStateServerTestInterceptor(structured_logger = MagicMock())
+  interceptor = RequestStateServerTestInterceptor()
 
   def test_intercept_with_request_metadata(self) -> None :
     """Test intercept with metadata present."""
@@ -174,7 +175,7 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
 class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
   """Test RequestStateServerInterceptor."""
 
-  interceptor = RequestStateServerInterceptor(structured_logger = MagicMock())
+  interceptor = RequestStateServerInterceptor()
 
   def test_set_backgate_request_id_with_request_metadata(self) -> None :
     """Test setting the backgate request id."""
@@ -195,3 +196,15 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
             request_metadata.caller.backgate_request_id,
             STATE.request.backgate_request_id,
           )
+
+
+class RequestStateServerInterceptorInstantiationTest(SimpleTestCase):
+  """Test instantiation."""
+
+  @patch('khaleesi.core.interceptors.server.request_state.import_setting')
+  def test_instantiation(self, import_setting: MagicMock) -> None :
+    """Test instantiation."""
+    # Execute test.
+    instantiate_request_state_interceptor()
+    # Assert result.
+    import_setting.assert_called_once()

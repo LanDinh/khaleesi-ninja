@@ -9,7 +9,11 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.logging.structured_logger import StructuredGrpcLogger, StructuredLogger
+from khaleesi.core.logging.structured_logger import (
+  StructuredGrpcLogger,
+  StructuredLogger,
+  instantiate_structured_logger,
+)
 from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.shared.state import STATE, Query
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
@@ -64,7 +68,7 @@ class StructuredTestLogger(StructuredLogger):
 class TestStructuredLogger(SimpleTestCase):
   """Test the structured logger."""
 
-  logger = StructuredTestLogger(channel_manager = MagicMock())
+  logger = StructuredTestLogger()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
   def test_log_request(self, metadata: MagicMock, logger: MagicMock) -> None :
@@ -312,7 +316,7 @@ class TestStructuredLogger(SimpleTestCase):
 class TestStructuredGrpcLogger(SimpleTestCase):
   """Test the structured gRPC logger."""
 
-  logger = StructuredGrpcLogger(channel_manager = MagicMock())
+  logger = StructuredGrpcLogger()
 
   def test_send_log_system_backgate_request(self) -> None :
     """Test sending a log request."""
@@ -376,3 +380,15 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     self.logger.send_log_event(event = MagicMock())
     # Assert result.
     self.logger.stub.LogEvent.assert_called_once()
+
+
+class StructuredLoggerInstantiationTest(SimpleTestCase):
+  """Test instantiation."""
+
+  @patch('khaleesi.core.logging.structured_logger.import_setting')
+  def test_instantiation(self, import_setting: MagicMock) -> None :
+    """Test instantiation."""
+    # Execute test.
+    instantiate_structured_logger()
+    # Assert result.
+    import_setting.assert_called_once()

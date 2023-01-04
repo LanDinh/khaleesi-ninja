@@ -7,7 +7,6 @@ from typing import List
 from django.conf import settings
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.channels import ChannelManager
 from khaleesi.core.metrics.metric_initializer import BaseMetricInitializer, EventData, GrpcData
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
@@ -21,8 +20,8 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class MetricInitializer(BaseMetricInitializer):
   """Collect info for initializing metrics."""
 
-  def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :
-    super().__init__(channel_manager = channel_manager, backgate_request_id = backgate_request_id)
+  def __init__(self, *, backgate_request_id: str) -> None :
+    super().__init__(backgate_request_id = backgate_request_id)
     # No gRPC call is executed for the gRPC lifecycle methods, so we need to manually add them.
     caller_details = GrpcCallerDetails()
     caller_details.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']

@@ -2,27 +2,30 @@
 
 # Python.
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable, Any, cast
 from uuid import uuid4
+
+# Django.
+from django.conf import settings
 
 # gRPC.
 from grpc import ServicerContext
 
 # khaleesi.ninja.
+from khaleesi.core.grpc.import_util import import_setting
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.logging.query_logger import query_logger
+from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import STATE, UserType
-from khaleesi.core.logging.structured_logger import StructuredLogger
 from khaleesi.proto.core_pb2 import RequestMetadata
+
+
+khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
   """Interceptor to handle state of requests."""
-
-  # noinspection PyUnusedLocal
-  def __init__(self, *, structured_logger: StructuredLogger) -> None :
-    """Initialize the RequestStateServerInterceptor."""
 
   def khaleesi_intercept(  # pylint: disable=inconsistent-return-statements
       self, *,
@@ -78,3 +81,11 @@ class RequestStateServerInterceptor(BaseRequestStateServerInterceptor):
     """Set the backgate request id."""
     if upstream.caller.backgate_request_id:
       STATE.request.backgate_request_id = upstream.caller.backgate_request_id
+
+
+def instantiate_request_state_interceptor() -> BaseRequestStateServerInterceptor :
+  """Instantiate the request state interceptor."""
+  return cast(BaseRequestStateServerInterceptor, import_setting(
+    name                 = 'request state interceptor',
+    fully_qualified_name = khaleesi_settings['GRPC']['INTERCEPTORS']['REQUEST_STATE']['NAME'],
+  ))

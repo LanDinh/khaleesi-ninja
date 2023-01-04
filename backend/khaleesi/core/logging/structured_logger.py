@@ -3,10 +3,9 @@
 # Python.
 from abc import ABC, abstractmethod
 from datetime import timezone, datetime
+from typing import Optional, cast
 
 # Django.
-from typing import Optional
-
 from django.conf import settings
 
 # gRPC.
@@ -14,7 +13,8 @@ from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.channels import ChannelManager
+from khaleesi.core.grpc.channels import CHANNEL_MANAGER
+from khaleesi.core.grpc.import_util import import_setting
 from khaleesi.core.grpc.request_metadata import (
   add_request_metadata,
   add_grpc_server_system_request_metadata,
@@ -43,10 +43,6 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 class StructuredLogger(ABC):
   """Basic structured logger."""
-
-  # noinspection PyUnusedLocal
-  def __init__(self, *, channel_manager: ChannelManager) -> None :
-    """Initialization."""
 
   def log_request(self, *, upstream_request: RequestMetadata) -> None :
     """Log a microservice request."""
@@ -266,9 +262,8 @@ class StructuredGrpcLogger(StructuredLogger):
 
   stub: LumberjackStub
 
-  def __init__(self, *, channel_manager: ChannelManager) -> None :
-    super().__init__(channel_manager = channel_manager)
-    channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
+  def __init__(self) -> None :
+    channel = CHANNEL_MANAGER.get_channel(gate = 'core', service = 'sawmill')
     self.stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
 
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
@@ -298,3 +293,11 @@ class StructuredGrpcLogger(StructuredLogger):
   def send_log_event(self, *, event: Event) -> None :
     """Send the log event to the logging facility."""
     self.stub.LogEvent(event)
+
+
+def instantiate_structured_logger() -> StructuredLogger:
+  """Instantiate the structured logger."""
+  return cast(StructuredLogger, import_setting(
+    name                 = 'request state interceptor',
+    fully_qualified_name = khaleesi_settings['GRPC']['INTERCEPTORS']['STRUCTURED_LOGGER']['NAME'],
+  ))

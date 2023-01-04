@@ -11,7 +11,7 @@ from microservice.structured_logger import StructuredDbLogger
 class TestStructuredDbLogger(SimpleTestCase):
   """Test the structured gRPC logger."""
 
-  logger = StructuredDbLogger(channel_manager = MagicMock())
+  logger = StructuredDbLogger()
 
   @patch('microservice.structured_logger.DbBackgateRequest')
   def test_send_log_system_backgate_request(self, db_backgate_request: MagicMock) -> None :

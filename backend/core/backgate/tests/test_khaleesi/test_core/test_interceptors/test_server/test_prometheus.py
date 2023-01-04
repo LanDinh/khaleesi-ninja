@@ -10,7 +10,10 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.interceptors.server.prometheus import PrometheusServerInterceptor
+from khaleesi.core.interceptors.server.prometheus import (
+  PrometheusServerInterceptor,
+  instantiate_prometheus_interceptor,
+)
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.test_util.exceptions import khaleesi_raising_method, exception_raising_method
@@ -33,6 +36,11 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
   def test_intercept_without_request_metadata(self) -> None :
     """Test intercept with no metadata present."""
     self._execute_intercept_tests(request = {}, request_params = self.empty_input)
+
+  def test_instantiation(self) -> None :
+    """Test instantiation."""
+    # Execute test.
+    instantiate_prometheus_interceptor()
 
   def _execute_intercept_tests(
       self, *,

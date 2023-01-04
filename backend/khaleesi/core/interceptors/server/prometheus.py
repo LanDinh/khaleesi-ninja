@@ -44,3 +44,8 @@ class PrometheusServerInterceptor(ServerInterceptor):
     except Exception:
       INCOMING_REQUESTS.inc(status = StatusCode.UNKNOWN, request = request_metadata, peer = peer)
       raise
+
+
+def instantiate_prometheus_interceptor() -> PrometheusServerInterceptor :
+  """Instantiate the prometheus interceptor."""
+  return PrometheusServerInterceptor()

@@ -13,7 +13,7 @@ from django.conf import settings
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.channels import ChannelManager
+from khaleesi.core.grpc.channels import CHANNEL_MANAGER
 from khaleesi.core.grpc.request_metadata import add_grpc_server_system_request_metadata
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS, RequestsMetric
@@ -61,7 +61,7 @@ class BaseMetricInitializer(ABC):
   request_id         : str
 
   # noinspection PyUnusedLocal
-  def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :  # pylint: disable=unused-argument,line-too-long
+  def __init__(self, *, backgate_request_id: str) -> None :  # pylint: disable=unused-argument,line-too-long
     self.own_name = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
     self.backgate_request_id = backgate_request_id
     self.request_id          = str(uuid4())
@@ -199,9 +199,9 @@ class MetricInitializer(BaseMetricInitializer):
 
   stub    : ForesterStub
 
-  def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :
-    super().__init__(channel_manager = channel_manager, backgate_request_id = backgate_request_id)
-    channel = channel_manager.get_channel(gate = 'core', service = 'sawmill')
+  def __init__(self, *, backgate_request_id: str) -> None :
+    super().__init__(backgate_request_id = backgate_request_id)
+    channel = CHANNEL_MANAGER.get_channel(gate = 'core', service = 'sawmill')
     self.stub = ForesterStub(channel)  # type: ignore[no-untyped-call]
 
   def get_service_call_data(self, *, request: EmptyRequest) -> ServiceCallData :

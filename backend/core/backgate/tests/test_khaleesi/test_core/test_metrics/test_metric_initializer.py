@@ -24,14 +24,13 @@ class MetricInitializer(BaseMetricInitializer):
 class BaseMetricInitializerTest(SimpleTestCase):
   """Test the metric initializer."""
 
-  metric_initializer = MetricInitializer(
-    channel_manager = MagicMock(),
-    backgate_request_id = 'backgate-request',
-  )
+  metric_initializer = MetricInitializer(backgate_request_id = 'backgate-request')
 
   @patch('khaleesi.core.metrics.metric_initializer.add_grpc_server_system_request_metadata')
   def test_requests(self, add_metadata: MagicMock) -> None :
     """Test requests."""
+    # Prepare data.
+    self.metric_initializer.stub = MagicMock()
     # Execute test.
     with patch.object(self.metric_initializer, 'stub') as stub:
       self.metric_initializer.requests()
@@ -54,6 +53,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
       action_custom_types = [ 'custom' ]
     )
     events = [ event_data ]
+    self.metric_initializer.stub = MagicMock()
     # Execute test.
     self.metric_initializer.initialize_metrics_with_data(events = events)
     # Assert result.
@@ -86,6 +86,8 @@ class BaseMetricInitializerTest(SimpleTestCase):
       outgoing_requests: MagicMock,
   ) -> None :
     """Test initializing request metrics."""
+    # Prepare data.
+    self.metric_initializer.stub = MagicMock()
     # Execute test.
     self.metric_initializer.initialize_metrics_with_data(events = [])
     # Assert result.

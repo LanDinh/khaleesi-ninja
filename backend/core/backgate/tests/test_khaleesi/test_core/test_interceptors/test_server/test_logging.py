@@ -2,7 +2,7 @@
 
 # Python.
 from typing import Any, Dict, Optional, cast
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # gRPC.
 from grpc import StatusCode
@@ -23,27 +23,30 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 
 
+@patch('khaleesi.core.interceptors.server.logging.SINGLETON')
 class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCase):
   """Test LoggingServerInterceptor"""
 
-  interceptor = LoggingServerInterceptor(structured_logger = MagicMock())
+  interceptor = LoggingServerInterceptor()
 
-  def test_intercept_with_request_metadata(self) -> None :
+  def test_intercept_with_request_metadata(self, singleton: MagicMock) -> None :
     """Test intercept with metadata present."""
     for name, request_params in self.metadata_request_params:
       with self.subTest(case = name):
         self._execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
           request_params = request_params,
+          singleton      = singleton,
         )
 
-  def test_intercept_without_request_metadata(self) -> None :
+  def test_intercept_without_request_metadata(self, singleton: MagicMock) -> None :
     """Test intercept with no metadata present."""
     self._execute_intercept_grpc_logging_test(  # pylint: disable=no-value-for-parameter
-      request = {},
+      request        = {},
       request_params = self.empty_input,
+      singleton      = singleton,
     )
 
-  def test_logging_khaleesi_exception(self) -> None :
+  def test_logging_khaleesi_exception(self, singleton: MagicMock) -> None :
     """Test the counter gets incremented."""
     for user_label, user_type in User.UserType.items():
       for status in StatusCode:
@@ -55,7 +58,6 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
               user = user_type,
               request_params = self.empty_input,
             )
-            self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
             STATE.reset()
             exception = default_khaleesi_exception(status = status, loglevel = loglevel)
             # Execute test.
@@ -67,9 +69,13 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
                 ),
               )
             # Assert result.
-            self._assert_exception_logging_call(loglevel = loglevel, exception = exception)
+            self._assert_exception_logging_call(
+              loglevel  = loglevel,
+              exception = exception,
+              singleton = singleton,
+            )
 
-  def test_logging_other_exception(self) -> None :
+  def test_logging_other_exception(self, singleton: MagicMock) -> None :
     """Test the counter gets incremented."""
     for user_label, user_type in User.UserType.items():
       with self.subTest(user = user_label.lower()):
@@ -79,7 +85,6 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           user = user_type,
           request_params = self.empty_input,
         )
-        self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
         STATE.reset()
         exception = MaskingInternalServerException(exception = default_exception())
         # Execute test.
@@ -89,12 +94,17 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
             **self.get_intercept_params(method = exception_raising_method(exception = exception)),
           )
         # Assert result.
-        self._assert_exception_logging_call(loglevel = LogLevel.FATAL, exception = exception)
+        self._assert_exception_logging_call(
+          loglevel  = LogLevel.FATAL,
+          exception = exception,
+          singleton = singleton,
+        )
 
   def _execute_intercept_grpc_logging_test(
       self, *,
-      request: Optional[Any] = None,
+      request       : Optional[Any] = None,
       request_params: Dict[str, Any],
+      singleton     : MagicMock,
   ) -> None :
     """Execute the logging tests."""
     for user_label, user_type in User.UserType.items():
@@ -102,10 +112,9 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         # Prepare data.
         request_metadata, final_request = self.get_request(
           request = request,
-          user = user_type,
+          user    = user_type,
           **request_params,
         )
-        self.interceptor.structured_logger.reset_mock()  # type: ignore[attr-defined]
         context = MagicMock()
         STATE.reset()
         # Execute test.
@@ -115,19 +124,25 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         )
         # Assert result.
         self._assert_logging_call(
-          context = context,
+          context          = context,
           request_metadata = request_metadata,
+          singleton        = singleton
         )
 
-  def _assert_logging_call(self, *, context: MagicMock, request_metadata: RequestMetadata) -> None :
+  def _assert_logging_call(
+      self, *,
+      context         : MagicMock,
+      request_metadata: RequestMetadata,
+      singleton       : MagicMock,
+  ) -> None :
     """Assert the logging calls were correct."""
     upstream_request = cast(
       RequestMetadata,
-      self.interceptor.structured_logger.log_request.call_args.kwargs['upstream_request'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
+      singleton.structured_logger.log_request.call_args.kwargs['upstream_request'],
     )
     status = cast(
       StatusCode,
-      self.interceptor.structured_logger.log_response.call_args.kwargs['status'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
+      singleton.structured_logger.log_response.call_args.kwargs['status'],
     )
     context.set_code.assert_not_called()
     context.set_details.assert_not_called()
@@ -138,15 +153,16 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
       self, *,
       exception: KhaleesiException,
       loglevel : LogLevel,
+      singleton: MagicMock,
   ) -> None :
     """Assert the logging calls were correct."""
     status = cast(
       StatusCode,
-      self.interceptor.structured_logger.log_response.call_args.kwargs['status'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
+      singleton.structured_logger.log_response.call_args.kwargs['status'],
     )
     logged_exception = cast(
       KhaleesiException,
-      self.interceptor.structured_logger.log_error.call_args.kwargs['exception'],  # type: ignore[attr-defined]  # pylint: disable=line-too-long
+      singleton.structured_logger.log_error.call_args.kwargs['exception'],
     )
     self.assertEqual(exception.status         , status)
     self.assertEqual(exception.status         , logged_exception.status)

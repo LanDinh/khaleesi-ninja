@@ -9,17 +9,11 @@ from grpc import ServicerContext, StatusCode
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.interceptors.server.util import ServerInterceptor
-from khaleesi.core.logging.structured_logger import StructuredLogger
+from khaleesi.core.shared.singleton import SINGLETON
 
 
 class LoggingServerInterceptor(ServerInterceptor):
   """Interceptor to log requests."""
-
-  structured_logger: StructuredLogger
-
-  def __init__(self, *, structured_logger: StructuredLogger) -> None :
-    super().__init__()
-    self.structured_logger = structured_logger
 
   def khaleesi_intercept(
       self, *,
@@ -30,13 +24,13 @@ class LoggingServerInterceptor(ServerInterceptor):
   ) -> Any :
     """Log the incoming request."""
 
-    self.structured_logger.log_request(
+    SINGLETON.structured_logger.log_request(
       upstream_request = self.get_upstream_request(request = request),
     )
 
     try:
       response = method(request, context)
-      self.structured_logger.log_response(status = StatusCode.OK)
+      SINGLETON.structured_logger.log_response(status = StatusCode.OK)
       return response
     except KhaleesiException as exception:
       self._handle_exception(exception = exception)
@@ -48,5 +42,10 @@ class LoggingServerInterceptor(ServerInterceptor):
 
   def _handle_exception(self, *, exception: KhaleesiException) -> None :
     """Properly handle the exception."""
-    self.structured_logger.log_error(exception = exception)
-    self.structured_logger.log_response(status = exception.status)
+    SINGLETON.structured_logger.log_error(exception = exception)
+    SINGLETON.structured_logger.log_response(status = exception.status)
+
+
+def instantiate_logging_interceptor() -> LoggingServerInterceptor:
+  """Instantiate the logging interceptor."""
+  return LoggingServerInterceptor()

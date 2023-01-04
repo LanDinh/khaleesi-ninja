@@ -43,3 +43,6 @@ class ChannelManager:
     """Close all channels to clean up."""
     for _, value in self.channels.items():
       value.close()
+
+
+CHANNEL_MANAGER = ChannelManager()

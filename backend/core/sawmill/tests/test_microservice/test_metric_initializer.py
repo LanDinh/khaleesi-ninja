@@ -24,17 +24,14 @@ class MetricInitializerTestCase(SimpleTestCase):
   def test_init(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test initialization."""
     # Prepare data & execute test.
-    MetricInitializer(channel_manager = MagicMock, backgate_request_id = 'backgate-request')  # type: ignore[arg-type]  # pylint: disable=line-too-long
+    MetricInitializer(backgate_request_id = 'backgate-request')
     # Assert result.
     service_registry.add_service.assert_called_once()
 
   def test_requests(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test the requests are fetched correctly."""
     # Prepare data.
-    metric_initializer = MetricInitializer(
-      channel_manager = MagicMock,  # type: ignore[arg-type]
-      backgate_request_id = 'backgate-request',
-    )
+    metric_initializer = MetricInitializer(backgate_request_id = 'backgate-request')
     # Execute test.
     metric_initializer.requests()
     # Assert result.
@@ -47,10 +44,7 @@ class MetricInitializerTestCase(SimpleTestCase):
   ) -> None :
     """Test initialization of metrics."""
     # Prepare data.
-    metric_initializer = MetricInitializer(
-      channel_manager = MagicMock,  # type: ignore[arg-type]
-      backgate_request_id = 'backgate-request',
-    )
+    metric_initializer = MetricInitializer(backgate_request_id = 'backgate-request')
     khaleesi_gate_name    = 'khaleesi-gate'
     khaleesi_service_name = 'khaleesi-service'
     grpc_service_name     = 'grpc-server'
