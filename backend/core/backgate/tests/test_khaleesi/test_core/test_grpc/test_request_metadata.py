@@ -25,7 +25,7 @@ class GrpcTestCase(SimpleTestCase):
     request.request_metadata = RequestMetadata()
     expected = RequestMetadata()
     expected.caller.backgate_request_id = 'backgate-request'
-    expected.caller.request_id          = 'system'
+    expected.caller.request_id          = 'request'
     expected.caller.grpc_service        = 'grpc-server'
     expected.caller.grpc_method         = 'lifecycle'
     expected.user.id                    = 'grpc-server'
@@ -33,7 +33,8 @@ class GrpcTestCase(SimpleTestCase):
     add_grpc_server_system_request_metadata(
       request             = request,
       grpc_method         = 'LIFECYCLE',
-      backgate_request_id = 'backgate-request'
+      backgate_request_id = 'backgate-request',
+      request_id          = 'request',
     )
     # Assert result
     self._assert_metadata(request = request, expected = expected, user_type = UserType.SYSTEM)

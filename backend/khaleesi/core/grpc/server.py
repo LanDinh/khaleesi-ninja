@@ -44,6 +44,7 @@ class Server:
   structured_logger           : StructuredLogger
   interceptors                : List[ServerInterceptor]
   lifetime_backgate_request_id: str
+  lifetime_request_id         : str
 
   def __init__(self) -> None :
     try:
@@ -99,8 +100,9 @@ class Server:
         details = f'Server start failed. {type(exception).__name__}: {str(exception)}'
       )
       raise
-    # Use a different backgate request for termination.
+    # Use different IDs while the server is running.
     self.lifetime_backgate_request_id = str(uuid4())
+    self.lifetime_request_id          = str(uuid4())
     self.server.wait_for_termination()
 
   def _init_add_handlers(self) -> None :
@@ -133,11 +135,7 @@ class Server:
       )
     except ImportError as error:  # pragma: no cover
       raise ImportError(f'Could not import "{structured_logger}" as structured logger.') from error
-    self.lifetime_backgate_request_id = str(uuid4())
-    self.structured_logger.log_system_backgate_request(
-      backgate_request_id = self.lifetime_backgate_request_id,
-      grpc_method         = 'LIFECYCLE',
-    )
+    self._log_server_request_start()
 
   def _init_interceptors(self) -> None :
     """Initialize the interceptors."""
@@ -173,6 +171,7 @@ class Server:
   def _handle_sigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""
     try:
+      self._log_server_request_start()
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
       self.health_servicer.enter_graceful_shutdown()
       done_event = self.server.stop(30)
@@ -197,6 +196,19 @@ class Server:
       )
       raise
 
+  def _log_server_request_start(self) -> None :
+    self.lifetime_backgate_request_id = str(uuid4())
+    self.lifetime_request_id = str(uuid4())
+    self.structured_logger.log_system_backgate_request(
+      backgate_request_id = self.lifetime_backgate_request_id,
+      grpc_method         = 'LIFECYCLE',
+    )
+    self.structured_logger.log_system_request(
+      backgate_request_id = self.lifetime_backgate_request_id,
+      request_id          = self.lifetime_request_id,
+      grpc_method         = 'LIFECYCLE',
+    )
+
   def _log_server_state_event(
       self, *,
       action: 'Event.Action.ActionType.V',
@@ -209,6 +221,7 @@ class Server:
     user.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
     self.structured_logger.log_system_event(
       backgate_request_id = self.lifetime_backgate_request_id,
+      request_id          = self.lifetime_request_id,
       grpc_method         = 'LIFECYCLE',
       target              = khaleesi_settings['METADATA']['POD_ID'],
       owner               = user,
@@ -217,7 +230,9 @@ class Server:
       details             = details,
       logger_send_metric  = True,
     )
+    status = StatusCode.OK if result == Event.Action.ResultType.SUCCESS else StatusCode.INTERNAL
+    self.structured_logger.log_response(request_id = self.lifetime_request_id, status = status)
     self.structured_logger.log_backgate_response(
       backgate_request_id = self.lifetime_backgate_request_id,
-      status = StatusCode.OK if result == Event.Action.ResultType.SUCCESS else StatusCode.INTERNAL,
+      status = status,
     )

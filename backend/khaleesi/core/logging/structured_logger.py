@@ -5,6 +5,8 @@ from abc import ABC, abstractmethod
 from datetime import timezone, datetime
 
 # Django.
+from typing import Optional
+
 from django.conf import settings
 
 # gRPC.
@@ -52,7 +54,8 @@ class StructuredLogger(ABC):
       f'User "{STATE.user.user_id}" started request '
       f'{STATE.request.grpc_service}.{STATE.request.grpc_method}.'
     )
-    LOGGER.info(f'Upstream request "{upstream_request.caller.request_id}" caller data: '
+    LOGGER.info(
+      f'Upstream request "{upstream_request.caller.request_id}" caller data: '
       f'{upstream_request.caller.khaleesi_gate}-{upstream_request.caller.khaleesi_service}: '
       f'{upstream_request.caller.grpc_service}.{upstream_request.caller.grpc_method}'
     )
@@ -67,14 +70,31 @@ class StructuredLogger(ABC):
 
     self.send_log_request(request = request)
 
-  def log_response(self, *, status: StatusCode) -> None :
+  def log_system_request(
+      self, *,
+      backgate_request_id: str,
+      request_id         : str,
+      grpc_method        : str,
+  ) -> None :
+    """Log a microservice request."""
+    LOGGER.info(f'System started request "{request_id}".')
+    request = Request()
+    add_grpc_server_system_request_metadata(
+      request             = request,
+      grpc_method         = grpc_method,
+      backgate_request_id = backgate_request_id,
+      request_id          = request_id,
+    )
+    self.send_log_request(request = request)
+
+  def log_response(self, *, request_id: Optional[str] = None, status: StatusCode) -> None :
     """Log a microservice response."""
     response = ResponseRequest()
-    response.request_id = STATE.request.request_id
+    response.request_id = request_id if request_id else STATE.request.request_id
     self._log_response_object(
       status       = status,
       request_name = 'Request',
-      response     = response.response
+      response     = response.response,
     )
     self._log_queries(queries = response.queries)
     self.send_log_response(response = response)
@@ -108,14 +128,13 @@ class StructuredLogger(ABC):
       request             = backgate_request,
       grpc_method         = grpc_method,
       backgate_request_id = backgate_request_id,
+      request_id          = 'system',
     )
     self.send_log_system_backgate_request(backgate_request = backgate_request)
 
   def log_backgate_request(self) -> None :
     """Log a backgate request for system requests."""
-    LOGGER.info(
-      f'Backgate request "{STATE.request.backgate_request_id}" started.'
-    )
+    LOGGER.info(f'Backgate request "{STATE.request.backgate_request_id}" started.')
     backgate_request = BackgateRequest()
     add_request_metadata(request = backgate_request)
     self.send_log_backgate_request(backgate_request = backgate_request)
@@ -123,21 +142,24 @@ class StructuredLogger(ABC):
   def log_backgate_response(
       self, *,
       status: StatusCode,
-      backgate_request_id: str = STATE.request.backgate_request_id,
+      backgate_request_id: Optional[str] = None,
   ) -> None :
     """Log a microservice backgate response."""
+    definite_backgate_request_id = \
+      backgate_request_id if backgate_request_id else STATE.request.backgate_request_id
     response = BackgateResponseRequest()
-    response.backgate_request_id = backgate_request_id
+    response.backgate_request_id = definite_backgate_request_id
     self._log_response_object(
       status       = status,
-      request_name = f'Backgate request "{backgate_request_id}"',
-      response     = response.response
+      request_name = f'Backgate request "{definite_backgate_request_id}"',
+      response     = response.response,
     )
     self.send_log_backgate_response(response = response)
 
   def log_system_event(
       self, *,
       backgate_request_id: str,
+      request_id         : str,
       grpc_method        : str,
       target             : str,
       owner              : User,
@@ -168,6 +190,7 @@ class StructuredLogger(ABC):
       request             = event,
       grpc_method         = grpc_method,
       backgate_request_id = backgate_request_id,
+      request_id          = request_id,
     )
     # noinspection PyTypedDict
     event.target.type        = target_type
@@ -196,9 +219,9 @@ class StructuredLogger(ABC):
 
   def _log_response_object(
       self, *,
-      status: StatusCode,
+      status      : StatusCode,
       request_name: str,
-      response: Response,
+      response    : Response,
   ) -> None :
     """Text log a response and return the response object."""
     if status == StatusCode.OK:

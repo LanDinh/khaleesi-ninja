@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List, Optional, cast
+from uuid import uuid4
 
 # Django.
 from django.conf import settings
@@ -55,13 +56,15 @@ class EventData:
 class BaseMetricInitializer(ABC):
   """Collect info for initializing metrics."""
 
-  own_name: str
+  own_name           : str
   backgate_request_id: str
+  request_id         : str
 
   # noinspection PyUnusedLocal
   def __init__(self, *, channel_manager: ChannelManager, backgate_request_id: str) -> None :  # pylint: disable=unused-argument,line-too-long
     self.own_name = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
     self.backgate_request_id = backgate_request_id
+    self.request_id          = str(uuid4())
 
   @abstractmethod
   def initialize_metrics(self) -> None :
@@ -82,6 +85,7 @@ class BaseMetricInitializer(ABC):
     add_grpc_server_system_request_metadata(
       request             = request,
       backgate_request_id = self.backgate_request_id,
+      request_id          = self.request_id,
       grpc_method         = 'INITIALIZE_REQUEST_METRICS',
     )
     return self.get_service_call_data(request = request)

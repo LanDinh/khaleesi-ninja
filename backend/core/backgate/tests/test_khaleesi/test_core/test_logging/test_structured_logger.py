@@ -66,11 +66,13 @@ class TestStructuredLogger(SimpleTestCase):
 
   logger = StructuredTestLogger(channel_manager = MagicMock())
 
-  def test_log_request(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_request(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
+    metadata.reset_mock()
     upstream_request = RequestMetadata()
     upstream_request.caller.request_id       = 'request-id'
     upstream_request.caller.khaleesi_gate    = 'khaleesi-gate'
@@ -82,8 +84,30 @@ class TestStructuredLogger(SimpleTestCase):
     # Assert result.
     self.logger.sender.send.assert_called_once()
     self.assertEqual(2, logger.info.call_count)
+    metadata.assert_called_once()
     log_request = cast(Request, self.logger.sender.send.call_args.kwargs['request'])
     self.assertEqual(upstream_request.caller, log_request.upstream_request)
+
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_system_request(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a system request."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    metadata.reset_mock()
+    backgate_request_id = 'backgate-request'
+    request_id          = 'request'
+    grpc_method         = 'grpc-method'
+    # Perform test.
+    self.logger.log_system_request(
+      backgate_request_id = backgate_request_id,
+      request_id          = request_id,
+      grpc_method         = grpc_method,
+    )
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called_once()
+    metadata.assert_called_once()
 
   def test_log_system_backgate_request(self, logger: MagicMock) -> None :
     """Test logging a request."""
@@ -121,26 +145,40 @@ class TestStructuredLogger(SimpleTestCase):
         # Prepare data.
         self.logger.sender.reset_mock()
         logger.reset_mock()
+        backgate_request_id = 'backgate-request'
         # Perform test.
-        self.logger.log_backgate_response(status = status)
+        self.logger.log_backgate_response(
+          status              = status,
+          backgate_request_id = backgate_request_id,
+        )
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
-        log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        log_response = cast(
+          BackgateResponseRequest,
+          self.logger.sender.send.call_args.kwargs['response'],
+        )
         self.assertEqual(status.name, log_response.response.status)
+        self.assertEqual(backgate_request_id, log_response.backgate_request_id)
 
   def test_log_ok_backgate_response(self, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
+    STATE.reset()
+    STATE.request.backgate_request_id = 'backgate-request'
     # Perform test.
     self.logger.log_backgate_response(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
-    log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
-    self.assertEqual(StatusCode.OK.name, log_response.response.status)
+    log_response = cast(
+      BackgateResponseRequest,
+      self.logger.sender.send.call_args.kwargs['response'],
+    )
+    self.assertEqual(StatusCode.OK.name               , log_response.response.status)
+    self.assertEqual(STATE.request.backgate_request_id, log_response.backgate_request_id)
 
   def test_log_not_ok_response(self, logger: MagicMock) -> None :
     """Test logging a response."""
@@ -150,13 +188,15 @@ class TestStructuredLogger(SimpleTestCase):
         self.logger.sender.reset_mock()
         logger.reset_mock()
         STATE.reset()
+        request_id = 'request'
         # Perform test.
-        self.logger.log_response(status = status)
+        self.logger.log_response(status = status, request_id = request_id)
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
         log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
         self.assertEqual(status.name, log_response.response.status)
+        self.assertEqual(request_id , log_response.request_id)
         self.assertEqual(0, len(log_response.queries))
 
   def test_log_ok_response(self, logger: MagicMock) -> None :
@@ -174,13 +214,15 @@ class TestStructuredLogger(SimpleTestCase):
         ],
         'zero': [],
     }
+    STATE.request.request_id = 'request'
     # Perform test.
     self.logger.log_response(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called()
     log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
-    self.assertEqual(StatusCode.OK.name, log_response.response.status)
+    self.assertEqual(StatusCode.OK.name      , log_response.response.status)
+    self.assertEqual(STATE.request.request_id, log_response.request_id)
     self.assertEqual(3, len(log_response.queries))
     for query_id in ids:
       self.assertIn(query_id, [ query.id for query in log_response.queries ])
@@ -215,6 +257,7 @@ class TestStructuredLogger(SimpleTestCase):
     method              = 'LIFECYCLE'
     details             = 'details'
     backgate_request_id = 'backgate-request'
+    request_id          = 'request'
     for action_label, action_type in Event.Action.ActionType.items():
       for result_label, result_type in Event.Action.ResultType.items():
         for user_label, user_type in User.UserType.items():
@@ -236,6 +279,7 @@ class TestStructuredLogger(SimpleTestCase):
               self.logger.log_system_event(
                 grpc_method         = method,
                 backgate_request_id = backgate_request_id,
+                request_id          = request_id,
                 target              = target,
                 owner               = owner,
                 action              = action_type,

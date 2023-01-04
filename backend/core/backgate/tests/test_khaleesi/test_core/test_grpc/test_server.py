@@ -143,6 +143,7 @@ class ServerTestCase(SimpleTestCase):
     grpc_server.return_value.start.assert_called_once_with()
     grpc_server.return_value.wait_for_termination.assert_called_once_with()
     structured_logger.log_system_backgate_request.assert_called_once()
+    structured_logger.log_system_request.assert_called_once()
     self._assert_server_state_event(
       action            = Event.Action.ActionType.START,
       result            = Event.Action.ResultType.SUCCESS,
@@ -229,4 +230,5 @@ class ServerTestCase(SimpleTestCase):
     self.assertEqual(kwargs['action']            , action)
     self.assertEqual(kwargs['result']            , result)
     self.assertEqual(kwargs['logger_send_metric'], True)
+    structured_logger.log_response.assert_called_once()
     structured_logger.log_backgate_response.assert_called_once()
