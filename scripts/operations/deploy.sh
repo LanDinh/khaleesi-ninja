@@ -79,6 +79,11 @@ deploy_service() {
 
     echo -e "${yellow}Rolling out the new container...${clear_color}"
     kubectl rollout restart deployment "${gate}-${service}" -n "khaleesi-ninja-${environment}"
+
+    if [[ ${type} == "backgate" ]] || [[ ${type} == "micro" ]]; then
+      echo -e "${yellow}Restarting grpcui...${clear_color}"
+      kubectl rollout restart deployment "${gate}-${service}-grpcui" -n "khaleesi-ninja-${environment}"
+    fi
   fi
 }
 
