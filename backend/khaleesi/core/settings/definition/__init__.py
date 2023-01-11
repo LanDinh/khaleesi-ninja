@@ -10,3 +10,4 @@ from .grpc import (  # pylint: disable=useless-import-alias
 )
 from .metadata import Metadata as Metadata, ServiceType as ServiceType  # pylint: disable=useless-import-alias
 from .monitoring import Monitoring as Monitoring  # pylint: disable=useless-import-alias
+from .startup import Startup as Startup, MigrationsBeforeServerStart as MigrationsBeforeServerStart  # pylint: disable=useless-import-alias

@@ -79,6 +79,14 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     SERVER_METHOD_NAMES = definition.GrpcServerMethodNames(
       SERVICE_NAME = 'grpc-server',
       USER_ID      = 'grpc-server',
+      MIGRATE = definition.GrpcEventMethodNames(
+        METHOD = 'migrate',
+        TARGET = 'core.core.server'
+      ),
+      INITIALIZE = definition.GrpcEventMethodNames(
+        METHOD = 'initialize',
+        TARGET = 'core.core.server'
+      ),
       LIFECYCLE = definition.GrpcEventMethodNames(
         METHOD = 'lifecycle',
         TARGET = 'core.core.server'
@@ -100,5 +108,11 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
   ),
   MONITORING = definition.Monitoring(
     PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),
+  ),
+  STARTUP = definition.Startup(
+    MIGRATIONS_BEFORE_SERVER_START = definition.MigrationsBeforeServerStart(
+      REQUIRED  = False,
+      MIGRATION = '',
+    ),
   ),
 )

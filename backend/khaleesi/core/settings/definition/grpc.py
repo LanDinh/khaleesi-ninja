@@ -16,8 +16,10 @@ class GrpcServerMethodNames(TypedDict):
 
   SERVICE_NAME              : str
   USER_ID                   : str
-  LIFECYCLE                 : GrpcEventMethodNames  # report changes in lifecycle for logging.
-  INITIALIZE_REQUEST_METRICS: GrpcEventMethodNames  # fetch gRPC calls for metric initialization.
+  MIGRATE                   : GrpcEventMethodNames  # Migrate database changes.
+  INITIALIZE                : GrpcEventMethodNames  # Initialize server.
+  LIFECYCLE                 : GrpcEventMethodNames  # Report changes in lifecycle for logging.
+  INITIALIZE_REQUEST_METRICS: GrpcEventMethodNames  # Fetch gRPC calls for metric initialization.
 
 
 class GrpcServerInterceptor(TypedDict):

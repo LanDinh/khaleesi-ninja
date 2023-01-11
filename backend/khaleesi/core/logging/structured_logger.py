@@ -95,23 +95,27 @@ class StructuredLogger(ABC):
     self._log_queries(queries = response.queries)
     self.send_log_response(response = response)
 
-  def log_error(self, *, exception: KhaleesiException ) -> None :
+  def log_error(self, *, exception: KhaleesiException) -> None :
     """Log an exception."""
-    LOGGER.log(exception.to_json(), loglevel = exception.loglevel)
-    LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
-
-    error = Error()
+    error = self._log_error_object(exception = exception)
     add_request_metadata(request = error)
-    error.status          = exception.status.name
-    error.loglevel        = exception.loglevel.name
-    error.gate            = exception.gate
-    error.service         = exception.service
-    error.public_key      = exception.public_key
-    error.public_details  = exception.public_details
-    error.private_message = exception.private_message
-    error.private_details = exception.private_details
-    error.stacktrace      = exception.stacktrace
+    self.send_log_error(error = error)
 
+  def log_system_error(
+      self, *,
+      exception          : KhaleesiException,
+      backgate_request_id: str,
+      request_id         : str,
+      grpc_method        : str,
+  ) -> None :
+    """Log an exception."""
+    error = self._log_error_object(exception = exception)
+    add_grpc_server_system_request_metadata(
+      request             = error,
+      backgate_request_id = backgate_request_id,
+      request_id          = request_id,
+      grpc_method         = grpc_method,
+    )
     self.send_log_error(error = error)
 
   def log_system_backgate_request(self, *, backgate_request_id: str, grpc_method: str) -> None :
@@ -228,6 +232,22 @@ class StructuredLogger(ABC):
     response.status = status.name
     response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 
+  def _log_error_object(self, *, exception: KhaleesiException) -> Error :
+    """Text log an exception and return the error object."""
+    LOGGER.log(exception.to_json(), loglevel = exception.loglevel)
+    LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
+    error = Error()
+    error.status          = exception.status.name
+    error.loglevel        = exception.loglevel.name
+    error.gate            = exception.gate
+    error.service         = exception.service
+    error.public_key      = exception.public_key
+    error.public_details  = exception.public_details
+    error.private_message = exception.private_message
+    error.private_details = exception.private_details
+    error.stacktrace      = exception.stacktrace
+    return error
+
   @abstractmethod
   def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
     """Send the backgate log request to the logging facility."""
@@ -298,6 +318,6 @@ class StructuredGrpcLogger(StructuredLogger):
 def instantiate_structured_logger() -> StructuredLogger:
   """Instantiate the structured logger."""
   return cast(StructuredLogger, import_setting(
-    name                 = 'request state interceptor',
+    name                 = 'structured logger',
     fully_qualified_name = khaleesi_settings['GRPC']['INTERCEPTORS']['STRUCTURED_LOGGER']['NAME'],
   ))

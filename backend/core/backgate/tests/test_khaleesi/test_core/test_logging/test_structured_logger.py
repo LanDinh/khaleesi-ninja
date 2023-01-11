@@ -15,6 +15,7 @@ from khaleesi.core.logging.structured_logger import (
   instantiate_structured_logger,
 )
 from khaleesi.core.logging.text_logger import LogLevel
+from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.state import STATE, Query
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
@@ -231,7 +232,8 @@ class TestStructuredLogger(SimpleTestCase):
     for query_id in ids:
       self.assertIn(query_id, [ query.id for query in log_response.queries ])
 
-  def test_log_error(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_error(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging an error."""
     for status in StatusCode:
       for loglevel in LogLevel:
@@ -239,6 +241,7 @@ class TestStructuredLogger(SimpleTestCase):
           # Prepare data.
           self.logger.sender.reset_mock()
           logger.reset_mock()
+          metadata.reset_mock()
           exception = default_khaleesi_exception(status = status, loglevel = loglevel)
           # Perform test.
           self.logger.log_error(exception = exception)
@@ -246,15 +249,40 @@ class TestStructuredLogger(SimpleTestCase):
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
           log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
-          self.assertEqual(status.name              , log_error.status)
-          self.assertEqual(loglevel.name            , log_error.loglevel)
-          self.assertEqual(exception.gate           , log_error.gate)
-          self.assertEqual(exception.service        , log_error.service)
-          self.assertEqual(exception.public_key     , log_error.public_key)
-          self.assertEqual(exception.public_details , log_error.public_details)
-          self.assertEqual(exception.private_message, log_error.private_message)
-          self.assertEqual(exception.private_details, log_error.private_details)
-          self.assertEqual(exception.stacktrace     , log_error.stacktrace)
+          self.assertEqual(status.name  , log_error.status)
+          self.assertEqual(loglevel.name, log_error.loglevel)
+          self._assert_error(exception = exception, log_error = log_error)
+          metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_system_error(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging an error."""
+    backgate_request_id = 'backgate-request'
+    request_id          = 'request'
+    grpc_method         = 'grpc-method'
+    for status in StatusCode:
+      for loglevel in LogLevel:
+        with self.subTest(status = status.name, loglevel = loglevel.name):
+          # Prepare data.
+          self.logger.sender.reset_mock()
+          logger.reset_mock()
+          metadata.reset_mock()
+          exception = default_khaleesi_exception(status = status, loglevel = loglevel)
+          # Perform test.
+          self.logger.log_system_error(
+            exception = exception,
+            backgate_request_id = backgate_request_id,
+            request_id = request_id,
+            grpc_method = grpc_method,
+          )
+          # Assert result.
+          self.logger.sender.send.assert_called_once()
+          self.assertEqual(2, logger.log.call_count)
+          log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
+          self.assertEqual(status.name  , log_error.status)
+          self.assertEqual(loglevel.name, log_error.loglevel)
+          self._assert_error(exception = exception, log_error = log_error)
+          metadata.assert_called_once()
 
   def test_log_system_event(self, logger: MagicMock) -> None :
     """Test logging an event."""
@@ -311,6 +339,15 @@ class TestStructuredLogger(SimpleTestCase):
               self.assertEqual(result_type       , log_event.action.result)
               self.assertEqual(details           , log_event.action.details)
               self.assertEqual(logger_send_metric, log_event.logger_send_metric)
+
+  def _assert_error(self, exception: KhaleesiException, log_error: Error) -> None :
+    self.assertEqual(exception.gate           , log_error.gate)
+    self.assertEqual(exception.service        , log_error.service)
+    self.assertEqual(exception.public_key     , log_error.public_key)
+    self.assertEqual(exception.public_details , log_error.public_details)
+    self.assertEqual(exception.private_message, log_error.private_message)
+    self.assertEqual(exception.private_details, log_error.private_details)
+    self.assertEqual(exception.stacktrace     , log_error.stacktrace)
 
 
 class TestStructuredGrpcLogger(SimpleTestCase):

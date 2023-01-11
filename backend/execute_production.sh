@@ -15,7 +15,6 @@ command=${1}
 
 
 run() {
-  python manage.py migrate --database migrate --settings khaleesi.core.settings.production
   exec python manage.py grpcserver --settings khaleesi.core.settings.production
 }
 

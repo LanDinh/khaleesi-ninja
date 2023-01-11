@@ -157,3 +157,18 @@ class UpstreamGrpcException(KhaleesiCoreException):
       private_details = private_details,
       loglevel        = LogLevel.ERROR
     )
+
+
+class TimeoutException(KhaleesiCoreException):
+  """Internal server errors."""
+
+  def __init__(self, *, private_details: str) -> None :
+    """Initialize the exception."""
+    super().__init__(
+      status          = StatusCode.DEADLINE_EXCEEDED,
+      public_key      = 'timeout-error',
+      public_details  = '',
+      private_message = 'Timeout happened.',
+      private_details = private_details,
+      loglevel        = LogLevel.ERROR
+    )

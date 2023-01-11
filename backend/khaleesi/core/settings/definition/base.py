@@ -7,6 +7,7 @@ from typing import TypedDict
 from khaleesi.core.settings.definition.grpc import Grpc
 from khaleesi.core.settings.definition.metadata import Metadata
 from khaleesi.core.settings.definition.monitoring import Monitoring
+from khaleesi.core.settings.definition.startup import Startup
 
 
 class KhaleesiNinjaSettings(TypedDict):
@@ -15,3 +16,4 @@ class KhaleesiNinjaSettings(TypedDict):
   METADATA   : Metadata
   GRPC       : Grpc
   MONITORING : Monitoring
+  STARTUP    : Startup
