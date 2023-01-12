@@ -6,6 +6,8 @@ from datetime import timezone, datetime
 from typing import cast
 
 # Django.
+from uuid import uuid4
+
 from django.conf import settings
 
 # gRPC.
@@ -230,7 +232,7 @@ class StructuredLogger(ABC):
       backgate_request_id = backgate_request_id,
       request_id          = request_id,
     )
-    # noinspection PyTypedDict
+    event.id                 = str(uuid4())
     event.target.type        = target_type
     event.target.id          = target
     event.target.owner.id    = owner.id
@@ -275,6 +277,7 @@ class StructuredLogger(ABC):
     LOGGER.log(exception.to_json(), loglevel = exception.loglevel)
     LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
     error = Error()
+    error.id              = str(uuid4())
     error.status          = exception.status.name
     error.loglevel        = exception.loglevel.name
     error.gate            = exception.gate

@@ -54,8 +54,9 @@ message Event {
   }
 
   khaleesi.core.RequestMetadata request_metadata   = 1;
-  Target                        target             = 2;
-  Action                        action             = 3;
+  string                        id                 = 2;
+  Target                        target             = 3;
+  Action                        action             = 4;
   bool                          logger_send_metric = 10;
 }
 
@@ -89,15 +90,16 @@ message Query {
 
 message Error {
   khaleesi.core.RequestMetadata request_metadata = 1;
-  string                        status           = 2;
-  string                        loglevel         = 3;
-  string                        gate             = 4;
-  string                        service          = 5;
-  string                        public_key       = 6;
-  string                        public_details   = 7;
-  string                        private_message  = 8;
-  string                        private_details  = 9;
-  string                        stacktrace       = 10;
+  string                        id               = 2;
+  string                        status           = 3;
+  string                        loglevel         = 4;
+  string                        gate             = 5;
+  string                        service          = 6;
+  string                        public_key       = 7;
+  string                        public_details   = 8;
+  string                        private_message  = 9;
+  string                        private_details  = 10;
+  string                        stacktrace       = 11;
 }
 
 

@@ -22,10 +22,11 @@ class ErrorManager(models.Manager['Error']):
     errors: List[str] = []
 
     error = {
-        'status'    : parse_string(raw = grpc_error.status   , name = 'status' , errors = errors),
-        'loglevel'  : parse_string(raw = grpc_error.loglevel , name = 'loglevel' , errors = errors),
-        'gate'      : parse_string(raw = grpc_error.gate     , name = 'gate'   , errors = errors),
-        'service'   : parse_string(raw = grpc_error.service  , name = 'service', errors = errors),
+        'error_id'  : parse_string(raw = grpc_error.id       , name = 'error_id', errors = errors),
+        'status'    : parse_string(raw = grpc_error.status   , name = 'status'  , errors = errors),
+        'loglevel'  : parse_string(raw = grpc_error.loglevel , name = 'loglevel', errors = errors),
+        'gate'      : parse_string(raw = grpc_error.gate     , name = 'gate'    , errors = errors),
+        'service'   : parse_string(raw = grpc_error.service  , name = 'service' , errors = errors),
         'public_key': parse_string(
           raw = grpc_error.public_key,
           name = 'public_key',
@@ -45,6 +46,7 @@ class ErrorManager(models.Manager['Error']):
 
 class Error(Metadata):
   """Error logs."""
+  error_id = models.TextField(default = 'UNKNOWN')
 
   status   = models.TextField(default = 'UNKNOWN')
   loglevel = models.TextField(default = 'FATAL')
@@ -68,6 +70,7 @@ class Error(Metadata):
     # Request metadata.
     self.request_metadata_to_grpc(request_metadata = grpc_error_response.error.request_metadata)
     self.response_metadata_to_grpc(response_metadata = grpc_error_response.error_metadata)
+    grpc_error_response.error.id = self.error_id
     # Error.
     grpc_error_response.error.status          = self.status
     grpc_error_response.error.loglevel        = self.loglevel

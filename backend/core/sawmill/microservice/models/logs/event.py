@@ -31,6 +31,7 @@ class EventManager(models.Manager['Event']):
     errors: List[str] = []
 
     return self.create(
+      event_id = parse_string(raw = grpc_event.id, name = 'event_id', errors = errors),
       # Target.
       target_type = parse_string(
         raw    = grpc_event.target.type,
@@ -52,11 +53,7 @@ class EventManager(models.Manager['Event']):
       action_crud_type   = GrpcEvent.Action.ActionType.Name(grpc_event.action.crud_type),
       action_custom_type = grpc_event.action.custom_type,
       action_result      = GrpcEvent.Action.ResultType.Name(grpc_event.action.result),
-      action_details = parse_string(
-        raw    = grpc_event.action.details,
-        name   = 'action_details',
-        errors = errors,
-      ),
+      action_details     = grpc_event.action.details,
       # Metadata.
       **self.model.log_metadata(metadata = grpc_event.request_metadata, errors = errors),
     )
@@ -64,6 +61,7 @@ class EventManager(models.Manager['Event']):
 
 class Event(Metadata):
   """Event logs."""
+  event_id = models.TextField(default = 'UNKNOWN')
 
   # Target.
   target_type       = models.TextField(default = 'UNKNOWN')
@@ -85,10 +83,11 @@ class Event(Metadata):
     grpc_event_response = GrpcEventResponse()
     self.request_metadata_to_grpc(request_metadata = grpc_event_response.event.request_metadata)
     self.response_metadata_to_grpc(response_metadata = grpc_event_response.event_metadata)
+    grpc_event_response.event.id = self.event_id
     # Target.
-    grpc_event_response.event.target.type = self.target_type
-    grpc_event_response.event.target.id   = self.target_id
-    grpc_event_response.event.target.owner.id = self.target_owner_id
+    grpc_event_response.event.target.type       = self.target_type
+    grpc_event_response.event.target.id         = self.target_id
+    grpc_event_response.event.target.owner.id   = self.target_owner_id
     grpc_event_response.event.target.owner.type = User.UserType.Value(self.target_owner_type)
     # Action.
     grpc_event_response.event.action.crud_type =\

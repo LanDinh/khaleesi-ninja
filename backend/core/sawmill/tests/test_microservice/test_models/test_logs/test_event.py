@@ -50,6 +50,7 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
                   now              = now,
                   user             = user_type,
                 )
+                grpc_event.id                 = 'event-id'
                 grpc_event.target.type        = 'target-type'
                 grpc_event.target.id          = 'target-id'
                 grpc_event.target.owner.id    = 'target-owner'
@@ -69,6 +70,7 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
                 self.assertEqual(action_label                 , result.action_crud_type)
                 self.assertEqual(grpc_event.action.custom_type, result.action_custom_type)
                 self.assertEqual(result_label                 , result.action_result)
+                self.assertEqual(grpc_event.action.details    , result.action_details)
                 if log_event_metric:
                   audit_metric.inc.assert_called_once()
                 else:
@@ -111,6 +113,7 @@ class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
             ):
               # Prepare data.
               event = Event(
+                event_id           = 'event-id',
                 target_type        = 'target-type',
                 target_id          = 'target-id',
                 target_owner_id    = 'owner-id',
@@ -129,6 +132,7 @@ class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
                 grpc = result.event.request_metadata,
                 grpc_response = result.event_metadata,
               )
+              self.assertEqual(event.event_id          , result.event.id)
               self.assertEqual(event.target_type       , result.event.target.type)
               self.assertEqual(owner_type              , result.event.target.owner.type)
               self.assertEqual(action_type             , result.event.action.crud_type)

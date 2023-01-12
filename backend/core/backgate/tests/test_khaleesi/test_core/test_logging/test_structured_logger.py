@@ -357,6 +357,7 @@ class TestStructuredLogger(SimpleTestCase):
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
           log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
+          self.assertIsNotNone(log_error.id)
           self.assertEqual(status.name  , log_error.status)
           self.assertEqual(loglevel.name, log_error.loglevel)
           self._assert_error(exception = exception, log_error = log_error)
@@ -387,6 +388,7 @@ class TestStructuredLogger(SimpleTestCase):
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
           log_error = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
+          self.assertIsNotNone(log_error.id)
           self.assertEqual(status.name  , log_error.status)
           self.assertEqual(loglevel.name, log_error.loglevel)
           self._assert_error(exception = exception, log_error = log_error)
@@ -435,6 +437,7 @@ class TestStructuredLogger(SimpleTestCase):
                 + logger.fatal.call_count,
               )
               log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
+              self.assertIsNotNone(log_event.id)
               self.assertEqual(
                 backgate_request_id,
                 log_event.request_metadata.caller.backgate_request_id,

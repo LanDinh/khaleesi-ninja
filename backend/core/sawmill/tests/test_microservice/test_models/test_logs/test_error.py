@@ -39,6 +39,7 @@ class ErrorManagerTestCase(GrpcTestMixin, TransactionTestCase):
               now = now,
               user = user_type,
             )
+            grpc_error.id              = 'error-id'
             grpc_error.status          = status.name
             grpc_error.loglevel        = loglevel.name
             grpc_error.gate            = 'gate'
@@ -88,6 +89,7 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           with self.subTest(status = status.name, user = user_label):
             # Prepare data.
             error = Error(
+              error_id        = 'error-id',
               status          = status.name,
               loglevel        = loglevel.name,
               gate            = 'gate',
@@ -107,6 +109,7 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
               grpc = result.error.request_metadata,
               grpc_response = result.error_metadata,
             )
+            self.assertEqual(error.error_id             , result.error.id)
             self.assertEqual(error.status         , result.error.status)
             self.assertEqual(error.loglevel       , result.error.loglevel)
             self.assertEqual(error.gate           , result.error.gate)
