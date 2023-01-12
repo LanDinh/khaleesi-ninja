@@ -2,7 +2,6 @@
 
 # Python.
 from datetime import datetime, timezone, timedelta
-from os import environ
 from typing import Dict, Any, Callable, TypeVar, Type
 
 # gRPC.
@@ -34,6 +33,7 @@ class ModelRequestMetadataMixin:
         'meta_caller_khaleesi_service': 'khaleesi-service',
         'meta_caller_grpc_service'    : 'grpc-service',
         'meta_caller_grpc_method'     : 'grpc-method',
+        'meta_caller_pod_id'          : 'pod_id',
         'meta_user_id'                : 'origin-user',
         'meta_user_type'              : user,
         'meta_reported_timestamp'     : datetime.now(tz = timezone.utc),
@@ -59,6 +59,7 @@ class ModelRequestMetadataMixin:
     self.assertEqual(model.meta_caller_khaleesi_service, grpc.caller.khaleesi_service)
     self.assertEqual(model.meta_caller_grpc_service    , grpc.caller.grpc_service)
     self.assertEqual(model.meta_caller_grpc_method     , grpc.caller.grpc_method)
+    self.assertEqual(model.meta_caller_pod_id          , grpc.caller.pod_id)
     self.assertEqual(model.meta_user_id  , grpc.user.id)
     self.assertEqual(model.meta_user_type, grpc.user.type)
     self.assertEqual(
@@ -69,7 +70,6 @@ class ModelRequestMetadataMixin:
       model.meta_logged_timestamp,
       grpc_response.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
-    self.assertEqual(model.meta_pod_id, environ['HOSTNAME'])
 
 
 M = TypeVar('M', bound = ResponseMetadata)

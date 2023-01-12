@@ -64,6 +64,7 @@ def _add_request_metadata(
   request_metadata.caller.khaleesi_service    = khaleesi_settings['METADATA']['SERVICE']
   request_metadata.caller.grpc_service        = grpc_service
   request_metadata.caller.grpc_method         = grpc_method
+  request_metadata.caller.pod_id              = khaleesi_settings['METADATA']['POD_ID']
   request_metadata.user.id                    = user_id
   request_metadata.user.type                  = user_type.value  # type: ignore[assignment]
   request_metadata.timestamp.FromDatetime(datetime.now(tz = timezone.utc))

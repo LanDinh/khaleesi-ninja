@@ -11,12 +11,12 @@ from khaleesi.proto.core_pb2 import User
 from microservice.request_state_interceptor import BackgateRequestStateServerInterceptor
 
 
+@patch('microservice.request_state_interceptor.SINGLETON')
 class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
   """Test RequestStateServerInterceptor."""
 
   interceptor = BackgateRequestStateServerInterceptor()
 
-  @patch('microservice.request_state_interceptor.SINGLETON')
   def test_set_backgate_request_id_with_request_metadata(self, singleton: MagicMock) -> None :
     """Test setting the backgate request id."""
     for name, request_params in self.metadata_request_params:

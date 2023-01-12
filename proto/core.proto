@@ -28,6 +28,7 @@ message GrpcCallerDetails {
   string khaleesi_service    = 4;
   string grpc_service        = 5;
   string grpc_method         = 6;
+  string pod_id              = 7;
 }
 
 message RequestMetadata {

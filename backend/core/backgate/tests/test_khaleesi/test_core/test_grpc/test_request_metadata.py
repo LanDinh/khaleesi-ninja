@@ -85,5 +85,6 @@ class GrpcTestCase(SimpleTestCase):
     # Automatic values.
     self.assertEqual('core'    , request.request_metadata.caller.khaleesi_gate)
     self.assertEqual('backgate', request.request_metadata.caller.khaleesi_service)
+    self.assertIsNotNone(request.request_metadata.caller.pod_id)
     now = datetime.now(tz = timezone.utc)
     self.assertEqual(now.date(), request.request_metadata.timestamp.ToDatetime().date())

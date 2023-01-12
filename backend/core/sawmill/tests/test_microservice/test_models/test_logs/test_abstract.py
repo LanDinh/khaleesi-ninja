@@ -31,6 +31,7 @@ class MetadataTestCase(SimpleTestCase):
         grpc_metadata.caller.khaleesi_service    = 'khaleesi-service'
         grpc_metadata.caller.grpc_service        = 'grpc-service'
         grpc_metadata.caller.grpc_method         = 'grpc-method'
+        grpc_metadata.caller.pod_id              = 'pod-id'
         grpc_metadata.user.id                    = 'user-id'
         grpc_metadata.user.type                  = user_type
         initial_error = 'test errors'
