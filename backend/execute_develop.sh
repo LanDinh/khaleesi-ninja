@@ -7,13 +7,15 @@ set -o pipefail # Make pipes fail
 
 
 command=${1}
+arguments=${2:-}
 
 
 test() {
+  arguments=${1:-}
   return_code=0
 
   echo "Django tests..."
-  if ! python -m coverage run manage.py test --settings=khaleesi.core.settings.unittest; then
+  if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest; then
     return_code=1
   fi
 
@@ -61,7 +63,7 @@ source .venv/bin/activate
 
 if [[ "${command}" == "test" ]]; then
   echo "Execute tests..."
-  test
+  test "${arguments}"
 
 elif [[ "${command}" == "run" ]]; then
   echo "Running development server..."
