@@ -91,8 +91,8 @@ class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         request_mock.reset_mock()
         request_mock.return_value = request
         grpc_response                 = GrpcResponse()
-        grpc_response.request_id      = 'request-id'
-        grpc_response.response.status = status.name
+        grpc_response.request_metadata.caller.request_id = 'request-id'
+        grpc_response.response.status                    = status.name
         grpc_response.response.timestamp.FromDatetime(request.meta_response_logged_timestamp)
         # Execute test.
         result = Request.objects.log_response(grpc_response = grpc_response)

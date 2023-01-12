@@ -81,8 +81,8 @@ class ServerTestCase(SimpleTestCase):
     )
     singleton.structured_logger.log_system_backgate_request.assert_called_once()
     singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_response.assert_called_once()
-    singleton.structured_logger.log_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_response.assert_called_once()
+    singleton.structured_logger.log_system_backgate_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_sigterm_failure(
@@ -110,8 +110,8 @@ class ServerTestCase(SimpleTestCase):
     )
     singleton.structured_logger.log_system_backgate_request.assert_called_once()
     singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_response.assert_called_once()
-    singleton.structured_logger.log_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_response.assert_called_once()
+    singleton.structured_logger.log_system_backgate_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_sigterm_timeout(
@@ -140,8 +140,8 @@ class ServerTestCase(SimpleTestCase):
     )
     singleton.structured_logger.log_system_backgate_request.assert_called_once()
     singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_response.assert_called_once()
-    singleton.structured_logger.log_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_response.assert_called_once()
+    singleton.structured_logger.log_system_backgate_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_start(self, grpc_server: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :
@@ -155,12 +155,23 @@ class ServerTestCase(SimpleTestCase):
     server.start(start_request_id = 'request-id')
     # Assert result.
     grpc_server.return_value.start.assert_called_once_with()
-    grpc_server.return_value.wait_for_termination.assert_called_once_with()
     self._assert_server_state_event(
       action    = Event.Action.ActionType.START,
       result    = Event.Action.ResultType.SUCCESS,
       singleton = singleton,
     )
+
+  def test_wait_for_termination(self, grpc_server: MagicMock, *_: MagicMock) -> None :
+    """Test that server wait for termination works correctly."""
+    # Prepare data.
+    server = Server(
+      start_backgate_request_id = 'backgate-request',
+      initialize_request_id = 'request-id',
+    )
+    # Execute test.
+    server.wait_for_termination()
+    # Assert result.
+    grpc_server.return_value.wait_for_termination.assert_called_once_with()
 
   def test_start_failure(
       self,

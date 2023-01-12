@@ -79,8 +79,8 @@ class BackgateRequestManager(models.Manager['BackgateRequest']):
   def log_response(self, *, grpc_response: GrpcBackgateResponseRequest) -> BackgateRequest :
     """Log a gRPC backgate response."""
     request = self.get(
-      meta_caller_backgate_request_id = grpc_response.backgate_request_id,
-      meta_response_status = 'IN_PROGRESS',
+      meta_caller_backgate_request_id = grpc_response.request_metadata.caller.backgate_request_id,
+      meta_response_status            = 'IN_PROGRESS',
     )
     request.log_response(grpc_response = grpc_response.response)
     request.save()

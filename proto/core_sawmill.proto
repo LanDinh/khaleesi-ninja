@@ -107,14 +107,14 @@ message Response {
 }
 
 message BackgateResponseRequest {
-  string         backgate_request_id = 1;
-  Response       response            = 2;
+  khaleesi.core.RequestMetadata request_metadata = 1;
+  Response                      response         = 2;
 }
 
 message ResponseRequest {
-  string         request_id = 1;
-  Response       response   = 2;
-  repeated Query queries    = 3;
+  khaleesi.core.RequestMetadata request_metadata = 1;
+  Response                      response         = 2;
+  repeated Query                queries          = 3;
 }
 
 

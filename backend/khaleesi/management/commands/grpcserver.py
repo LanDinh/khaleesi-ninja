@@ -54,20 +54,25 @@ class Command(BaseCommand, DjangoMigrateCommand):
       self._log_system_request(**options, method = self._initialize, grpc_method = 'INITIALIZE')
       self._log_system_request(**options, method = self._start     , grpc_method = 'LIFECYCLE')
 
-      SINGLETON.structured_logger.log_backgate_response(
+      SINGLETON.structured_logger.log_system_backgate_response(
         backgate_request_id = self.server_start_backgate_request_id,
-        status = StatusCode.OK,
+        grpc_method         = 'LIFECYCLE',
+        status              = StatusCode.OK,
       )
+
+      self.server.wait_for_termination()
     except KhaleesiException as exception:
-      SINGLETON.structured_logger.log_backgate_response(
+      SINGLETON.structured_logger.log_system_backgate_response(
         backgate_request_id = self.server_start_backgate_request_id,
-        status = exception.status,
+        grpc_method         = 'LIFECYCLE',
+        status              = exception.status,
       )
       raise
     except Exception:
-      SINGLETON.structured_logger.log_backgate_response(
+      SINGLETON.structured_logger.log_system_backgate_response(
         backgate_request_id = self.server_start_backgate_request_id,
-        status = StatusCode.INTERNAL,
+        grpc_method         = 'LIFECYCLE',
+        status              = StatusCode.INTERNAL,
       )
       raise
 
@@ -100,7 +105,12 @@ class Command(BaseCommand, DjangoMigrateCommand):
     )
     try:
       method(request_id = request_id, **options)
-      SINGLETON.structured_logger.log_response(request_id = request_id, status = StatusCode.OK)
+      SINGLETON.structured_logger.log_system_response(
+        backgate_request_id = self.server_start_backgate_request_id,
+        request_id          = request_id,
+        grpc_method         = grpc_method,
+        status              = StatusCode.OK,
+      )
     except KhaleesiException as exception:
       self._log_exception(
         exception   = exception,
@@ -129,4 +139,9 @@ class Command(BaseCommand, DjangoMigrateCommand):
       request_id          = request_id,
       grpc_method         = grpc_method,
     )
-    SINGLETON.structured_logger.log_response(request_id = request_id, status = exception.status)
+    SINGLETON.structured_logger.log_system_response(
+      backgate_request_id = self.server_start_backgate_request_id,
+      request_id          = request_id,
+      grpc_method         = grpc_method,
+      status              = exception.status,
+    )

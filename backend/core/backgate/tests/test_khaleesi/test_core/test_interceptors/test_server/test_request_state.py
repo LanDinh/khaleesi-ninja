@@ -201,8 +201,9 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
 class RequestStateServerInterceptorInstantiationTest(SimpleTestCase):
   """Test instantiation."""
 
+  @patch('khaleesi.core.interceptors.server.request_state.LOGGER')
   @patch('khaleesi.core.interceptors.server.request_state.import_setting')
-  def test_instantiation(self, import_setting: MagicMock) -> None :
+  def test_instantiation(self, import_setting: MagicMock, *_: MagicMock) -> None :
     """Test instantiation."""
     # Execute test.
     instantiate_request_state_interceptor()

@@ -15,6 +15,7 @@ from grpc import ServicerContext
 from khaleesi.core.grpc.import_util import import_setting
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.logging.query_logger import query_logger
+from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import STATE, UserType
@@ -85,6 +86,7 @@ class RequestStateServerInterceptor(BaseRequestStateServerInterceptor):
 
 def instantiate_request_state_interceptor() -> BaseRequestStateServerInterceptor :
   """Instantiate the request state interceptor."""
+  LOGGER.info('Importing request state interceptor...')
   return cast(BaseRequestStateServerInterceptor, import_setting(
     name                 = 'request state interceptor',
     fully_qualified_name = khaleesi_settings['GRPC']['INTERCEPTORS']['REQUEST_STATE']['NAME'],

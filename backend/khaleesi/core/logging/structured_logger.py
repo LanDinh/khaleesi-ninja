@@ -3,7 +3,7 @@
 # Python.
 from abc import ABC, abstractmethod
 from datetime import timezone, datetime
-from typing import Optional, cast
+from typing import cast
 
 # Django.
 from django.conf import settings
@@ -83,10 +83,33 @@ class StructuredLogger(ABC):
     )
     self.send_log_request(request = request)
 
-  def log_response(self, *, request_id: Optional[str] = None, status: StatusCode) -> None :
+  def log_system_response(
+      self, *,
+      backgate_request_id: str,
+      request_id         : str,
+      grpc_method        : str,
+      status             : StatusCode,
+  ) -> None :
+    """Log a microservice system response."""
+    response = ResponseRequest()
+    add_grpc_server_system_request_metadata(
+      request             = response,
+      backgate_request_id = backgate_request_id,
+      request_id          = request_id,
+      grpc_method         = grpc_method,
+    )
+    self._log_response_object(
+      status       = status,
+      request_name = 'Request',
+      response     = response.response,
+    )
+    self._log_queries(queries = response.queries)
+    self.send_log_response(response = response)
+
+  def log_response(self, *, status: StatusCode) -> None :
     """Log a microservice response."""
     response = ResponseRequest()
-    response.request_id = request_id if request_id else STATE.request.request_id
+    add_request_metadata(request = response)
     self._log_response_object(
       status       = status,
       request_name = 'Request',
@@ -139,19 +162,34 @@ class StructuredLogger(ABC):
     add_request_metadata(request = backgate_request)
     self.send_log_backgate_request(backgate_request = backgate_request)
 
-  def log_backgate_response(
+  def log_system_backgate_response(
       self, *,
-      status: StatusCode,
-      backgate_request_id: Optional[str] = None,
+      backgate_request_id: str,
+      grpc_method        : str,
+      status             : StatusCode,
   ) -> None :
-    """Log a microservice backgate response."""
-    definite_backgate_request_id = \
-      backgate_request_id if backgate_request_id else STATE.request.backgate_request_id
+    """Log a microservice system backgate response."""
     response = BackgateResponseRequest()
-    response.backgate_request_id = definite_backgate_request_id
+    add_grpc_server_system_request_metadata(
+      request             = response,
+      grpc_method         = grpc_method,
+      backgate_request_id = backgate_request_id,
+      request_id          = 'system',
+    )
     self._log_response_object(
       status       = status,
-      request_name = f'Backgate request "{definite_backgate_request_id}"',
+      request_name = f'Backgate request "{backgate_request_id}"',
+      response     = response.response,
+    )
+    self.send_log_backgate_response(response = response)
+
+  def log_backgate_response(self, *, status: StatusCode) -> None :
+    """Log a microservice backgate response."""
+    response = BackgateResponseRequest()
+    add_request_metadata(request = response)
+    self._log_response_object(
+      status       = status,
+      request_name = f'Backgate request "{STATE.request.backgate_request_id}"',
       response     = response.response,
     )
     self.send_log_backgate_response(response = response)
@@ -317,6 +355,7 @@ class StructuredGrpcLogger(StructuredLogger):
 
 def instantiate_structured_logger() -> StructuredLogger:
   """Instantiate the structured logger."""
+  LOGGER.info('Importing structured logger...')
   return cast(StructuredLogger, import_setting(
     name                 = 'structured logger',
     fully_qualified_name = khaleesi_settings['GRPC']['INTERCEPTORS']['STRUCTURED_LOGGER']['NAME'],

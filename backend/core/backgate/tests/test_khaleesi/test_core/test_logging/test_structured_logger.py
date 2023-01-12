@@ -114,7 +114,8 @@ class TestStructuredLogger(SimpleTestCase):
     logger.info.assert_called_once()
     metadata.assert_called_once()
 
-  def test_log_system_backgate_request(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_system_backgate_request(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -128,10 +129,10 @@ class TestStructuredLogger(SimpleTestCase):
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
-    log_request = cast(EmptyRequest, self.logger.sender.send.call_args.kwargs['request'])
-    self.assertEqual(backgate_request_id, log_request.request_metadata.caller.backgate_request_id)
+    metadata.assert_called_once()
 
-  def test_log_backgate_request(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_backgate_request(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -141,20 +142,26 @@ class TestStructuredLogger(SimpleTestCase):
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
-    cast(EmptyRequest, self.logger.sender.send.call_args.kwargs['request'])
+    metadata.assert_called_once()
 
-  def test_log_not_ok_backgate_response(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_not_ok_system_backgate_response(
+      self,
+      metadata: MagicMock,
+      logger: MagicMock,
+  ) -> None :
     """Test logging a response."""
     for status in [s for s in StatusCode if s != StatusCode.OK]:
       with self.subTest(status = status.name):
         # Prepare data.
         self.logger.sender.reset_mock()
         logger.reset_mock()
-        backgate_request_id = 'backgate-request'
+        metadata.reset_mock()
         # Perform test.
-        self.logger.log_backgate_response(
+        self.logger.log_system_backgate_response(
+          backgate_request_id = 'backgate-request',
           status              = status,
-          backgate_request_id = backgate_request_id,
+          grpc_method         = 'grpc-method',
         )
         # Assert result.
         self.logger.sender.send.assert_called_once()
@@ -164,15 +171,57 @@ class TestStructuredLogger(SimpleTestCase):
           self.logger.sender.send.call_args.kwargs['response'],
         )
         self.assertEqual(status.name, log_response.response.status)
-        self.assertEqual(backgate_request_id, log_response.backgate_request_id)
+        metadata.assert_called_once()
 
-  def test_log_ok_backgate_response(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_ok_system_backgate_response(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
-    STATE.reset()
-    STATE.request.backgate_request_id = 'backgate-request'
+    # Perform test.
+    self.logger.log_system_backgate_response(
+      backgate_request_id = 'backgate-request',
+      grpc_method         = 'grpc-method',
+      status              = StatusCode.OK,
+    )
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called_once()
+    log_response = cast(
+      BackgateResponseRequest,
+      self.logger.sender.send.call_args.kwargs['response'],
+    )
+    self.assertEqual(StatusCode.OK.name, log_response.response.status)
+    metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_not_ok_backgate_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    for status in [s for s in StatusCode if s != StatusCode.OK]:
+      with self.subTest(status = status.name):
+        # Prepare data.
+        self.logger.sender.reset_mock()
+        logger.reset_mock()
+        metadata.reset_mock()
+        # Perform test.
+        self.logger.log_backgate_response(status = status)
+        # Assert result.
+        self.logger.sender.send.assert_called_once()
+        logger.warning.assert_called_once()
+        log_response = cast(
+          BackgateResponseRequest,
+          self.logger.sender.send.call_args.kwargs['response'],
+        )
+        self.assertEqual(status.name, log_response.response.status)
+        metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_ok_backgate_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
     # Perform test.
     self.logger.log_backgate_response(status = StatusCode.OK)
     # Assert result.
@@ -182,29 +231,36 @@ class TestStructuredLogger(SimpleTestCase):
       BackgateResponseRequest,
       self.logger.sender.send.call_args.kwargs['response'],
     )
-    self.assertEqual(StatusCode.OK.name               , log_response.response.status)
-    self.assertEqual(STATE.request.backgate_request_id, log_response.backgate_request_id)
+    self.assertEqual(StatusCode.OK.name, log_response.response.status)
+    metadata.assert_called_once()
 
-  def test_log_not_ok_response(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_not_ok_system_response(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     for status in [s for s in StatusCode if s != StatusCode.OK]:
       with self.subTest(status = status.name):
         # Prepare data.
         self.logger.sender.reset_mock()
         logger.reset_mock()
+        metadata.reset_mock()
         STATE.reset()
-        request_id = 'request'
         # Perform test.
-        self.logger.log_response(status = status, request_id = request_id)
+        self.logger.log_system_response(
+          backgate_request_id = 'backgate-request',
+          request_id          = 'request-id',
+          grpc_method         = 'grpc_method',
+          status              = status,
+        )
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
         log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
         self.assertEqual(status.name, log_response.response.status)
-        self.assertEqual(request_id , log_response.request_id)
         self.assertEqual(0, len(log_response.queries))
+        metadata.assert_called_once()
 
-  def test_log_ok_response(self, logger: MagicMock) -> None :
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_ok_system_response(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -219,18 +275,70 @@ class TestStructuredLogger(SimpleTestCase):
         ],
         'zero': [],
     }
-    STATE.request.request_id = 'request'
+    # Perform test.
+    self.logger.log_system_response(
+      backgate_request_id = 'backgate-request',
+      request_id          = 'request-id',
+      grpc_method         = 'grpc-method',
+      status              = StatusCode.OK,
+    )
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called()
+    log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    self.assertEqual(StatusCode.OK.name, log_response.response.status)
+    self.assertEqual(3, len(log_response.queries))
+    for query_id in ids:
+      self.assertIn(query_id, [ query.id for query in log_response.queries ])
+    metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_not_ok_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    for status in [s for s in StatusCode if s != StatusCode.OK]:
+      with self.subTest(status = status.name):
+        # Prepare data.
+        self.logger.sender.reset_mock()
+        logger.reset_mock()
+        metadata.reset_mock()
+        STATE.reset()
+        # Perform test.
+        self.logger.log_response(status = status)
+        # Assert result.
+        self.logger.sender.send.assert_called_once()
+        logger.warning.assert_called_once()
+        log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        self.assertEqual(status.name, log_response.response.status)
+        self.assertEqual(0, len(log_response.queries))
+        metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_ok_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    ids = [ 'id0', 'id1', 'id2', ]
+    STATE.reset()
+    STATE.queries = {
+        'one' : [ Query(query_id = ids[0], raw = 'raw', start = datetime.now(tz = timezone.utc)) ],
+        'two' : [
+            Query(query_id = ids[1], raw = 'raw', start = datetime.now(tz = timezone.utc)),
+            Query(query_id = ids[2], raw = 'raw', start = datetime.now(tz = timezone.utc)),
+        ],
+        'zero': [],
+    }
     # Perform test.
     self.logger.log_response(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called()
     log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
-    self.assertEqual(StatusCode.OK.name      , log_response.response.status)
-    self.assertEqual(STATE.request.request_id, log_response.request_id)
+    self.assertEqual(StatusCode.OK.name, log_response.response.status)
     self.assertEqual(3, len(log_response.queries))
     for query_id in ids:
       self.assertIn(query_id, [ query.id for query in log_response.queries ])
+    metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
   def test_log_error(self, metadata: MagicMock, logger: MagicMock) -> None :
@@ -422,8 +530,9 @@ class TestStructuredGrpcLogger(SimpleTestCase):
 class StructuredLoggerInstantiationTest(SimpleTestCase):
   """Test instantiation."""
 
+  @patch('khaleesi.core.logging.structured_logger.LOGGER')
   @patch('khaleesi.core.logging.structured_logger.import_setting')
-  def test_instantiation(self, import_setting: MagicMock) -> None :
+  def test_instantiation(self, import_setting: MagicMock, *_: MagicMock) -> None :
     """Test instantiation."""
     # Execute test.
     instantiate_structured_logger()

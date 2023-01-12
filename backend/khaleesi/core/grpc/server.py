@@ -101,8 +101,6 @@ class Server:
         result     = Event.Action.ResultType.SUCCESS,
         details    = 'Server started successfully.',
       )
-      self._print_banner()
-      self.server.wait_for_termination()
     except KhaleesiException as exception:
       self._log_start_exception(
         exception  = exception,
@@ -119,19 +117,8 @@ class Server:
       )
       raise masked from exception
 
-  def _init_add_handlers(self) -> None :
-    """Attempt to import handlers from string representations."""
-    raw_handlers = khaleesi_settings['GRPC']['HANDLERS']
-    self.service_names = [reflection.SERVICE_NAME]
-    for raw_handler in raw_handlers:
-      self.service_names.append(register_service(raw_handler = raw_handler, server = self.server))
-    LOGGER.debug('Adding reflection service...')
-    reflection.enable_server_reflection(self.service_names, self.server)
-    LOGGER.debug('Adding health service...')
-    add_HealthServicer_to_server(self.health_servicer, self.server)
-
-  def _print_banner(self) -> None :
-    """Print the startup banner."""
+  def wait_for_termination(self) -> None :
+    """Wait for termination. No more log messages will be called in this thread."""
     LOGGER.info('')
     LOGGER.info('       \\****__              ____')
     LOGGER.info('         |    *****\\_      --/ *\\-__')
@@ -144,6 +131,18 @@ class Server:
     LOGGER.info('         \\___--"                    \\_____ )')
     LOGGER.info('                                          "')
     LOGGER.info('')
+    self.server.wait_for_termination()
+
+  def _init_add_handlers(self) -> None :
+    """Attempt to import handlers from string representations."""
+    raw_handlers = khaleesi_settings['GRPC']['HANDLERS']
+    self.service_names = [reflection.SERVICE_NAME]
+    for raw_handler in raw_handlers:
+      self.service_names.append(register_service(raw_handler = raw_handler, server = self.server))
+    LOGGER.debug('Adding reflection service...')
+    reflection.enable_server_reflection(self.service_names, self.server)
+    LOGGER.debug('Adding health service...')
+    add_HealthServicer_to_server(self.health_servicer, self.server)
 
   def _handle_sigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""
@@ -306,8 +305,14 @@ class Server:
       status             : StatusCode,
   ) -> None :
     """Log shutdown of server."""
-    SINGLETON.structured_logger.log_response(request_id = request_id, status = status)
-    SINGLETON.structured_logger.log_backgate_response(
+    SINGLETON.structured_logger.log_system_response(
       backgate_request_id = backgate_request_id,
-      status = status,
+      request_id          = request_id,
+      grpc_method         = 'LIFECYCLE',
+      status              = status,
+    )
+    SINGLETON.structured_logger.log_system_backgate_response(
+      backgate_request_id = backgate_request_id,
+      grpc_method         = 'LIFECYCLE',
+      status              = status,
     )

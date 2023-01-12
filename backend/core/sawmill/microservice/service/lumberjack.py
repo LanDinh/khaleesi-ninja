@@ -44,7 +44,10 @@ class Service(Servicer):
     def method() -> Metadata :
       LOGGER.info('Adding service to service registry.')
       SERVICE_REGISTRY.add_service(caller_details = request.request_metadata.caller)
-      LOGGER.info('Saving the event to the database.')
+      LOGGER.info(
+        f'Saving an event to the request "{request.request_metadata.caller.request_id}" '
+        f'to the database.',
+      )
       return DbEvent.objects.log_event(grpc_event = request)
 
     return self._handle_response(method = method)
@@ -56,7 +59,10 @@ class Service(Servicer):
   ) -> LogStandardResponse :
     """Log backgate request."""
     def method() -> Metadata :
-      LOGGER.info('Saving the backgate request to the database.')
+      LOGGER.info(
+        f'Saving the backgate request "{request.request_metadata.caller.backgate_request_id}" '
+        'to the database.',
+      )
       return DbBackgateRequest.objects.log_backgate_request(grpc_backgate_request = request)
     return self._handle_response(method = method)
 
@@ -67,7 +73,10 @@ class Service(Servicer):
   ) -> LogStandardResponse :
     """Log backgate request."""
     def method() -> Metadata :
-      LOGGER.info('Saving the backgate request to the database.')
+      LOGGER.info(
+        'Saving the system backgate request '
+        f'"{request.request_metadata.caller.backgate_request_id}" to the database.',
+      )
       return DbBackgateRequest.objects.log_system_backgate_request(grpc_backgate_request = request)
     return self._handle_response(method = method)
 
@@ -78,7 +87,10 @@ class Service(Servicer):
   ) -> LogStandardResponse :
     """Log request responses."""
     def method() -> Metadata :
-      LOGGER.info('Saving the backgate response to the database.')
+      LOGGER.info(
+        'Saving the response to the backgate request '
+        f'"{request.request_metadata.caller.backgate_request_id}" to the database.',
+      )
       return DbBackgateRequest.objects.log_response(grpc_response = request)
     return self._handle_response(method = method)
 
@@ -90,7 +102,9 @@ class Service(Servicer):
         caller_details = request.upstream_request,
         called_details = request.request_metadata.caller,
       )
-      LOGGER.info('Saving the request to the database.')
+      LOGGER.info(
+        f'Saving the request "{request.request_metadata.caller.request_id}" to the database.',
+      )
       return DbRequest.objects.log_request(grpc_request = request)
 
     return self._handle_response(method = method)
@@ -98,7 +112,10 @@ class Service(Servicer):
   def LogResponse(self, request: ResponseRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log request responses."""
     def method() -> Metadata :
-      LOGGER.info('Saving the response to the database.')
+      LOGGER.info(
+        f'Saving the response to the request "{request.request_metadata.caller.request_id}" '
+        f'to the database.',
+      )
       result = DbRequest.objects.log_response(grpc_response = request)
       LOGGER.info('Saving the queries to the database.')
       queries = DbQuery.objects.log_queries(
@@ -113,7 +130,10 @@ class Service(Servicer):
   def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log errors."""
     def method() -> Metadata :
-      LOGGER.info('Saving the error to the database.')
+      LOGGER.info(
+        f'Saving an error to the request "{request.request_metadata.caller.request_id}" '
+        'to the database.',
+      )
       return DbError.objects.log_error(grpc_error = request)
     return self._handle_response(method = method)
 
