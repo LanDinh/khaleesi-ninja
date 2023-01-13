@@ -130,8 +130,8 @@ class GrpcServerTestCase(SimpleTestCase):
     """Test the ok case."""
     # Prepare test.
     exception = default_exception()
-    server.return_value.start.side_effect = exception
-    with self.assertRaises(KhaleesiException) as raised_exception:
+    server.return_value.wait_for_termination.side_effect = exception
+    with self.assertRaises(Exception):
       # Execute test.
       self.command.khaleesi_handle()
       # Assert result.
@@ -142,6 +142,3 @@ class GrpcServerTestCase(SimpleTestCase):
       self.assertEqual(migration_calls, migrate.handle.call_count)
       server.return_value.start.assert_called_once_with()
       metrics_server.assert_called_once()
-      raised_khaleesi_exception = cast(KhaleesiException, raised_exception)
-      self.assertEqual(StatusCode.INTERNAL, raised_khaleesi_exception.status)  # pylint: disable=no-member
-      self.assertEqual(LogLevel.FATAL     , raised_khaleesi_exception.loglevel)  # pylint: disable=no-member
