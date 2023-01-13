@@ -43,9 +43,10 @@ class GrpcServerTestCase(SimpleTestCase):
   def _execute_tests(self, *, migration_calls: int = 1) -> None :
     """Execute the test cases."""
     for name, method in [
-        ('ok'                , self._execute_ok_test),
-        ('khaleesi exception', self._execute_khaleesi_exception_test),
-        ('other exception'   , self._execute_other_exception_test),
+        ('ok'                     , self._execute_ok_test),
+        ('khaleesi exception'     , self._execute_khaleesi_exception_test),
+        ('other exception wrapped', self._execute_other_exception_wrapped_test),
+        ('other exception'        , self._execute_other_exception_test),
     ]:
       with self.subTest(name = name):
         method(migration_calls = migration_calls)  # pylint: disable=no-value-for-parameter
@@ -118,7 +119,7 @@ class GrpcServerTestCase(SimpleTestCase):
   @patch('khaleesi.management.commands.grpcserver.start_http_server')
   @patch('khaleesi.management.commands.grpcserver.Server')
   @patch('khaleesi.management.commands.grpcserver.DjangoMigrateCommand')
-  def _execute_other_exception_wrapped_test(
+  def _execute_other_exception_test(
       self,
       migrate       : MagicMock,
       server        : MagicMock,
@@ -127,7 +128,7 @@ class GrpcServerTestCase(SimpleTestCase):
       *,
       migration_calls: int,
   ) -> None :
-    """Test other exceptions in the wrapped case."""
+    """Test the other exception case."""
     # Prepare test.
     exception = default_exception()
     server.return_value.wait_for_termination.side_effect = exception
@@ -147,7 +148,7 @@ class GrpcServerTestCase(SimpleTestCase):
   @patch('khaleesi.management.commands.grpcserver.start_http_server')
   @patch('khaleesi.management.commands.grpcserver.Server')
   @patch('khaleesi.management.commands.grpcserver.DjangoMigrateCommand')
-  def _execute_other_exception_test(
+  def _execute_other_exception_wrapped_test(
       self,
       migrate       : MagicMock,
       server        : MagicMock,
@@ -156,7 +157,7 @@ class GrpcServerTestCase(SimpleTestCase):
       *,
       migration_calls: int,
   ) -> None :
-    """Test the other exception case."""
+    """Test other exceptions in the wrapped case."""
     # Prepare test.
     exception = default_exception()
     server.return_value.start.side_effect = exception
