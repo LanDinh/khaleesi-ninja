@@ -8,7 +8,10 @@ from unittest.mock import MagicMock, patch
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.interceptors.server.logging import LoggingServerInterceptor
+from khaleesi.core.interceptors.server.logging import (
+  LoggingServerInterceptor,
+  instantiate_logging_interceptor,
+)
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.shared.state import STATE
@@ -86,7 +89,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
           request_params = self.empty_input,
         )
         STATE.reset()
-        exception = MaskingInternalServerException(exception = default_exception())
+        exception = default_exception()
         # Execute test.
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesi_intercept(
@@ -96,7 +99,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         # Assert result.
         self._assert_exception_logging_call(
           loglevel  = LogLevel.FATAL,
-          exception = exception,
+          exception = MaskingInternalServerException(exception = exception),
           singleton = singleton,
         )
 
@@ -175,3 +178,12 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     self.assertEqual(exception.private_message, logged_exception.private_message)
     self.assertEqual(exception.private_details, logged_exception.private_details)
     self.assertIsNotNone(logged_exception.stacktrace)
+
+
+class LoggingServerInterceptorInstantiationTest(SimpleTestCase):
+  """Test instantiation."""
+
+  def test_instantiation(self) -> None :
+    """Test instantiation."""
+    # Execute test & assert result.
+    instantiate_logging_interceptor()

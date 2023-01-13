@@ -11,7 +11,7 @@ from khaleesi.core.metrics.metric_initializer import (
 )
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import Event
+from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
 
 
 class MetricInitializer(BaseMetricInitializer):
@@ -88,13 +88,19 @@ class BaseMetricInitializerTest(SimpleTestCase):
     """Test initializing request metrics."""
     # Prepare data.
     self.metric_initializer.stub = MagicMock()
+    service_call_data = ServiceCallData()
+    call_self = service_call_data.call_list.add()
+    call_self.call.grpc_service = 'grpc-server'
+    call_self.calls.add()
+    call_other = service_call_data.call_list.add()
+    call_other.call.grpc_service = 'some-other-service'
+    call_other.called_by.add()
+    self.metric_initializer.stub.GetServiceCallData.return_value = service_call_data
     # Execute test.
     self.metric_initializer.initialize_metrics_with_data(events = [])
     # Assert result.
-    incoming_arguments = incoming_requests.register.call_args_list
-    outgoing_arguments = outgoing_requests.register.call_args_list
-    self.assertEqual(0  , len(incoming_arguments))
-    self.assertEqual(0, len(outgoing_arguments))
+    incoming_requests.register.assert_called()
+    outgoing_requests.register.assert_called()
 
   def assert_caller(self, *, expected: GrpcData, actual: GrpcCallerDetails) -> None :
     """Assert the caller data is correct."""

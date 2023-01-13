@@ -22,7 +22,7 @@ class ParseUtilTestCase(SimpleTestCase):
         result = parse_timestamp(raw = raw, name = 'valid_timestamp', errors = errors)
         # Assert result.
         self.assertEqual(raw.replace(tzinfo = None), result.replace(tzinfo = None))  # type: ignore[union-attr]  # pylint: disable=line-too-long
-        self.assertEqual(0 , len(errors))
+        self.assertEqual(0                         , len(errors))
 
   def test_parse_timestamp_empty(self) -> None :
     """Test empty input for parse_timestamp."""
@@ -33,7 +33,18 @@ class ParseUtilTestCase(SimpleTestCase):
     result = parse_timestamp(raw = raw, name = 'empty_timestamp', errors = errors)
     # Assert result.
     self.assertEqual(datetime.min.replace(tzinfo = timezone.utc), result)
-    self.assertEqual(0 , len(errors))
+    self.assertEqual(0                                          , len(errors))
+
+  def test_parse_timestamp_invalid(self) -> None :
+    """Test empty input for parse_timestamp."""
+    # Prepare data.
+    raw = 'not-a-timestamp'
+    errors: List[str] = []
+    # Execute test.
+    result = parse_timestamp(raw = raw, name = 'invalid_timestamp', errors = errors)
+    # Assert result.
+    self.assertEqual(datetime.min.replace(tzinfo = timezone.utc), result)
+    self.assertEqual(1                                          , len(errors))
 
   def test_parse_string(self) -> None :
     """Test valid input for parse_timestamp."""
@@ -44,7 +55,7 @@ class ParseUtilTestCase(SimpleTestCase):
     result = parse_string(raw = raw, name = 'valid_string', errors = errors)
     # Assert result.
     self.assertEqual(raw, result)
-    self.assertEqual(0 , len(errors))
+    self.assertEqual(0  , len(errors))
 
   def test_parse_string_empty(self) -> None :
     """Test empty input for parse_timestamp."""
@@ -55,4 +66,4 @@ class ParseUtilTestCase(SimpleTestCase):
     result = parse_string(raw = raw, name = 'empty_string', errors = errors)
     # Assert result.
     self.assertEqual('UNKNOWN', result)
-    self.assertEqual(0 , len(errors))
+    self.assertEqual(0        , len(errors))

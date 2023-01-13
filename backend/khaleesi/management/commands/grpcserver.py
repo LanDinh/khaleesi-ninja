@@ -76,6 +76,7 @@ class Command(BaseCommand, DjangoMigrateCommand):
       )
       raise
 
+  # noinspection PyUnusedLocal
   def _migrate(self, request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument
     """Perform migration."""
     options_copy = options.copy()
@@ -83,6 +84,7 @@ class Command(BaseCommand, DjangoMigrateCommand):
     options_copy['app_label'] = 'microservice'
     DjangoMigrateCommand.handle(self, **options_copy)
 
+  # noinspection PyUnusedLocal
   def _initialize(self, request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument
     """Initialize the server."""
     self.server = Server(
@@ -90,6 +92,7 @@ class Command(BaseCommand, DjangoMigrateCommand):
       initialize_request_id     = request_id,
     )
 
+  # noinspection PyUnusedLocal
   def _start(self, request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument
     """Start the server."""
     start_http_server(int(khaleesi_settings['MONITORING']['PORT']))

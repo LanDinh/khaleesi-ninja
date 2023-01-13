@@ -37,7 +37,8 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
         timestamp.reset_mock()
         start = datetime.now(tz = timezone.utc)
         end = start + timedelta(days = 1)
-        timestamp.side_effect = [ start, end, start, end ]
+        metadata.return_value = { 'meta_reported_timestamp': start }
+        timestamp.side_effect = [ start, end, start, datetime.max.replace(tzinfo = timezone.utc) ]
         sql_parser.reset_mock()
         sql_parser.return_value.generalize = 'generalized'
         sql_parser.return_value.tables = [ 'table1', 'table2' ]
@@ -61,6 +62,7 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
         self.assertEqual('table1,table2', result[0].tables)
         self.assertEqual(''             , result[1].columns)
         self.assertEqual(timedelta(days = 1), result[0].reported_duration)
+        self.assertEqual(timedelta(0)       , result[1].reported_duration)
         self.assertEqual(2, metadata.call_count)
         self.assertEqual(request_metadata, metadata.call_args_list[0].kwargs['metadata'])
         self.assertEqual(request_metadata, metadata.call_args_list[1].kwargs['metadata'])

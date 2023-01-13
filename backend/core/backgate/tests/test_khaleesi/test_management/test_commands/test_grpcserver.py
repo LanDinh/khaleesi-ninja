@@ -23,11 +23,20 @@ class GrpcServerTestCase(SimpleTestCase):
 
   command = Command()
 
-  def _test_init_migration(self) -> None :
+
+  @patch.dict('khaleesi.management.commands.grpcserver.khaleesi_settings', {
+      'STARTUP': {
+          'MIGRATIONS_BEFORE_SERVER_START': {
+              'REQUIRED' : True,
+              'MIGRATION': 'migration-name',
+          },
+      },
+  })
+  def test_init_migration(self) -> None :
     """Test server start if preliminary migrations need to be applied."""
     self._execute_tests(migration_calls = 2)
 
-  def _test_regular(self) -> None :
+  def test_regular(self) -> None :
     """Test regular server start."""
     self._execute_tests()
 
@@ -63,7 +72,7 @@ class GrpcServerTestCase(SimpleTestCase):
     self.assertEqual(3, singleton.structured_logger.log_system_request.call_count)
     self.assertEqual(3, singleton.structured_logger.log_system_response.call_count)
     self.assertEqual(migration_calls, migrate.handle.call_count)
-    server.return_value.start.assert_called_once_with()
+    server.return_value.start.assert_called_once()
     metrics_server.assert_called_once()
 
   @patch('khaleesi.management.commands.grpcserver.SINGLETON')

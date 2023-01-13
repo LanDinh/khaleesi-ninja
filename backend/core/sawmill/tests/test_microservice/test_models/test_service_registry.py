@@ -246,6 +246,16 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(caller_details.grpc_method, result.call_list[0].call.grpc_method)
     self.assertEqual(calls                     , result.call_list[0].calls[0].grpc_method)
 
+  @patch.object(SERVICE_REGISTRY, 'cache')
+  def test_get_service_registry_no_cache(self, cache: MagicMock, *_: MagicMock) -> None :
+    """Test instantiation."""
+    # Prepare data.
+    cache.get.return_value = None
+    # Execute result.
+    result = SERVICE_REGISTRY.get_service_registry()
+    # Assert result.
+    self.assertEqual({}, result)
+
   def _registry_contains_k_gate(self, *, number: int) -> None :
     self.assertIsNotNone(SERVICE_REGISTRY.cache.get('service-registry')[f'khaleesi-gate-{number}'])
 

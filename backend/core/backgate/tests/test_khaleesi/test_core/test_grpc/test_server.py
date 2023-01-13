@@ -2,15 +2,21 @@
 
 # Python.
 import threading
+from typing import cast
 from unittest.mock import patch, MagicMock
 
 # Django.
 from django.conf import settings
 
+# gRPC.
+from grpc import StatusCode
+
 # khaleesi.ninja.
 from khaleesi.core.grpc.server import Server
+from khaleesi.core.logging.text_logger import LogLevel
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
-from khaleesi.core.shared.exceptions import TimeoutException
+from khaleesi.core.shared.exceptions import TimeoutException, KhaleesiException
+from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
@@ -37,7 +43,38 @@ class ServerTestCase(SimpleTestCase):
     # Execute test & assert result.
     Server(start_backgate_request_id = 'backgate-request', initialize_request_id = 'request-id')
 
-  def test_initialization_failure(
+  def test_initialization_khaleesi_failure(
+      self,
+      grpc_server: MagicMock,
+      singleton  : MagicMock,
+      *_         : MagicMock,
+  ) -> None :
+    """Test initialization failure."""
+    for status in StatusCode:
+      for loglevel in LogLevel:
+        with self.subTest(status = status.name, loglevel = loglevel.name):
+          # Prepare data.
+          exception = default_khaleesi_exception(status = status, loglevel = loglevel)
+          grpc_server.side_effect = exception
+          # Execute test.
+          with self.assertRaises(KhaleesiException):
+            Server(
+              start_backgate_request_id = 'backgate-request',
+              initialize_request_id = 'request-id',
+            )
+          # Assert result.
+          self._assert_server_state_event(
+            action    = Event.Action.ActionType.START,
+            result    = Event.Action.ResultType.FATAL,
+            singleton = singleton,
+          )
+          self._assert_exception_logging(
+            singleton = singleton,
+            exception = exception,
+            loglevel  = loglevel,
+          )
+
+  def test_initialization_other_failure(
       self,
       grpc_server: MagicMock,
       singleton  : MagicMock,
@@ -173,7 +210,39 @@ class ServerTestCase(SimpleTestCase):
     # Assert result.
     grpc_server.return_value.wait_for_termination.assert_called_once_with()
 
-  def test_start_failure(
+  def test_start_khaleesi_failure(
+      self,
+      grpc_server: MagicMock,
+      singleton  : MagicMock,
+      *_         : MagicMock,
+  ) -> None :
+    """Test that server start fails correctly."""
+    for status in StatusCode:
+      for loglevel in LogLevel:
+        with self.subTest(status = status.name, loglevel = loglevel.name):
+          # Prepare data.
+          exception = default_khaleesi_exception(status = status, loglevel = loglevel)
+          server = Server(
+            start_backgate_request_id = 'backgate-request',
+            initialize_request_id = 'request-id',
+          )
+          grpc_server.return_value.start.side_effect = exception
+          # Execute test.
+          with self.assertRaises(KhaleesiException):
+            server.start(start_request_id = 'request-id')
+          # Assert result.
+          self._assert_server_state_event(
+            action    = Event.Action.ActionType.START,
+            result    = Event.Action.ResultType.FATAL,
+            singleton = singleton,
+          )
+          self._assert_exception_logging(
+            singleton = singleton,
+            exception = exception,
+            loglevel  = loglevel,
+          )
+
+  def test_start_other_failure(
       self,
       grpc_server: MagicMock,
       singleton  : MagicMock,
@@ -196,6 +265,20 @@ class ServerTestCase(SimpleTestCase):
       singleton = singleton,
     )
 
+  def _assert_exception_logging(
+      self, *,
+      singleton: MagicMock,
+      exception: KhaleesiException,
+      loglevel : LogLevel,
+  ) -> None :
+    """Assert exception logging."""
+    logged_exception = cast(
+      KhaleesiException,
+      singleton.structured_logger.log_system_error.call_args.kwargs['exception'],
+    )
+    self.assertEqual(exception.status         , logged_exception.status)
+    self.assertEqual(exception.loglevel       , loglevel)
+    self.assertEqual(exception.loglevel       , logged_exception.loglevel)
 
   def _assert_server_state_event(
       self, *,

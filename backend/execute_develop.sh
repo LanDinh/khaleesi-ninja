@@ -15,6 +15,7 @@ test() {
   return_code=0
 
   echo "Django tests..."
+  # shellcheck disable=SC2086
   if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest; then
     return_code=1
   fi
