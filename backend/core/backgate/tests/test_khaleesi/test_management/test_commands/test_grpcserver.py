@@ -88,7 +88,7 @@ class GrpcServerTestCase(SimpleTestCase):
       *,
       migration_calls: int,
   ) -> None :
-    """Test the ok case."""
+    """Test khaleesi exceptions."""
     for status in StatusCode:
       for loglevel in LogLevel:
         with self.subTest(status = status.name, loglevel = loglevel.name):
@@ -118,7 +118,7 @@ class GrpcServerTestCase(SimpleTestCase):
   @patch('khaleesi.management.commands.grpcserver.start_http_server')
   @patch('khaleesi.management.commands.grpcserver.Server')
   @patch('khaleesi.management.commands.grpcserver.DjangoMigrateCommand')
-  def _execute_other_exception_test(
+  def _execute_other_exception_wrapped_test(
       self,
       migrate       : MagicMock,
       server        : MagicMock,
@@ -127,7 +127,7 @@ class GrpcServerTestCase(SimpleTestCase):
       *,
       migration_calls: int,
   ) -> None :
-    """Test the ok case."""
+    """Test other exceptions in the wrapped case."""
     # Prepare test.
     exception = default_exception()
     server.return_value.wait_for_termination.side_effect = exception
@@ -142,3 +142,35 @@ class GrpcServerTestCase(SimpleTestCase):
       self.assertEqual(migration_calls, migrate.handle.call_count)
       server.return_value.start.assert_called_once_with()
       metrics_server.assert_called_once()
+
+  @patch('khaleesi.management.commands.grpcserver.SINGLETON')
+  @patch('khaleesi.management.commands.grpcserver.start_http_server')
+  @patch('khaleesi.management.commands.grpcserver.Server')
+  @patch('khaleesi.management.commands.grpcserver.DjangoMigrateCommand')
+  def _execute_other_exception_test(
+      self,
+      migrate       : MagicMock,
+      server        : MagicMock,
+      metrics_server: MagicMock,
+      singleton     : MagicMock,
+      *,
+      migration_calls: int,
+  ) -> None :
+    """Test the other exception case."""
+    # Prepare test.
+    exception = default_exception()
+    server.return_value.start.side_effect = exception
+    with self.assertRaises(KhaleesiException) as raised_exception:
+      # Execute test.
+      self.command.khaleesi_handle()
+      # Assert result.
+      singleton.structured_logger.log_system_backgate_request.assert_called_once()
+      singleton.structured_logger.log_system_backgate_response.assert_called_once()
+      self.assertEqual(3, singleton.structured_logger.log_system_request.call_count)
+      self.assertEqual(3, singleton.structured_logger.log_system_response.call_count)
+      self.assertEqual(migration_calls, migrate.handle.call_count)
+      server.return_value.start.assert_called_once_with()
+      metrics_server.assert_called_once()
+      raised_khaleesi_exception = cast(KhaleesiException, raised_exception)
+      self.assertEqual(StatusCode.INTERNAL, raised_khaleesi_exception.status)  # pylint: disable=no-member
+      self.assertEqual(LogLevel.FATAL     , raised_khaleesi_exception.loglevel)  # pylint: disable=no-member
