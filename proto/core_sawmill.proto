@@ -82,6 +82,7 @@ message Request {
 message Query {
   string id         = 1;
   string raw        = 2;
+  string connection = 3;
 
   google.protobuf.Timestamp start = 10;
   google.protobuf.Timestamp end   = 11;
@@ -159,8 +160,10 @@ message QueryList{
 
 
 message ProcessedResponse {
-  google.protobuf.Duration reported_duration = 1;
-  google.protobuf.Duration logged_duration   = 2;
+  google.protobuf.Duration reported_duration       = 1;
+  google.protobuf.Duration logged_duration         = 2;
+  google.protobuf.Duration child_duration_absolute = 10;
+  double                   child_duration_relative = 11;
 }
 
 

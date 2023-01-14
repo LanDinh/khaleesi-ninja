@@ -91,6 +91,7 @@ class ModelResponseMetadataMixin(ModelRequestMetadataMixin):
         'meta_response_status'            : status.name,
         'meta_response_reported_timestamp': datetime.now(tz = timezone.utc) + timedelta(days = 1),
         'meta_response_logged_timestamp'  : datetime.now(tz = timezone.utc) + timedelta(days = 1),
+        'meta_child_duration'             : timedelta(hours = 12),
         **super().model_full_request_metadata(user = user),
     }
 
@@ -133,5 +134,10 @@ class ModelResponseMetadataMixin(ModelRequestMetadataMixin):
       model.meta_response_logged_timestamp,
       grpc_response_response.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
+    self.assertEqual(
+      model.meta_child_duration.total_seconds(),
+      grpc_response_processed.child_duration_absolute.seconds,
+    )
+    self.assertEqual(0.5, round(grpc_response_processed.child_duration_relative, 1))
     self.assertLess(0, grpc_response_processed.logged_duration.nanos)
     self.assertLess(0, grpc_response_processed.reported_duration.nanos)

@@ -1,6 +1,7 @@
 """Test the core-sawmill lumberjack service."""
 
 # Python.
+from datetime import datetime, timezone, timedelta
 from typing import Callable, Any
 from unittest.mock import patch, MagicMock
 
@@ -71,16 +72,23 @@ class LumberjackServiceTestCase(SimpleTestCase):
   def test_log_response(self, *_: MagicMock) -> None :
     """Test logging responses."""
     with patch.object(DbRequest.objects, 'log_response') as logging_request:
-      with patch.object(DbQuery.objects, 'log_queries') as logging_query:
-        # Prepare data.
-        logging_request.return_value = DbRequest()
-        logging_request.return_value.to_grpc_request_response = MagicMock()
-        logging_query.return_value = [ DbQuery() ]
-        # Execute test.
-        self.service.LogResponse(MagicMock(), MagicMock())
-        # Assert result.
-        logging_request.assert_called_once()
-        logging_query.assert_called_once()
+      with patch.object(DbBackgateRequest.objects, 'add_child_duration') as logging_backgate:
+        with patch.object(DbQuery.objects, 'log_queries') as logging_query:
+          # Prepare data.
+          now = datetime.now().replace(tzinfo = timezone.utc)
+          logging_request.return_value = DbRequest()
+          logging_request.return_value.to_grpc_request_response = MagicMock()
+          logging_request.return_value.save = MagicMock()
+          logging_query.return_value = [ DbQuery() ]
+          logging_query.return_value[0].reported_start = now
+          logging_query.return_value[0].reported_end = now + timedelta(days = 1)
+          # Execute test.
+          self.service.LogResponse(MagicMock(), MagicMock())
+          # Assert result.
+          logging_backgate.assert_called_once()
+          logging_request.assert_called_once()
+          logging_query.assert_called_once()
+          logging_request.return_value.save.assert_called_once_with()
 
   def test_log_error(self, *_: MagicMock) -> None :
     """Test logging events."""

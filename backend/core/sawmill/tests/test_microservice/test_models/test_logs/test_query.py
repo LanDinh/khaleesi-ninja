@@ -90,6 +90,7 @@ class QueryTestCase(ModelRequestMetadataMixin, SimpleTestCase):
         # Prepare data.
         query = Query(
           query_id       = 'query-id',
+          connection     = 'connection',
           raw            = 'raw',
           normalized     = 'normalized',
           tables         = 'table1,table2',
@@ -106,13 +107,14 @@ class QueryTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           grpc = result.query_request_metadata,
           grpc_response = result.query_response_metadata,
         )
-        self.assertEqual(query.query_id         , result.query.id)
-        self.assertEqual(query.raw              , result.query.raw)
-        self.assertEqual(query.normalized       , result.normalized)
-        self.assertEqual(2                      , len(result.tables))
-        self.assertEqual('table1'               , result.tables[0])
-        self.assertEqual('table2'               , result.tables[1])
-        self.assertEqual(0                      , len(result.columns))
+        self.assertEqual(query.query_id  , result.query.id)
+        self.assertEqual(query.connection, result.query.connection)
+        self.assertEqual(query.raw       , result.query.raw)
+        self.assertEqual(query.normalized, result.normalized)
+        self.assertEqual(2               , len(result.tables))
+        self.assertEqual('table1'        , result.tables[0])
+        self.assertEqual('table2'        , result.tables[1])
+        self.assertEqual(0               , len(result.columns))
         self.assertEqual(
           query.reported_start.replace(tzinfo = None),  # pylint: disable=unexpected-keyword-arg
           result.query.start.ToDatetime(),

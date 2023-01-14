@@ -159,6 +159,19 @@ class BackgateRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
     result.save.assert_called_once_with()  # type: ignore[attr-defined]
     result.log_response.assert_called_once()  # type: ignore[attr-defined]
 
+  @patch.object(BackgateRequest.objects, 'get')
+  def test_add_child_duration(self, request_mock: MagicMock) -> None :
+    """Test adding child durations."""
+    # Prepare data.
+    request = ModelResponseMetadataMixin.get_model_for_response_saving(model_type = BackgateRequest)
+    request.save = MagicMock()  # type: ignore[assignment]
+    request_mock.reset_mock()
+    request_mock.return_value = request
+    # Execute test.
+    BackgateRequest.objects.add_child_duration(request = MagicMock())
+    # Assert result.
+    request.save.assert_called_once_with()
+
 
 class BackgateRequestTestCase(ModelResponseMetadataMixin, SimpleTestCase):
   """Test the backgate request logs models."""

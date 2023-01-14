@@ -33,6 +33,7 @@ class ResponseMetadata(Metadata):
     default = datetime.min.replace(tzinfo = timezone.utc),
   )
   meta_response_logged_timestamp = models.DateTimeField(auto_now = True)
+  meta_child_duration = models.DurationField(default = timedelta())
 
   # Misc.
   meta_response_logging_errors = models.TextField(blank = True)
@@ -57,6 +58,13 @@ class ResponseMetadata(Metadata):
     if self.is_in_progress:
       return timedelta()
     return self.meta_response_logged_timestamp - self.meta_logged_timestamp
+
+  @property
+  def child_duration_relative(self) -> float:
+    """Get the child duration compared to the logged duration."""
+    if self.is_in_progress:
+      return 0
+    return self.meta_child_duration / self.logged_duration
 
   def log_response(self, *, grpc_response: GrpcResponse) -> None :
     """Log response."""
@@ -93,6 +101,8 @@ class ResponseMetadata(Metadata):
     # Processed data.
     processed.logged_duration.FromTimedelta(self.logged_duration)
     processed.reported_duration.FromTimedelta(self.reported_duration)
+    processed.child_duration_absolute.FromTimedelta(self.meta_child_duration)
+    processed.child_duration_relative = self.child_duration_relative
 
   class Meta:
     """Abstract class."""

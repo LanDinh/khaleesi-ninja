@@ -15,6 +15,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   BackgateResponseRequest as GrpcBackgateResponseRequest,
 )
 from microservice.models.logs.abstract_response import ResponseMetadata
+from microservice.models.logs.request import Request
 from microservice.parse_util import parse_string
 
 
@@ -85,6 +86,15 @@ class BackgateRequestManager(models.Manager['BackgateRequest']):
     request.log_response(grpc_response = grpc_response.response)
     request.save()
     return request
+
+  def add_child_duration(self, *, request: Request) -> None :
+    """Log request duration."""
+    backgate_request = self.get(
+      meta_caller_backgate_request_id = request.meta_caller_backgate_request_id,
+      meta_response_status            = 'IN_PROGRESS',
+    )
+    backgate_request.meta_child_duration += request.reported_duration
+    backgate_request.save()
 
 
 class BackgateRequest(ResponseMetadata):

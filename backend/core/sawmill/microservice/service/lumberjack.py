@@ -117,13 +117,19 @@ class Service(Servicer):
         f'to the database.',
       )
       result = DbRequest.objects.log_response(grpc_response = request)
+      DbBackgateRequest.objects.add_child_duration(request = result)
       LOGGER.info('Saving the queries to the database.')
       queries = DbQuery.objects.log_queries(
         queries = request.queries,
         metadata = result.to_grpc_request_response().request.request_metadata,
       )
+      errors = result.meta_logging_errors
+      LOGGER.info('Processing the query times and errors.')
       for query in queries:
-        result.meta_logging_errors += query.meta_logging_errors
+        errors += query.meta_logging_errors
+        result.meta_child_duration += query.reported_duration
+      result.save()
+      result.meta_logging_errors = errors
       return result
     return self._handle_response(method = method)
 

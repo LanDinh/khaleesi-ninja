@@ -47,10 +47,19 @@ class StructuredDbLogger(StructuredLogger):
   def send_log_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
     result = DbRequest.objects.log_response(grpc_response = response)
-    DbQuery.objects.log_queries(
+    try:
+      DbBackgateRequest.objects.add_child_duration(request = result)
+    except Exception:  # pylint: disable=broad-except
+      # TODO(45) - remove this hack
+      pass
+
+    queries = DbQuery.objects.log_queries(
       queries = response.queries,
       metadata = result.to_grpc_request_response().request.request_metadata,
     )
+    for query in queries:
+      result.meta_child_duration += query.reported_duration
+    result.save()
 
   def send_log_error(self, *, error: Error) -> None :
     """Send the log error to the logging facility."""

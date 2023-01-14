@@ -290,6 +290,10 @@ class TestStructuredLogger(SimpleTestCase):
     self.assertEqual(3, len(log_response.queries))
     for query_id in ids:
       self.assertIn(query_id, [ query.id for query in log_response.queries ])
+    connections = [ query.connection for query in log_response.queries ]
+    self.assertIn('one', connections)
+    self.assertIn('two', connections)
+    self.assertNotIn('three', connections)
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')

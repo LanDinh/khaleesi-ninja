@@ -247,11 +247,12 @@ class StructuredLogger(ABC):
   def _log_queries(self, *, queries: RepeatedCompositeFieldContainer[Query]) -> None :
     """Attach queries to the gRPC object."""
     count = 0
-    for _, state_queries in STATE.queries.items():
+    for connection, state_queries in STATE.queries.items():
       for query in state_queries:
-        grpc_query     = queries.add()
-        grpc_query.id  = query.query_id
-        grpc_query.raw = query.raw
+        grpc_query            = queries.add()
+        grpc_query.id         = query.query_id
+        grpc_query.connection = connection
+        grpc_query.raw        = query.raw
         grpc_query.start.FromDatetime(query.start)
         grpc_query.end.FromDatetime(query.end)
         count += 1

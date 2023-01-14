@@ -28,8 +28,24 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
     # Assert result.
     self.assertTrue(response.is_in_progress)
     self.assertEqual('IN_PROGRESS', response.meta_response_status)
-    self.assertEqual(timedelta(0), response.logged_duration)
-    self.assertEqual(timedelta(0), response.reported_duration)
+    self.assertEqual(timedelta(0) , response.logged_duration)
+    self.assertEqual(timedelta(0) , response.reported_duration)
+    self.assertEqual(timedelta(0) , response.meta_child_duration)
+    self.assertEqual(0            , response.child_duration_relative)
+
+  def test_child_duration_relative(self) -> None :
+    """Test child duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    response = ResponseMetadata()
+    response.meta_logged_timestamp          = now
+    response.meta_response_logged_timestamp = now + timedelta(minutes = 10)
+    response.meta_child_duration            = timedelta(minutes = 1)
+    response.meta_response_status           = 'OK'
+    # Execute test.
+    result = response.child_duration_relative
+    # Assert result.
+    self.assertEqual(0.1, result)
 
   @patch('microservice.models.logs.abstract_response.parse_timestamp')
   def test_log_response(self, timestamp: MagicMock) -> None :
