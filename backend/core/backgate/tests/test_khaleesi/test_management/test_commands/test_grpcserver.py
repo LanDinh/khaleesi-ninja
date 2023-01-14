@@ -34,13 +34,13 @@ class GrpcServerTestCase(SimpleTestCase):
   })
   def test_init_migration(self) -> None :
     """Test server start if preliminary migrations need to be applied."""
-    self._execute_tests(migration_calls = 2)
+    self._execute_tests(migration_calls = 3)
 
   def test_regular(self) -> None :
     """Test regular server start."""
-    self._execute_tests()
+    self._execute_tests(migration_calls = 2)
 
-  def _execute_tests(self, *, migration_calls: int = 1) -> None :
+  def _execute_tests(self, *, migration_calls: int) -> None :
     """Execute the test cases."""
     for name, method in [
         ('ok'                     , self._execute_ok_test),

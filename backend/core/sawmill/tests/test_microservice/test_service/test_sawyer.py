@@ -5,13 +5,14 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.test_util.test_case import SimpleTestCase
+from khaleesi.models import JobExecution
 from khaleesi.proto.core_sawmill_pb2 import (
-  LogFilter,
+  CleanupRequest, LogFilter,
   EventResponse as GrpcEventResponse,
   RequestResponse as GrpcRequestResponse,
   ErrorResponse as GrpcErrorResponse,
   BackgateRequestResponse as GrpcBackgateResponse,
-  QueryResponse as GrpcQueryResponse
+  QueryResponse as GrpcQueryResponse,
 )
 from microservice.models import Event, Request, Error, BackgateRequest, Query
 from microservice.service.sawyer import Service
@@ -21,6 +22,26 @@ class SawyerServiceTestCase(SimpleTestCase):
   """Test the core-sawmill sawyer service."""
 
   service = Service()
+
+  @patch.object(JobExecution.objects, 'start_job_execution')
+  def test_cleanup(self, job_executions: MagicMock, *_: MagicMock) -> None :
+    """Test cleaning up."""
+    # Prepare data.
+    job_executions.return_value.in_progress = True
+    # Execute test.
+    self.service.Cleanup(CleanupRequest(), MagicMock())
+    # Assert result.
+    job_executions.assert_called_once()
+
+  @patch.object(JobExecution.objects, 'start_job_execution')
+  def test_cleanup_skip(self, job_executions: MagicMock, *_: MagicMock) -> None :
+    """Test cleaning up."""
+    # Prepare data.
+    job_executions.return_value.in_progress = False
+    # Execute test.
+    self.service.Cleanup(CleanupRequest(), MagicMock())
+    # Assert result.
+    job_executions.assert_called_once()
 
   @patch.object(Event.objects, 'filter')
   def test_get_events(self, db_events: MagicMock, *_: MagicMock) -> None :

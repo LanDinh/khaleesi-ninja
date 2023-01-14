@@ -220,12 +220,31 @@ message LogFilter {
   khaleesi.core.RequestMetadata request_metadata = 1;
 }
 
+
+
+message CleanupRequest {
+  khaleesi.core.RequestMetadata      request_metadata = 1;
+  khaleesi.core.JobExecutionMetadata job              = 2;
+
+  CleanupInstance backgate_request = 10;
+  CleanupInstance request          = 11;
+  CleanupInstance event            = 12;
+  CleanupInstance error            = 13;
+  CleanupInstance query            = 14;
+}
+
+message CleanupInstance {
+  khaleesi.core.JobActionConfiguration        action_configuration  = 1;
+  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 2;
+}
+
 service Sawyer {
-  rpc GetEvents           (LogFilter) returns (EventsList);
-  rpc GetRequests         (LogFilter) returns (RequestList);
-  rpc GetErrors           (LogFilter) returns (ErrorList);
-  rpc GetBackgateRequests (LogFilter) returns (BackgateRequestList);
-  rpc GetQueries          (LogFilter) returns (QueryList);
+  rpc GetEvents           (LogFilter)      returns (EventsList);
+  rpc GetRequests         (LogFilter)      returns (RequestList);
+  rpc GetErrors           (LogFilter)      returns (ErrorList);
+  rpc GetBackgateRequests (LogFilter)      returns (BackgateRequestList);
+  rpc GetQueries          (LogFilter)      returns (QueryList);
+  rpc Cleanup             (CleanupRequest) returns (khaleesi.core.JobExecutionResponse);
 }
 
 message EmptyRequest {

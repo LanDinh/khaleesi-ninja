@@ -83,6 +83,8 @@ class Command(BaseCommand, DjangoMigrateCommand):
     options_copy['database']  = 'migrate'
     options_copy['app_label'] = 'microservice'
     DjangoMigrateCommand.handle(self, **options_copy)
+    options_copy['app_label'] = 'khaleesi'
+    DjangoMigrateCommand.handle(self, **options_copy)
 
   # noinspection PyUnusedLocal
   def _initialize(self, request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument

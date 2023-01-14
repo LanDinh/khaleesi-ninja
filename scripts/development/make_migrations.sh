@@ -20,6 +20,7 @@ fi
 
 # Options.
 current_service_file="./data/current_service"
+app=$1
 
 
 # Check if interactive mode.
@@ -44,11 +45,11 @@ make_migrations_container() {
   . scripts/util/build.sh "development" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
 
   echo -e "${yellow}Making the migrations...${clear_color}"
-  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" make_migrations "microservice"
+  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" make_migrations "${app}"
 
   echo -e "${yellow}Copying the migrations...${clear_color}"
-  cp -r temp/* "backend/${gate}/${service}/microservice/migrations"
-  rm -r "backend/${gate}/${service}/microservice/migrations/__pycache__"
+  cp -r temp/* "backend/${gate}/${service}/${app}/migrations"
+  rm -r "backend/${gate}/${service}/${app}/migrations/__pycache__"
 }
 
 echo -e "${magenta}Cleaning up old files and create mount directory...${clear_color}"
