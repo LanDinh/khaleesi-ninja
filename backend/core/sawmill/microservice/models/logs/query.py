@@ -15,6 +15,7 @@ from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
 from sql_metadata import Parser  # type: ignore[import]
 
 # khaleesi.ninja.
+from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import Query as GrpcQuery, QueryResponse as GrpcQueryResponse
 from microservice.models.logs.abstract import Metadata
@@ -35,30 +36,33 @@ class QueryManager(models.Manager['Query']):
       errors: List[str] = []
       raw = parse_string(raw = grpc_query.raw, name = 'raw', errors = errors)
       parser = Parser(sql = raw)
-      query = Query(  # type: ignore[misc]
-        query_id       = parse_string(raw = grpc_query.id, name = 'query_id', errors = errors),
-        connection     = parse_string(
-          raw = grpc_query.connection,
-          name = 'connection',
-          errors = errors,
-        ),
-        raw            = raw,
-        normalized     = parser.generalize,
-        tables         = ','.join(parser.tables),
-        columns        = ','.join(parser.columns),
-        reported_start = parse_timestamp(
-          raw = grpc_query.start.ToDatetime(),
-          name = 'start',
-          errors = errors,
-        ),
-        reported_end = parse_timestamp(
-          raw = grpc_query.end.ToDatetime(),
-          name = 'end',
-          errors = errors,
-        ),
-        **self.model.log_metadata(metadata = metadata, errors = errors)
-      )
-      new_queries.append(query)
+      try:
+        query = Query(  # type: ignore[misc]
+          query_id       = parse_string(raw = grpc_query.id, name = 'query_id', errors = errors),
+          connection     = parse_string(
+            raw = grpc_query.connection,
+            name = 'connection',
+            errors = errors,
+          ),
+          raw            = raw,
+          normalized     = parser.generalize,
+          tables         = ','.join(parser.tables),
+          columns        = ','.join(parser.columns),
+          reported_start = parse_timestamp(
+            raw = grpc_query.start.ToDatetime(),
+            name = 'start',
+            errors = errors,
+          ),
+          reported_end = parse_timestamp(
+            raw = grpc_query.end.ToDatetime(),
+            name = 'end',
+            errors = errors,
+          ),
+          **self.model.log_metadata(metadata = metadata, errors = errors)
+        )
+        new_queries.append(query)
+      except ValueError:  # TODO
+        LOGGER.error(f'ValueError when parsing SQL: {raw}')
     return self.bulk_create(objs = new_queries, batch_size = 100)
 
 
