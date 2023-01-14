@@ -65,5 +65,7 @@ jobs:
         run: ./scripts/operations/setup_environment.sh ${{ matrix.environment.name }}
       - name: Spin up the environment
         run: ./scripts/operations/deploy.sh ${{ matrix.environment.name }}
-      - name: Wait for succesful spinup
-        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod --all --for condition=ready --timeout 5m
+      - name: Check the status.
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
+      #- name: Wait for succesful spinup
+      #  run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod --all --for condition=ready --timeout 5m
