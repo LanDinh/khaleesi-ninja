@@ -56,6 +56,16 @@ deploy_service() {
     return 0
   fi
 
+  if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
+    local container_mode=production
+    if [[ "${environment}" == "development" ]]; then
+      container_mode=development
+    fi
+
+    echo -e "${yellow}Rebuilding the container...${clear_color}"
+    . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
+  fi
+
   # Note: the order in which to call the values files is important!
   # Most specific first, to allow more generic ones to override some values
   # (e.g. only 1 replica for development)
@@ -69,20 +79,13 @@ deploy_service() {
     --set service.drop_database="${drop_database}"
 
   if [[ "${environment}" == "development" ]] || [[ "${environment}" == "integration" ]]; then
-    local container_mode=production
-    if [[ "${environment}" == "development" ]]; then
-      container_mode=development
-    fi
-
-    echo -e "${yellow}Rebuilding the container...${clear_color}"
-    . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
-
     echo -e "${yellow}Rolling out the new container...${clear_color}"
-    kubectl rollout restart deployment "${gate}-${service}" -n "khaleesi-ninja-${environment}"
+    kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${gate}-${service}"
 
     if [[ ${type} == "backgate" ]] || [[ ${type} == "micro" ]]; then
+      kubectl -n "khaleesi-ninja-${environment}" wait deployment "${gate}-${service}" --for condition=Available=True --timeout 1m
       echo -e "${yellow}Restarting grpcui...${clear_color}"
-      kubectl rollout restart deployment "${gate}-${service}-grpcui" -n "khaleesi-ninja-${environment}"
+      kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${gate}-${service}-grpcui"
     fi
   fi
 }
