@@ -64,6 +64,7 @@ deploy_service() {
 
     echo -e "${yellow}Rebuilding the container...${clear_color}"
     . scripts/util/build.sh "${container_mode}" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
+    sleep 5
   fi
 
   # Note: the order in which to call the values files is important!
