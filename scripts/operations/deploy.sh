@@ -84,8 +84,10 @@ deploy_service() {
 
     if [[ ${type} == "backgate" ]] || [[ ${type} == "micro" ]]; then
       kubectl -n "khaleesi-ninja-${environment}" get pod
+      docker image -ls
       kubectl -n "khaleesi-ninja-${environment}" wait deployment "${gate}-${service}" --for condition=Available=True --timeout 1m || echo
       kubectl -n "khaleesi-ninja-${environment}" get pod
+      docker image -ls
       echo -e "${yellow}Restarting grpcui...${clear_color}"
       kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${gate}-${service}-grpcui"
     fi
