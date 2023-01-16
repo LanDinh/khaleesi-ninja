@@ -67,11 +67,7 @@ jobs:
         run:  |
           eval $(minikube -p minikube docker-env)
           ./scripts/operations/deploy.sh ${{ matrix.environment.name }}
-      - name: "DEBUG: Check the status."
+      - name: Check the status.
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
-      - name: "DEBUG: Check the images."
-        run: |
-          eval $(minikube -p minikube docker-env)
-          docker image ls
       - name: Wait for successful spinup
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod --all --for condition=ready --timeout 1m

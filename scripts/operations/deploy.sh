@@ -83,14 +83,14 @@ deploy_service() {
     echo -e "${yellow}Rolling out the new container...${clear_color}"
     kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${gate}-${service}"
 
-
-    if [[ $(kubectl -n "khaleesi-ninja-${environment}" wait pod -l gate="${gate}",name="${service}",type="${type}" --for condition=ready --timeout 5s |& grep -c "timed out") -gt 0 ]]; then
-      failed=$(kubectl -n "khaleesi-ninja-${environment}" get pod | grep -m 1 "CrashLoopBackOff" | grep -oE "${gate}-${service}-[a-zA-Z0-9]+-[a-zA-Z0-9]+")
-      kubectl -n "khaleesi-ninja-${environment}" logs "${failed}" deployment
+    wait_output=$(kubectl -n "khaleesi-ninja-${environment}" wait pod -l gate="${gate}",name="${service}",type="${type}" --for condition=ready --timeout 5s 2>&1 > /dev/null) || true
+    if [[ -n "${wait_output}" ]]; then
+      grep -oE "${gate}-${service}-[a-zA-Z0-9]+-[a-zA-Z0-9]+" <<< "${wait_output}" | while read -r failed; do
+        kubectl -n "khaleesi-ninja-${environment}" logs "${failed}" deployment || true
+      done
     fi
 
     if [[ ${type} == "backgate" ]] || [[ ${type} == "micro" ]]; then
-
       echo -e "${yellow}Restarting grpcui...${clear_color}"
       kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${gate}-${service}-grpcui"
     fi
