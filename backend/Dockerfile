@@ -19,12 +19,13 @@ RUN export PATH=/usr/lib/postgresql/X.Y/bin/:$PATH
 
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
-COPY ./requirements.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./manage.py /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
+COPY ./requirements.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
+COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/requirements-service.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 RUN python -m venv .venv
 RUN ./.venv/bin/pip install --upgrade pip
 RUN ./.venv/bin/pip install -r requirements.txt
-RUN ./.venv/bin/pip install -r /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/requirements.txt
+RUN ./.venv/bin/pip install -r requirements-service.txt
 
 ################################################################################
 #                               Development Base                               #
