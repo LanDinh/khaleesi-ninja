@@ -7,7 +7,6 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from khaleesi.core.logging.query_logger import QueryLogger, query_logger
 from khaleesi.core.shared.state import STATE
-from khaleesi.core.test_util.exceptions import exception_raising_method
 from khaleesi.core.test_util.test_case import SimpleTestCase
 
 class QueryLoggerTestCase(SimpleTestCase):
