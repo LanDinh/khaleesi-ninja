@@ -40,12 +40,12 @@ jobs:
       - name: Upload python protos
         uses: actions/upload-artifact@v3
         with:
-          name: protos/python
+          name: protos-python
           path: backend/khaleesi/proto/
       - name: Upload typescript protos
         uses: actions/upload-artifact@v3
         with:
-          name: protos/typescript
+          name: protos-typescript
           path: frontgate/core/src/core/proto/
 
   
@@ -63,12 +63,12 @@ jobs:
       - name: Download python protos
         uses: actions/download-artifact@v3
         with:
-          name: protos/python
+          name: protos-python
           path: backend/khaleesi/proto/
       - name: Download typescript protos
         uses: actions/download-artifact@v3
         with:
-          name: protos/typescript
+          name: protos-typescript
           path: frontgate/core/src/core/proto/
       - name: Build the container image
         run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} ${{ matrix.environment.container_mode }}
