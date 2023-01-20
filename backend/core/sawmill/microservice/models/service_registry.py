@@ -3,11 +3,11 @@
 # Python.
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Any, Dict, MutableMapping, Optional, Tuple, TypeVar
+from typing import Dict, TypeVar
 
 # Django.
 from django.core.cache import caches
-from django.db import IntegrityError, models
+from django.db import models
 
 # gRPC.
 from google.protobuf.internal.containers import RepeatedCompositeFieldContainer
@@ -18,29 +18,9 @@ from khaleesi.proto.core_pb2 import GrpcCallerDetails
 from khaleesi.proto.core_sawmill_pb2 import ServiceCallData, CallData
 
 
-M = TypeVar('M', bound = models.Model)
-
-
-class Manager(models.Manager[M]):
-  """Wrap get_or_create to avoid errors."""
-
-  def get_or_create(
-      self,
-      defaults: Optional[MutableMapping[str, Any]] = None,
-      **kwargs: Any
-  ) -> Tuple[M, bool] :
-    """Wrap get_or_create to avoid errors."""
-    try:
-      return super().get_or_create(defaults = defaults, **kwargs)
-    except IntegrityError:
-      return self.get(**kwargs), False
-
-
 class ServiceRegistryKhaleesiGate(models.Model):
   """Gates."""
   name = models.TextField(unique = True)
-
-  objects: Manager[ServiceRegistryKhaleesiGate] = Manager()
 
 
 class ServiceRegistryKhaleesiService(models.Model):
@@ -51,8 +31,6 @@ class ServiceRegistryKhaleesiService(models.Model):
     on_delete = models.CASCADE,
     related_name = 'khaleesi_services',
   )
-
-  objects: Manager[ServiceRegistryKhaleesiService] = Manager()
 
   class Meta:
     constraints = [ models.UniqueConstraint(
@@ -70,8 +48,6 @@ class ServiceRegistryGrpcService(models.Model):
     related_name = 'grpc_services',
   )
 
-  objects: Manager[ServiceRegistryGrpcService] = Manager()
-
   class Meta:
     constraints = [ models.UniqueConstraint(
       fields = [ 'name', 'khaleesi_service' ],
@@ -87,8 +63,6 @@ class ServiceRegistryGrpcMethod(models.Model):
     on_delete = models.CASCADE,
     related_name = 'grpc_methods',
   )
-
-  objects: Manager[ServiceRegistryGrpcMethod] = Manager()
 
   class Meta:
     constraints = [ models.UniqueConstraint(
@@ -109,8 +83,6 @@ class ServiceRegistryGrpcCall(models.Model):
     on_delete = models.CASCADE,
     related_name = 'calls',
   )
-
-  objects: Manager[ServiceRegistryGrpcCall] = Manager()
 
   class Meta:
     constraints = [ models.UniqueConstraint(fields = [ 'caller', 'called' ], name = 'unique_calls')]

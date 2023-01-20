@@ -1,18 +1,13 @@
 """Test query logger."""
 
 # Python.
-from typing import Any, cast
+from typing import Any
 from unittest.mock import patch, MagicMock
-
-# gRPC.
-from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.logging.query_logger import QueryLogger, query_logger
-from khaleesi.core.logging.text_logger import LogLevel
-from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.state import STATE
-from khaleesi.core.test_util.exceptions import khaleesi_raising_method, exception_raising_method
+from khaleesi.core.test_util.exceptions import exception_raising_method
 from khaleesi.core.test_util.test_case import SimpleTestCase
 
 class QueryLoggerTestCase(SimpleTestCase):
@@ -38,31 +33,6 @@ class QueryLoggerTestCase(SimpleTestCase):
         self.assertEqual(sql, STATE.queries[alias][0].raw)
         self.assertIsNotNone(STATE.queries[alias][0].query_id)
 
-  def test_call_khaleesi_exception(self) -> None :
-    """Test calling the query logger."""
-    for many in [ True, False ]:
-      for status in StatusCode:
-        for loglevel in LogLevel:
-          with self.subTest(many = many, status = status.name, loglevel = loglevel.name):
-            # Prepare data.
-            alias = 'test'
-            sql = 'sql'
-            logger = QueryLogger(alias = alias)
-            method = khaleesi_raising_method(status = status, loglevel = loglevel)
-            STATE.reset()
-            STATE.queries[alias] = []
-            self.assertEqual(0, len(STATE.queries[alias]))
-            # Execute test.
-            with self.assertRaises(KhaleesiException) as exception:
-              logger(execute = method, sql = sql, params = None, many = many, context = {})
-              # Assert result.
-              khaleesi_exception = cast(KhaleesiException, exception)
-              self.assertEqual(1, len(STATE.queries[alias]))
-              self.assertEqual(sql, STATE.queries[alias][0].raw)
-              self.assertIsNotNone(STATE.queries[alias][0].query_id)
-              self.assertEqual(status  , khaleesi_exception.status)  # pylint: disable=no-member
-              self.assertEqual(loglevel, khaleesi_exception.loglevel)  # pylint: disable=no-member
-
   def test_call_other_exception(self) -> None :
     """Test calling the query logger."""
     for many in [ True, False ]:
@@ -76,15 +46,12 @@ class QueryLoggerTestCase(SimpleTestCase):
         STATE.queries[alias] = []
         self.assertEqual(0, len(STATE.queries[alias]))
         # Execute test.
-        with self.assertRaises(Exception) as exception:
+        with self.assertRaises(Exception):
           logger(execute = method, sql = sql, params = None, many = many, context = {})
           # Assert result.
-          khaleesi_exception = cast(KhaleesiException, exception)
           self.assertEqual(1, len(STATE.queries[alias]))
           self.assertEqual(sql, STATE.queries[alias][0].raw)
           self.assertIsNotNone(STATE.queries[alias][0].query_id)
-          self.assertEqual(StatusCode.INTERNAL, khaleesi_exception.status)  # pylint: disable=no-member
-          self.assertEqual(LogLevel.FATAL     , khaleesi_exception.loglevel)  # pylint: disable=no-member
 
 
 class QueryLoggerContextManagerTestCase(SimpleTestCase):

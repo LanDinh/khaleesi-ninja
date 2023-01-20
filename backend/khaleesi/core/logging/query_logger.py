@@ -10,7 +10,6 @@ from uuid import uuid4
 from django.db import connections
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.shared.state import Query, STATE
 
 
@@ -37,10 +36,8 @@ class QueryLogger:
     try:
       result = execute(sql, params, many, context)
       return result  # finally executes before the return statement.
-    except KhaleesiException:
+    except Exception:
       raise
-    except Exception as exception:
-      raise MaskingInternalServerException(exception = exception) from exception
     finally:
       query.end = datetime.now(tz = timezone.utc)
 
