@@ -151,7 +151,7 @@ class ServiceRegistry:
     if should_add_call:
       caller = self._get_or_create_entry_for_db(caller_details = caller_details)
       called = self._get_or_create_entry_for_db(caller_details = called_details)
-      ServiceRegistryGrpcCall.objects.get_or_create(caller = caller, called = called)
+      ServiceRegistryGrpcCall.objects.get_or_create(caller_id = caller.pk, called_id = called.pk)
       self.reload()
 
   def add_service(self, *, caller_details: GrpcCallerDetails) -> None :
@@ -310,16 +310,16 @@ class ServiceRegistry:
       name = caller_details.khaleesi_gate,
     )
     khaleesi_service, _ = ServiceRegistryKhaleesiService.objects.get_or_create(
-      name          = caller_details.khaleesi_service,
-      khaleesi_gate = khaleesi_gate,
+      name              = caller_details.khaleesi_service,
+      khaleesi_gate_id = khaleesi_gate.pk,
     )
     grpc_service, _ = ServiceRegistryGrpcService.objects.get_or_create(
-      name             = caller_details.grpc_service,
-      khaleesi_service = khaleesi_service,
+      name                 = caller_details.grpc_service,
+      khaleesi_service_id = khaleesi_service.pk,
     )
     grpc_method, _ = ServiceRegistryGrpcMethod.objects.get_or_create(
-      name         = caller_details.grpc_method,
-      grpc_service = grpc_service,
+      name             = caller_details.grpc_method,
+      grpc_service_id = grpc_service.pk,
     )
     return grpc_method
 
