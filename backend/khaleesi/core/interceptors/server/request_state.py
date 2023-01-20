@@ -71,6 +71,8 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
       exception: KhaleesiException,
   ) -> None :
     """Properly handle the exception."""
+    LOGGER.log(exception.to_json(), loglevel = exception.loglevel)
+    LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
     STATE.reset()  # Always clean up afterwards.
     context.abort(code = exception.status, details = exception.to_json())
 
