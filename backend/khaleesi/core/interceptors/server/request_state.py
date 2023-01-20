@@ -56,8 +56,10 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
         STATE.reset()  # Always clean up afterwards.
         return response
     except KhaleesiException as exception:
+      raise
       self._handle_exception(context = context, exception = exception)
     except Exception as exception:  # pylint: disable=broad-except
+      raise
       new_exception = MaskingInternalServerException(exception = exception)
       self._handle_exception(context = context, exception = new_exception)
 
