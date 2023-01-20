@@ -18,11 +18,11 @@ fi
 
 # Options.
 all_services_file=./data/services.json
-container_mode=${1}
-gate=${2}
-service=${3}
-type=${4}
-version=${5}
+gate=${1}
+service=${2}
+type=${3}
+version=${4}
+container_mode=${6}
 location="backend"
 frontgate_version=
 
@@ -44,8 +44,8 @@ docker build "${location}" \
   --build-arg version="${version}" \
   --build-arg frontgate_version="${frontgate_version}" \
   --target "${container_mode}" \
-  -t "khaleesi-ninja/${gate}/${service}:latest" \
-  -t "khaleesi-ninja/${gate}/${service}:${version}"
+  -t "khaleesi-ninja/${gate}/${service}:latest-${container_mode}" \
+  -t "khaleesi-ninja/${gate}/${service}:${version}-${container_mode}"
 
 echo -e "${yellow}Cleaning up dangling images...${clear_color}"
 docker image prune -f

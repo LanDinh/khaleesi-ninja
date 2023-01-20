@@ -26,7 +26,7 @@ app=$1
 # Check if interactive mode.
 services=
 if [[ ! -f "${current_service_file}" ]]; then
-  . ./scripts/development/switch_current_service.sh
+  . ./scripts/local/switch_current_service.sh
 fi
 while read -r raw_line; do
   read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
@@ -39,13 +39,12 @@ make_migrations_container() {
   local service=${2}
   local type=${3}
   local version=${4}
-  local deploy=${5}
 
   echo -e "${yellow}Building the images...${clear_color}"
-  . scripts/util/build.sh "development" "${gate}" "${service}" "${type}" "${version}" "${deploy}"
+  . scripts/build.sh "${gate}" "${service}" "${type}" "${version}" "development"
 
   echo -e "${yellow}Making the migrations...${clear_color}"
-  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}" make_migrations "${app}"
+  docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}:latest-development" make_migrations "${app}"
 
   echo -e "${yellow}Copying the migrations...${clear_color}"
   cp -r temp/* "backend/${gate}/${service}/${app}/migrations"
@@ -58,6 +57,6 @@ mkdir temp
 
 echo -e "${magenta}Making the migrations...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh make_migrations_container ${services[@]}
+make_migrations_container ${services[@]}
 
 echo -e "${green}DONE! :D${clear_color}"

@@ -14,5 +14,6 @@ line=${1}
 IFS="\"" read -r -a split <<< "${line}"
 environment="${split[3]}"
 deploy="${split[7]}"
+container_mode="${split[11]}"
 
-echo "${environment}" "${deploy}"
+echo "${environment}" "${deploy}" "${container_mode}"

@@ -6,7 +6,7 @@ kubegres:
   replicas: 1
   size: 200Mi
 service:
-  version: "latest"
+  version: "latest-production"
   replicas: 1
   image_pull_policy: "Never"
 grpc_web:

@@ -1,0 +1,101 @@
+name: test-services
+on: [ push ]
+jobs:
+  # Make data lists available across jobs for use in matrix.
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      all-services: ${{ steps.set-services.outputs.full-json }}
+      deploy-services: ${{ steps.set-services.outputs.deploy-json }}
+      all-environments: ${{ steps.set-environments.outputs.full-json }}
+      deploy-environments: ${{ steps.set-environments.outputs.deploy-json }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - id: set-services
+        name: Read services into matrix
+        uses: ./.github/actions/set-json-output
+        with:
+          filename: data/services.json
+      - id: set-environments
+        name: Read environments into matrix
+        uses: ./.github/actions/set-json-output
+        with:
+          filename: data/environments.json
+  
+  # Build the images for reuse.
+  build:
+    runs-on: ubuntu-latest
+    needs: [ matrix ]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.matrix.outputs.all-services) }}
+        environment: ${{ fromJson(needs.matrix.outputs.deploy-environments) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+      - name: Generate protos
+        run: ./scripts/generate_protos.sh
+      - name: Build the container image
+        run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} ${{ matrix.environment.container_mode }}
+      - name: Upload latest image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-${{ matrix.environment.container_mode }}
+  
+
+  # Execute the unit tests in parallel.
+  unit_test:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.matrix.outputs.all-services) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Download image
+        uses: ishworkh/docker-image-artifact-download@v1
+        with:
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-${{ matrix.environment.container_mode }}
+      - name: Execute the container test
+        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
+      - name: Upload coverage to codecov
+        if: ${{ always() }}
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          flags: integration
+          fail_ci_if_error: true
+          directory: temp/
+  
+  # Execute the E2E tests in parallel.
+  e2e_test:
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    strategy:
+      matrix:
+        environment: ${{ fromJson(needs.matrix.outputs.deploy-environments) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Start minikube
+        uses: medyagh/setup-minikube@latest
+      - name: Setup helm
+        uses: azure/setup-helm@v3
+      - name: Set up the cluster
+        run: ./scripts/operations/setup_cluster.sh
+      - name: Set up the environment
+        run: ./scripts/operations/setup_environment.sh ${{ matrix.environment.name }}
+      - name: Download all images
+        uses: actions/download-artifact@v3
+        with:
+          path: /tmp/artifacts
+      - name: Spin up the environment
+        run:  ./scripts/ci/deploy.sh /tmp/artifacts ${{ matrix.environment.name }} ${{ matrix.environment.container_mode }}
+      - name: Check the status.
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
+      - name: Wait for successful spinup
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod --all --for condition=ready --timeout 1m
