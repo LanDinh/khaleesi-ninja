@@ -85,7 +85,7 @@ deploy_service() {
 
     wait_output=$(kubectl -n "khaleesi-ninja-${environment}" wait pod --all --for condition=ready --timeout 1m 2>&1) || true
     if [[ -n "${wait_output}" ]]; then
-      grep -oE "[a-z]+-[a-z]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+" <<< "${wait_output}" | while read -r failed; do
+      grep -oE "core-sawmill-[a-zA-Z0-9]+-[a-zA-Z0-9]+" <<< "${wait_output}" | while read -r failed; do
         kubectl -n "khaleesi-ninja-${environment}" logs "${failed}" deployment || true
       done
     fi
