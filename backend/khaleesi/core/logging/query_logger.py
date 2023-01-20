@@ -36,8 +36,6 @@ class QueryLogger:
     try:
       result = execute(sql, params, many, context)
       return result  # finally executes before the return statement.
-    except Exception:
-      raise
     finally:
       query.end = datetime.now(tz = timezone.utc)
 
