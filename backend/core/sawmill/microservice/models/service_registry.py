@@ -20,7 +20,7 @@ from khaleesi.proto.core_sawmill_pb2 import ServiceCallData, CallData
 
 class ServiceRegistryKhaleesiGate(models.Model):
   """Gates."""
-  name = models.TextField()
+  name = models.TextField(unique = True)
 
 
 class ServiceRegistryKhaleesiService(models.Model):
@@ -31,6 +31,11 @@ class ServiceRegistryKhaleesiService(models.Model):
     on_delete = models.CASCADE,
     related_name = 'khaleesi_services',
   )
+  class Meta:
+    constraints = [ models.UniqueConstraint(
+      fields = [ 'name', 'khaleesi_gate' ],
+      name   = 'unique_khaleesi_service',
+    )]
 
 
 class ServiceRegistryGrpcService(models.Model):
@@ -41,6 +46,11 @@ class ServiceRegistryGrpcService(models.Model):
     on_delete = models.CASCADE,
     related_name = 'grpc_services',
   )
+  class Meta:
+    constraints = [ models.UniqueConstraint(
+      fields = [ 'name', 'khaleesi_service' ],
+      name   = 'unique_grpc_service',
+    )]
 
 
 class ServiceRegistryGrpcMethod(models.Model):
@@ -51,6 +61,11 @@ class ServiceRegistryGrpcMethod(models.Model):
     on_delete = models.CASCADE,
     related_name = 'grpc_methods',
   )
+  class Meta:
+    constraints = [ models.UniqueConstraint(
+      fields = [ 'name', 'grpc_service' ],
+      name   = 'unique_grpc_method',
+    )]
 
 
 class ServiceRegistryGrpcCall(models.Model):
@@ -65,6 +80,8 @@ class ServiceRegistryGrpcCall(models.Model):
     on_delete = models.CASCADE,
     related_name = 'calls',
   )
+  class Meta:
+    constraints = [ models.UniqueConstraint(fields = [ 'caller', 'called' ], name = 'unique_calls')]
 
 
 T = TypeVar('T')
