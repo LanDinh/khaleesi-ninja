@@ -101,8 +101,8 @@ echo -e "${magenta}Deploying the services...${clear_color}"
 # shellcheck disable=SC2068
 . scripts/util/service_loop.sh deploy_service ${services[@]}
 
+kubectl -n "khaleesi-ninja-${environment}" wait pod -l gate="${gate}",name="sawmill",type="${type}" --for condition=ready --timeout 1m
 wait_output=$(kubectl -n "khaleesi-ninja-${environment}" wait pod -l gate="${gate}",name="sawmill",type="${type}" --for condition=ready --timeout 1m 2>&1) || true
-echo wait_output
 if [[ -n "${wait_output}" ]]; then
   grep -oE "${gate}-${service}-[a-zA-Z0-9]+-[a-zA-Z0-9]+" <<< "${wait_output}" | while read -r failed; do
     kubectl -n "khaleesi-ninja-${environment}" logs "${failed}" deployment || true
