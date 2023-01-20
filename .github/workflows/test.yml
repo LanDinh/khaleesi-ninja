@@ -83,7 +83,7 @@ jobs:
   # Execute the unit tests in parallel.
   unit_test:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ matrix, build ]
     strategy:
       matrix:
         service: ${{ fromJson(needs.matrix.outputs.all-services) }}
@@ -108,7 +108,7 @@ jobs:
   # Execute the E2E tests in parallel.
   e2e_test:
     runs-on: ubuntu-latest
-    needs: [ build ]
+    needs: [ matrix, build ]
     strategy:
       matrix:
         environment: ${{ fromJson(needs.matrix.outputs.deploy-environments) }}
