@@ -17,7 +17,7 @@ clear_color='\033[0m'
 path=${1}
 environment=${2}
 container_mode=${3}
-services=("$@")
+services=("$@:4")
 
 
 deploy_service() {

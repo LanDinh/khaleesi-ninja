@@ -93,7 +93,7 @@ jobs:
       - name: Download image
         uses: ishworkh/docker-image-artifact-download@v1
         with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-${{ matrix.environment.container_mode }}
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
       - name: Execute the container test
         run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
       - name: Upload coverage to codecov
