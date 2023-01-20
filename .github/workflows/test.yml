@@ -1,4 +1,4 @@
-name: test-services
+name: test
 on: [ push ]
 jobs:
   # Make data lists available across jobs for use in matrix.
