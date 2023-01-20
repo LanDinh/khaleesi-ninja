@@ -1,4 +1,4 @@
-name: test
+name: Tests
 on: [ push ]
 jobs:
   # Make data lists available across jobs for use in matrix.
@@ -36,6 +36,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
+      - name: Install Protoc for gRPC-Web
+        run: |
+          curl -L -o /usr/local/bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/${{ inputs.protoc-gen-grpc-web-version }}/protoc-gen-grpc-web-${{ inputs.protoc-gen-grpc-web-version }}-linux-x86_64
+          chmod +x /usr/local/bin/protoc-gen-grpc-web
       - name: Generate protos
         run: ./scripts/generate_protos.sh
       - name: Build the container image
