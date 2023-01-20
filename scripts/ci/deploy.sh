@@ -17,7 +17,6 @@ clear_color='\033[0m'
 path=${1}
 environment=${2}
 container_mode=${3}
-services=("$@:4")
 
 
 deploy_service() {
@@ -36,6 +35,6 @@ deploy_service() {
 
 echo -e "${magenta}Uploading the images...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh upload_image ${services[@]}
+. scripts/util/service_loop.sh upload_image
 
 echo -e "${green}DONE! :D${clear_color}"

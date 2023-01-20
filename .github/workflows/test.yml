@@ -1,5 +1,8 @@
 name: Tests
-on: [ push ]
+on:
+  push:
+    paths-ignore:
+      - documentation/**
 jobs:
   # Make data lists available across jobs for use in matrix.
   matrix:
@@ -95,7 +98,7 @@ jobs:
         with:
           image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
       - name: Execute the container test
-        run: ./scripts/development/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
+        run: ./scripts/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
       - name: Upload coverage to codecov
         if: ${{ always() }}
         uses: codecov/codecov-action@v3
