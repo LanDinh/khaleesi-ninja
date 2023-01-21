@@ -3,6 +3,7 @@ on:
   workflow_call:
   push:
     paths:
+      - .github
       - backend/requirements.txt
       - backend/requirements-develop.txt
       - frontgate/package.json
@@ -36,7 +37,7 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - name: Build the base images
-        run: .scripts/util/build-backend-base.sh 1.0.0
+        run: ./scripts/util/build-backend-base.sh 1.0.0
       - name: Save images to filesystem
         run: docker image save khaleesi/base/backend-construction:1.0.0 khaleesi/base/backend-image:1.0.0 > /tmp/khaleesi/images/backend-base-images
       - name: Cache images
