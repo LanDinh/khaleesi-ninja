@@ -25,7 +25,5 @@ runs:
       with:
         path: /tmp/khaleesi/images/backend-base-images
         key: khaleesi/images/backend-base-images
-    - if: steps.cache-images.outputs.cache-hit != 'true'
-      uses: ./.github/actions/build-backend-base-images
     - shell: bash
       run: docker load -i /tmp/khaleesi/images/backend-base-images

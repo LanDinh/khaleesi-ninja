@@ -31,5 +31,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Build backend base images
-        uses: ./.github/actions/build-backend-base-images
+      - name: Setup python cache
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Build images
+        run: ./scripts/util/build-backend-base.sh 1.0.0
+      - name: prepare filesystem for caching
+        run: mkdir -p /tmp/khaleesi/images
+      - name: Save images to filesystem
+        run: docker image save khaleesi/base/backend-construction:1.0.0 khaleesi/base/backend-image:1.0.0 > /tmp/khaleesi/images/backend-base-images
+      - name: Cache images
+        uses: actions/cache@v3
+        with:
+          path: /tmp/khaleesi/images/backend-base-images
+          key: khaleesi/images/backend-base-imagesbuild-backend-base-images
