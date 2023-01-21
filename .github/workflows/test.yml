@@ -16,12 +16,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Wait for cache dependency updates to succeed
-        uses: lewagon/wait-on-check-action@v1.2.0
-        with:
-          ref: ${{ github.sha }}
-          running-workflow-name: 'Update Dependencies'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - id: set-services
         name: Read services into matrix
         uses: ./.github/actions/set-json-output
