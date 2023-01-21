@@ -29,16 +29,20 @@ frontgate_version=
 
 if [[ "${type}" == "frontgate" ]]; then
   location="frontgate"
-elif [[ "${service}" == "backgate" ]]; then
-  echo -e "${yellow}Fetching the frontgate version...${clear_color}"
-  raw_frontgate=$(grep "\"gate\": \"${gate}\"" "${all_services_file}" | grep "\"type\": \"frontgate\"")
-  read -r -a frontgate <<< "$(./scripts/util/parse_service.sh "${raw_frontgate}")"
-  frontgate_version="${frontgate[3]}"
+  cache="cache=~/"
+else
+  cache="pip_cache=$(pip cache dir)"
+  if [[ "${service}" == "backgate" ]]; then
+    echo -e "${yellow}Fetching the frontgate version...${clear_color}"
+    raw_frontgate=$(grep "\"gate\": \"${gate}\"" "${all_services_file}" | grep "\"type\": \"frontgate\"")
+    read -r -a frontgate <<< "$(./scripts/util/parse_service.sh "${raw_frontgate}")"
+    frontgate_version="${frontgate[3]}"
+  fi
 fi
 
 
 echo -e "${yellow}Building the image khaleesi-ninja/${gate}/${service} for ${container_mode}...${clear_color}"
-DOCKER_BUILDKIT=1 docker buildx build "${location}" --build-context=pip_cache=$(pip cache dir) --progress plain --no-cache\
+DOCKER_BUILDKIT=1 docker buildx build "${location}" --build-context="${cache}" --progress plain --no-cache\
   --build-arg gate="${gate}" \
   --build-arg service="${service}" \
   --build-arg version="${version}" \
