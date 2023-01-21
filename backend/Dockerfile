@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 ################################################################################
 #                                     Base                                     #
 ################################################################################
@@ -23,9 +24,9 @@ COPY ./manage.py /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./requirements.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/requirements-service.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 RUN python -m venv .venv
-RUN --mount=type=cache,target=~/.cache/pip ./.venv/bin/pip install --upgrade pip
-RUN --mount=type=cache,target=~/.cache/pip ./.venv/bin/pip install -r requirements.txt
-RUN --mount=type=cache,target=~/.cache/pip ./.venv/bin/pip install -r requirements-service.txt
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install --upgrade pip
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements.txt
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements-service.txt
 
 ################################################################################
 #                               Development Base                               #
@@ -44,11 +45,11 @@ ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
-COPY ./requirements_develop.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
+COPY ./requirements-develop.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./mypy.ini /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./pylintrc /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./execute_develop.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
-RUN --mount=type=cache,target=~/.cache/pip ./.venv/bin/pip install -r requirements_develop.txt
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements-develop.txt
 
 # Data. Copy here instead of Base to avoid re-running pip install for dev tools.
 COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
