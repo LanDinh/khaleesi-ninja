@@ -9,10 +9,12 @@ metadata:
     gate: {{ .Values.gate.name }}
     name: {{ .Values.service.name }}
     type: kubegres
-    job: "true"
 spec:
   ttlSecondsAfterFinished: 600
   template:
+    metadata:
+      labels:
+        job: "true"
     spec:
       containers:
         - name: create-user-and-database
