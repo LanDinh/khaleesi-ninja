@@ -1,0 +1,19 @@
+name: Build backend base images
+description: Build the backend base images
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    - shell: bash
+      run: ./scripts/util/build-backend-base.sh 1.0.0
+    - shell: bash
+      run: mkdir -p /tmp/khaleesi/images
+    - shell: bash
+      run: docker image save khaleesi/base/backend-construction:1.0.0 khaleesi/base/backend-image:1.0.0 > /tmp/khaleesi/images/backend-base-images
+    - uses: actions/cache@v3
+      with:
+        path: /tmp/khaleesi/images/backend-base-images
+        key: khaleesi/images/backend-base-images
