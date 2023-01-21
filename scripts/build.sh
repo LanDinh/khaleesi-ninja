@@ -29,7 +29,7 @@ frontgate_version=
 
 if [[ "${type}" == "frontgate" ]]; then
   location="frontgate"
-  cache="cache=~/"
+  cache="cache=./"
 else
   cache="pip_cache=$(pip cache dir)"
   if [[ "${service}" == "backgate" ]]; then
