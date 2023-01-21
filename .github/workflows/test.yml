@@ -38,7 +38,7 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - name: Fill python cache
-        run: pip install -r ./backend/requiremets.txt -r ./backend/requirments-develop.txt
+        run: pip install -r ./backend/requirements.txt -r ./backend/requirements-develop.txt
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
