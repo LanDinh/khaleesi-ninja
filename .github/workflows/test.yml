@@ -79,7 +79,7 @@ jobs:
           cache: 'pip'
       - name: Fill python cache
         if: matrix.service.type == 'backgate' || matrix.service.type == 'micro'
-        run: pip install -r ./backend/${{ matrix.service.gate }}/${{ matrix.service.name }}/requiremets-service.txt
+        run: pip install -r ./backend/${{ matrix.service.gate }}/${{ matrix.service.name }}/requirements-service.txt
       - name: Download python protos
         uses: actions/download-artifact@v3
         with:
