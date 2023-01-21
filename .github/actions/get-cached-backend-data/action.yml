@@ -1,0 +1,31 @@
+name: Get cached data
+description: Get dependency cache, built protos, and base images
+inputs:
+  gate:
+    description: The name of the gate
+    required: true
+  service:
+    description: The name of the service
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+    - shell: bash
+      run: pip install -r ./backend/${{ inputs.gate }}/${{ inputs.service }}/requirements-service.txt
+    - uses: actions/download-artifact@v3
+      with:
+        name: protos-python
+        path: backend/khaleesi/proto/
+    - id: cache-images
+      uses: actions/cache@v3
+      with:
+        path: /tmp/khaleesi/images/backend-base-images
+        key: khaleesi/images/backend-base-images
+    - if: steps.cache-images.outputs.cache-hit != 'true'
+      uses: ./.github/workflows/update-dependencies.yml
+    - shell: bash
+      run: docker load -i /tmp/khaleesi/images/backend-base-images

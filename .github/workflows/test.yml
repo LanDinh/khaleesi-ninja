@@ -32,13 +32,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup python cache
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          cache: 'pip'
-      - name: Fill python cache
-        run: pip install -r ./backend/requirements.txt -r ./backend/requirements-develop.txt
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -71,21 +64,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup python cache
+      - name: Get cached backend data
         if: matrix.service.type == 'backgate' || matrix.service.type == 'micro'
-        uses: actions/setup-python@v4
+        uses: ./.github/actions/get-cached-backend-data
         with:
-          python-version: '3.10'
-          cache: 'pip'
-      - name: Fill python cache
-        if: matrix.service.type == 'backgate' || matrix.service.type == 'micro'
-        run: pip install -r ./backend/${{ matrix.service.gate }}/${{ matrix.service.name }}/requirements-service.txt
-      - name: Download python protos
-        uses: actions/download-artifact@v3
-        with:
-          name: protos-python
-          path: backend/khaleesi/proto/
+          gate: ${{ matrix.service.gate }}
+          service: ${{ matrix.service.name }}
       - name: Download typescript protos
+        if: matrix.service.type == 'frontgate'
         uses: actions/download-artifact@v3
         with:
           name: protos-typescript

@@ -57,9 +57,10 @@ deploy_service() {
 
   echo -e "${yellow}Deploying the service...${clear_color}"
   . scripts/deploy.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${environment}" "${drop_database}"
-
-
 }
+
+echo -e "${magenta}Building the base images...${clear_color}"
+. scripts/util/build-backend-base.sh 1.0.0
 
 echo -e "${magenta}Deploying the services...${clear_color}"
 # shellcheck disable=SC2068

@@ -2,7 +2,7 @@
 ################################################################################
 #                                     Base                                     #
 ################################################################################
-FROM python:3.10-slim as base
+FROM khaleesi/base/backend-construction:1.0.0 as base
 
 # Arguments & environment.
 ARG gate
@@ -14,19 +14,12 @@ ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
-# Prerequisites.
-RUN apt-get update && apt-get install -y python3-dev libpq-dev gcc
-RUN export PATH=/usr/lib/postgresql/X.Y/bin/:$PATH
-
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
 COPY ./manage.py /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./requirements.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/requirements-service.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-RUN python -m venv .venv
-RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install --upgrade pip
-RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements.txt
-RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements-service.txt
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pip install -r requirements-service.txt
 
 ################################################################################
 #                               Development Base                               #
@@ -49,7 +42,7 @@ COPY ./requirements-develop.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVIC
 COPY ./mypy.ini /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./pylintrc /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
 COPY ./execute_develop.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
-RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements-develop.txt
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pip install -r requirements-develop.txt
 
 # Data. Copy here instead of Base to avoid re-running pip install for dev tools.
 COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
@@ -58,11 +51,7 @@ COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
 ################################################################################
 #                              Development Image                               #
 ################################################################################
-FROM python:3.10-slim as development
-LABEL environment=development
-
-# Prerequisites.
-RUN apt-get update && apt-get install -y postgresql
+FROM khaleesi/base/backend-image:1.0.0 as development
 
 # Arguments & environment.
 ARG gate
@@ -115,11 +104,7 @@ RUN rm -r tests
 ################################################################################
 #                               Production Image                               #
 ################################################################################
-FROM python:3.10-slim as production
-LABEL environment=production
-
-# Prerequisites.
-RUN apt-get update && apt-get install -y postgresql
+FROM khaleesi/base/backend-image:1.0.0 as production
 
 # Arguments & environment.
 ARG gate

@@ -19,7 +19,7 @@ run() {
 }
 
 
-source .venv/bin/activate
+source ../../.venv/bin/activate
 
 if [[ "${command}" == "run" ]]; then
   echo -e "${magenta}Running production server...${clear_color}"

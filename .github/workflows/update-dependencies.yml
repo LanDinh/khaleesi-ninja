@@ -1,0 +1,46 @@
+name: Update Dependencies
+on:
+  workflow_call:
+  push:
+    paths:
+      - backend/requirements.txt
+      - backend/requirements-develop.txt
+      - frontgate/package.json
+      - frontgate/package-lock.json
+      - scripts/**
+
+jobs:
+  # Update the pip cache with new requirements.
+  update-pip-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup python cache
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Fill python cache
+        run: pip install -r ./backend/requirements.txt -r ./backend/requirements-develop.txt
+
+  # Update the backend base images with new requirements.
+  update-backend-base-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup python cache
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Build the base images
+        run: .scripts/util/build-backend-base.sh 1.0.0
+      - name: Save images to filesystem
+        run: docker image save khaleesi/base/backend-construction:1.0.0 khaleesi/base/backend-image:1.0.0 > /tmp/khaleesi/images/backend-base-images
+      - name: Cache images
+        uses: actions/cache@v3
+        with:
+          path: /tmp/khaleesi/images/backend-base-images
+          key: khaleesi/images/backend-base-images

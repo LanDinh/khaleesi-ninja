@@ -60,7 +60,7 @@ make_migrations() {
 }
 
 
-source .venv/bin/activate
+source ../../.venv/bin/activate
 
 if [[ "${command}" == "test" ]]; then
   echo "Execute tests..."

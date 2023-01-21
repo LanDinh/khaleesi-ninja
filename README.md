@@ -110,6 +110,6 @@ Execute the tests by running `./scripts/development/test.sh`
   
 ### Upgrades
 
-Infrastructure: test.yml, scripts
+Infrastructure: test.yml, scripts, kubernetes/configuration
 Backend: requirements.txt, requirements-development.txt, requirements-service.txt
 Frontgate: package.json

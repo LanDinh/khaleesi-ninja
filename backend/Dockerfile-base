@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+################################################################################
+#                                 Construction                                 #
+################################################################################
+FROM python:3.10-slim as construction
+
+# Install tooling.
+RUN apt-get update && apt-get install -y python3-dev libpq-dev gcc
+RUN export PATH=/usr/lib/postgresql/X.Y/bin/:$PATH
+
+# Download shared dependencies.
+WORKDIR /code/backend
+COPY ./requirements.txt /code/backend/
+RUN python -m venv .venv
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install --upgrade pip
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip install -r requirements.txt
+
+################################################################################
+#                                    Image                                     #
+################################################################################
+FROM python:3.10-slim as image
+
+# Install tooling.
+RUN apt-get update && apt-get install -y postgresql
