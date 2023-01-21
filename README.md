@@ -107,3 +107,9 @@ Execute the tests by running `./scripts/development/test.sh`
   To make this more user friendly, it is possible to pass the argument `current_service` to both `./scripts/development/test.sh` as well as `./scripts/operations/deploy.sh` (in front of all optional arguments).
   The first time `current_service` is passed, an interactive prompt will require choosing the service to be worked on.
   When it is time to switch work to a different service, simply call `./scripts/development/switch_current_service.sh`.
+  
+### Upgrades
+
+Infrastructure: test.yml, scripts
+Backend: requirements.txt, requirements-development.txt, requirements-service.txt
+Frontgate: package.json
