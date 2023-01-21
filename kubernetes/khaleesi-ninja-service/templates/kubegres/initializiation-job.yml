@@ -9,7 +9,7 @@ metadata:
     gate: {{ .Values.gate.name }}
     name: {{ .Values.service.name }}
     type: kubegres
-    job: true
+    job: "true"
 spec:
   ttlSecondsAfterFinished: 600
   template:
