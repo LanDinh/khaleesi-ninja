@@ -42,7 +42,7 @@ fi
 
 
 echo -e "${yellow}Building the image khaleesi-ninja/${gate}/${service} for ${container_mode}...${clear_color}"
-DOCKER_BUILDKIT=1 docker buildx build "${location}" --build-context="${cache}" --progress plain --no-cache\
+DOCKER_BUILDKIT=1 docker buildx build "${location}" --build-context="${cache}" \
   --build-arg gate="${gate}" \
   --build-arg service="${service}" \
   --build-arg version="${version}" \

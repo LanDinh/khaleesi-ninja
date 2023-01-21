@@ -22,6 +22,9 @@ container_mode=${3}
 deploy_service() {
   local gate=${1}
   local service=${2}
+  local type=${3}
+  local version=${4}
+  local deploy=${5}
 
   echo -e "${yellow}Loading the image to docker...${clear_color}"
   docker load -i "${path}/action_image_artifact_khaleesi-ninja_${gate}_${service}_latest-${container_mode}/khaleesi-ninja_${gate}_${service}_latest-${container_mode}"
@@ -30,7 +33,7 @@ deploy_service() {
   minikube image load "khaleesi-ninja/${gate}/${service}:latest-${container_mode}"
 
   echo -e "${yellow}Deploying the service...${clear_color}"
-  ./scripts/deploy.sh "${environment}"
+  ./scripts/deploy.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${environment}"
 }
 
 echo -e "${magenta}Uploading the images...${clear_color}"
