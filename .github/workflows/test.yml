@@ -61,7 +61,6 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.matrix.outputs.all-services) }}
-        environment: ${{ fromJson(needs.matrix.outputs.deploy-environments) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -75,12 +74,18 @@ jobs:
         with:
           name: protos-typescript
           path: frontgate/core/src/core/proto/
-      - name: Build the container image
-        run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} ${{ matrix.environment.container_mode }}
-      - name: Upload latest image
+      - name: Build the development container image
+        run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} development
+      - name: Build the production container image
+        run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} production
+      - name: Upload development image
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-${{ matrix.environment.container_mode }}
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
+      - name: Upload production image
+        uses: ishworkh/docker-image-artifact-upload@v1
+        with:
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-production
   
 
   # Execute the unit tests in parallel.

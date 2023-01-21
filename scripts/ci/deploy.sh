@@ -35,6 +35,6 @@ deploy_service() {
 
 echo -e "${magenta}Uploading the images...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh upload_image
+. scripts/util/service_loop.sh deploy_service
 
 echo -e "${green}DONE! :D${clear_color}"
