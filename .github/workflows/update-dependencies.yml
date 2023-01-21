@@ -3,7 +3,7 @@ on:
   workflow_call:
   push:
     paths:
-      - .github
+      - .github/**
       - backend/requirements.txt
       - backend/requirements-develop.txt
       - frontgate/package.json
