@@ -8,18 +8,14 @@ jobs:
   # Figure out changes.
   changes:
     runs-on: ubuntu-latest
-    # Required permissions
-    permissions:
-      pull-requests: read
-    # Set job outputs to values from filter step
     outputs:
       backend_dependencies: ${{ steps.filter.outputs.backend_dependencies }}
     steps:
-      # For pull requests it's not necessary to checkout the code
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
-          ref: ${{ github.ref }}
           filters: |
             backend_dependencies:
               - 'backend/requirements.txt'
