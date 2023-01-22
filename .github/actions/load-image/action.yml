@@ -4,6 +4,10 @@ inputs:
   image:
     description: Single image to be cached
     required: true
+  commit:
+    description: Reference for saving the cache.
+    required: true
+    default: global
 runs:
   using: 'node16'
   main: 'index.js'
