@@ -28,6 +28,8 @@ jobs:
   # Update the backend base images with new requirements.
   update-backend-base-images:
     runs-on: ubuntu-latest
+    matrix:
+      base-image-version: [ 1.0.0 ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -37,13 +39,12 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - name: Build images
-        run: ./scripts/util/build-backend-base.sh 1.0.0
-      - name: prepare filesystem for caching
-        run: mkdir -p /tmp/khaleesi/images
-      - name: Save images to filesystem
-        run: docker image save khaleesi/base/backend-construction:1.0.0 khaleesi/base/backend-image:1.0.0 > /tmp/khaleesi/images/backend-base-images
-      - name: Cache images
-        uses: actions/cache@v3
+        run: ./scripts/util/build-backend-base.sh ${{ matrix.base-image-version }}
+      - name: Cache construction base
+        uses: ./.github/actions/cache-image
         with:
-          path: /tmp/khaleesi/images/backend-base-images
-          key: khaleesi/images/backend-base-imagesbuild-backend-base-images
+          image: khaleesi/base/backend-construction:${{ matrix.base-image-version }}
+      - name: Cache image base
+        uses: ./.github/actions/cache-image
+        with:
+          image: khaleesi/base/backend-image:${{ matrix.base-image-version }}

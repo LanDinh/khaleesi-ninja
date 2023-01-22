@@ -1,0 +1,22 @@
+name: Cache an image
+description: Cache an image
+inputs:
+  branch:
+    description: The branch this should be limited to
+    required: false
+    default: g
+  image:
+    description: Single image to be cached
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: mkdir -p /tmp/khaleesi/${{ inputs.branch }}/images
+    - shell: bash
+      run: docker image save ${{ inputs.image }} > /tmp/khaleesi/${{ inputs.branch }}/images/${{ inputs.image }}
+    - name: Cache images
+      uses: actions/cache@v3
+      with:
+        path: /tmp/khaleesi/${{ inputs.branch }}/images/${{ inputs.image }}
+        key: khaleesi/${{ inputs.branch }}/images/${{ inputs.image }}

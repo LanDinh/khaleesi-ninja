@@ -20,10 +20,11 @@ runs:
       with:
         name: protos-python
         path: backend/khaleesi/proto/
-    - id: cache-images
-      uses: actions/cache@v3
+    - name: Load construction base
+      uses: ./.github/actions/load-image
       with:
-        path: /tmp/khaleesi/images/backend-base-images
-        key: khaleesi/images/backend-base-images
-    - shell: bash
-      run: docker load -i /tmp/khaleesi/images/backend-base-images
+        image: khaleesi/base/backend-construction:${{ matrix.base-image-version }}
+    - name: Load image base
+      uses: ./.github/actions/load-image
+      with:
+        image: khaleesi/base/backend-image:${{ matrix.base-image-version }}
