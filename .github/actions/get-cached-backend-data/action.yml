@@ -7,6 +7,10 @@ inputs:
   service:
     description: The name of the service
     required: true
+  base-image-version:
+    description: The version of the base images to be fetched
+    required: false
+    default: 1.0.0
 runs:
   using: "composite"
   steps:
@@ -23,8 +27,8 @@ runs:
     - name: Load construction base
       uses: ./.github/actions/load-image
       with:
-        image: khaleesi/base/backend-construction:${{ matrix.base-image-version }}
+        image: khaleesi/base/backend-construction:${{ inputs.base-image-version }}
     - name: Load image base
       uses: ./.github/actions/load-image
       with:
-        image: khaleesi/base/backend-image:${{ matrix.base-image-version }}
+        image: khaleesi/base/backend-image:${{ inputs.base-image-version }}
