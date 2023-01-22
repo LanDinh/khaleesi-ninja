@@ -19,6 +19,7 @@ jobs:
       - uses: dorny/paths-filter@v2
         id: filter
         with:
+          ref: ${{ github.ref }}
           filters: |
             backend_dependencies:
               - 'backend/requirements.txt'
