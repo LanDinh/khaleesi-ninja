@@ -6,7 +6,7 @@ export async function runAction(image) {
   const key = `khaleesi/images/${image}`
   await cache.restoreCache([path], key, [])
 
-  const docker = dockerCli.Docker()
+  const docker = new dockerCli.Docker()
 
   await docker.command(`load -i ${path}`)
 }
