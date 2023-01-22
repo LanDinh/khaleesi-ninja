@@ -29,9 +29,6 @@ deploy_service() {
   echo -e "${yellow}Loading the image to docker...${clear_color}"
   docker load -i "${path}/action_image_artifact_khaleesi-ninja_${gate}_${service}_latest-${container_mode}/khaleesi-ninja_${gate}_${service}_latest-${container_mode}"
 
-  echo -e "${yellow}Loading the image to minikube...${clear_color}"
-  minikube image load "khaleesi-ninja/${gate}/${service}:latest-${container_mode}"
-
   echo -e "${yellow}Deploying the service...${clear_color}"
   ./scripts/deploy.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${environment}"
 }
