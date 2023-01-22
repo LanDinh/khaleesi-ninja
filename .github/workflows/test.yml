@@ -114,7 +114,7 @@ jobs:
   # Build the images for reuse.
   build:
     runs-on: ubuntu-latest
-    needs: [ matrix, generate-protos, build-backend-base-images ]
+    needs: [ matrix, generate-protos, build-backend-base-images, update-pip-cache ]
     strategy:
       matrix:
         service: ${{ fromJson(needs.matrix.outputs.all-services) }}

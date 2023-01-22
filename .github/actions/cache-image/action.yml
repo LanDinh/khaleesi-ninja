@@ -14,7 +14,7 @@ runs:
     - shell: bash
       run: mkdir -p /tmp/khaleesi/${{ inputs.commit }}/images/khaleesi/base
     - shell: bash
-      run: docker image save ${{ inputs.image }} > /tmp/khaleesi/images/${{ inputs.image }}
+      run: docker image save ${{ inputs.image }} > /tmp/khaleesi/${{ inputs.commit }}/images/${{ inputs.image }}
     - name: Cache images
       uses: actions/cache@v3
       with:
