@@ -101,15 +101,15 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - name: Build images
-        run: ./scripts/util/build-backend-base.sh ${{ base-image-version }}
+        run: ./scripts/util/build-backend-base.sh ${{ env.base-image-version }}
       - name: Cache construction base
         uses: ./.github/actions/cache-image
         with:
-          image: khaleesi/base/backend-construction:${{ base-image-version }}
+          image: khaleesi/base/backend-construction:${{ env.base-image-version }}
       - name: Cache image base
         uses: ./.github/actions/cache-image
         with:
-          image: khaleesi/base/backend-image:${{ base-image-version }}
+          image: khaleesi/base/backend-image:${{ env.base-image-version }}
   
   # Build the images for reuse.
   build:
