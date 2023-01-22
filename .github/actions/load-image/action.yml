@@ -7,7 +7,7 @@ inputs:
   commit:
     description: Reference for saving the cache.
     required: true
-    default: global
+    default: ${{ github.sha }}
 runs:
   using: 'node16'
   main: 'index.js'

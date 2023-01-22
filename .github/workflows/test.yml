@@ -106,12 +106,10 @@ jobs:
         uses: ./.github/actions/cache-image
         with:
           image: khaleesi/base/backend-construction:${{ env.base-image-version }}
-          commit: ${{ github.sha }}
       - name: Cache image base
         uses: ./.github/actions/cache-image
         with:
           image: khaleesi/base/backend-image:${{ env.base-image-version }}
-          commit: ${{ github.sha }}
   
   # Build the images for reuse.
   build:

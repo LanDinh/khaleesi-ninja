@@ -4,15 +4,19 @@ inputs:
   image:
     description: Single image to be cached
     required: true
+  commit:
+    description: Reference for saving the cache.
+    required: true
+    default: ${{ github.sha }}
 runs:
   using: "composite"
   steps:
     - shell: bash
-      run: mkdir -p /tmp/khaleesi/images/khaleesi/base
+      run: mkdir -p /tmp/khaleesi/${{ inputs.commit }}/images/khaleesi/base
     - shell: bash
       run: docker image save ${{ inputs.image }} > /tmp/khaleesi/images/${{ inputs.image }}
     - name: Cache images
       uses: actions/cache@v3
       with:
-        path: /tmp/khaleesi/images/${{ inputs.image }}
-        key: khaleesi/images/${{ inputs.image }}
+        path: /tmp/khaleesi/${{ inputs.commit }}/images/${{ inputs.image }}
+        key: khaleesi/${{ inputs.commit }}/images/${{ inputs.image }}
