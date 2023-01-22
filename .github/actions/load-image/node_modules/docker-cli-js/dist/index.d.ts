@@ -1,0 +1,22 @@
+/// <reference types="node" />
+export declare const dockerCommand: (command: string, options?: IOptions) => Promise<any>;
+export declare class Docker {
+    private options;
+    constructor(options?: IOptions);
+    command(command: string, callback?: (err: any, data: any) => void): Promise<any>;
+}
+export interface IOptions {
+    machineName?: string;
+    currentWorkingDirectory?: string;
+    echo?: boolean;
+    env?: NodeJS.ProcessEnv;
+    stdin?: string;
+}
+export declare class Options implements IOptions {
+    machineName?: string | undefined;
+    currentWorkingDirectory?: string | undefined;
+    echo: boolean;
+    env?: NodeJS.ProcessEnv | undefined;
+    stdin?: string | undefined;
+    constructor(machineName?: string | undefined, currentWorkingDirectory?: string | undefined, echo?: boolean, env?: NodeJS.ProcessEnv | undefined, stdin?: string | undefined);
+}

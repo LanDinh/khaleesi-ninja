@@ -14,4 +14,3 @@
 
 # Operations
 /letsencrypt/*
-.github/actions/*/node_modules/*
