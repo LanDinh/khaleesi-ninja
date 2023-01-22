@@ -16,6 +16,7 @@ jobs:
       - uses: dorny/paths-filter@v2
         id: filter
         with:
+          ref: ${{ github.sha }}
           filters: |
             backend_dependencies:
               - 'backend/requirements.txt'
@@ -89,9 +90,8 @@ jobs:
   # Build the backend base images with new requirements.
   build-backend-base-images:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        base-image-version: [ 1.0.0 ]
+    env:
+      base-image-version: 1.0.0
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -101,15 +101,15 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
       - name: Build images
-        run: ./scripts/util/build-backend-base.sh ${{ matrix.base-image-version }}
+        run: ./scripts/util/build-backend-base.sh ${{ base-image-version }}
       - name: Cache construction base
         uses: ./.github/actions/cache-image
         with:
-          image: khaleesi/base/backend-construction:${{ matrix.base-image-version }}
+          image: khaleesi/base/backend-construction:${{ base-image-version }}
       - name: Cache image base
         uses: ./.github/actions/cache-image
         with:
-          image: khaleesi/base/backend-image:${{ matrix.base-image-version }}
+          image: khaleesi/base/backend-image:${{ base-image-version }}
   
   # Build the images for reuse.
   build:
