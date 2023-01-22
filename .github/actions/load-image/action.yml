@@ -1,10 +1,6 @@
 name: Cache an image
 description: Cache an image
 inputs:
-  branch:
-    description: The branch this should be limited to
-    required: false
-    default: g
   image:
     description: Single image to be cached
     required: true
@@ -13,7 +9,7 @@ runs:
   steps:
     - uses: actions/cache@v3
       with:
-        path: /tmp/khaleesi/${{ inputs.branch }}/images/${{ inputs.image }}
-        key: khaleesi/${{ inputs.branch }}/images/${{ inputs.image }}
+        path: /tmp/khaleesi/images/${{ inputs.image }}
+        key: khaleesi/images/${{ inputs.image }}
     - shell: bash
-      run: docker load -i /tmp/khaleesi/${{ inputs.branch }}/images/${{ inputs.image }}
+      run: docker load -i /tmp/khaleesi/images/${{ inputs.image }}
