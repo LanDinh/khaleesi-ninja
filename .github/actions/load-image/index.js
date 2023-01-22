@@ -1,5 +1,5 @@
 const core = require('@actions/core')
-const action = require('action')
+const action = require('./action')
 
 
 const image = core.getInput('image')
