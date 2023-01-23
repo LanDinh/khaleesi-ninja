@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as cache from '@actions/cache'
 import * as dockerCli from 'docker-cli-js'
+import * as fs from 'fs'
 
 
 const image = core.getInput('image')
