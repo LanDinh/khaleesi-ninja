@@ -4,7 +4,7 @@ inputs:
   prefix:
     description: The prefix for which to clean up
     required: true
-    default: khaleesi/${{ github.sha }}
+    default: khaleesi/${{ github.sha }}/
 runs:
   using: "composite"
   steps:
@@ -15,7 +15,7 @@ runs:
           const caches = await github.rest.actions.getActionsCacheList({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            key: '${{ inputs.prefix }}/',
+            key: '${{ inputs.prefix }}',
             per_page: 100,
           })
           for (const cache of caches.data.actions_caches) {
