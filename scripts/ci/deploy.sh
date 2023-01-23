@@ -14,9 +14,7 @@ clear_color='\033[0m'
 
 
 # Options.
-path=${1}
-environment=${2}
-container_mode=${3}
+environment=${1}
 
 
 deploy_service() {
@@ -25,9 +23,6 @@ deploy_service() {
   local type=${3}
   local version=${4}
   local deploy=${5}
-
-  echo -e "${yellow}Loading the image to docker...${clear_color}"
-  docker load -i "${path}/action_image_artifact_khaleesi-ninja_${gate}_${service}_latest-${container_mode}/khaleesi-ninja_${gate}_${service}_latest-${container_mode}"
 
   echo -e "${yellow}Deploying the service...${clear_color}"
   ./scripts/deploy.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${environment}"

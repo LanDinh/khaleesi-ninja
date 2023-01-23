@@ -1,0 +1,16 @@
+name: Load all images
+description: Load the images of all services defined in the input.
+inputs:
+  services:
+    description: JSON object containing all services.
+    required: true
+  container_mode:
+    description: Container mode.
+    required: true
+  commit:
+    description: Reference for saving the cache.
+    required: true
+    default: ${{ github.sha }}
+runs:
+  using: 'node16'
+  main: 'index.js'

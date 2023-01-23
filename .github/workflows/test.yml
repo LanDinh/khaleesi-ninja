@@ -103,14 +103,6 @@ jobs:
         run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} development
       - name: Build the production container image
         run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} production
-      - name: Upload development image
-        uses: ishworkh/docker-image-artifact-upload@v1
-        with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
-      - name: Upload production image
-        uses: ishworkh/docker-image-artifact-upload@v1
-        with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-production
       - name: Cache development image
         uses: ./.github/actions/cache-image
         with:
@@ -169,12 +161,13 @@ jobs:
         run: ./scripts/operations/setup_cluster.sh
       - name: Set up the environment
         run: ./scripts/operations/setup_environment.sh ${{ matrix.environment.name }}
-      - name: Download all images
-        uses: actions/download-artifact@v3
+      - name: Load all image
+        uses: ./.github/actions/load-all-images
         with:
-          path: /tmp/artifacts
+          services: ${{ fromJson(needs.matrix.outputs.deploy-services) }}
+          container_mode: ${{ matrix.environment.container_mode }}
       - name: Spin up the environment
-        run:  ./scripts/ci/deploy.sh /tmp/artifacts ${{ matrix.environment.name }} ${{ matrix.environment.container_mode }}
+        run:  ./scripts/ci/deploy.sh ${{ matrix.environment.name }}
       - name: Check the status.
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
       - name: Wait for successful spinup
