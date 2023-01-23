@@ -1,10 +1,10 @@
 name: Clean cached data
 description: Clean cached data for a specific commit
 inputs:
-  commit:
+  prefix:
     description: The commit for which to clean up
     required: true
-    default: ${{ github.sha }}
+    default: khaleesi/${{ github.sha }}
 runs:
   using: "composite"
   steps:
@@ -15,7 +15,7 @@ runs:
           const caches = await github.rest.actions.getActionsCacheList({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            key: 'khaleesi/${{ inputs.commit }}/',
+            key: '${{ inputs.prefix }}/',
           })
           for (const cache of caches.data.actions_caches) {
             console.log(cache)
