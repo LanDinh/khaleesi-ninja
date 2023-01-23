@@ -43,8 +43,6 @@ fi
 
 echo -e "${yellow}Building the image khaleesi-ninja/${gate}/${service} for ${container_mode}...${clear_color}"
 DOCKER_BUILDKIT=1 docker buildx build "${location}" \
-  --cache-to type=gha,mode=max \
-  --cache-from type=gha \
   --build-context="${cache}" \
   --build-arg gate="${gate}" \
   --build-arg service="${service}" \

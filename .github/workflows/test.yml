@@ -69,6 +69,8 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
+      - name: Setup docker layer cache
+        uses: satackey/action-docker-layer-caching@v0.0.11
       - name: Build image
         run: ./scripts/util/build-backend-base.sh ${{ env.base-image-version }} ${{ matrix.image }}
       - name: Cache image
@@ -86,6 +88,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup docker layer cache
+        uses: satackey/action-docker-layer-caching@v0.0.11
       - name: Get cached backend data
         if: matrix.service.type == 'backgate' || matrix.service.type == 'micro'
         uses: ./.github/actions/get-cached-backend-data
