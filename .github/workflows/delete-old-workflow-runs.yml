@@ -1,4 +1,4 @@
-name: Tests
+name: Delete Old Workflow Runs
 on:
   workflow_dispatch:
     inputs:
