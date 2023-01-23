@@ -60,6 +60,10 @@ mkdir temp
 echo -e "${magenta}Updating the protos...${clear_color}"
 . scripts/generate_protos.sh
 
+echo -e "${magenta}Building the base images...${clear_color}"
+. scripts/util/build-backend-base.sh 1.0.0 construction
+. scripts/util/build-backend-base.sh 1.0.0 image
+
 echo -e "${magenta}Testing the services...${clear_color}"
 # shellcheck disable=SC2068
 . scripts/util/service_loop.sh test_container ${services[@]}

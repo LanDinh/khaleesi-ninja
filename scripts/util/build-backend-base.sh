@@ -18,23 +18,14 @@ fi
 
 # Options.
 version=${1}
+image=${2}
 
 
-echo -e "${yellow}Building the image khaleesi/base/backend-construction...${clear_color}"
+echo -e "${yellow}Building the image khaleesi/base/backend-${image}...${clear_color}"
 DOCKER_BUILDKIT=1 docker buildx build backend -f backend/Dockerfile-base \
-  --cache-to type=gha,mode=max \
-  --cache-from type=gha \
   --build-context="pip_cache=$(pip cache dir)" \
-  --target "construction" \
-  -t "khaleesi/base/backend-construction:${version}"
-
-echo -e "${yellow}Building the image khaleesi/base/backend-image...${clear_color}"
-DOCKER_BUILDKIT=1 docker buildx build backend -f backend/Dockerfile-base \
-  --cache-to type=gha,mode=max \
-  --cache-from type=gha \
-  --build-context="pip_cache=$(pip cache dir)" \
-  --target "image" \
-  -t "khaleesi/base/backend-image:${version}"
+  --target "${image}" \
+  -t "khaleesi/base/backend-${image}:${version}"
 
 echo -e "${yellow}Cleaning up dangling images...${clear_color}"
 docker image prune -f

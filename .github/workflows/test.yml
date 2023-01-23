@@ -56,6 +56,9 @@ jobs:
   # Build the backend base images with new requirements.
   build-backend-base-images:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        image: [ construction, image ]
     env:
       base-image-version: 1.0.0
     steps:
@@ -66,16 +69,12 @@ jobs:
         with:
           python-version: '3.10'
           cache: 'pip'
-      - name: Build images
-        run: ./scripts/util/build-backend-base.sh ${{ env.base-image-version }}
-      - name: Cache construction base
+      - name: Build image
+        run: ./scripts/util/build-backend-base.sh ${{ env.base-image-version }} ${{ matrix.image }}
+      - name: Cache image
         uses: ./.github/actions/cache-image
         with:
-          image: khaleesi/base/backend-construction:${{ env.base-image-version }}
-      - name: Cache image base
-        uses: ./.github/actions/cache-image
-        with:
-          image: khaleesi/base/backend-image:${{ env.base-image-version }}
+          image: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
   
   # Build the images for reuse.
   build:

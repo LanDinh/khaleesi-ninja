@@ -60,7 +60,8 @@ deploy_service() {
 }
 
 echo -e "${magenta}Building the base images...${clear_color}"
-. scripts/util/build-backend-base.sh 1.0.0
+. scripts/util/build-backend-base.sh 1.0.0 construction
+. scripts/util/build-backend-base.sh 1.0.0 image
 
 echo -e "${magenta}Deploying the services...${clear_color}"
 # shellcheck disable=SC2068
