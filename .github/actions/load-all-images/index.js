@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as loadImage from '../load-image/action.js'
 
 async function runAction() {
-  const services = core.getInput('services')
+  const services = JSON.parse(core.getInput('services'))
   const container_mode = core.getInput('container_mode')
   const commit = core.getInput('commit')
   for (const service of services){

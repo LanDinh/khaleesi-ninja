@@ -164,7 +164,7 @@ jobs:
       - name: Load all image
         uses: ./.github/actions/load-all-images
         with:
-          services: ${{ fromJson(needs.matrix.outputs.deploy-services) }}
+          services: ${{ needs.matrix.outputs.deploy-services }}
           container_mode: ${{ matrix.environment.container_mode }}
       - name: Spin up the environment
         run:  ./scripts/ci/deploy.sh ${{ matrix.environment.name }}
