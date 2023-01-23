@@ -11,7 +11,7 @@ const commit = core.getInput('commit')
 export async function runAction(image, commit) {
   const key = `khaleesi/${commit}/images/${image}`
   const path = `/tmp/${key}`
-  const path_directory = path.split('/').slice(0, -1)
+  const path_directory = path.split('/').slice(0, -1).join('/')
 
   fs.mkdirSync(path_directory, { recursive: true })
 
