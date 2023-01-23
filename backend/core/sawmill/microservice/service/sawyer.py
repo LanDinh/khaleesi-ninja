@@ -6,11 +6,9 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.models import JobExecution
-from khaleesi.proto.core_pb2 import JobExecutionResponse
+from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
-  CleanupRequest,
   LogFilter,
   EventsList,
   RequestList,
@@ -34,14 +32,45 @@ from microservice.models import (
 class Service(Servicer):
   """Sawyer service."""
 
-  def Cleanup(self, request: CleanupRequest, _: grpc.ServicerContext) -> JobExecutionResponse :
+  def CleanupEvents(
+      self,
+      request: JobCleanupRequest,
+      _: grpc.ServicerContext,
+  ) -> JobExecutionResponse :
     """Clean up old data."""
-    job_execution = JobExecution.objects.start_job_execution(job = request.job)
-    if job_execution.in_progress:
-      LOGGER.info('Executing the job.')
-    else:
-      LOGGER.warning('Skipping job execution!')
-    return job_execution.to_grpc_job_execution_response()
+    return DbEvent.objects.cleanup(request)
+
+  def CleanupRequests(
+      self,
+      request: JobCleanupRequest,
+      _: grpc.ServicerContext,
+  ) -> JobExecutionResponse :
+    """Clean up old data."""
+    return DbRequest.objects.cleanup(request)
+
+  def CleanupErrors(
+      self,
+      request: JobCleanupRequest,
+      _: grpc.ServicerContext,
+  ) -> JobExecutionResponse :
+    """Clean up old data."""
+    return DbError.objects.cleanup(request)
+
+  def CleanupBackgateRequests(
+      self,
+      request: JobCleanupRequest,
+      _: grpc.ServicerContext,
+  ) -> JobExecutionResponse :
+    """Clean up old data."""
+    return DbBackgateRequest.objects.cleanup(request)
+
+  def CleanupQueries(
+      self,
+      request: JobCleanupRequest,
+      _: grpc.ServicerContext,
+  ) -> JobExecutionResponse :
+    """Clean up old data."""
+    return DbQuery.objects.cleanup(request)
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""

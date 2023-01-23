@@ -22,6 +22,11 @@ from microservice.test_util import ModelRequestMetadataMixin
 class ErrorManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the error logs objects manager."""
 
+  def test_cleanup(self, *_: MagicMock) -> None :
+    """Test cleanup."""
+    # Execute test.
+    Error.objects.cleanup.__wrapped__(MagicMock(), MagicMock())  # type: ignore[attr-defined]  # pylint: disable=no-member
+
   def test_log_error(self, metadata: MagicMock, string: MagicMock) -> None :
     """Test logging an error."""
     for status in StatusCode:

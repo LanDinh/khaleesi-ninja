@@ -52,6 +52,13 @@ message JobCleanupActionConfiguration {
   google.protobuf.Duration cleanup_delay = 1;
 }
 
+message JobCleanupRequest {
+  RequestMetadata               request_metadata      = 1;
+  JobExecutionMetadata          job                   = 2;
+  JobActionConfiguration        action_configuration  = 3;
+  JobCleanupActionConfiguration cleanup_configuration = 4;
+}
+
 message JobExecutionResponse {
   enum Status {
     // Only for pulling the status.

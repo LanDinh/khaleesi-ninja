@@ -1,13 +1,16 @@
 """Test the core-sawmill sawyer service."""
 
 # Python.
+from typing import Callable
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
+from grpc import ServicerContext
+
 from khaleesi.core.test_util.test_case import SimpleTestCase
-from khaleesi.models import JobExecution
+from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import (
-  CleanupRequest, LogFilter,
+  LogFilter,
   EventResponse as GrpcEventResponse,
   RequestResponse as GrpcRequestResponse,
   ErrorResponse as GrpcErrorResponse,
@@ -23,25 +26,35 @@ class SawyerServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch.object(JobExecution.objects, 'start_job_execution')
-  def test_cleanup(self, job_executions: MagicMock, *_: MagicMock) -> None :
+  @patch.object(Event.objects, 'cleanup')
+  def test_cleanup_events(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
-    # Prepare data.
-    job_executions.return_value.in_progress = True
     # Execute test.
-    self.service.Cleanup(CleanupRequest(), MagicMock())
-    # Assert result.
-    job_executions.assert_called_once()
+    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupEvents)
 
-  @patch.object(JobExecution.objects, 'start_job_execution')
-  def test_cleanup_skip(self, job_executions: MagicMock, *_: MagicMock) -> None :
+  @patch.object(Request.objects, 'cleanup')
+  def test_cleanup_requests(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
-    # Prepare data.
-    job_executions.return_value.in_progress = False
     # Execute test.
-    self.service.Cleanup(CleanupRequest(), MagicMock())
-    # Assert result.
-    job_executions.assert_called_once()
+    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupRequests)
+
+  @patch.object(Error.objects, 'cleanup')
+  def test_cleanup_errors(self, cleanup: MagicMock, *_: MagicMock) -> None :
+    """Test cleaning up."""
+    # Execute test.
+    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupErrors)
+
+  @patch.object(BackgateRequest.objects, 'cleanup')
+  def test_cleanup_backgate_requests(self, cleanup: MagicMock, *_: MagicMock) -> None :
+    """Test cleaning up."""
+    # Execute test.
+    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupBackgateRequests)
+
+  @patch.object(Query.objects, 'cleanup')
+  def test_cleanup_queries(self, cleanup: MagicMock, *_: MagicMock) -> None :
+    """Test cleaning up."""
+    # Execute test.
+    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupQueries)
 
   @patch.object(Event.objects, 'filter')
   def test_get_events(self, db_events: MagicMock, *_: MagicMock) -> None :
@@ -112,3 +125,16 @@ class SawyerServiceTestCase(SimpleTestCase):
     self.assertEqual(1, len(result.errors))
     db_errors.assert_called_once_with()
     db_error.to_grpc_error_response.assert_called_once_with()
+
+  def _execute_cleanup_test(
+      self, *,
+      cleanup: MagicMock,
+      method: Callable[[JobCleanupRequest, ServicerContext], JobExecutionResponse],
+  ) -> None :
+    """All cleanup methods look the same, so we can have a unified test."""
+    # Prepare data.
+    request = JobCleanupRequest()
+    # Execute test.
+    method(request, MagicMock())
+    # Assert result.
+    cleanup.assert_called_once_with(request)

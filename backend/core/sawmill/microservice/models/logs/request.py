@@ -2,15 +2,17 @@
 
 # Python.
 from __future__ import annotations
-from typing import List
+from typing import List, Tuple
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.shared.job import job
+from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import (
-    Request as GrpcRequest, RequestResponse as GrpcRequestResponse,
-    ResponseRequest as GrpcResponse,
+  Request as GrpcRequest, RequestResponse as GrpcRequestResponse,
+  ResponseRequest as GrpcResponse,
 )
 from microservice.models.logs.abstract_response import ResponseMetadata
 from microservice.parse_util import parse_string
@@ -18,6 +20,14 @@ from microservice.parse_util import parse_string
 
 class RequestManager(models.Manager['Request']):
   """Custom model manager."""
+
+  @job()
+  def cleanup(
+      self,
+      request: JobCleanupRequest,
+  ) -> Tuple['JobExecutionResponse.Status.V', int, str] :
+    """Cleanup"""
+    return JobExecutionResponse.Status.SUCCESS, 0, 'Job done.'
 
   def log_request(self, *, grpc_request: GrpcRequest) -> Request :
     """Log a gRPC request."""

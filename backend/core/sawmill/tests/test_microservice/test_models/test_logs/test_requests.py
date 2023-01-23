@@ -18,6 +18,11 @@ from microservice.test_util import ModelResponseMetadataMixin
 class RequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the request logs objects manager."""
 
+  def test_cleanup(self, *_: MagicMock) -> None :
+    """Test cleanup."""
+    # Execute test.
+    Request.objects.cleanup.__wrapped__(MagicMock(), MagicMock())  # type: ignore[attr-defined]  # pylint: disable=no-member
+
   @patch('microservice.models.logs.request.parse_string')
   @patch.object(Request.objects.model, 'log_metadata')
   def test_log_request(self, metadata: MagicMock, string: MagicMock) -> None :

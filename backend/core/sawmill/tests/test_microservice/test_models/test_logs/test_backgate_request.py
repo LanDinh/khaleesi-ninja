@@ -23,6 +23,11 @@ from microservice.test_util import ModelResponseMetadataMixin
 class BackgateRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the backgate request logs objects manager."""
 
+  def test_cleanup(self, *_: MagicMock) -> None :
+    """Test cleanup."""
+    # Execute test.
+    BackgateRequest.objects.cleanup.__wrapped__(MagicMock(), MagicMock())  # type: ignore[attr-defined]  # pylint: disable=no-member,line-too-long
+
   @patch('microservice.models.logs.request.parse_string', return_value = 'parsed-string')
   @patch.object(BackgateRequest.objects.model, 'log_metadata', return_value = {})
   def test_log_backgate_request(self, metadata: MagicMock, string: MagicMock) -> None :

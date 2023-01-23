@@ -18,20 +18,6 @@ class JobExecutionManager(models.Manager['JobExecution']):
       return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'SKIPPED')
     return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'IN_PROGRESS')
 
-  def finish_job_execution(
-      self, *,
-      job            : JobExecutionMetadata,
-      status         : 'JobExecutionResponse.Status.V',
-      items_processed: int,
-      details        : str,
-  ) -> None :
-    """Register job finish."""
-    job_execution = self.get(job_id = job.job_id, execution_id = job.execution_id)
-    job_execution.status          = JobExecutionResponse.Status.Name(status)
-    job_execution.items_processed = items_processed
-    job_execution.details         = details
-    job_execution.save()
-
 class JobExecution(models.Model):
   """Basic job."""
   job_id          = models.TextField(default = 'UNKNOWN')
@@ -47,6 +33,18 @@ class JobExecution(models.Model):
   def in_progress(self) -> bool :
     """Specify if the job is in progress."""
     return self.status == 'IN_PROGRESS'
+
+  def finish(
+      self, *,
+      status         : 'JobExecutionResponse.Status.V',
+      items_processed: int,
+      details        : str,
+  ) -> None :
+    """Register job finish."""
+    self.status          = JobExecutionResponse.Status.Name(status)
+    self.items_processed = items_processed
+    self.details         = details
+    self.save()
 
   def to_grpc_job_execution_response(self) -> JobExecutionResponse :
     """Transform into gRPC."""

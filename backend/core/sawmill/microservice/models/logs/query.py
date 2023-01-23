@@ -3,7 +3,7 @@
 # Python.
 from __future__ import annotations
 from datetime import timedelta, datetime, timezone
-from typing import List
+from typing import List, Tuple
 
 # Django.
 from django.db import models
@@ -16,7 +16,8 @@ from sql_metadata import Parser  # type: ignore[import]
 
 # khaleesi.ninja.
 from khaleesi.core.logging.text_logger import LOGGER
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.core.shared.job import job
+from khaleesi.proto.core_pb2 import RequestMetadata, JobExecutionResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import Query as GrpcQuery, QueryResponse as GrpcQueryResponse
 from microservice.models.logs.abstract import Metadata
 from microservice.parse_util import parse_string, parse_timestamp
@@ -24,6 +25,14 @@ from microservice.parse_util import parse_string, parse_timestamp
 
 class QueryManager(models.Manager['Query']):
   """Custom model manager."""
+
+  @job()
+  def cleanup(
+      self,
+      request: JobCleanupRequest,
+  ) -> Tuple['JobExecutionResponse.Status.V', int, str] :
+    """Cleanup"""
+    return JobExecutionResponse.Status.SUCCESS, 0, 'Job done.'
 
   def log_queries(
       self, *,
