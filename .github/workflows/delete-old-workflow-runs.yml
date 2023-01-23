@@ -24,6 +24,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: '${{ inputs.workflow }}',
+              per_page: 100,
             })
             for (const workflow_run of workflow_runs.data.workflow_runs) {
               console.log(workflow_run)
