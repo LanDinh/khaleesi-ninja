@@ -1,0 +1,34 @@
+name: Delete Old Workflow Runs
+on:
+  workflow_dispatch:
+    inputs:
+      workflow:
+        description: the workflow that needs to be deleted
+        required: true
+        type: string
+jobs:
+  # Delete workflow runs inside the workflow to clean it up.
+  delete-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Clean up old workflow data.
+        uses: actions/github-script@v6
+        with:
+          script: |
+            console.log('Start deletion of workflow runs.')
+            const workflow_runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: '${{ inputs.workflow }}',
+            })
+            for (const workflow_run of workflow_runs.data.workflow_runs) {
+              console.log(workflow_run)
+              github.rest.actions.deleteWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: workflow_run.id,
+              })
+            }
+            console.log('Finished deletion of workflow runs.')    
