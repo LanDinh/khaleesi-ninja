@@ -111,6 +111,14 @@ jobs:
         uses: ishworkh/docker-image-artifact-upload@v1
         with:
           image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-production
+      - name: Cache development image
+        uses: ./.github/actions/cache-image
+        with:
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
+      - name: Cache production image
+        uses: ./.github/actions/cache-image
+        with:
+          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-production
 
   # Execute the unit tests in parallel.
   unit-test:
@@ -122,8 +130,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Download image
-        uses: ishworkh/docker-image-artifact-download@v1
+      - name: Load image
+        uses: ./.github/actions/load-image
         with:
           image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
       - name: Execute the container test
@@ -183,11 +191,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            console.log("Start cleaning cache.")
+            console.log('Start cleaning cache.')
             const caches = await github.rest.actions.getActionsCacheList({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              key: khaleesi/${commit}/,
+              key: 'khaleesi/${commit}/',
             })
             for (const cache of caches.data.actions_caches) {
               console.log(cache)
@@ -197,4 +205,4 @@ jobs:
                 cache_id: cache.id,
               })
             }
-            console.log("Finished cleaning cache.")
+            console.log('Finished cleaning cache.')
