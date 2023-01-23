@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Clean up cache.
+      - name: Clean up old workflow data.
         uses: actions/github-script@v6
         with:
           script: |

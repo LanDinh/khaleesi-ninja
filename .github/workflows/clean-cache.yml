@@ -1,0 +1,17 @@
+name: Clean Cache
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: the commit for which to
+        required: true
+        type: string
+jobs:
+  # Delete workflow runs inside the workflow to clean it up.
+  clean-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Clean up cache.
+        uses: ./.github/actions/clean-cache
