@@ -9,14 +9,5 @@ inputs:
     required: true
     default: ${{ github.sha }}
 runs:
-  using: "composite"
-  steps:
-    - shell: bash
-      run: mkdir -p /tmp/khaleesi/${{ inputs.commit }}/images/khaleesi/base
-    - shell: bash
-      run: docker image save ${{ inputs.image }} > /tmp/khaleesi/${{ inputs.commit }}/images/${{ inputs.image }}
-    - name: Cache images
-      uses: actions/cache@v3
-      with:
-        path: /tmp/khaleesi/${{ inputs.commit }}/images/${{ inputs.image }}
-        key: khaleesi/${{ inputs.commit }}/images/${{ inputs.image }}
+  using: 'node16'
+  main: 'index.js'
