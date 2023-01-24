@@ -37,10 +37,8 @@ fi
 echo -e "${magenta}Deploying the core gate...${clear_color}"
 helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-gate \
   --values "kubernetes/configuration/gate/core.yml" \
-  --values "kubernetes/configuration/environment/${environment}.yml"
-
-echo -e "${magenta}Waiting for the environment to be ready...${clear_color}"
-kubectl -n "khaleesi-ninja-${environment}" wait pod -l job!=true --for condition=ready --timeout 5m
+  --values "kubernetes/configuration/environment/${environment}.yml" \
+  --wait --timeout 5m
 
 
 echo -e "${green}DONE! :D${clear_color}"
