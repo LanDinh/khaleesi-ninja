@@ -216,12 +216,11 @@ class StructuredLogger(ABC):
       backgate_request_id = backgate_request_id,
       request_id          = request_id,
     )
-    event.target.owner.id    = owner.id
-    event.target.owner.type  = owner.type
     self._log_event(
       event              = event,
       target             = target,
       target_type        = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
+      owner              = owner,
       action             = '',
       action_crud        = action,
       result             = result,
@@ -233,6 +232,7 @@ class StructuredLogger(ABC):
       self, *,
       target     : str,
       target_type: str,
+      owner      : User,
       action     : str,
       action_crud: 'Event.Action.ActionType.V',
       result     : 'Event.Action.ResultType.V',
@@ -245,6 +245,7 @@ class StructuredLogger(ABC):
       event              = event,
       target             = target,
       target_type        = target_type,
+      owner              = owner,
       action             = action,
       action_crud        = action_crud,
       result             = result,
@@ -257,6 +258,7 @@ class StructuredLogger(ABC):
       event             : Event,
       target            : str,
       target_type       : str,
+      owner             : User,
       action            : str,
       action_crud       : 'Event.Action.ActionType.V',
       result            : 'Event.Action.ResultType.V',
@@ -283,6 +285,8 @@ class StructuredLogger(ABC):
     event.id                 = str(uuid4())
     event.target.type        = target_type
     event.target.id          = target
+    event.target.owner.id    = owner.id
+    event.target.owner.type  = owner.type
     event.action.custom_type = action
     event.action.crud_type   = action_crud
     event.action.result      = result

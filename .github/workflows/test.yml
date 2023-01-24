@@ -165,6 +165,8 @@ jobs:
         with:
           services: ${{ needs.matrix.outputs.deploy-services }}
           container_mode: ${{ matrix.environment.container_mode }}
+      - name: Wait for the environment to be ready
+        run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m
       - name: Spin up the environment
         run:  ./scripts/ci/deploy.sh ${{ matrix.environment.name }}
       - name: Check the status.

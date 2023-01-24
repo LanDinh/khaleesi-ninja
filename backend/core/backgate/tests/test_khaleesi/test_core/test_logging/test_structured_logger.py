@@ -464,37 +464,44 @@ class TestStructuredLogger(SimpleTestCase):
     action      = 'action'
     for action_label, action_type in Event.Action.ActionType.items():
       for result_label, result_type in Event.Action.ResultType.items():
-        with self.subTest(action = action_label, result = result_label):
-          # Prepare data.
-          request_metadata.reset_mock()
-          self.logger.sender.reset_mock()
-          logger.reset_mock()
-          # Perform test.
-          self.logger.log_event(
-            target      = target,
-            target_type = target_type,
-            action      = action,
-            action_crud = action_type,
-            result      = result_type,
-            details     = details,
-          )
-          # Assert result.
-          request_metadata.assert_called_once()
-          self.logger.sender.send.assert_called_once()
-          self.assertEqual(
-            1,
-            logger.info.call_count + logger.warning.call_count + logger.error.call_count
-            + logger.fatal.call_count,
-          )
-          log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
-          self.assertIsNotNone(log_event.id)
-          self.assertEqual(target            , log_event.target.id)
-          self.assertEqual(target_type       , log_event.target.type)
-          self.assertEqual(action            , log_event.action.custom_type)
-          self.assertEqual(action_type       , log_event.action.crud_type)
-          self.assertEqual(result_type       , log_event.action.result)
-          self.assertEqual(details           , log_event.action.details)
-          self.assertEqual(False             , log_event.logger_send_metric)
+        for user_label, user_type in User.UserType.items():
+          with self.subTest(action = action_label, result = result_label, user = user_label):
+            # Prepare data.
+            request_metadata.reset_mock()
+            self.logger.sender.reset_mock()
+            logger.reset_mock()
+            owner      = User()
+            owner.type = user_type
+            owner.id   = 'user'
+            # Perform test.
+            self.logger.log_event(
+              target      = target,
+              target_type = target_type,
+              owner       = owner,
+              action      = action,
+              action_crud = action_type,
+              result      = result_type,
+              details     = details,
+            )
+            # Assert result.
+            request_metadata.assert_called_once()
+            self.logger.sender.send.assert_called_once()
+            self.assertEqual(
+              1,
+              logger.info.call_count + logger.warning.call_count + logger.error.call_count
+              + logger.fatal.call_count,
+            )
+            log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
+            self.assertIsNotNone(log_event.id)
+            self.assertEqual(target            , log_event.target.id)
+            self.assertEqual(target_type       , log_event.target.type)
+            self.assertEqual(owner.id          , log_event.target.owner.id)
+            self.assertEqual(owner.type        , log_event.target.owner.type)
+            self.assertEqual(action            , log_event.action.custom_type)
+            self.assertEqual(action_type       , log_event.action.crud_type)
+            self.assertEqual(result_type       , log_event.action.result)
+            self.assertEqual(details           , log_event.action.details)
+            self.assertEqual(False             , log_event.logger_send_metric)
 
   def _assert_error(self, exception: KhaleesiException, log_error: Error) -> None :
     self.assertEqual(exception.gate           , log_error.gate)
