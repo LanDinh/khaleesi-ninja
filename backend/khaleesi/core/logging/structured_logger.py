@@ -208,11 +208,66 @@ class StructuredLogger(ABC):
       details            : str,
       logger_send_metric : bool,
   ) -> None :
+    """Log a system event."""
+    event = Event()
+    add_grpc_server_system_request_metadata(
+      request             = event,
+      grpc_method         = grpc_method,
+      backgate_request_id = backgate_request_id,
+      request_id          = request_id,
+    )
+    event.target.owner.id    = owner.id
+    event.target.owner.type  = owner.type
+    self._log_event(
+      event              = event,
+      target             = target,
+      target_type        = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
+      action             = '',
+      action_crud        = action,
+      result             = result,
+      details            = details,
+      logger_send_metric = logger_send_metric,
+    )
+
+  def log_event(
+      self, *,
+      target     : str,
+      target_type: str,
+      action     : str,
+      action_crud: 'Event.Action.ActionType.V',
+      result     : 'Event.Action.ResultType.V',
+      details    : str,
+  ) -> None :
+    """Log a system event."""
+    event = Event()
+    add_request_metadata(request = event)
+    self._log_event(
+      event              = event,
+      target             = target,
+      target_type        = target_type,
+      action             = action,
+      action_crud        = action_crud,
+      result             = result,
+      details            = details,
+      logger_send_metric = False,
+    )
+
+  def _log_event(
+      self, *,
+      event             : Event,
+      target            : str,
+      target_type       : str,
+      action            : str,
+      action_crud       : 'Event.Action.ActionType.V',
+      result            : 'Event.Action.ResultType.V',
+      details           : str,
+      logger_send_metric: bool,
+  ) -> None :
     """Log an event."""
-    target_type = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
+    action_string = Event.Action.ActionType.Name(action_crud) if action_crud else action
     log_string = \
-      f'Event targeting "{target_type}": "{target}" owned by "{owner.id}". '\
-      f'{Event.Action.ActionType.Name(action)} with result {Event.Action.ResultType.Name(result)}.'
+      f'Event targeting "{target_type}": "{target}" owned by "{event.target.owner.id}". '\
+      f'{action_string} with result {Event.Action.ResultType.Name(result)}.'
 
     if result == Event.Action.ResultType.SUCCESS:
       LOGGER.info(log_string)
@@ -225,19 +280,11 @@ class StructuredLogger(ABC):
     else:
       LOGGER.fatal(log_string)
 
-    event = Event()
-    add_grpc_server_system_request_metadata(
-      request             = event,
-      grpc_method         = grpc_method,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-    )
     event.id                 = str(uuid4())
     event.target.type        = target_type
     event.target.id          = target
-    event.target.owner.id    = owner.id
-    event.target.owner.type  = owner.type
-    event.action.crud_type   = action
+    event.action.custom_type = action
+    event.action.crud_type   = action_crud
     event.action.result      = result
     event.action.details     = details
     event.logger_send_metric = logger_send_metric

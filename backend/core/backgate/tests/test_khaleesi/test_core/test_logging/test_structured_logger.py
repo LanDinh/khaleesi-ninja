@@ -398,29 +398,31 @@ class TestStructuredLogger(SimpleTestCase):
           self._assert_error(exception = exception, log_error = log_error)
           metadata.assert_called_once()
 
-  def test_log_system_event(self, logger: MagicMock) -> None :
-    """Test logging an event."""
+  @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
+  def test_log_system_event(self, request_metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a system event."""
     method              = 'LIFECYCLE'
     details             = 'details'
     backgate_request_id = 'backgate-request'
     request_id          = 'request'
+    target              = 'target'
     for action_label, action_type in Event.Action.ActionType.items():
       for result_label, result_type in Event.Action.ResultType.items():
         for user_label, user_type in User.UserType.items():
           for logger_send_metric in [True, False]:
             with self.subTest(
-                action = action_label,
-                result = result_label,
-                user = user_label,
+                action             = action_label,
+                result             = result_label,
+                user               = user_label,
                 logger_send_metric = logger_send_metric,
             ):
               # Prepare data.
+              request_metadata.reset_mock()
               self.logger.sender.reset_mock()
               logger.reset_mock()
               owner      = User()
               owner.type = user_type
               owner.id   = 'user'
-              target = 'target'
               # Perform test.
               self.logger.log_system_event(
                 grpc_method         = method,
@@ -434,6 +436,7 @@ class TestStructuredLogger(SimpleTestCase):
                 logger_send_metric  = logger_send_metric,
               )
               # Assert result.
+              request_metadata.assert_called_once()
               self.logger.sender.send.assert_called_once()
               self.assertEqual(
                 1,
@@ -442,18 +445,56 @@ class TestStructuredLogger(SimpleTestCase):
               )
               log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
               self.assertIsNotNone(log_event.id)
-              self.assertEqual(
-                backgate_request_id,
-                log_event.request_metadata.caller.backgate_request_id,
-              )
-              self.assertEqual(target            , log_event.target.id)
+              self.assertIsNotNone(log_event.target.type)
               self.assertEqual(target            , log_event.target.id)
               self.assertEqual(owner.id          , log_event.target.owner.id)
               self.assertEqual(owner.type        , log_event.target.owner.type)
+              self.assertEqual(''                , log_event.action.custom_type)
               self.assertEqual(action_type       , log_event.action.crud_type)
               self.assertEqual(result_type       , log_event.action.result)
               self.assertEqual(details           , log_event.action.details)
               self.assertEqual(logger_send_metric, log_event.logger_send_metric)
+
+  @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
+  def test_log_event(self, request_metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging an event."""
+    details     = 'details'
+    target      = 'target'
+    target_type = 'target-type'
+    action      = 'action'
+    for action_label, action_type in Event.Action.ActionType.items():
+      for result_label, result_type in Event.Action.ResultType.items():
+        with self.subTest(action = action_label, result = result_label):
+          # Prepare data.
+          request_metadata.reset_mock()
+          self.logger.sender.reset_mock()
+          logger.reset_mock()
+          # Perform test.
+          self.logger.log_event(
+            target      = target,
+            target_type = target_type,
+            action      = action,
+            action_crud = action_type,
+            result      = result_type,
+            details     = details,
+          )
+          # Assert result.
+          request_metadata.assert_called_once()
+          self.logger.sender.send.assert_called_once()
+          self.assertEqual(
+            1,
+            logger.info.call_count + logger.warning.call_count + logger.error.call_count
+            + logger.fatal.call_count,
+          )
+          log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
+          self.assertIsNotNone(log_event.id)
+          self.assertEqual(target            , log_event.target.id)
+          self.assertEqual(target_type       , log_event.target.type)
+          self.assertEqual(action            , log_event.action.custom_type)
+          self.assertEqual(action_type       , log_event.action.crud_type)
+          self.assertEqual(result_type       , log_event.action.result)
+          self.assertEqual(details           , log_event.action.details)
+          self.assertEqual(False             , log_event.logger_send_metric)
 
   def _assert_error(self, exception: KhaleesiException, log_error: Error) -> None :
     self.assertEqual(exception.gate           , log_error.gate)
