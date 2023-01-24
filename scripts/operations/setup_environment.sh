@@ -39,5 +39,8 @@ helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-
   --values "kubernetes/configuration/gate/core.yml" \
   --values "kubernetes/configuration/environment/${environment}.yml"
 
+echo -e "${magenta}Waiting for the environment to be ready...${clear_color}"
+kubectl -n "khaleesi-ninja-${environment}" wait pod -l job!=true --for condition=ready --timeout 5m
+
 
 echo -e "${green}DONE! :D${clear_color}"
