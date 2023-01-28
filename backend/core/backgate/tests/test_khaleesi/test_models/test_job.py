@@ -56,6 +56,18 @@ class JobExecutionTestCase(SimpleTestCase):
         # Assert result.
         self.assertFalse(result)
 
+  def test_set_total(self) -> None :
+    """Test if a job execution is in progress."""
+    # Prepare data.
+    job_execution = JobExecution()
+    job_execution.save = MagicMock()  # type: ignore[assignment]
+    total = 13
+    # Execute test.
+    job_execution.set_total(total = 13)
+    # Assert result.
+    self.assertEqual(total, job_execution.total_items)
+    job_execution.save.assert_called_once_with()
+
   def test_finish(self) -> None :
     """Test finishing a job."""
     items_processed = 13

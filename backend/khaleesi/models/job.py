@@ -25,6 +25,7 @@ class JobExecution(models.Model):
   status          = models.TextField(default = 'UNKNOWN')
   end             = models.DateTimeField(auto_now = True)
   items_processed = models.IntegerField(default = 0)
+  total_items     = models.IntegerField(default = 0)
   details         = models.TextField(default = '')
 
   objects = JobExecutionManager()
@@ -33,6 +34,11 @@ class JobExecution(models.Model):
   def in_progress(self) -> bool :
     """Specify if the job is in progress."""
     return self.status == 'IN_PROGRESS'
+
+  def set_total(self, *, total: int) -> None :
+    """Set the total amount of items for the job."""
+    self.total_items = total
+    self.save()
 
   def finish(
       self, *,
