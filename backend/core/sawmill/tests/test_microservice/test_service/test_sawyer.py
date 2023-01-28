@@ -26,35 +26,50 @@ class SawyerServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch.object(Event.objects, 'cleanup')
+  @patch('microservice.service.sawyer.SINGLETON')
   def test_cleanup_events(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupEvents)
+    self._execute_cleanup_test(
+      cleanup = cleanup.cleanup_requests,
+      method  = self.service.CleanupEvents,
+    )
 
-  @patch.object(Request.objects, 'cleanup')
+  @patch('microservice.service.sawyer.SINGLETON')
   def test_cleanup_requests(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupRequests)
+    self._execute_cleanup_test(
+      cleanup = cleanup.cleanup_requests,
+      method  = self.service.CleanupRequests,
+    )
 
-  @patch.object(Error.objects, 'cleanup')
+  @patch('microservice.service.sawyer.SINGLETON')
   def test_cleanup_errors(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupErrors)
+    self._execute_cleanup_test(
+      cleanup = cleanup.cleanup_requests,
+      method  = self.service.CleanupErrors,
+    )
 
-  @patch.object(BackgateRequest.objects, 'cleanup')
+  @patch('microservice.service.sawyer.SINGLETON')
   def test_cleanup_backgate_requests(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupBackgateRequests)
+    self._execute_cleanup_test(
+      cleanup = cleanup.cleanup_requests,
+      method  = self.service.CleanupBackgateRequests,
+    )
 
-  @patch.object(Query.objects, 'cleanup')
+  @patch('microservice.service.sawyer.SINGLETON')
   def test_cleanup_queries(self, cleanup: MagicMock, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(cleanup = cleanup, method = self.service.CleanupQueries)
+    self._execute_cleanup_test(
+      cleanup = cleanup.cleanup_requests,
+      method  = self.service.CleanupQueries,
+    )
 
   @patch.object(Event.objects, 'filter')
   def test_get_events(self, db_events: MagicMock, *_: MagicMock) -> None :
@@ -137,4 +152,4 @@ class SawyerServiceTestCase(SimpleTestCase):
     # Execute test.
     method(request, MagicMock())
     # Assert result.
-    cleanup.assert_called_once_with(request)
+    cleanup.execute.assert_called_once_with(request = request)

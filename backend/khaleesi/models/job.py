@@ -8,15 +8,18 @@ from khaleesi.core.grpc.request_metadata import add_request_metadata
 from khaleesi.proto.core_pb2 import JobExecutionMetadata, JobExecutionResponse
 
 
+IN_PROGRESS = JobExecutionResponse.Status.Name(JobExecutionResponse.Status.IN_PROGRESS)
+
+
 class JobExecutionManager(models.Manager['JobExecution']):
   """Basic job manager."""
 
   def start_job_execution(self, *, job: JobExecutionMetadata) -> 'JobExecution' :
     """Register job start. Returns whether the job should start or not."""
-    in_progress_count = self.filter(job_id = job.job_id, status = 'IN_PROGRESS').count()
+    in_progress_count = self.filter(job_id = job.job_id, status = IN_PROGRESS).count()
     if in_progress_count > 0:
       return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'SKIPPED')
-    return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'IN_PROGRESS')
+    return self.create(job_id = job.job_id, execution_id = job.execution_id, status = IN_PROGRESS)
 
 class JobExecution(models.Model):
   """Basic job."""
@@ -33,7 +36,7 @@ class JobExecution(models.Model):
   @property
   def in_progress(self) -> bool :
     """Specify if the job is in progress."""
-    return self.status == 'IN_PROGRESS'
+    return self.status == IN_PROGRESS
 
   def set_total(self, *, total: int) -> None :
     """Set the total amount of items for the job."""

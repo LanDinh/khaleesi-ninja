@@ -19,11 +19,6 @@ from microservice.test_util import ModelRequestMetadataMixin
 class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the event logs objects manager."""
 
-  def test_cleanup(self, *_: MagicMock) -> None :
-    """Test cleanup."""
-    # Execute test.
-    Event.objects.cleanup.__wrapped__(MagicMock(), MagicMock())  # type: ignore[attr-defined]  # pylint: disable=no-member
-
   def test_log_event(
       self,
       metadata: MagicMock,

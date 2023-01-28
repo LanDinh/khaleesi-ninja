@@ -21,11 +21,6 @@ from microservice.test_util import ModelRequestMetadataMixin
 class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
   """Test the query logs objects manager."""
 
-  def test_cleanup(self, *_: MagicMock) -> None :
-    """Test cleanup."""
-    # Execute test.
-    Query.objects.cleanup.__wrapped__(MagicMock(), MagicMock())  # type: ignore[attr-defined]  # pylint: disable=no-member
-
   def test_log_queries(
       self,
       metadata: MagicMock,

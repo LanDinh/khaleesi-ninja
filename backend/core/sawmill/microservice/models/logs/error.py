@@ -2,14 +2,12 @@
 
 # Python.
 from __future__ import annotations
-from typing import List, Tuple
+from typing import List
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.shared.job import job
-from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import Error as GrpcError, ErrorResponse as GrpcErrorResponse
 from microservice.models.logs.abstract import Metadata
 from microservice.parse_util import parse_string
@@ -17,14 +15,6 @@ from microservice.parse_util import parse_string
 
 class ErrorManager(models.Manager['Error']):
   """Custom model manager."""
-
-  @job()
-  def cleanup(
-      self,
-      request: JobCleanupRequest,
-  ) -> Tuple['JobExecutionResponse.Status.V', int, str] :
-    """Cleanup"""
-    return JobExecutionResponse.Status.SUCCESS, 0, 'Job done.'
 
   def log_error(self, *, grpc_error: GrpcError) -> Error :
     """Log an error."""

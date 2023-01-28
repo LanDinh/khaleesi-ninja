@@ -2,7 +2,7 @@
 
 # Python.
 from __future__ import annotations
-from typing import List, Tuple
+from typing import List
 
 # Django.
 from django.db import models
@@ -11,8 +11,7 @@ from django.conf import settings
 # khaleesi.ninja.
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
-from khaleesi.core.shared.job import job
-from khaleesi.proto.core_pb2 import User, JobExecutionResponse, JobCleanupRequest
+from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.logs.abstract import Metadata
 from microservice.parse_util import parse_string
@@ -23,14 +22,6 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 class EventManager(models.Manager['Event']):
   """Custom model manager."""
-
-  @job()
-  def cleanup(
-      self,
-      request: JobCleanupRequest,
-  ) -> Tuple['JobExecutionResponse.Status.V', int, str] :
-    """Cleanup"""
-    return JobExecutionResponse.Status.SUCCESS, 0, 'Job done.'
 
   def log_event(self, *, grpc_event: GrpcEvent) -> Event :
     """Log a gRPC event."""
