@@ -115,4 +115,5 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
       MIGRATION = '',
     ),
   ),
+  BATCH = definition.Batch(TARGET_TYPE = 'core.core.table'),
 )
