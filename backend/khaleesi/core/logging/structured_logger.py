@@ -268,7 +268,7 @@ class StructuredLogger(ABC):
     """Log an event."""
     action_string = Event.Action.ActionType.Name(action_crud) if action_crud else action
     log_string = \
-      f'Event targeting "{target_type}": "{target}" owned by "{event.target.owner.id}". '\
+      f'Event targeting "{target_type}": "{target}" owned by "{owner.id}". ' \
       f'{action_string} with result {Event.Action.ResultType.Name(result)}.'
 
     if result == Event.Action.ResultType.SUCCESS:
