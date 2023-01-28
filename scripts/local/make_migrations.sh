@@ -39,9 +39,10 @@ make_migrations_container() {
   local service=${2}
   local type=${3}
   local version=${4}
+  local deploy=${5}
 
   echo -e "${yellow}Building the images...${clear_color}"
-  . scripts/build.sh "${gate}" "${service}" "${type}" "${version}" "development"
+  . scripts/build.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "development"
 
   echo -e "${yellow}Making the migrations...${clear_color}"
   docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}:latest-development" make_migrations "${app}"
