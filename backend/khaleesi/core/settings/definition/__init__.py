@@ -1,7 +1,7 @@
 """Definition import helper."""
 
 from .base import KhaleesiNinjaSettings as KhaleesiNinjaSettings  # pylint: disable=useless-import-alias
-from .batch import Batch
+from .batch import Batch as Batch
 from .grpc import (  # pylint: disable=useless-import-alias
   Grpc as Grpc,
   GrpcInterceptors as GrpcInterceptors,

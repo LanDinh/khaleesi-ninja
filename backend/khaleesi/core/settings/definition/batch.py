@@ -1,7 +1,7 @@
 """khaleesi.ninja settings definition."""
 
 # Python.
-from typing import TypedDict, List
+from typing import TypedDict
 
 
 class Batch(TypedDict):
