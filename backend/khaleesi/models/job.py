@@ -63,6 +63,7 @@ class JobExecution(models.Model):
     response.execution_metadata.execution_id = self.execution_id
     response.status          = JobExecutionResponse.Status.Value(self.status)
     response.items_processed = self.items_processed
+    response.total_items     = self.total_items
     response.details         = self.details
     response.end.FromDatetime(self.end)
     return response

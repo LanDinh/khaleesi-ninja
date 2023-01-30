@@ -101,6 +101,7 @@ class JobExecutionTestCase(SimpleTestCase):
           execution_id    = 13,
           status          = status_label,
           items_processed = 42,
+          total_items     = 1337,
           details         = 'details',
           end             = datetime.now().replace(tzinfo = timezone.utc)
         )
@@ -112,5 +113,6 @@ class JobExecutionTestCase(SimpleTestCase):
         self.assertEqual(job_execution.execution_id   , result.execution_metadata.execution_id)
         self.assertEqual(status_type                  , result.status)
         self.assertEqual(job_execution.items_processed, result.items_processed)
+        self.assertEqual(job_execution.total_items    , result.total_items)
         self.assertEqual(job_execution.details        , result.details)
         self.assertEqual(job_execution.end, result.end.ToDatetime().replace(tzinfo = timezone.utc))

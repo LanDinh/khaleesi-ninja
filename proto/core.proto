@@ -77,5 +77,6 @@ message JobExecutionResponse {
   Status                    status             = 10;
   google.protobuf.Timestamp end                = 11;
   int64                     items_processed    = 12;
-  string                    details            = 13;
+  int64                     total_items        = 13;
+  string                    details            = 14;
 }
