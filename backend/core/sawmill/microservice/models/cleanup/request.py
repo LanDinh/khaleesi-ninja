@@ -1,26 +1,20 @@
 """Request logs."""
 
-# Python.
-from __future__ import annotations
+# Django.
+from django.db.models import QuerySet
 
 # khaleesi.ninja.
-from khaleesi.core.logging.text_logger import LOGGER
-from khaleesi.core.shared.job import Job
+from khaleesi.core.shared.job import CleanupJob
+from microservice.models import Request
 
 
-class RequestCleanupJob(Job):
+class RequestCleanupJob(CleanupJob[Request]):
   """Clean up requests."""
 
-  def execute_batch(self) -> int :
-    """Execute one batch of the job and return the number of items that were processed."""
-    LOGGER.info('Running batch.')
-    return 1
+  def __init__(self) -> None :
+    """Initialize job."""
+    super().__init__(model = Request)
 
-  def count_total(self) -> int :
+  def get_queryset(self) -> QuerySet[Request] :
     """Count the total number of items that should be executed."""
-    LOGGER.info('Counting batch.')
-    return 5
-
-  def target(self) -> str :
-    """Return the target resource. By default, this is should be the affected model name."""
-    return 'Request'
+    return Request.objects.filter(meta_logged_timestamp__lt = self.cleanup_timestamp)
