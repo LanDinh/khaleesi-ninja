@@ -2,6 +2,22 @@ syntax = "proto3";
 
 package khaleesi.core.clocktower;
 
-service BellRinger {
+import "core.proto";
 
+
+message Job {
+  khaleesi.core.RequestMetadata               request_metadata      = 1;
+  khaleesi.core.JobActionConfiguration        action_configuration  = 10;
+  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 11;
+  string                                      name                  = 20;
+  string                                      description           = 21;
+  string                                      cron_expression       = 22;
+  string                                      action                = 23;
+}
+
+message EmptyMessage {}
+
+
+service BellRinger {
+  rpc CreateJob (Job) returns (EmptyMessage);
 }

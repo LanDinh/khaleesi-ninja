@@ -1,28 +1,27 @@
 """core_clocktower service."""
 
 # gRPC.
-#import grpc
+import grpc
 
 # khaleesi-ninja.
+from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR
+from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, Job as GrpcJob, EmptyMessage
 from khaleesi.proto.core_clocktower_pb2_grpc import (
-#    BellRingerStub,
     BellRingerServicer as Servicer,
     add_BellRingerServicer_to_server as add_to_server
 )
-# from microservice.models import SomeModel
+from microservice.models import Job
 
 
 class Service(Servicer):
   """core_clocktower service."""
 
-  #def SomeMethod(self, request: SomeRequest, _: grpc.ServicerContext) -> SomeResponse :
-  #  """Does something."""
-  #  channel = grpc.insecure_channel("some-micro-service:8000")
-  #  client = SomeStub(channel)
-  #  response = client.SomeMethod(request)
-  #  return SomeResponse()
+  def CreateJob(self, request: GrpcJob, _: grpc.ServicerContext) -> EmptyMessage :
+    """Create a new job."""
+    LOGGER.info('Creating the new job.')
+    Job.objects.create_job(grpc_job = request)
+    return EmptyMessage()
 
 
 service_configuration = ServiceConfiguration[Service](

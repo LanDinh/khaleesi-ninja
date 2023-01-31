@@ -4,9 +4,10 @@
 from typing import Callable
 from unittest.mock import patch, MagicMock
 
-# khaleesi.ninja.
+# gRPC.
 from grpc import ServicerContext
 
+# khaleesi.ninja.
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import (
