@@ -3,7 +3,7 @@
 # Python.
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import TypeVar, Type, Generic, cast
+from typing import TypeVar, Type, Generic
 
 # Django.
 from django.conf import settings
@@ -249,7 +249,7 @@ class Job(ABC, Generic[M]):
 
 
 # noinspection PyAbstractClass
-class CleanupJob(Job, Generic[M]):  # type: ignore[type-arg]
+class CleanupJob(Job[M], Generic[M]):
   """Job specifically for cleaning up."""
 
   cleanup_configuration = JobCleanupActionConfiguration()
@@ -260,7 +260,7 @@ class CleanupJob(Job, Generic[M]):  # type: ignore[type-arg]
     count, _ = self.model.objects.filter(
       pk__in = models.Subquery(page.object_list.values('pk')),  # type: ignore[attr-defined]
     ).delete()
-    return cast(int, count)
+    return count
 
   def execute(self, *, request: JobCleanupRequest) -> JobExecutionResponse :
     """Execute the job."""

@@ -31,7 +31,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test cleaning up."""
     # Execute test.
     self._execute_cleanup_test(
-      cleanup = cleanup.cleanup_requests,
+      cleanup = cleanup.cleanup_events,
       method  = self.service.CleanupEvents,
     )
 
@@ -49,7 +49,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test cleaning up."""
     # Execute test.
     self._execute_cleanup_test(
-      cleanup = cleanup.cleanup_requests,
+      cleanup = cleanup.cleanup_errors,
       method  = self.service.CleanupErrors,
     )
 
@@ -58,7 +58,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test cleaning up."""
     # Execute test.
     self._execute_cleanup_test(
-      cleanup = cleanup.cleanup_requests,
+      cleanup = cleanup.cleanup_backgate_requests,
       method  = self.service.CleanupBackgateRequests,
     )
 
@@ -67,7 +67,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test cleaning up."""
     # Execute test.
     self._execute_cleanup_test(
-      cleanup = cleanup.cleanup_requests,
+      cleanup = cleanup.cleanup_queries,
       method  = self.service.CleanupQueries,
     )
 

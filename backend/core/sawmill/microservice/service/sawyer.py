@@ -39,7 +39,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_requests.execute(request = request)
+    return SINGLETON.cleanup_events.execute(request = request)
 
   def CleanupRequests(
       self,
@@ -55,7 +55,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_requests.execute(request = request)
+    return SINGLETON.cleanup_errors.execute(request = request)
 
   def CleanupBackgateRequests(
       self,
@@ -63,7 +63,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_requests.execute(request = request)
+    return SINGLETON.cleanup_backgate_requests.execute(request = request)
 
   def CleanupQueries(
       self,
@@ -71,7 +71,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_requests.execute(request = request)
+    return SINGLETON.cleanup_queries.execute(request = request)
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
