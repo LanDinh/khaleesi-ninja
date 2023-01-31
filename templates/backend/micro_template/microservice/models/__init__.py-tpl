@@ -1,0 +1,5 @@
+"""{{ project_name }} models."""
+
+# pylint: disable=useless-import-alias
+
+from .models import Model as Model
