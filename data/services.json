@@ -1,6 +1,7 @@
 [
   { "gate": "core", "name": "sawmill", "type": "micro", "version": "1.0.0", "deploy": "true" },
   { "gate": "core", "name": "guard", "type": "micro", "version": "1.0.0", "deploy": "true" },
+  { "gate": "core", "name": "clocktower", "type": "micro", "version": "1.0.0", "deploy": "true" },
   { "gate": "core", "name": "backgate", "type": "backgate", "version": "1.0.0","deploy": "true" },
   { "gate": "core", "name": "frontgate", "type": "frontgate", "version": "1.0.0", "deploy": "true" }
 ]

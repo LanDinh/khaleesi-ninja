@@ -1,0 +1,4 @@
+service:
+  name: "clocktower"
+  version: "1.0.0"
+  replicas: 1
