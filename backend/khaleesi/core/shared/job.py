@@ -248,6 +248,7 @@ class Job(ABC, Generic[M]):
     )
 
 
+# noinspection PyAbstractClass
 class CleanupJob(Job, Generic[M]):  # type: ignore[type-arg]
   """Job specifically for cleaning up."""
 

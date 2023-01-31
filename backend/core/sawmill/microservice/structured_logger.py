@@ -47,6 +47,7 @@ class StructuredDbLogger(StructuredLogger):
   def send_log_response(self, *, response: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
     result = DbRequest.objects.log_response(grpc_response = response)
+    # noinspection PyBroadException
     try:
       DbBackgateRequest.objects.add_child_duration(request = result)
     except Exception:  # pylint: disable=broad-except

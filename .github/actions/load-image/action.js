@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedFunction,NpmUsedModulesInstalled
+
 import * as cache from '@actions/cache'
 import * as dockerCli from 'docker-cli-js'
 

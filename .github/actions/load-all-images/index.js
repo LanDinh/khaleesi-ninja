@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedFunction,JSUnresolvedVariable,NpmUsedModulesInstalled
+
 import * as core from '@actions/core'
 import * as loadImage from '../load-image/action.js'
 
