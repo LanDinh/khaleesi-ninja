@@ -8,9 +8,9 @@ from typing import List
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.shared.parse_util import parse_string
 from khaleesi.proto.core_sawmill_pb2 import Error as GrpcError, ErrorResponse as GrpcErrorResponse
 from microservice.models.logs.abstract import Metadata
-from khaleesi.core.shared.parse_util import parse_string
 
 
 class ErrorManager(models.Manager['Error']):

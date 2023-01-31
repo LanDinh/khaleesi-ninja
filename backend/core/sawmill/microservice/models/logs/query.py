@@ -16,10 +16,10 @@ from sql_metadata import Parser  # type: ignore[import]
 
 # khaleesi.ninja.
 from khaleesi.core.logging.text_logger import LOGGER
+from khaleesi.core.shared.parse_util import parse_string, parse_timestamp
 from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import Query as GrpcQuery, QueryResponse as GrpcQueryResponse
 from microservice.models.logs.abstract import Metadata
-from khaleesi.core.shared.parse_util import parse_string, parse_timestamp
 
 
 class QueryManager(models.Manager['Query']):

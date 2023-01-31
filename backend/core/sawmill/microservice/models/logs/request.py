@@ -8,12 +8,12 @@ from typing import List
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.shared.parse_util import parse_string
 from khaleesi.proto.core_sawmill_pb2 import (
   Request as GrpcRequest, RequestResponse as GrpcRequestResponse,
   ResponseRequest as GrpcResponse,
 )
 from microservice.models.logs.abstract_response import ResponseMetadata
-from khaleesi.core.shared.parse_util import parse_string
 
 
 class RequestManager(models.Manager['Request']):
