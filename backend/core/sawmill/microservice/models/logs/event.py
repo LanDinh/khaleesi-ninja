@@ -14,7 +14,7 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
 from microservice.models.logs.abstract import Metadata
-from microservice.parse_util import parse_string
+from khaleesi.core.shared.parse_util import parse_string
 
 
 khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA

@@ -16,7 +16,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
 )
 from microservice.models.logs.abstract_response import ResponseMetadata
 from microservice.models.logs.request import Request
-from microservice.parse_util import parse_string
+from khaleesi.core.shared.parse_util import parse_string
 
 
 class BackgateRequestManager(models.Manager['BackgateRequest']):

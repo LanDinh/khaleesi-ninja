@@ -10,7 +10,7 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import ResponseMetadata
-from microservice.parse_util import parse_timestamp, parse_string
+from khaleesi.core.shared.parse_util import parse_timestamp, parse_string
 
 
 class Metadata(models.Model):

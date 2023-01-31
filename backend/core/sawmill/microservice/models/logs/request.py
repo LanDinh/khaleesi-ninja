@@ -13,7 +13,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   ResponseRequest as GrpcResponse,
 )
 from microservice.models.logs.abstract_response import ResponseMetadata
-from microservice.parse_util import parse_string
+from khaleesi.core.shared.parse_util import parse_string
 
 
 class RequestManager(models.Manager['Request']):

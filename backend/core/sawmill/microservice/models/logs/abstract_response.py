@@ -16,7 +16,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   ProcessedResponse as GrpcProcessedResponse,
 )
 from microservice.models.logs.abstract import Metadata
-from microservice.parse_util import parse_timestamp
+from khaleesi.core.shared.parse_util import parse_timestamp
 
 
 khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA

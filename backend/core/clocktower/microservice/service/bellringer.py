@@ -26,7 +26,7 @@ class Service(Servicer):
 
 
 service_configuration = ServiceConfiguration[Service](
-  name = DESCRIPTOR.services_by_name['SomeService'].full_name,
+  name = DESCRIPTOR.services_by_name['BellRinger'].full_name,
   add_service_to_server = add_to_server,
   service = Service()
 )

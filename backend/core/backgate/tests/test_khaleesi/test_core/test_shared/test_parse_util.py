@@ -6,7 +6,7 @@ from typing import List
 
 # khaleesi.ninja.
 from khaleesi.core.test_util.test_case import SimpleTestCase
-from microservice.parse_util import parse_timestamp, parse_string
+from khaleesi.core.shared.parse_util import parse_timestamp, parse_string
 
 
 class ParseUtilTestCase(SimpleTestCase):
