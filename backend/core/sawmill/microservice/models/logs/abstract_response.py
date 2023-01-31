@@ -10,13 +10,13 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
+from khaleesi.core.shared.parse_util import parse_timestamp
 from khaleesi.proto.core_sawmill_pb2 import (
   Response as GrpcResponse,
   ResponseMetadata as GrpcResponseMetadata,
   ProcessedResponse as GrpcProcessedResponse,
 )
 from microservice.models.logs.abstract import Metadata
-from khaleesi.core.shared.parse_util import parse_timestamp
 
 
 khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
