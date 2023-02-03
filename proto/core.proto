@@ -80,3 +80,7 @@ message JobExecutionResponse {
   int64                     total_items        = 13;
   string                    details            = 14;
 }
+
+message IdMessage {
+  string id = 1;
+}

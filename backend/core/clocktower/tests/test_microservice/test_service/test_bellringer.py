@@ -19,7 +19,9 @@ class BellRingerServiceTestCase(SimpleTestCase):
     """Test creating a new job."""
     # Prepare data.
     request = GrpcJob()
+    create.return_value.job_id = 'job-id'
     # Execute test.
-    self.service.CreateJob(request, MagicMock())
+    result = self.service.CreateJob(request, MagicMock())
     # Assert result.
     create.assert_called_once_with(grpc_job = request)
+    self.assertEqual(create.return_value.job_id, result.id)

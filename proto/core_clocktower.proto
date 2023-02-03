@@ -15,9 +15,7 @@ message Job {
   string                                      action                = 23;
 }
 
-message EmptyMessage {}
-
 
 service BellRinger {
-  rpc CreateJob (Job) returns (EmptyMessage);
+  rpc CreateJob (Job) returns (khaleesi.core.IdMessage);
 }
