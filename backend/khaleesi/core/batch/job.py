@@ -3,6 +3,7 @@
 # Python.
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
+from threading import Event as ThreadingEvent
 from typing import TypeVar, Type, Generic
 
 # Django.
@@ -70,7 +71,7 @@ class BaseJob(ABC, Generic[M]):
     self.job_execution   = JobExecution()
     self.paginator       = Paginator(self.get_queryset(), action.batch_size)
 
-  def execute(self) -> JobExecutionResponse :
+  def execute(self, *, stop_event: ThreadingEvent) -> JobExecutionResponse :
     """Execute the job."""
     # Start job execution.
     LOGGER.info('Attempting to start job.')
@@ -92,15 +93,9 @@ class BaseJob(ABC, Generic[M]):
 
     # Determine if skipping happens.
     if not self.job_execution.in_progress:
-      self._log_event(
-        action  = Event.Action.ActionType.END,
-        result  = Event.Action.ResultType.WARNING,
-        details = 'Job skipped because a different job execution is in progress.',
-      )
-      self.job_execution.finish(
-        status          = JobExecutionResponse.SKIPPED,
-        items_processed = self.items_processed,
-        details         = 'Job skipped because a different job execution is in progress.',
+      self._handle_job_end(
+        details          = 'Job skipped because a different job execution is in progress.',
+        execution_status = JobExecutionResponse.Status.SKIPPED,
       )
       return self.job_execution.to_grpc_job_execution_response()
     LOGGER.info('Job is not getting skipped.')
@@ -122,18 +117,19 @@ class BaseJob(ABC, Generic[M]):
     # Execute loop.
     try:
       for page_number in self.paginator.page_range:
+        # Abort check.
+        if stop_event.is_set():
+          self._handle_job_end(
+            details          = 'Job aborted.',
+            execution_status = JobExecutionResponse.Status.ABORT,
+          )
+          return self.job_execution.to_grpc_job_execution_response()
         # Timeout check.
         if datetime.now(tz = timezone.utc) > \
             self.start + self.action.timelimit.ToTimedelta():
-          self.job_execution.finish(
-            status          = JobExecutionResponse.Status.TIMEOUT,
-            items_processed = self.items_processed,
-            details         = 'Job timed out.',
-          )
-          self._log_event(
-            action  = Event.Action.ActionType.END,
-            result  = Event.Action.ResultType.WARNING,
-            details = 'Job timed out.'
+          self._handle_job_end(
+            details          = 'Job timed out.',
+            execution_status = JobExecutionResponse.Status.TIMEOUT,
           )
           return self.job_execution.to_grpc_job_execution_response()
 
@@ -143,15 +139,10 @@ class BaseJob(ABC, Generic[M]):
         LOGGER.info(f'{self.items_processed} items processed so far.')
 
       # Job is done.
-      self.job_execution.finish(
-        status          = JobExecutionResponse.Status.SUCCESS,
-        items_processed = self.items_processed,
-        details         = 'Job finished successfully.',
-      )
-      self._log_event(
-        action  = Event.Action.ActionType.END,
-        result  = Event.Action.ResultType.SUCCESS,
-        details = 'Job finished successfully.'
+      self._handle_job_end(
+        details          = 'Job finished successfully.',
+        execution_status = JobExecutionResponse.Status.SUCCESS,
+        event_result     = Event.Action.ResultType.SUCCESS,
       )
       return self.job_execution.to_grpc_job_execution_response()
 
@@ -209,9 +200,22 @@ class BaseJob(ABC, Generic[M]):
       khaleesi_exception = exception
     else:
       khaleesi_exception = MaskingInternalServerException(exception = exception)
+    self._handle_job_end(
+      details          = details,
+      execution_status = JobExecutionResponse.Status.ERROR,
+      event_result     = event_result,
+    )
+    SINGLETON.structured_logger.log_error(exception = khaleesi_exception)
 
+  def _handle_job_end(
+      self, *,
+      details         : str,
+      execution_status: 'JobExecutionResponse.Status.V',
+      event_result    : 'Event.Action.ResultType.V' = Event.Action.ResultType.WARNING,
+  ) -> None :
+    """Handle the job finishing."""
     self.job_execution.finish(
-      status          = JobExecutionResponse.Status.ERROR,
+      status          = execution_status,
       items_processed = self.items_processed,
       details         = details,
     )
@@ -220,7 +224,6 @@ class BaseJob(ABC, Generic[M]):
       result  = event_result,
       details = details,
     )
-    SINGLETON.structured_logger.log_error(exception = khaleesi_exception)
 
   def _log_event(
       self, *,

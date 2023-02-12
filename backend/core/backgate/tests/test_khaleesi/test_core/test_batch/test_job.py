@@ -1,6 +1,7 @@
 """Test job execution."""
 
 # Python.
+from threading import Event
 from unittest.mock import patch, MagicMock, PropertyMock
 
 # Django.
@@ -102,7 +103,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self._set_job(request = request)
     # Execute test.
     with self.assertRaises(Exception):
-      self.job.execute()
+      self.job.execute(stop_event = Event())
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ERROR),
@@ -133,7 +134,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
         request.action_configuration.batch_size = 2
         self._set_job(request = request)
         # Execute test.
-        self.job.execute()
+        self.job.execute(stop_event = Event())
         # Assert result.
         self.assertEqual(
           JobExecutionResponse.Status.Name(JobExecutionResponse.Status.SKIPPED),
@@ -157,7 +158,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     type(paginator.return_value).count = PropertyMock(side_effect = Exception('no total count'))
     self._set_job(request = request)
     # Execute test.
-    self.job.execute()
+    self.job.execute(stop_event = Event())
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ERROR),
@@ -168,6 +169,31 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertIn('total amount of affected items', self.job.job_execution.details)
     self.assertEqual(2, singleton.structured_logger.log_event.call_count)
     singleton.structured_logger.log_error.assert_called_once()
+
+  def test_job_abort(
+      self,
+      start    : MagicMock,
+      singleton: MagicMock,
+      paginator: MagicMock,
+      *_: MagicMock,
+  ) -> None :
+    """Test job timeout."""
+    # Prepare data.
+    request = self._successfully_start_job(start = start, paginator = paginator)
+    self._set_job(request = request)
+    stop_event = Event()
+    stop_event.set()
+    # Execute test.
+    self.job.execute(stop_event = stop_event)
+    # Assert result.
+    self.assertIn('aborted', self.job.job_execution.details)
+    self.assertEqual(
+      JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ABORT),
+      self.job.job_execution.status,
+    )
+    self.assertEqual(0       , self.job.job_execution.items_processed)
+    self.assertEqual(6       , self.job.job_execution.total_items)
+    self.assertEqual(2, singleton.structured_logger.log_event.call_count)
 
   def test_job_timeout(
       self,
@@ -181,7 +207,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     request = self._successfully_start_job(start = start, paginator = paginator)
     self._set_job(request = request)
     # Execute test.
-    self.job.execute()
+    self.job.execute(stop_event = Event())
     # Assert result.
     self.assertIn('timed out', self.job.job_execution.details)
     self.assertEqual(
@@ -206,7 +232,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self._set_job(request = request)
     self.job.mock.execute_batch.side_effect = Exception('error in batch')
     # Execute test.
-    self.job.execute()
+    self.job.execute(stop_event = Event())
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ERROR),
@@ -232,7 +258,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     request.action_configuration.timelimit.FromSeconds(60)
     self._set_job(request = request)
     # Execute test.
-    self.job.execute()
+    self.job.execute(stop_event = Event())
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.SUCCESS),
@@ -275,7 +301,7 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     filter_delete.return_value.delete.return_value = (2, 0)
     self._set_job(request = request)
     # Execute test.
-    self.job.execute()
+    self.job.execute(stop_event = Event())
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.SUCCESS),

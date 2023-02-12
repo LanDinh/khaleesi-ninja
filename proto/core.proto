@@ -68,8 +68,9 @@ message JobExecutionResponse {
     // For pushing the status.
     SUCCESS = 2;
     TIMEOUT = 10;
-    ERROR   = 11;
-    SKIPPED = 12;
+    ABORT   = 11;
+    ERROR   = 12;
+    SKIPPED = 13;
   }
 
   RequestMetadata           request_metadata   = 1;

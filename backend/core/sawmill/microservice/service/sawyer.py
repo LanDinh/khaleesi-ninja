@@ -1,5 +1,8 @@
 """Sawyer service."""
 
+# Python.
+from threading import Event as ThreadingEvent
+
 # gRPC.
 import grpc
 
@@ -39,7 +42,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbEvent, request = request).execute()
+    return CleanupJob(model = DbEvent, request = request).execute(stop_event = ThreadingEvent())
 
   def CleanupRequests(
       self,
@@ -47,7 +50,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbRequest, request = request).execute()
+    return CleanupJob(model = DbRequest, request = request).execute(stop_event = ThreadingEvent())
 
   def CleanupErrors(
       self,
@@ -55,7 +58,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbError, request = request).execute()
+    return CleanupJob(model = DbError, request = request).execute(stop_event = ThreadingEvent())
 
   def CleanupBackgateRequests(
       self,
@@ -63,7 +66,8 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbBackgateRequest, request = request).execute()
+    return CleanupJob(model = DbBackgateRequest, request = request).execute(
+      stop_event = ThreadingEvent())
 
   def CleanupQueries(
       self,
@@ -71,7 +75,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbQuery, request = request).execute()
+    return CleanupJob(model = DbQuery, request = request).execute(stop_event = ThreadingEvent())
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""

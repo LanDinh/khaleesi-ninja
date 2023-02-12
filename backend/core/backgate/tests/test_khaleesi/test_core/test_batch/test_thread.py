@@ -20,7 +20,7 @@ class BatchJobThreadTestCase(SimpleTestCase):
     # Execute test.
     thread.start()
     # Assert result.
-    job.execute.assert_called_once()
+    job.execute.assert_called_once_with(stop_event = thread.stop_event)
 
   def test_stop(self) -> None :
     """Test if stopping the thread works as expected."""
@@ -29,14 +29,14 @@ class BatchJobThreadTestCase(SimpleTestCase):
     # Execute test.
     thread.stop()
     # Assert result.
-    self.assertTrue(thread.is_stopped)
+    self.assertTrue(thread.stop_event.is_set())
 
   def test_thread_starts_stopped(self) -> None :
     """Test if stopping the thread works as expected."""
     # Prepare data.
     thread = BatchJobThread(job = MagicMock())  # type: ignore[var-annotated]
     # Execute test.
-    result = thread.is_stopped
+    result = thread.stop_event.is_set()
     # Assert result.
     self.assertFalse(result)
 

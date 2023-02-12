@@ -23,16 +23,11 @@ class BatchJobThread(Thread, Generic[M]):
 
   def run(self) -> None :
     """Run the job."""
-    self.job.execute()
+    self.job.execute(stop_event = self.stop_event)
 
   def stop(self) -> None :
     """Stop the current thread object."""
     self.stop_event.set()
-
-  @property
-  def is_stopped(self) -> bool :
-    """Check if the thread has been stopped."""
-    return self.stop_event.is_set()
 
   def is_job(self, *, job: JobExecutionMetadata) -> bool :
     """Check if the job is the one asked for."""
