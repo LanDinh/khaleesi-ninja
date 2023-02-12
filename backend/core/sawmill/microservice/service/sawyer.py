@@ -1,15 +1,13 @@
 """Sawyer service."""
 
-# Python.
-from threading import Event as ThreadingEvent
-
 # gRPC.
 import grpc
 
 # khaleesi-ninja.
+from khaleesi.core.batch.executor import job_executor
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
+from khaleesi.proto.core_pb2 import EmptyResponse, JobCleanupRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogFilter,
@@ -36,46 +34,29 @@ from microservice.models.cleanup import CleanupJob
 class Service(Servicer):
   """Sawyer service."""
 
-  def CleanupEvents(
-      self,
-      request: JobCleanupRequest,
-      _: grpc.ServicerContext,
-  ) -> JobExecutionResponse :
+  def CleanupEvents(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbEvent, request = request).execute(stop_event = ThreadingEvent())
+    return job_executor(job = CleanupJob(model = DbEvent, request = request))
 
-  def CleanupRequests(
-      self,
-      request: JobCleanupRequest,
-      _: grpc.ServicerContext,
-  ) -> JobExecutionResponse :
+  def CleanupRequests(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbRequest, request = request).execute(stop_event = ThreadingEvent())
+    return job_executor(job = CleanupJob(model = DbRequest, request = request))
 
-  def CleanupErrors(
-      self,
-      request: JobCleanupRequest,
-      _: grpc.ServicerContext,
-  ) -> JobExecutionResponse :
+  def CleanupErrors(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbError, request = request).execute(stop_event = ThreadingEvent())
+    return job_executor(job = CleanupJob(model = DbError, request = request))
 
   def CleanupBackgateRequests(
       self,
       request: JobCleanupRequest,
       _: grpc.ServicerContext,
-  ) -> JobExecutionResponse :
+  ) -> EmptyResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbBackgateRequest, request = request).execute(
-      stop_event = ThreadingEvent())
+    return job_executor(job = CleanupJob(model = DbBackgateRequest, request = request))
 
-  def CleanupQueries(
-      self,
-      request: JobCleanupRequest,
-      _: grpc.ServicerContext,
-  ) -> JobExecutionResponse :
+  def CleanupQueries(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
-    return CleanupJob(model = DbQuery, request = request).execute(stop_event = ThreadingEvent())
+    return job_executor(job = CleanupJob(model = DbQuery, request = request))
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""

@@ -123,9 +123,11 @@ class SawyerServiceTestCase(SimpleTestCase):
     db_error.to_grpc_error_response.assert_called_once_with()
 
   @patch('microservice.service.sawyer.CleanupJob')
+  @patch('microservice.service.sawyer.job_executor')
   def _execute_cleanup_test(
       self,
-      cleanup: MagicMock,
+      executor: MagicMock,
+      cleanup : MagicMock,
       *,
       method: Callable[[JobCleanupRequest, ServicerContext], JobExecutionResponse],
   ) -> None :
@@ -133,4 +135,4 @@ class SawyerServiceTestCase(SimpleTestCase):
     # Execute test.
     method(JobCleanupRequest(), MagicMock())
     # Assert result.
-    cleanup.return_value.execute.assert_called_once()
+    executor.assert_called_once_with(job = cleanup.return_value)
