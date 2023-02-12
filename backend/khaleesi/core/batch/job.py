@@ -3,7 +3,7 @@
 # Python.
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import Any, TypeVar, Type, Generic
+from typing import TypeVar, Type, Generic
 
 # Django.
 from django.conf import settings
@@ -27,7 +27,6 @@ from khaleesi.proto.core_pb2 import (
   JobActionConfiguration,
   JobCleanupActionConfiguration,
   User,
-  EmptyResponse,
 )
 from khaleesi.proto.core_sawmill_pb2 import Event
 
