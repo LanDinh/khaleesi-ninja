@@ -27,6 +27,7 @@ from microservice.models import (
   BackgateRequest as DbBackgateRequest,
   Query as DbQuery,
 )
+from microservice.models.cleanup import CleanupJob
 
 
 class Service(Servicer):
