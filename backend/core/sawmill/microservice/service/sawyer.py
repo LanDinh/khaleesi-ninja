@@ -63,7 +63,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_backgate_requests.execute()
+    return CleanupJob(model = DbBackgateRequest, request = request).execute()
 
   def CleanupQueries(
       self,

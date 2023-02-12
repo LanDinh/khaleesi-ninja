@@ -30,27 +30,27 @@ class SawyerServiceTestCase(SimpleTestCase):
   def test_cleanup_events(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method  = self.service.CleanupEvents)
+    self._execute_cleanup_test(method  = self.service.CleanupEvents)  # pylint: disable=no-value-for-parameter
 
   def test_cleanup_requests(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method = self.service.CleanupRequests)
+    self._execute_cleanup_test(method = self.service.CleanupRequests)  # pylint: disable=no-value-for-parameter
 
   def test_cleanup_errors(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method = self.service.CleanupErrors)
+    self._execute_cleanup_test(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
 
   def test_cleanup_backgate_requests(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method = self.service.CleanupBackgateRequests)
+    self._execute_cleanup_test(method = self.service.CleanupBackgateRequests)  # pylint: disable=no-value-for-parameter
 
   def test_cleanup_queries(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method = self.service.CleanupQueries)
+    self._execute_cleanup_test(method = self.service.CleanupQueries)  # pylint: disable=no-value-for-parameter
 
   @patch.object(Event.objects, 'filter')
   def test_get_events(self, db_events: MagicMock, *_: MagicMock) -> None :
