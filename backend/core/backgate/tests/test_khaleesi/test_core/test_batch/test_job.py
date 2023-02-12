@@ -9,7 +9,7 @@ from django.db.models import QuerySet
 
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
-from khaleesi.core.shared.job import Job as BaseJob, CleanupJob as BaseCleanupJob
+from khaleesi.core.batch.job import Job as BaseJob, CleanupJob as BaseCleanupJob
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
@@ -61,30 +61,30 @@ class JobTestMixin:
     return request
 
 
-@patch('khaleesi.core.shared.job.LOGGER')
-@patch('khaleesi.core.shared.job.Paginator')
-@patch('khaleesi.core.shared.job.SINGLETON')
-@patch('khaleesi.core.shared.job.JobExecution.objects.start_job_execution')
+@patch('khaleesi.core.batch.job.LOGGER')
+@patch('khaleesi.core.batch.job.Paginator')
+@patch('khaleesi.core.batch.job.SINGLETON')
+@patch('khaleesi.core.batch.job.JobExecution.objects.start_job_execution')
 class JobTestCase(SimpleTestCase, JobTestMixin):
   """Test job execution."""
 
-  job = Job(model = JobExecution)
+  job: Job
 
-  def setUp(self) -> None :
-    """Reset mocks."""
+  def _set_job(self, *, request: JobCleanupRequest) -> None :
+    self.job = Job(model = JobExecution, request = request)
     self.job.mock = MagicMock()
 
   def test_mandatory_batch_size(self, *_: MagicMock) -> None :
     """Test that the batch size is specified."""
     # Execute test.
     with self.assertRaises(InvalidArgumentException) as context:
-      self.job.execute(request = JobCleanupRequest())
+      self.job = Job(model = JobExecution, request = JobCleanupRequest())
     # Assert result.
     self.assertIn('action_configuration.batch_size', context.exception.public_details)
     self.assertIn('action_configuration.batch_size', context.exception.private_message)
     self.assertIn('action_configuration.batch_size', context.exception.private_details)
 
-  @patch('khaleesi.core.shared.job.JobExecution')
+  @patch('khaleesi.core.batch.job.JobExecution')
   def test_job_fails_to_start(
       self,
       job_execution: MagicMock,
@@ -99,9 +99,10 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     job_execution.return_value.save = MagicMock()  # type: ignore[assignment]
     request = JobCleanupRequest()
     request.action_configuration.batch_size = 2
+    self._set_job(request = request)
     # Execute test.
     with self.assertRaises(Exception):
-      self.job.execute(request = request)
+      self.job.execute()
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ERROR),
@@ -122,7 +123,6 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     ]:
       with self.subTest(status = status_label):
         # Prepare data.
-        self.setUp()
         singleton.reset_mock()
         start.reset_mock()
         start.return_value                                = JobExecution()
@@ -131,8 +131,9 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
         start.return_value.save                           = MagicMock()  # type: ignore[assignment]
         request = JobCleanupRequest()
         request.action_configuration.batch_size = 2
+        self._set_job(request = request)
         # Execute test.
-        self.job.execute(request = request)
+        self.job.execute()
         # Assert result.
         self.assertEqual(
           JobExecutionResponse.Status.Name(JobExecutionResponse.Status.SKIPPED),
@@ -154,8 +155,9 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
     type(paginator.return_value).count = PropertyMock(side_effect = Exception('no total count'))
+    self._set_job(request = request)
     # Execute test.
-    self.job.execute(request = request)
+    self.job.execute()
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ERROR),
@@ -177,8 +179,9 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test job timeout."""
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
+    self._set_job(request = request)
     # Execute test.
-    self.job.execute(request = request)
+    self.job.execute()
     # Assert result.
     self.assertIn('timed out', self.job.job_execution.details)
     self.assertEqual(
@@ -198,11 +201,12 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
   ) -> None :
     """Test job error during batch processing."""
     # Prepare data.
-    self.job.mock.execute_batch.side_effect = Exception('error in batch')
     request = self._successfully_start_job(start = start, paginator = paginator)
     request.action_configuration.timelimit.FromSeconds(60)
+    self._set_job(request = request)
+    self.job.mock.execute_batch.side_effect = Exception('error in batch')
     # Execute test.
-    self.job.execute(request = request)
+    self.job.execute()
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.ERROR),
@@ -226,8 +230,9 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
     request.action_configuration.timelimit.FromSeconds(60)
+    self._set_job(request = request)
     # Execute test.
-    self.job.execute(request = request)
+    self.job.execute()
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.SUCCESS),
@@ -241,15 +246,19 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertNotEqual(1, paginator.return_value.get_page.call_args.args[0])
 
 
-@patch('khaleesi.core.shared.job.LOGGER')
-@patch('tests.test_khaleesi.test_core.test_shared.test_job.JobExecution.objects.filter')
-@patch('khaleesi.core.shared.job.Paginator')
-@patch('khaleesi.core.shared.job.SINGLETON')
-@patch('khaleesi.core.shared.job.JobExecution.objects.start_job_execution')
+@patch('khaleesi.core.batch.job.LOGGER')
+@patch('tests.test_khaleesi.test_core.test_batch.test_job.JobExecution.objects.filter')
+@patch('khaleesi.core.batch.job.Paginator')
+@patch('khaleesi.core.batch.job.SINGLETON')
+@patch('khaleesi.core.batch.job.JobExecution.objects.start_job_execution')
 class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
   """Test job execution."""
 
-  job = CleanupJob(model = JobExecution)
+  job: CleanupJob
+
+  def _set_job(self, *, request: JobCleanupRequest) -> None :
+    self.job = CleanupJob(model = JobExecution, request = request)
+    self.job.mock = MagicMock()
 
   def test_job_success(
       self,
@@ -264,8 +273,9 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     request = self._successfully_start_job(start = start, paginator = paginator)
     request.action_configuration.timelimit.FromSeconds(60)
     filter_delete.return_value.delete.return_value = (2, 0)
+    self._set_job(request = request)
     # Execute test.
-    self.job.execute(request = request)
+    self.job.execute()
     # Assert result.
     self.assertEqual(
       JobExecutionResponse.Status.Name(JobExecutionResponse.Status.SUCCESS),

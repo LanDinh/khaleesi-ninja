@@ -3,7 +3,7 @@
 # Python.
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from typing import TypeVar, Type, Generic
+from typing import Any, TypeVar, Type, Generic
 
 # Django.
 from django.conf import settings
@@ -27,6 +27,7 @@ from khaleesi.proto.core_pb2 import (
   JobActionConfiguration,
   JobCleanupActionConfiguration,
   User,
+  EmptyResponse,
 )
 from khaleesi.proto.core_sawmill_pb2 import Event
 
@@ -37,28 +38,25 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 M = TypeVar('M', bound = models.Model)
 
 
-class Job(ABC, Generic[M]):
-  """A generic job."""
+class BaseJob(ABC, Generic[M]):
+  """Generic job logic."""
 
   job             = JobExecutionMetadata()
   action          = JobActionConfiguration()
   items_processed = 0
   start           = datetime.now(tz = timezone.utc)
   job_execution   = JobExecution()
-  model    : Type[M]
-  paginator: Paginator  # type: ignore[type-arg]
+  model     : Type[M]
+  paginator : Paginator  # type: ignore[type-arg]
 
-  def __init__(self, *, model: Type[M]) -> None :
+  def __init__(
+      self, *,
+      model : Type[M],
+      job   : JobExecutionMetadata,
+      action: JobActionConfiguration,
+  ) -> None :
     """Initialize the job."""
     self.model = model
-
-  def execute(self, *, request: JobCleanupRequest) -> JobExecutionResponse :
-    """Execute the job."""
-    self.init(job = request.job, action = request.action_configuration)
-    return self.execute_job(job = request.job, action = request.action_configuration)
-
-  def init(self, *,job: JobExecutionMetadata, action: JobActionConfiguration) -> None :
-    """Initialize necessary values."""
     if not action.batch_size:
       # Without the batch size, the paginator tries to divide by 0.
       raise InvalidArgumentException(
@@ -73,16 +71,12 @@ class Job(ABC, Generic[M]):
     self.job_execution   = JobExecution()
     self.paginator       = Paginator(self.get_queryset(), action.batch_size)
 
-  def execute_job(
-      self, *,
-      job   : JobExecutionMetadata,
-      action: JobActionConfiguration,
-  ) -> JobExecutionResponse :
-    """The main method."""
+  def execute(self) -> JobExecutionResponse :
+    """Execute the job."""
     # Start job execution.
     LOGGER.info('Attempting to start job.')
     try:
-      self.job_execution = JobExecution.objects.start_job_execution(job = job)
+      self.job_execution = JobExecution.objects.start_job_execution(job = self.job)
     except Exception as exception:
       self._log_event(
         action  = Event.Action.ActionType.START,
@@ -131,7 +125,7 @@ class Job(ABC, Generic[M]):
       for page_number in self.paginator.page_range:
         # Timeout check.
         if datetime.now(tz = timezone.utc) > \
-            self.start + action.timelimit.ToTimedelta():
+            self.start + self.action.timelimit.ToTimedelta():
           self.job_execution.finish(
             status          = JobExecutionResponse.Status.TIMEOUT,
             items_processed = self.items_processed,
@@ -247,13 +241,27 @@ class Job(ABC, Generic[M]):
                     f'{details}. {self.items_processed} items processed so far.',
     )
 
+# noinspection PyAbstractClass
+class Job(BaseJob[M], Generic[M]):
+  """General job."""
+
+  def __init__(self, *, model: Type[M], request : JobCleanupRequest) -> None :
+    """Initialize the job."""
+    super().__init__(model = model, job = request.job, action = request.action_configuration)
+
 
 # noinspection PyAbstractClass
-class CleanupJob(Job[M], Generic[M]):
+class CleanupJob(BaseJob[M], Generic[M]):
   """Job specifically for cleaning up."""
 
   cleanup_configuration = JobCleanupActionConfiguration()
   cleanup_timestamp = datetime.now(tz = timezone.utc)
+
+  def __init__(self, *, model: Type[M], request : JobCleanupRequest) -> None :
+    """Initialize the job."""
+    super().__init__(model = model, job = request.job, action = request.action_configuration)
+    self.cleanup_configuration = request.cleanup_configuration
+    self.cleanup_timestamp = self.start - request.cleanup_configuration.cleanup_delay.ToTimedelta()
 
   def execute_batch(self, *, page: Page[M]) -> int :
     """Execute a batch deletion."""
@@ -261,17 +269,6 @@ class CleanupJob(Job[M], Generic[M]):
       pk__in = models.Subquery(page.object_list.values('pk')),  # type: ignore[attr-defined]
     ).delete()
     return count
-
-  def execute(self, *, request: JobCleanupRequest) -> JobExecutionResponse :
-    """Execute the job."""
-    self.init(job = request.job, action = request.action_configuration)
-    self.init_cleanup(cleanup = request.cleanup_configuration)
-    return self.execute_job(job = request.job, action = request.action_configuration)
-
-  def init_cleanup(self, *, cleanup: JobCleanupActionConfiguration) -> None :
-    """Initialize necessary values."""
-    self.cleanup_configuration = cleanup
-    self.cleanup_timestamp = self.start - cleanup.cleanup_delay.ToTimedelta()
 
   def get_page(self, *, page_number: int) -> Page[M] :
     """Get the next page to be worked on."""

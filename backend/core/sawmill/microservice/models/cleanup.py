@@ -7,7 +7,7 @@ from typing import TypeVar, Generic, cast
 from django.db.models import QuerySet
 
 # khaleesi.ninja.
-from khaleesi.core.shared.job import CleanupJob as BaseCleanupJob
+from khaleesi.core.batch.job import CleanupJob as BaseCleanupJob
 from microservice.models.logs.abstract import Metadata
 
 

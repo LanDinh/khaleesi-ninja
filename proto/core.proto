@@ -81,6 +81,8 @@ message JobExecutionResponse {
   string                    details            = 14;
 }
 
+message EmptyResponse {}
+
 message IdMessage {
   string id = 1;
 }

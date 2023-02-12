@@ -153,4 +153,4 @@ class SawyerServiceTestCase(SimpleTestCase):
     # Execute test.
     method(request, MagicMock())
     # Assert result.
-    cleanup.execute.assert_called_once_with(request = request)
+    cleanup.execute.assert_called_once_with()
