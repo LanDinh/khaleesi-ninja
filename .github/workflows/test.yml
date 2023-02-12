@@ -26,12 +26,32 @@ jobs:
         with:
           filename: data/environments.json
 
-  # Generate the protos.
-  generate-protos:
+  # Update the pip cache with new requirements.
+  update-pip-cache:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup python cache
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Fill python cache
+        run: pip install -r ./backend/requirements.txt -r ./backend/requirements-develop.txt
+
+  # Generate the protos.
+  generate-protos:
+    runs-on: ubuntu-latest
+    needs: [ update-pip-cache ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup python cache
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -56,6 +76,7 @@ jobs:
   # Build the backend base images with new requirements.
   build-backend-base-images:
     runs-on: ubuntu-latest
+    needs: [ update-pip-cache ]
     strategy:
       matrix:
         image: [ construction, image ]
