@@ -27,7 +27,6 @@ from microservice.models import (
   BackgateRequest as DbBackgateRequest,
   Query as DbQuery,
 )
-from microservice.singleton import SINGLETON
 
 
 class Service(Servicer):
@@ -39,7 +38,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_events.execute()
+    return CleanupJob(model = DbEvent, request = request).execute()
 
   def CleanupRequests(
       self,
@@ -47,7 +46,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_requests.execute()
+    return CleanupJob(model = DbRequest, request = request).execute()
 
   def CleanupErrors(
       self,
@@ -55,7 +54,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_errors.execute()
+    return CleanupJob(model = DbError, request = request).execute()
 
   def CleanupBackgateRequests(
       self,
@@ -71,7 +70,7 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> JobExecutionResponse :
     """Clean up old data."""
-    return SINGLETON.cleanup_queries.execute()
+    return CleanupJob(model = DbQuery, request = request).execute()
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
