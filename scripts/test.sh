@@ -27,6 +27,6 @@ rm -r -f temp
 mkdir temp
 
 echo -e "${yellow}Executing tests for the ${gate} ${service} service...${clear_color}"
-docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}:latest-development" test "${arguments}"
+docker run --rm --env CI --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}:latest-development" test "${arguments}"
 
 echo -e "${yellow}DONE testing! :D${clear_color}"
