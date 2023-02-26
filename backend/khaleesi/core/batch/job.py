@@ -78,6 +78,7 @@ class BaseJob(ABC, Generic[M]):
     try:
       self.job_execution = JobExecution.objects.start_job_execution(job = self.job)
     except Exception as exception:
+      LOGGER.fatal('Job failed to start.')
       self._log_event(
         action  = Event.Action.ActionType.START,
         result  = Event.Action.ResultType.FATAL,
@@ -214,6 +215,13 @@ class BaseJob(ABC, Generic[M]):
       event_result    : 'Event.Action.ResultType.V' = Event.Action.ResultType.WARNING,
   ) -> None :
     """Handle the job finishing."""
+    if event_result == Event.Action.ResultType.WARNING:
+      LOGGER.warning(details)
+    elif event_result == Event.Action.ResultType.ERROR:
+      LOGGER.error(details)
+    elif event_result == Event.Action.ResultType.FATAL:
+      LOGGER.fatal(details)
+
     self.job_execution.finish(
       status          = execution_status,
       items_processed = self.items_processed,
