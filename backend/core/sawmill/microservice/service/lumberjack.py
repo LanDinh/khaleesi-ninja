@@ -117,7 +117,11 @@ class Service(Servicer):
         f'to the database.',
       )
       result = DbRequest.objects.log_response(grpc_response = request)
-      DbBackgateRequest.objects.add_child_duration(request = result)
+      try:
+        DbBackgateRequest.objects.add_child_duration(request = result)
+      except Exception:  # pylint: disable=broad-except
+        # TODO(45) - remove this hack
+        pass
       LOGGER.info('Saving the queries to the database.')
       queries = DbQuery.objects.log_queries(
         queries = request.queries,
