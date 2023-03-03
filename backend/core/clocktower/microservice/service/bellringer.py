@@ -6,12 +6,19 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import IdMessage
+from khaleesi.proto.core_pb2 import (
+  IdMessage,
+  EmptyResponse,
+  JobExecutionMetadata,
+  JobActionConfiguration,
+  JobCleanupActionConfiguration,
+)
 from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, Job as GrpcJob
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
     add_BellRingerServicer_to_server as add_to_server
 )
+from microservice.actuator.actuator import ACTUATOR
 from microservice.models import Job
 
 
@@ -25,6 +32,22 @@ class Service(Servicer):
     response = IdMessage()
     response.id = job.job_id
     return response
+
+  def ExecuteJob(self, request: IdMessage, _: grpc.ServicerContext) -> EmptyResponse :
+    """Execute a job by ID."""
+    LOGGER.info(f'Executing job "{request.id}".')
+    job = JobExecutionMetadata()
+    action = JobActionConfiguration()
+    cleanup = JobCleanupActionConfiguration()
+    action.batch_size = 5
+    action.timelimit.FromSeconds(600)
+    ACTUATOR.actuate(
+      action_name = 'core.sawmill.cleanup-requests',
+      job         = job,
+      action      = action,
+      cleanup     = cleanup,
+    )
+    return EmptyResponse()
 
 
 service_configuration = ServiceConfiguration[Service](

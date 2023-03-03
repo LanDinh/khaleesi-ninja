@@ -5,6 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.test_util.test_case import SimpleTestCase
+from khaleesi.proto.core_pb2 import IdMessage
 from khaleesi.proto.core_clocktower_pb2 import Job as GrpcJob
 from microservice.service.bellringer import Service
 
@@ -25,3 +26,13 @@ class BellRingerServiceTestCase(SimpleTestCase):
     # Assert result.
     create.assert_called_once_with(grpc_job = request)
     self.assertEqual(create.return_value.job_id, result.id)
+
+  @patch('microservice.service.bellringer.ACTUATOR')
+  def test_execute_job(self, actuator: MagicMock, *_: MagicMock) -> None :
+    """Test creating a new job."""
+    # Prepare data.
+    request = IdMessage()
+    # Execute test.
+    self.service.ExecuteJob(request, MagicMock())
+    # Assert result.
+    actuator.actuate.assert_called_once()
