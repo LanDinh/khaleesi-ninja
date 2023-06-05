@@ -25,10 +25,10 @@ test() {
   #  return_code=1
   #fi
 
-  #echo "Eslint..."
-  #if ! npm run lint; then
-  #  return_code=1
-  #fi
+  echo "Eslint..."
+  if ! npm run lint; then
+    return_code=1
+  fi
 
   exit ${return_code}
 }

@@ -5,7 +5,8 @@
     "build": "remix build",
     "dev": "remix dev",
     "start": "remix-serve build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "lint": "npx eslint --ext .ts --ext .tsx ."
   },
   "dependencies": {
     "@remix-run/css-bundle": "^1.16.1",
