@@ -42,7 +42,7 @@ The general deployment is done with:
 
 ![helm badge](https://img.shields.io/badge/helm-v3.8-informational)
 ![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.25-informational)
-![docker badge](https://img.shields.io/badge/docker-v20.10-informational)
+![docker badge](https://img.shields.io/badge/docker-v24.0-informational)
 
 Other infrastructure consists of:
 

@@ -10,7 +10,7 @@ set -o pipefail # Make pipes fail
 proto_in="proto"
 python_in="proto/python"
 python_out="backend/khaleesi/proto"
-typescript_out="frontgate/core/src/core/proto"
+typescript_out="frontgate/core/app/core/proto"
 
 
 echo "Generating the python protos..."

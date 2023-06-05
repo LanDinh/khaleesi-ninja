@@ -2,7 +2,7 @@
 ################################################################################
 #                                     Base                                     #
 ################################################################################
-FROM node:19.4-slim as base
+FROM node:20.2.0-slim as base
 
 # Arguments & environment.
 ARG gate
@@ -22,7 +22,7 @@ RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package-lock.jso
 RUN mkdir node_modules && npm ci
 
 # Data.
-COPY ./core/src/core/ /code/src/core/
+COPY ./core/app/core/ /code/app/core/
 COPY ./${KHALEESI_GATE}/ /code/
 
 ################################################################################
@@ -35,13 +35,13 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-COPY ./.eslintrc.json /code/
+COPY ./.eslintrc.js /code/
 COPY execute_develop.sh /code/execute.sh
 
 ################################################################################
 #                              Development Image                               #
 ################################################################################
-FROM node:16.13-slim as development
+FROM node:20.2.0-slim as development
 LABEL environment=development
 
 # Arguments & environment.
