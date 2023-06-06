@@ -1,4 +1,4 @@
-# khaleesi.ninja
+# khaleesi.ninja.
 environment:
   #name: "required name"
   #domain: "required domain"
@@ -19,6 +19,7 @@ ingress:
   path: "/"
   regex_path: false
   port: "service"
+  root: false
 
 # Django.
 django:

@@ -3,7 +3,6 @@ type:
 ingress:
   enabled: true
   path: "/"
-  root: false
 probe:
   http:
     enabled: true
