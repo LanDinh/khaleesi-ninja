@@ -68,7 +68,7 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-WORKDIR /code/
+WORKDIR /code/frontgate/${KHALEESI_GATE}/
 RUN npm run build
 
 ################################################################################
