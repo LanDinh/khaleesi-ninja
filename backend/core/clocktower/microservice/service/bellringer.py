@@ -7,6 +7,7 @@ import grpc
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
 from khaleesi.proto.core_pb2 import (
+  IdRequest,
   IdMessage,
   EmptyResponse,
   JobExecutionMetadata,
@@ -33,9 +34,9 @@ class Service(Servicer):
     response.id = job.job_id
     return response
 
-  def ExecuteJob(self, request: IdMessage, _: grpc.ServicerContext) -> EmptyResponse :
+  def ExecuteJob(self, request: IdRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Execute a job by ID."""
-    LOGGER.info(f'Executing job "{request.id}".')
+    LOGGER.info(f'Executing job "{request.id_message.id}".')
     job = JobExecutionMetadata()
     action = JobActionConfiguration()
     cleanup = JobCleanupActionConfiguration()

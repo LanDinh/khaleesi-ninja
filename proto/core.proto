@@ -87,3 +87,8 @@ message EmptyResponse {}
 message IdMessage {
   string id = 1;
 }
+
+message IdRequest {
+  RequestMetadata request_metadata = 1;
+  IdMessage       id_message       = 10;
+}
