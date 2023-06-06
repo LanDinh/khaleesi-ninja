@@ -118,7 +118,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: protos-typescript
-          path: frontgate/core/src/core/proto/
+          path: frontgate/${{ matrix.service.gate }}/app/khaleesi/proto/
       - name: Build the development container image
         run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} development
       - name: Build the production container image

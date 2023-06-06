@@ -1,5 +1,5 @@
 import { Outlet } from "@remix-run/react"
-import type { LinksFunction } from "@remix-run/react"
+import type { LinksFunction } from "@remix-run/node"
 import styles from "../khaleesi/core/styles/index.css"
 
 export const links: LinksFunction = () => [
