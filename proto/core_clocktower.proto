@@ -17,6 +17,6 @@ message Job {
 
 
 service BellRinger {
-  rpc CreateJob (Job) returns (khaleesi.core.IdMessage);
-  rpc ExecuteJob (khaleesi.core.IdMessage) returns (khaleesi.core.EmptyResponse);
+  rpc CreateJob  (Job)                     returns (khaleesi.core.IdMessage);
+  rpc ExecuteJob (khaleesi.core.IdRequest) returns (khaleesi.core.EmptyResponse);
 }
