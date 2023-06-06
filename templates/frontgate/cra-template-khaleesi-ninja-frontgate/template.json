@@ -1,7 +1,0 @@
-{
-  "package": {
-    "scripts": {
-      "lint": "npx eslint --ext .ts --ext .tsx ."
-    }
-  }
-}

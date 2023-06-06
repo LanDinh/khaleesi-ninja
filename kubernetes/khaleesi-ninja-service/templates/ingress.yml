@@ -20,7 +20,7 @@ spec:
       hosts:
       - {{ .Values.gate.name }}.{{ .Values.environment.domain }}
   rules:
-    - host: {{ .Values.gate.name }}.{{ .Values.environment.domain }}
+    - host: {{ if not .Values.ingress.root }}{{ .Values.gate.name }}.{{ end }}{{ .Values.environment.domain }}
       http:
         paths:
           - path: {{ .Values.ingress.path }}

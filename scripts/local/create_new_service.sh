@@ -120,13 +120,10 @@ create_frontgate() {
   fi
 
   echo -e "${yellow}Creating react project...${clear_color}"
-  npx create-react-app "${project_folder}" --template "file:${template_folder}/cra-template-khaleesi-ninja-frontgate"
+  npx create-remix "${project_folder}" --template "${template_folder}/frontgate_template" --no-install --typescript
 
-  echo -e "${yellow}Removing unnecessary files... (this might take a while)${clear_color}"
-  rm "${project_folder}/.gitignore"
-  rm "${project_folder}/package-lock.json"
+  echo -e "${yellow}Removing unnecessary files...${clear_color}"
   rm "${project_folder}/package.json"
-  rm -r "${project_folder}/node_modules"
 
   echo -e "${yellow}Adding symlinks...${clear_color}"
   # shellcheck disable=SC2086

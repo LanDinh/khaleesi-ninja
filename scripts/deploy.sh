@@ -43,14 +43,13 @@ fi
 
 
 # Note: the order in which to call the values files is important!
-# Most specific first, to allow more generic ones to override some values
-# (e.g. only 1 replica for development)
+# Environment last to allow develop to only have 1 replica, then less specific to more specific.
 echo -e "${yellow}Deploying the service ${gate}-${service}...${clear_color}"
 kubectl -n "khaleesi-ninja-${environment}" delete job "${gate}-${service}-kubegres-initialization" --ignore-not-found
 helm upgrade --install "khaleesi-ninja-${environment}-${gate}-${service}" kubernetes/khaleesi-ninja-service \
-  --values "kubernetes/configuration/service/${gate}/${service}.yml" \
-  --values "kubernetes/configuration/type/${type}.yml" \
   --values "kubernetes/configuration/gate/${gate}.yml" \
+  --values "kubernetes/configuration/type/${type}.yml" \
+  --values "kubernetes/configuration/service/${gate}/${service}.yml" \
   --values "kubernetes/configuration/environment/${environment}.yml" \
   --set service.drop_database="${drop_database}"
 
