@@ -1,4 +1,5 @@
-import type { V2_MetaFunction } from "@remix-run/node"
+import type { V2_MetaFunction, LinksFunction } from "@remix-run/node"
+import styles from "../khaleesi/core/styles/index.css"
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -7,8 +8,15 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+]
+
+
 export default function Index() {
   return (
-    <div>Dragonpit</div>
+    <div><ul>
+      <li><a href="/kitchen">Kitchen</a></li>
+    </ul></div>
   )
 }

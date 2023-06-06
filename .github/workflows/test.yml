@@ -71,7 +71,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: protos-typescript
-          path: frontgate/core/src/core/proto/
+          path: frontgate/khaleesi/app/khaleesi/proto/
 
   # Build the backend base images with new requirements.
   build-backend-base-images:

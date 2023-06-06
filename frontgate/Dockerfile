@@ -22,7 +22,7 @@ RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package-lock.jso
 RUN mkdir node_modules && npm ci
 
 # Data.
-COPY ./core/app/core/ /code/app/core/
+COPY ./khaleesi/app/khaleesi/core/ /code/app/khaleesi/core/
 COPY ./${KHALEESI_GATE}/ /code/
 
 ################################################################################

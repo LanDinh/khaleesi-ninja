@@ -1,0 +1,14 @@
+:root {
+  --background-dark-color : #272727;
+  --background-light-color: #D8D8D8;
+  --theme-dark-color      : #39007F;
+  --theme-light-color     : #7200FF;
+  --bad-color             : #FF2F00;
+  --average-color         : #FFD000;
+  --good-color            : #00FF2F;
+}
+
+body {
+  color: var(--background-light-color);
+  background-color: var(--background-dark-color);
+}
