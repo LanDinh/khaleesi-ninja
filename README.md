@@ -10,17 +10,17 @@
 
 The following environments are ready to use.
 
-| Environment       | Intended Use       | Install Location | Debug Mode         | Users              |
-| ----------------- | ------------------ | ---------------- | ------------------ | ------------------ |
-| `development`     | development        | localhost        | :heavy_check_mark: | self only          |
-| `integration`     | development        | localhost        | :x:                | self only          |
-| `staging`         | quality assurance  | upstream         | :x:                | selected few users |
-| `production`      | production         | upstream         | :x:                | real users         |
+| Environment   | Intended Use      | Install Location | Debug Mode         | Users              |
+|---------------|-------------------|------------------|--------------------|--------------------|
+| `development` | development       | localhost        | :heavy_check_mark: | self only          |
+| `integration` | development       | localhost        | :x:                | self only          |
+| `staging`     | quality assurance | upstream         | :x:                | selected few users |
+| `production`  | production        | upstream         | :x:                | real users         |
 
 The following gates are ready to use.
 
 | Gate   | Domain | `production` | `staging`    | Use                      |
-| ------ | ------ | ------------ | ------------ | ------------------------ |
+|--------|--------|--------------|--------------|--------------------------|
 | `core` | -      | not deployed | not deployed | Code shared by all gates |
 
 ## Getting Started
@@ -48,11 +48,11 @@ Other infrastructure consists of:
 
 ![kube-prometheus badge](https://img.shields.io/badge/kube--prometheus-latest-informational)
 
-| Service Type     | General | Infrastructure | Development |
-| ---------------- | ------- | -------------- | ----------- |
-| Frontgate        | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react--router-v6.0-informational) <br /> ![grpc-web badge](https://img.shields.io/badge/grpc--web-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) </br> ![nginx-prometheus-exporter badge](https://img.shields.io/badge/nginx--prometheus--exporter-v0.9-informational) | ![create-react-app badge](https://img.shields.io/badge/create--react--app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational) |
-| Backgate / Micro | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.47-informational) <br /> ![django badge](https://img.shields.io/badge/django-v4.0-informational) | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.16-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![grpcio-tools badge](https://img.shields.io/badge/grpcio--tools-v1.47-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v2.14-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v0.961-informational) |
-| Backgate         | | ![envoy badge](https://img.shields.io/badge/envoy-v1.20-informational) | |
+| Service Type     | General                                                                                                                                                                                                                                                                                                                                       | Infrastructure                                                                                                                                                                               | Development                                                                                                                                                                                                                                                                                                                         |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Frontgate        | ![typescript badge](https://img.shields.io/badge/typescript-v4.4-informational) <br /> ![react badge](https://img.shields.io/badge/react-v17.0-informational) <br /> ![react-router badge](https://img.shields.io/badge/react--router-v6.0-informational) <br /> ![grpc-web badge](https://img.shields.io/badge/grpc--web-v6.0-informational) | ![nginx badge](https://img.shields.io/badge/nginx-v1.21-informational) </br> ![nginx-prometheus-exporter badge](https://img.shields.io/badge/nginx--prometheus--exporter-v0.9-informational) | ![create-react-app badge](https://img.shields.io/badge/create--react--app-latest-informational) <br /> ![jest badge](https://img.shields.io/badge/jest-v26.0-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational)                                                                        |
+| Backgate / Micro | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.47-informational) <br /> ![django badge](https://img.shields.io/badge/django-v4.0-informational)                                                                                                       | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.16-informational)                                                                                                                 | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![grpcio-tools badge](https://img.shields.io/badge/grpcio--tools-v1.47-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v2.14-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v0.961-informational) |
+| Backgate         |                                                                                                                                                                                                                                                                                                                                               | ![envoy badge](https://img.shields.io/badge/envoy-v1.20-informational)                                                                                                                       |                                                                                                                                                                                                                                                                                                                                     |
 
 ### Structure
 
@@ -72,7 +72,7 @@ The logical structure is as follows:
 
 * Each `gate` covers a specific group of use cases, and they all contain the following elements:
   * A `frontgate` which serves a SPA to browsers.
-    To create a new `frontgate`, use its [custom template](/templates/frontgate/cra-template-khaleesi-ninja-frontgate)
+    To create a new `frontgate`, use its [custom template](/templates/frontgate/frontgate_template)
   * A `backgate` which serves as entry point into the backend system.
     The `frontgate` communicates with the `backgate` via `grpc-web`
     To create a new `backgate`, use its [custom template](/templates/backend/backgate_template)

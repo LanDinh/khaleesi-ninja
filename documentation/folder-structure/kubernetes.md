@@ -19,11 +19,11 @@ One `prometheus` instance scrapes metrics from everywhere, and they are availabl
 
 ### Conventions
 
-| Port | Use                     |
-| ---- | ----------------------- |
-| 8000 | General service         |
-| 8010 | Sidecar proxy           |
-| 8020 | Metrics                 |
+| Port | Use             |
+|------|-----------------|
+| 8000 | General service |
+| 8010 | Sidecar proxy   |
+| 8020 | Metrics         |
 
 ## Folder Structure
 

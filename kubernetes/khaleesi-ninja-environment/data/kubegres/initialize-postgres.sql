@@ -20,9 +20,9 @@ END
 $$ LANGUAGE plpgsql;
 
 
--- noinspection SyntaxError
+-- noinspection SyntaxError,SqlSignature
 SELECT pg_temp.create_database(:'superUser', :'superUserPassword', :'database');
--- noinspection SyntaxError
+-- noinspection SyntaxError,SqlSignature
 SELECT pg_temp.create_user(:'writeUser', :'writePassword');
--- noinspection SyntaxError
+-- noinspection SyntaxError,SqlSignature
 SELECT pg_temp.create_user(:'readUser', :'readPassword');

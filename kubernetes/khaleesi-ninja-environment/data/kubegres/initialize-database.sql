@@ -24,5 +24,5 @@ END
 $$ LANGUAGE plpgsql;
 
 
--- noinspection SyntaxError
+-- noinspection SyntaxError,SqlSignature
 SELECT pg_temp.assert_permissions(:'writeUser', :'readUser', :'database');

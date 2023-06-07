@@ -1,3 +1,4 @@
+// noinspection JSUnresolvedReference
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   extends: ["@remix-run/eslint-config", "@remix-run/eslint-config/node"],
@@ -5,4 +6,4 @@ module.exports = {
   rules: {
     "semi": [2, "never"]
   }
-};
+}

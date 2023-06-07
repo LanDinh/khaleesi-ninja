@@ -1,3 +1,4 @@
+// noinspection JSUnresolvedReference
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
@@ -5,4 +6,4 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest',
   },
   transformIgnorePatterns: ['node_modules/'],
-};
+}
