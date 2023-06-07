@@ -24,7 +24,7 @@ RUN mkdir node_modules && npm ci
 # Data.
 COPY ./${KHALEESI_GATE}/ /code/
 RUN rm /code/app/khaleesi
-COPY ./khaleesi/app/khaleesi/core/ /code/app/khaleesi/core/
+COPY ./khaleesi/app/khaleesi/ /code/app/khaleesi/
 
 ################################################################################
 #                               Development Base                               #

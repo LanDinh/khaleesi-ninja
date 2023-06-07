@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package khaleesi.core.kitchen;
+
+
+message RecipeStep {
+  string recipe_step_id = 1;
+
+  bytes  image       = 10;
+  string description = 11;
+}
+
+message RecipeIngredient {
+  string ingredient_id = 1;
+
+  string name          = 10;
+  float  quantity      = 11;
+  string quantity_unit = 12;
+  string description   = 13;
+}
+
+message Recipe {
+  string recipe_id = 1;
+
+  string   name                         = 10;
+  bytes    image                        = 11;
+  string   description                  = 12;
+  repeated RecipeIngredient ingredients = 13;
+  repeated RecipeStep       steps       = 14;
+}
