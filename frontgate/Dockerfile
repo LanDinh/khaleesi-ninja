@@ -37,6 +37,7 @@ ENV KHALEESI_GATE=${gate}
 
 # Data.
 COPY ./.eslintrc.js /code/
+COPY ./jest.config.js /code/
 COPY execute_develop.sh /code/execute.sh
 
 ################################################################################
