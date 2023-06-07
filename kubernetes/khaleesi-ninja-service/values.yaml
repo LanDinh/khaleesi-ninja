@@ -35,9 +35,9 @@ kubegres:
 probe:
   http:
     enabled: false
-    readiness: "/monitoring/ready"
-    liveness: "/monitoring/alive"
-    startup: "monitoring/startup"
+    readiness: "/"
+    liveness: "/"
+    startup: "/"
   grpc:
     enabled: false
 
