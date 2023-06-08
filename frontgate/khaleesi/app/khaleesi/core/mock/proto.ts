@@ -9,16 +9,39 @@ class RecipeClientMock {
 
   constructor() {
     const recipe_a: Recipe = new Recipe()
-    recipe_a.setRecipeId('0');
+    recipe_a.setRecipeId('0')
     recipe_a.setName('Recipe A')
     recipe_a.setDescription('Cooking something delicious')
-    this.recipes = [ recipe_a.toObject() ]
+
+    const recipe_b: Recipe = new Recipe()
+    recipe_b.setRecipeId('1')
+    recipe_b.setName('Recipe B')
+    recipe_b.setDescription('Cooking something awful')
+
+    this.recipes = [ recipe_a.toObject(), recipe_b.toObject() ]
   }
   async get_recipes(): Promise<Recipe.AsObject[]> {
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(this.recipes)
+      }, 1000) // 1s.
+    })
+  }
+
+  async get_recipe(id: string): Promise<Recipe.AsObject> {
+    for (let recipe of this.recipes) {
+      if (recipe.recipeId === id) {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(recipe)
+          }, 1000) // 1s.
+        })
+      }
+    }
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject()
       }, 1000) // 1s.
     })
   }

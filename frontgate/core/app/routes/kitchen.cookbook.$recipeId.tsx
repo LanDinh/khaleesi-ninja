@@ -1,6 +1,6 @@
 import type { V2_MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { Recipe } from '../khaleesi/proto/core_kitchen_pb'
+import type { Recipe } from '../khaleesi/proto/core_kitchen_pb'
 import { RECIPE_CLIENT_MOCK } from '../khaleesi/core/mock/proto'
 
 
@@ -11,15 +11,16 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export async function loader(): Promise<Recipe.AsObject[]> {
-  return RECIPE_CLIENT_MOCK.get_recipes()
+export async function loader(params: { recipeId: string }): Promise<Recipe.AsObject> {
+  return RECIPE_CLIENT_MOCK.get_recipe(params.recipeId)
 }
 
 export default function RecipeInstanceRoute() {
-  const recipes = useLoaderData<typeof loader>();
+  const recipe = useLoaderData<typeof loader>()
   return (
-    <ul>
-      { recipes.map((recipe) => <li>{recipe.name}</li>) }
-    </ul>
+    <div>
+      <h2>{ recipe.name }</h2>
+      <p>{ recipe.description }</p>
+    </div>
   )
 }
