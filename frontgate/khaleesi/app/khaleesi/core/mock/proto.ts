@@ -54,6 +54,20 @@ class RecipeClientMock {
       }, 1000) // 1s.
     })
   }
+
+  async create_recipe(name: string, description: string): Promise<Recipe.AsObject> {
+    const new_recipe = new Recipe()
+    new_recipe.setRecipeId('2')
+    new_recipe.setName(name)
+    new_recipe.setDescription(description)
+    this.recipes.push(new_recipe.toObject())
+
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(new_recipe.toObject())
+      }, 1000) // 1s.
+    })
+  }
 }
 
 export const RECIPE_CLIENT_MOCK = new RecipeClientMock()
