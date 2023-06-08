@@ -1,5 +1,5 @@
 import type { V2_MetaFunction, LoaderArgs } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useParams } from '@remix-run/react'
 import type { Recipe } from '../khaleesi/proto/core_kitchen_pb'
 import { RECIPE_CLIENT_MOCK } from '../khaleesi/core/mock/proto'
 
@@ -9,6 +9,13 @@ export const meta: V2_MetaFunction = () => {
     { title: 'khaleesi.ninja | Recipe' },
     { name: 'description', content: 'Khaleesi\'s Dragonpit: a recipe for hungry dragons.' },
   ]
+}
+
+export function ErrorBoundary() {
+  const { recipeId } = useParams()
+  return <div>
+    There was an error loading the recipe with the ID { recipeId }.
+  </div>
 }
 
 export async function loader({ params }: LoaderArgs): Promise<Recipe.AsObject> {
