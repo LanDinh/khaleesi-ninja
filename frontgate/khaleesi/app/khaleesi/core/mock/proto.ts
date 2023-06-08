@@ -29,7 +29,15 @@ class RecipeClientMock {
     })
   }
 
-  async get_recipe(id: string): Promise<Recipe.AsObject> {
+  async get_recipe(id: string | undefined): Promise<Recipe.AsObject> {
+    if (!id) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          reject()
+        }, 1000) // 1s.
+      })
+    }
+
     for (let recipe of this.recipes) {
       if (recipe.recipeId === id) {
         return new Promise((resolve, reject) => {
@@ -39,6 +47,7 @@ class RecipeClientMock {
         })
       }
     }
+
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         reject()
