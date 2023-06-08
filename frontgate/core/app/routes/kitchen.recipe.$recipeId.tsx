@@ -11,15 +11,15 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export async function loader(): Promise<Recipe.AsObject> {
-  return RECIPE_CLIENT_MOCK.get_recipe()
+export async function loader(): Promise<Recipe.AsObject[]> {
+  return RECIPE_CLIENT_MOCK.get_recipes()
 }
 
 export default function RecipeInstanceRoute() {
-  const recipe = useLoaderData<typeof loader>();
+  const recipes = useLoaderData<typeof loader>();
   return (
-    <div>
-      { recipe.name }
-    </div>
+    <ul>
+      { recipes.map((recipe) => <li>{recipe.name}</li>) }
+    </ul>
   )
 }

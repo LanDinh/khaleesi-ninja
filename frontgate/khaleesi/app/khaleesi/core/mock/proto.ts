@@ -4,14 +4,21 @@ import { Recipe } from '../../proto/core_kitchen_pb'
 
 
 class RecipeClientMock {
-  async get_recipe(): Promise<Recipe.AsObject> {
+
+  recipes: Recipe.AsObject[]
+
+  constructor() {
     const recipe_a: Recipe = new Recipe()
+    recipe_a.setRecipeId('0');
     recipe_a.setName('Recipe A')
     recipe_a.setDescription('Cooking something delicious')
+    this.recipes = [ recipe_a.toObject() ]
+  }
+  async get_recipes(): Promise<Recipe.AsObject[]> {
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve(recipe_a.toObject())
+        resolve(this.recipes)
       }, 1000) // 1s.
     })
   }
