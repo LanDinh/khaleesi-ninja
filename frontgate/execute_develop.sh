@@ -30,6 +30,11 @@ test() {
     return_code=1
   fi
 
+  echo "Type check..."
+  if ! npm run typecheck; then
+    return_code=1
+  fi
+
   exit ${return_code}
 }
 

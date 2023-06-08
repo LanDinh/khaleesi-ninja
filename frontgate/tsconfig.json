@@ -17,6 +17,7 @@
       "~/*": ["./app/*"]
     },
     "preserveSymlinks": true,
+    "skipLibCheck": true,  // Type checks are broken https://github.com/remix-run/remix/issues/6244
 
     // Remix takes care of building everything in `remix build`.
     "noEmit": true
