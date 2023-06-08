@@ -193,7 +193,7 @@ jobs:
       - name: Check the status.
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
       - name: Wait for successful spinup
-        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod -l job!=true --for condition=ready --timeout 5m
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod -l job!=true --for condition=ready --timeout 10m
 
   # Clean up cache.
   clean-cache:
