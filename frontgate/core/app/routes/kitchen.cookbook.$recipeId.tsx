@@ -19,7 +19,7 @@ export function ErrorBoundary() {
 }
 
 export async function loader({ params }: LoaderArgs): Promise<Recipe.AsObject> {
-  return RECIPE_CLIENT_MOCK.get_recipe(params.recipeId)
+  return RECIPE_CLIENT_MOCK.getRecipe(params.recipeId)
 }
 
 export default function RecipeInstanceRoute() {

@@ -8,19 +8,19 @@ class RecipeClientMock {
   recipes: Recipe.AsObject[]
 
   constructor() {
-    const recipe_a: Recipe = new Recipe()
-    recipe_a.setRecipeId('0')
-    recipe_a.setName('Recipe A')
-    recipe_a.setDescription('Cooking something delicious')
+    const recipeA: Recipe = new Recipe()
+    recipeA.setRecipeId('0')
+    recipeA.setName('Recipe A')
+    recipeA.setDescription('Cooking something delicious')
 
-    const recipe_b: Recipe = new Recipe()
-    recipe_b.setRecipeId('1')
-    recipe_b.setName('Recipe B')
-    recipe_b.setDescription('Cooking something awful')
+    const recipeB: Recipe = new Recipe()
+    recipeB.setRecipeId('1')
+    recipeB.setName('Recipe B')
+    recipeB.setDescription('Cooking something awful')
 
-    this.recipes = [ recipe_a.toObject(), recipe_b.toObject() ]
+    this.recipes = [ recipeA.toObject(), recipeB.toObject() ]
   }
-  async get_recipes(): Promise<Recipe.AsObject[]> {
+  async getRecipes(): Promise<Recipe.AsObject[]> {
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -29,7 +29,7 @@ class RecipeClientMock {
     })
   }
 
-  async get_recipe(id: string | undefined): Promise<Recipe.AsObject> {
+  async getRecipe(id: string | undefined): Promise<Recipe.AsObject> {
     if (!id) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -55,16 +55,16 @@ class RecipeClientMock {
     })
   }
 
-  async create_recipe(name: string, description: string): Promise<Recipe.AsObject> {
-    const new_recipe = new Recipe()
-    new_recipe.setRecipeId('2')
-    new_recipe.setName(name)
-    new_recipe.setDescription(description)
-    this.recipes.push(new_recipe.toObject())
+  async createRecipe(name: string, description: string): Promise<Recipe.AsObject> {
+    const newRecipe = new Recipe()
+    newRecipe.setRecipeId('2')
+    newRecipe.setName(name)
+    newRecipe.setDescription(description)
+    this.recipes.push(newRecipe.toObject())
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        resolve(new_recipe.toObject())
+        resolve(newRecipe.toObject())
       }, 1000) // 1s.
     })
   }

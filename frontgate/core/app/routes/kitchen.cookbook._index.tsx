@@ -11,7 +11,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader(): Promise<Recipe.AsObject[]> {
-  return RECIPE_CLIENT_MOCK.get_recipes()
+  return RECIPE_CLIENT_MOCK.getRecipes()
 }
 
 export default function RecipeIndex() {
