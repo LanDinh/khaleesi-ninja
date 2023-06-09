@@ -4,5 +4,5 @@ grpcio==1.54.2
 grpcio-health-checking==1.54.2
 grpcio-reflection==1.54.2
 prometheus-client==0.14.1
-protobuf==4.23.2
+protobuf==3.21.2
 psycopg2==2.9.3
