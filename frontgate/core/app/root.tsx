@@ -13,7 +13,7 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ]
 export function ErrorBoundary() {
-  const error = useRouteError();
+  const error = useRouteError()
 
   if (isRouteErrorResponse(error)) {
     return <html lang="en">
@@ -32,7 +32,7 @@ export function ErrorBoundary() {
     </html>
   }
 
-  const error_message = error instanceof Error ? error.message : "Unknown error";
+  const error_message = error instanceof Error ? error.message : 'Unknown error'
   return <html lang="en">
     <head>
       <meta charSet="utf-8" />
