@@ -193,10 +193,10 @@ jobs:
       - name: Check the status.
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
       - name: Wait for successful spinup
-        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod -l job!=true --for condition=ready --timeout 10m
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod -l job!=true --for condition=ready --timeout 2m
       - name: Print frontgate logs
         if: ${{ always() }}
-        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} logs -l name=frontgate
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} logs -l name=frontgate --tail=-1
 
   # Clean up cache.
   clean-cache:
