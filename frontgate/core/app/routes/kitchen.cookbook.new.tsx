@@ -1,6 +1,6 @@
 import type { ActionArgs } from '@remix-run/node'
 import { redirect, json } from '@remix-run/node'
-import { useActionData } from '@remix-run/react'
+import { useActionData, Form } from '@remix-run/react'
 import { RECIPE_CLIENT_MOCK } from '../khaleesi/core/mock/proto'
 
 
@@ -44,7 +44,7 @@ export default function NewRecipeRoute() {
   const action_data = useActionData<typeof action>()
   return (
     <div>
-      <form method="post">
+      <Form method="post">
         <div>
           <label>
             Name: <input type="text" name="name" defaultValue={action_data?.fields?.name}/>
@@ -62,7 +62,7 @@ export default function NewRecipeRoute() {
             Add
           </button>
         </div>
-      </form>
+      </Form>
     </div>
   )
 }
