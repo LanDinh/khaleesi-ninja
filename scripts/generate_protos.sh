@@ -23,4 +23,4 @@ python -m grpc_tools.protoc -I "${proto_in}" --python_out="${python_out}" --grpc
 echo "Generating the typescript protos..."
 rm -f "${typescript_out}/"*
 mkdir -p "${typescript_out}"
-protoc -I="${proto_in}" --js_out=import_style=commonjs:"${typescript_out}" --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:"${typescript_out}" "${proto_in}"/*.proto
+protoc -I="${proto_in}" --js_out=import_style=commonjs_strict:"${typescript_out}" --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:"${typescript_out}" "${proto_in}"/*.proto
