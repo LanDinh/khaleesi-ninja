@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
-import styles from '../khaleesi/styles/index.css'
+import styles from './khaleesi/styles/index.css'
 
 
 export const links: LinksFunction = () => [
