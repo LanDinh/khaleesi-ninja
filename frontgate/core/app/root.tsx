@@ -1,4 +1,3 @@
-import { cssBundleHref } from '@remix-run/css-bundle'
 import type { LinksFunction } from '@remix-run/node'
 import { useRouteError, isRouteErrorResponse } from '@remix-run/react'
 import {
@@ -8,9 +7,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
+import styles from './khaleesi/core/styles/index.css'
+
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+  // Font.
+  { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap' },
+  // Style.
+  { rel: 'stylesheet', href: styles },
 ]
 export function ErrorBoundary() {
   const error = useRouteError()
