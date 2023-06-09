@@ -6,7 +6,7 @@
     "dev": "remix dev",
     "start": "remix-serve build",
     "typecheck": "tsc",
-    "lint": "npx eslint --ext .ts --ext .tsx .",
+    "lint": "npx eslint --ext .ts --ext .tsx . --max-warnings=0",
     "test": "jest --coverage"
   },
   "dependencies": {
