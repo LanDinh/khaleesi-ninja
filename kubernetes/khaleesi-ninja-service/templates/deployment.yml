@@ -73,7 +73,7 @@ spec:
               port: 8000
             {{- end }}
           {{- end }}
-          {{- if or .Values.django.enabled .Values.kubegres.enabled }}
+          {{- if or .Values.django.enabled .Values.kubegres.enabled .Values.ingress.enabled }}
           env:
           {{- end }}
           {{- if .Values.django.enabled }}
@@ -82,6 +82,10 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.gate.name }}-{{ .Values.service.name }}-django
                   key: secretKey
+          {{- end }}
+          {{- if .Values.ingress.enabled }}
+            - name: KHALEESI_DOMAIN
+              value: {{ .Values.environment.domain }}
           {{- end }}
           {{- if .Values.kubegres.enabled }}
             - name: KHALEESI_DATABASE_HOST
