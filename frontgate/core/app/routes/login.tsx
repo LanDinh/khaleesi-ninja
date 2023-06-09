@@ -2,7 +2,7 @@ import type { V2_MetaFunction } from '@remix-run/node'
 import type { ActionArgs } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { Form } from '@remix-run/react'
-import { createUserSession } from '../khaleesi/core/auth'
+import { createUserSession } from '../khaleesi/auth'
 
 
 export const meta: V2_MetaFunction = () => {

@@ -1,7 +1,7 @@
 import type { ActionArgs } from '@remix-run/node'
 import { redirect, json } from '@remix-run/node'
 import { useActionData, Form } from '@remix-run/react'
-import { RECIPE_CLIENT_MOCK } from '../khaleesi/core/mock/proto'
+import { RECIPE_CLIENT_MOCK } from '../khaleesi/temp/proto'
 
 
 function validate(data: any): string | void {

@@ -1,6 +1,6 @@
 import type { V2_MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { RECIPE_CLIENT_MOCK } from '../khaleesi/core/mock/proto'
+import { RECIPE_CLIENT_MOCK } from '../khaleesi/temp/proto'
 import type { Recipe } from '../khaleesi/proto/core_kitchen_pb'
 
 export const meta: V2_MetaFunction = () => {

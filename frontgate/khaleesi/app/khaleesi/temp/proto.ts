@@ -1,6 +1,6 @@
 // Fake gRPC clients until the interfaces are implemented.
 
-import { Recipe } from '../../proto/core_kitchen_pb'
+import { Recipe } from '../proto/core_kitchen_pb'
 
 
 class RecipeClientMock {

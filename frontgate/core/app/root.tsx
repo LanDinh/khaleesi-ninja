@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from '@remix-run/react'
-import styles from './khaleesi/core/styles/index.css'
+import styles from '../khaleesi/styles/index.css'
 
 
 export const links: LinksFunction = () => [
@@ -36,7 +36,7 @@ export function ErrorBoundary() {
     </html>
   }
 
-  const error_message = error instanceof Error ? error.message : 'Unknown error'
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error'
   return <html lang="en">
     <head>
       <meta charSet="utf-8" />
@@ -45,7 +45,7 @@ export function ErrorBoundary() {
       <Links />
     </head>
     <body>
-      <div>An error happened: { error_message }</div>
+      <div>An error happened: { errorMessage }</div>
       <ScrollRestoration />
       <Scripts />
     </body>
