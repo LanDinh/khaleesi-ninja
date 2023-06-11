@@ -28,6 +28,11 @@ class Service(Servicer):
     JobExecution.objects.stop_job(id_message = request.id_message)
     return EmptyResponse()
 
+  def AbortAllBatchJobs(self, request: EmptyRequest, _: grpc.ServicerContext) -> EmptyResponse :
+    """Abort all running batch jobs."""
+    JobExecution.objects.stop_all_jobs()
+    return EmptyResponse()
+
 
 service_configuration = ServiceConfiguration[Service](
   name = DESCRIPTOR.services_by_name['Maid'].full_name,

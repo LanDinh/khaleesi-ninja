@@ -45,6 +45,12 @@ class JobExecutionManager(models.Manager['JobExecution']):
             print('stopping the thread')
             thread.stop()  # type: ignore[attr-defined]
 
+  def stop_all_jobs(self) -> None :
+    """Stop all jobs."""
+    for thread in threading.enumerate():
+      if hasattr(thread, 'is_batch_job_thread'):
+        thread.stop()  # type: ignore[attr-defined]
+
 
 class JobExecution(models.Model):
   """Basic job."""

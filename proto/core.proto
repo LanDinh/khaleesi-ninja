@@ -84,6 +84,10 @@ message JobExecutionResponse {
 
 message EmptyResponse {}
 
+message EmptyRequest {
+  RequestMetadata request_metadata = 1;
+}
+
 message IdMessage {
   string id = 1;
 }
@@ -96,4 +100,5 @@ message IdRequest {
 
 service Maid {
   rpc AbortBatchJob     (IdRequest)    returns (EmptyResponse);
+  rpc AbortAllBatchJobs (EmptyRequest) returns (EmptyResponse);
 }
