@@ -6,17 +6,25 @@ import "core.proto";
 
 
 message Job {
-  khaleesi.core.RequestMetadata               request_metadata      = 1;
-  khaleesi.core.JobActionConfiguration        action_configuration  = 10;
-  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 11;
-  string                                      name                  = 20;
-  string                                      description           = 21;
-  string                                      cron_expression       = 22;
-  string                                      action                = 23;
+  string id          = 1;
+  string name        = 2;
+  string description = 3;
+
+  string                               cron_expression       = 10;
+  string                               action                = 11;
+  khaleesi.core.JobActionConfiguration action_configuration  = 12;
+
+  bool                                        is_cleanup_job        = 20;
+  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 21;
+}
+
+message JobRequest {
+  khaleesi.core.RequestMetadata request_metadata = 1;
+  Job                           job              = 2;
 }
 
 
 service BellRinger {
-  rpc CreateJob  (Job)                     returns (khaleesi.core.IdMessage);
+  rpc CreateJob  (JobRequest)              returns (khaleesi.core.IdMessage);
   rpc ExecuteJob (khaleesi.core.IdRequest) returns (khaleesi.core.EmptyResponse);
 }
