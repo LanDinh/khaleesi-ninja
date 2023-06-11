@@ -92,3 +92,8 @@ message IdRequest {
   RequestMetadata request_metadata = 1;
   IdMessage       id_message       = 10;
 }
+
+
+service Maid {
+  rpc AbortBatchJob     (IdRequest)    returns (EmptyResponse);
+}

@@ -40,6 +40,15 @@ class BatchJobThreadTestCase(SimpleTestCase):
     # Assert result.
     self.assertFalse(result)
 
+  def test_is_batch_job_thread(self) -> None :
+    """Test if the thread type can be correctly identified."""
+    # Prepare data.
+    thread: BatchJobThread[MagicMock] = BatchJobThread(job = MagicMock())
+    # Execute test.
+    result = thread.is_batch_job_thread
+    # Assert result.
+    self.assertTrue(result)
+
   def test_is_job(self) -> None :
     """Test if stopping the thread works as expected."""
     # Prepare data.

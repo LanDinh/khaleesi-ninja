@@ -104,7 +104,7 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
         NAME = 'khaleesi.core.interceptors.server.request_state.RequestStateServerInterceptor',
       ),
     ),
-    HANDLERS = [],
+    HANDLERS = [ 'khaleesi.core.service.maid' ],
   ),
   MONITORING = definition.Monitoring(
     PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),

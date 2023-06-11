@@ -12,14 +12,16 @@ from khaleesi.proto.core_pb2 import JobExecutionMetadata
 class BatchJobThread(Thread, Generic[M]):
   """Thread utility class."""
 
-  stop_event: Event
-  job       : BaseJob[M]
+  stop_event         : Event
+  job                : BaseJob[M]
+  is_batch_job_thread: bool
 
   def __init__(self, *, job: BaseJob[M]) -> None :
     """Init the thread."""
     super().__init__()
     self.stop_event = Event()
     self.job = job
+    self.is_batch_job_thread = True
 
   def run(self) -> None :
     """Run the job."""

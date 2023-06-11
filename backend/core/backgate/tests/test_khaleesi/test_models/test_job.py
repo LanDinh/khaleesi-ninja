@@ -34,6 +34,25 @@ class JobExecutionManagerTestCase(SimpleTestCase):
         # Assert result.
         create.assert_called_once()
 
+  @patch('khaleesi.models.job.threading')
+  @patch.object(JobExecution.objects, 'filter')
+  def test_stop_job_execution(self, filter_data: MagicMock, threading: MagicMock) -> None :
+    """Test stopping a job execution."""
+    # Prepare data.
+    job = MagicMock()
+    job.job_id = 'job-id'
+    filter_data.return_value = [ job, job ]
+    thread_to_stop = MagicMock()
+    thread_to_stop.is_batch_job_thread = True
+    thread_to_stop.is_job.side_effect = [ True, False ]
+    thread_to_not_stop = MagicMock([ 'stop' ])
+    threading.enumerate.return_value = [ thread_to_stop, thread_to_not_stop ]
+    # Execute test.
+    JobExecution.objects.stop_job(id_message = MagicMock())
+    # Assert result.
+    thread_to_stop.stop.assert_called_once()
+    thread_to_not_stop.stop.assert_not_called()
+
 
 class JobExecutionTestCase(SimpleTestCase):
   """Test job executions."""
