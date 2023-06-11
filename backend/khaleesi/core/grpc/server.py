@@ -2,6 +2,7 @@
 
 # Python.
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone, timedelta
 from signal import signal, SIGTERM
 from typing import Any, List
 from uuid import uuid4
@@ -31,6 +32,7 @@ from khaleesi.core.shared.exceptions import (
   TimeoutException,
 )
 from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences
@@ -146,8 +148,11 @@ class Server:
 
   def _handle_sigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""
+    seconds_remaining = khaleesi_settings['GRPC']['SHUTDOWN_GRACE_SECS']
+    end = datetime.now(tz = timezone.utc) + timedelta(seconds = seconds_remaining)
     stop_backgate_request_id = str(uuid4())
     request_id               = str(uuid4())
+
     try:
       SINGLETON.structured_logger.log_system_backgate_request(
         backgate_request_id = stop_backgate_request_id,
@@ -160,8 +165,23 @@ class Server:
       )
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
       self.health_servicer.enter_graceful_shutdown()
-      done_event = self.server.stop(30)
-      if done_event.wait(khaleesi_settings['GRPC']['SHUTDOWN_GRACE_SECS']):
+
+      seconds_remaining = (end - datetime.now(tz = timezone.utc)).seconds
+      done_event = self.server.stop(seconds_remaining)
+
+      threads = JobExecution.objects.stop_all_jobs()
+      for thread in threads:
+        seconds_remaining = (end - datetime.now(tz = timezone.utc)).seconds
+        thread.join(seconds_remaining)
+      threads_finished_gracefully = True
+      for thread in threads:
+        if not thread.is_alive():
+          threads_finished_gracefully = False
+
+      seconds_remaining = (end - datetime.now(tz = timezone.utc)).seconds
+      server_finished_gracefully = done_event.wait(seconds_remaining)
+
+      if server_finished_gracefully and threads_finished_gracefully:
         self._log_server_state_event(
           backgate_request_id = stop_backgate_request_id,
           request_id          = request_id,
@@ -175,8 +195,14 @@ class Server:
           status              = StatusCode.OK,
         )
         CHANNEL_MANAGER.close_all_channels()
-      else:
-        raise TimeoutException(private_details = 'Server stop timed out.')
+        return
+
+      reason = ''
+      if not threads_finished_gracefully:
+        reason += 'Threads didn\'t terminate. '
+      if not server_finished_gracefully:
+        reason += 'Server didn\'t terminate. '
+      raise TimeoutException(private_details = f'Server stop timed out. - {reason}')
     except KhaleesiException as exception:
       self._log_end_exception(
         exception           = exception,

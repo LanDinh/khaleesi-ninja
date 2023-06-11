@@ -255,7 +255,7 @@ class BaseJob(ABC, Generic[M]):
       action_crud = action,
       result      = result,
       details     = f'Job execution "{self.job.execution_id}" for "{self.job.job_id}": '
-                    f'{details}. {self.items_processed} items processed so far.',
+                    f'{details} {self.items_processed} items processed so far.',
     )
 
 # noinspection PyAbstractClass

@@ -18,6 +18,7 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import TimeoutException, KhaleesiException
 from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
+from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 
@@ -32,6 +33,7 @@ khaleesi_ninja_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 @patch('khaleesi.core.grpc.server.LOGGER')
 @patch('khaleesi.core.grpc.server.HEALTH_METRIC')
 @patch('khaleesi.core.grpc.server.MetricInitializer')
+@patch.object(JobExecution.objects, 'stop_all_jobs')
 @patch('khaleesi.core.grpc.server.CHANNEL_MANAGER')
 @patch('khaleesi.core.grpc.server.SINGLETON')
 @patch('khaleesi.core.grpc.server.server')
@@ -97,6 +99,7 @@ class ServerTestCase(SimpleTestCase):
       grpc_server    : MagicMock,
       singleton      : MagicMock,
       channel_manager: MagicMock,
+      threads_to_stop: MagicMock,
       *_             : MagicMock,
   ) -> None :
     """Test sigterm success."""
@@ -107,6 +110,7 @@ class ServerTestCase(SimpleTestCase):
     )
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
+    threads_to_stop.return_value = []
     # Execute test.
     event.set()
     server._handle_sigterm()  # pylint: disable=protected-access
@@ -122,11 +126,12 @@ class ServerTestCase(SimpleTestCase):
     singleton.structured_logger.log_system_backgate_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
-  def test_sigterm_failure(
+  def test_sigterm_failure_server_timeout(
       self,
       grpc_server    : MagicMock,
       singleton      : MagicMock,
       channel_manager: MagicMock,
+      threads_to_stop: MagicMock,
       *_             : MagicMock,
   ) -> None :
     """Test sigterm failure."""
@@ -136,7 +141,43 @@ class ServerTestCase(SimpleTestCase):
       initialize_request_id = 'request-id',
     )
     grpc_server.return_value.stop.side_effect = Exception('test')
+    threads_to_stop.return_value = []
     # Execute test.
+    with self.assertRaises(Exception):
+      server._handle_sigterm()  # pylint: disable=protected-access
+    # Assert result.
+    self._assert_server_state_event(
+      action    = Event.Action.ActionType.END,
+      result    = Event.Action.ResultType.FATAL,
+      singleton = singleton,
+    )
+    singleton.structured_logger.log_system_backgate_request.assert_called_once()
+    singleton.structured_logger.log_system_request.assert_called_once()
+    singleton.structured_logger.log_system_response.assert_called_once()
+    singleton.structured_logger.log_system_backgate_response.assert_called_once()
+    channel_manager.close_all_channels.assert_called_once_with()
+
+  def test_sigterm_failure_thread_timeout(
+      self,
+      grpc_server    : MagicMock,
+      singleton      : MagicMock,
+      channel_manager: MagicMock,
+      threads_to_stop: MagicMock,
+      *_             : MagicMock,
+  ) -> None :
+    """Test sigterm failure."""
+    # Prepare data.
+    server = Server(
+      start_backgate_request_id = 'backgate-request',
+      initialize_request_id = 'request-id',
+    )
+    event = threading.Event()
+    grpc_server.return_value.stop.return_value = event
+    thread_to_stop = MagicMock()
+    thread_to_stop.is_alive.return_value = False
+    threads_to_stop.return_value = [ thread_to_stop ]
+    # Execute test.
+    event.set()
     with self.assertRaises(Exception):
       server._handle_sigterm()  # pylint: disable=protected-access
     # Assert result.

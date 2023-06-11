@@ -1,7 +1,7 @@
 """Basic job tracking."""
 
 # Python.
-import threading
+from threading import Thread, enumerate as threading_enumerate
 from typing import List
 
 # Django.
@@ -35,21 +35,22 @@ class JobExecutionManager(models.Manager['JobExecution']):
       job.job_id = job_object.job_id
       job.execution_id = job_object.execution_id
       jobs.append(job)
-    for thread in threading.enumerate():
+    for thread in threading_enumerate():
       if hasattr(thread, 'is_batch_job_thread'):
         # This is expected to have at most 1 element, but stop all executions just in case.
         for job in jobs:
           temp = thread.is_job(job = job)  # type: ignore[attr-defined]
-          print(f'temp = {temp}')
           if temp:
-            print('stopping the thread')
             thread.stop()  # type: ignore[attr-defined]
 
-  def stop_all_jobs(self) -> None :
+  def stop_all_jobs(self) -> List[ Thread ] :
     """Stop all jobs."""
-    for thread in threading.enumerate():
+    threads: List[Thread] = []
+    for thread in threading_enumerate():
       if hasattr(thread, 'is_batch_job_thread'):
         thread.stop()  # type: ignore[attr-defined]
+        threads.append(thread)
+    return threads
 
 
 class JobExecution(models.Model):

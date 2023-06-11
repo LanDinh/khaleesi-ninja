@@ -34,9 +34,13 @@ class JobExecutionManagerTestCase(SimpleTestCase):
         # Assert result.
         create.assert_called_once()
 
-  @patch('khaleesi.models.job.threading')
+  @patch('khaleesi.models.job.threading_enumerate')
   @patch.object(JobExecution.objects, 'filter')
-  def test_stop_job_execution(self, filter_data: MagicMock, threading: MagicMock) -> None :
+  def test_stop_job_execution(
+      self,
+      filter_data        : MagicMock,
+      threading_enumerate: MagicMock,
+  ) -> None :
     """Test stopping a job execution."""
     # Prepare data.
     job = MagicMock()
@@ -46,27 +50,28 @@ class JobExecutionManagerTestCase(SimpleTestCase):
     thread_to_stop.is_batch_job_thread = True
     thread_to_stop.is_job.side_effect  = [ True, False ]
     thread_to_not_stop = MagicMock([ 'stop' ])
-    threading.enumerate.return_value = [ thread_to_stop, thread_to_not_stop ]
+    threading_enumerate.return_value = [ thread_to_stop, thread_to_not_stop ]
     # Execute test.
     JobExecution.objects.stop_job(id_message = MagicMock())
     # Assert result.
     thread_to_stop.stop.assert_called_once()
     thread_to_not_stop.stop.assert_not_called()
 
-  @patch('khaleesi.models.job.threading')
-  def test_stop_all_jobs(self, threading: MagicMock) -> None :
+  @patch('khaleesi.models.job.threading_enumerate')
+  def test_stop_all_jobs(self, threading_enumerate: MagicMock) -> None :
     """Test stopping a job execution."""
     # Prepare data.
     thread_to_stop = MagicMock()
     thread_to_stop.is_batch_job_thread = True
     thread_to_stop.is_job              = True
     thread_to_not_stop = MagicMock([ 'stop' ])
-    threading.enumerate.return_value = [ thread_to_stop, thread_to_not_stop ]
+    threading_enumerate.return_value = [ thread_to_stop, thread_to_not_stop ]
     # Execute test.
-    JobExecution.objects.stop_all_jobs()
+    result = JobExecution.objects.stop_all_jobs()
     # Assert result.
     thread_to_stop.stop.assert_called_once()
     thread_to_not_stop.stop.assert_not_called()
+    self.assertEqual([ thread_to_stop ], result)
 
 
 class JobExecutionTestCase(SimpleTestCase):
