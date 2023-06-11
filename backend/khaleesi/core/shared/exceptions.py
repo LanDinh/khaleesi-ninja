@@ -97,7 +97,7 @@ class InvalidArgumentException(KhaleesiCoreException):
     """Initialize the exception."""
     super().__init__(
       status          = StatusCode.INVALID_ARGUMENT,
-      public_key      = 'invalid-argument',
+      public_key      = 'core-invalid-argument',
       public_details  = public_details,
       private_message = private_message,
       private_details = private_details,
@@ -112,7 +112,7 @@ class InternalServerException(KhaleesiCoreException):
     """Initialize the exception."""
     super().__init__(
       status          = StatusCode.INTERNAL,
-      public_key      = 'internal-server-error',
+      public_key      = 'core-internal-server-error',
       public_details  = '',
       private_message = private_message,
       private_details = private_details,
@@ -145,13 +145,13 @@ class ProgrammingException(InternalServerException):
 
 
 class UpstreamGrpcException(KhaleesiCoreException):
-  """Internal server errors."""
+  """Error in upstream gRPC request."""
 
   def __init__(self, *, status: StatusCode, private_details: str) -> None :
     """Initialize the exception."""
     super().__init__(
       status          = status,
-      public_key      = 'upstream-grpc-error',
+      public_key      = 'core-upstream-grpc-error',
       public_details  = '',
       private_message = f'Upstream error {status} received.',
       private_details = private_details,
@@ -160,15 +160,15 @@ class UpstreamGrpcException(KhaleesiCoreException):
 
 
 class TimeoutException(KhaleesiCoreException):
-  """Internal server errors."""
+  """Timeouts."""
 
   def __init__(self, *, private_details: str) -> None :
     """Initialize the exception."""
     super().__init__(
       status          = StatusCode.DEADLINE_EXCEEDED,
-      public_key      = 'timeout-error',
+      public_key      = 'core-timeout-error',
       public_details  = '',
       private_message = 'Timeout happened.',
       private_details = private_details,
-      loglevel        = LogLevel.ERROR
+      loglevel        = LogLevel.ERROR,
     )
