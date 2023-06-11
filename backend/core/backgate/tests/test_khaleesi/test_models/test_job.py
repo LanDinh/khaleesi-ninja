@@ -13,9 +13,15 @@ from khaleesi.proto.core_pb2 import JobExecutionResponse
 class JobExecutionManagerTestCase(SimpleTestCase):
   """Test the job execution manager."""
 
+  @patch('khaleesi.models.job.transaction.atomic')
   @patch.object(JobExecution.objects, 'filter')
   @patch.object(JobExecution.objects, 'create')
-  def test_start_job_execution(self, create: MagicMock, filter_count: MagicMock) -> None :
+  def test_start_job_execution(
+      self,
+      create      : MagicMock,
+      filter_count: MagicMock,
+      *_          : MagicMock,
+  ) -> None :
     """Test starting a job execution."""
     for count in [ 0, 1 ]:
       with self.subTest(count = count):

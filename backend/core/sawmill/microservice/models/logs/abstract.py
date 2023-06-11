@@ -118,3 +118,4 @@ class Metadata(models.Model):
   class Meta:
     """Abstract class."""
     abstract = True
+    ordering = [ 'pk' ]

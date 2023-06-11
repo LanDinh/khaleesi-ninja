@@ -1,7 +1,7 @@
 """Basic job tracking."""
 
 # Django.
-from django.db import models
+from django.db import models, transaction
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.request_metadata import add_request_metadata
@@ -16,10 +16,11 @@ class JobExecutionManager(models.Manager['JobExecution']):
 
   def start_job_execution(self, *, job: JobExecutionMetadata) -> 'JobExecution' :
     """Register job start. Returns whether the job should start or not."""
-    in_progress_count = self.filter(job_id = job.job_id, status = IN_PROGRESS).count()
-    if in_progress_count > 0:
-      return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'SKIPPED')
-    return self.create(job_id = job.job_id, execution_id = job.execution_id, status = IN_PROGRESS)
+    with transaction.atomic(using = 'write'):
+      in_progress_count = self.filter(job_id = job.job_id, status = IN_PROGRESS).count()
+      if in_progress_count > 0:
+        return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'SKIPPED')
+      return self.create(job_id = job.job_id, execution_id = job.execution_id, status = IN_PROGRESS)
 
 class JobExecution(models.Model):
   """Basic job."""

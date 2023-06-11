@@ -64,17 +64,24 @@ class BaseJob(ABC, Generic[M]):
         private_message = 'action_configuration.batch_size is mandatory!',
         private_details = f'action_configuration.batch_size = {action.batch_size}',
       )
+    if not action.timelimit:
+      # Without the time limit, the job will not run at all.
+      raise InvalidArgumentException(
+        public_details  = f'action_configuration.timelimit = {action.timelimit}',
+        private_message = 'action_configuration.timelimit is mandatory!',
+        private_details = f'action_configuration.timelimit = {action.timelimit}',
+      )
     self.start           = datetime.now(tz = timezone.utc)
     self.items_processed = 0
     self.job             = job
     self.action          = action
     self.job_execution   = JobExecution()
-    self.paginator       = Paginator(self.get_queryset(), action.batch_size)
 
   def execute(self, *, stop_event: ThreadingEvent) -> JobExecutionResponse :
     """Execute the job."""
     # Start job execution.
     LOGGER.info('Attempting to start job.')
+    self.paginator = Paginator(self.get_queryset(), self.action.batch_size)
     try:
       self.job_execution = JobExecution.objects.start_job_execution(job = self.job)
     except Exception as exception:
@@ -275,7 +282,7 @@ class CleanupJob(BaseJob[M], Generic[M]):
 
   def execute_batch(self, *, page: Page[M]) -> int :
     """Execute a batch deletion."""
-    count, _ = self.model.objects.filter(
+    count, _ = self.get_queryset().filter(
       pk__in = models.Subquery(page.object_list.values('pk')),  # type: ignore[attr-defined]
     ).delete()
     return count

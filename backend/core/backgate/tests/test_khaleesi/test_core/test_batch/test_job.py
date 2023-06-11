@@ -59,6 +59,7 @@ class JobTestMixin:
     paginator.return_value.page_range = [ 1, 2, 3 ]
     request = JobCleanupRequest()
     request.action_configuration.batch_size = 2
+    request.action_configuration.timelimit.FromSeconds(60)
     return request
 
 
@@ -85,6 +86,18 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertIn('action_configuration.batch_size', context.exception.private_message)
     self.assertIn('action_configuration.batch_size', context.exception.private_details)
 
+  def test_mandatory_time_limit(self, *_: MagicMock) -> None :
+    """Test that the timelimit is specified."""
+    # Execute test.
+    with self.assertRaises(InvalidArgumentException) as context:
+      request = JobCleanupRequest()
+      request.action_configuration.batch_size = 5
+      self.job = Job(model = JobExecution, request = request)
+    # Assert result.
+    self.assertIn('action_configuration.timelimit', context.exception.public_details)
+    self.assertIn('action_configuration.timelimit', context.exception.private_message)
+    self.assertIn('action_configuration.timelimit', context.exception.private_details)
+
   @patch('khaleesi.core.batch.job.JobExecution')
   def test_job_fails_to_start(
       self,
@@ -100,6 +113,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     job_execution.return_value.save = MagicMock()  # type: ignore[assignment]
     request = JobCleanupRequest()
     request.action_configuration.batch_size = 2
+    request.action_configuration.timelimit.FromSeconds(60)
     self._set_job(request = request)
     # Execute test.
     with self.assertRaises(Exception):
@@ -132,6 +146,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
         start.return_value.save                           = MagicMock()  # type: ignore[assignment]
         request = JobCleanupRequest()
         request.action_configuration.batch_size = 2
+        request.action_configuration.timelimit.FromSeconds(60)
         self._set_job(request = request)
         # Execute test.
         self.job.execute(stop_event = Event())
@@ -205,6 +220,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test job timeout."""
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
+    request.action_configuration.timelimit.FromNanoseconds(1)
     self._set_job(request = request)
     # Execute test.
     self.job.execute(stop_event = Event())
@@ -228,7 +244,6 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test job error during batch processing."""
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
-    request.action_configuration.timelimit.FromSeconds(60)
     self._set_job(request = request)
     self.job.mock.execute_batch.side_effect = Exception('error in batch')
     # Execute test.
@@ -255,7 +270,6 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test successful job run."""
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
-    request.action_configuration.timelimit.FromSeconds(60)
     self._set_job(request = request)
     # Execute test.
     self.job.execute(stop_event = Event())
@@ -273,7 +287,6 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
 
 
 @patch('khaleesi.core.batch.job.LOGGER')
-@patch('tests.test_khaleesi.test_core.test_batch.test_job.JobExecution.objects.filter')
 @patch('khaleesi.core.batch.job.Paginator')
 @patch('khaleesi.core.batch.job.SINGLETON')
 @patch('khaleesi.core.batch.job.JobExecution.objects.start_job_execution')
@@ -291,15 +304,13 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
       start        : MagicMock,
       singleton    : MagicMock,
       paginator    : MagicMock,
-      filter_delete: MagicMock,
-      *_: MagicMock,
+      *_           : MagicMock,
   ) -> None :
     """Test successful job run."""
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
-    request.action_configuration.timelimit.FromSeconds(60)
-    filter_delete.return_value.delete.return_value = (2, 0)
     self._set_job(request = request)
+    self.job.mock.get_queryset.return_value.filter.return_value.delete.return_value = (2, 0)
     # Execute test.
     self.job.execute(stop_event = Event())
     # Assert result.
