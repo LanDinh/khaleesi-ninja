@@ -23,7 +23,7 @@ from khaleesi.core.shared.singleton import SINGLETON
 from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import (
   JobExecutionResponse,
-  JobCleanupRequest,
+  JobRequest,
   JobExecutionMetadata,
   JobActionConfiguration,
   JobCleanupActionConfiguration,
@@ -262,7 +262,7 @@ class BaseJob(ABC, Generic[M]):
 class Job(BaseJob[M], Generic[M]):
   """General job."""
 
-  def __init__(self, *, model: Type[M], request : JobCleanupRequest) -> None :
+  def __init__(self, *, model: Type[M], request : JobRequest) -> None :
     """Initialize the job."""
     super().__init__(model = model, job = request.job, action = request.action_configuration)
 
@@ -274,7 +274,7 @@ class CleanupJob(BaseJob[M], Generic[M]):
   cleanup_configuration = JobCleanupActionConfiguration()
   cleanup_timestamp = datetime.now(tz = timezone.utc)
 
-  def __init__(self, *, model: Type[M], request : JobCleanupRequest) -> None :
+  def __init__(self, *, model: Type[M], request : JobRequest) -> None :
     """Initialize the job."""
     super().__init__(model = model, job = request.job, action = request.action_configuration)
     self.cleanup_configuration = request.cleanup_configuration

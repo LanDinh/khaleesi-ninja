@@ -7,7 +7,7 @@ from khaleesi.proto.core_pb2 import (
   JobExecutionMetadata,
   JobActionConfiguration,
   JobCleanupActionConfiguration,
-  JobCleanupRequest,
+  JobRequest,
   EmptyResponse,
 )
 from microservice.actuator.core import CORE
@@ -40,7 +40,7 @@ class Actuator:
     name    = parts[2]
     try:
       method = self.actions[gate][service][name]
-      return method(self._cleanup_request(job = job, action = action, cleanup = cleanup))
+      return method(self._request(job = job, action = action, cleanup = cleanup))
     except KeyError as exception:
       raise InvalidArgumentException(
         public_details  = f'gate = ${gate}, service = ${service}, action = ${action}',
@@ -48,14 +48,14 @@ class Actuator:
         private_details = f'gate = ${gate}, service = ${service}, action = ${action}',
       ) from exception
 
-  def _cleanup_request(
+  def _request(
       self, *,
       job    : JobExecutionMetadata,
       action : JobActionConfiguration,
       cleanup: JobCleanupActionConfiguration,
-  ) -> JobCleanupRequest :
-    """Build a JobCleanupRequest."""
-    request = JobCleanupRequest()
+  ) -> JobRequest :
+    """Build a JobRequest."""
+    request = JobRequest()
     add_request_metadata(request = request)
     request.job.job_id       = job.job_id
     request.job.execution_id = job.execution_id

@@ -222,16 +222,16 @@ message LogFilter {
 
 
 service Sawyer {
-  rpc GetEvents               (LogFilter)                       returns (EventsList);
-  rpc GetRequests             (LogFilter)                       returns (RequestList);
-  rpc GetErrors               (LogFilter)                       returns (ErrorList);
-  rpc GetBackgateRequests     (LogFilter)                       returns (BackgateRequestList);
-  rpc GetQueries              (LogFilter)                       returns (QueryList);
-  rpc CleanupEvents           (khaleesi.core.JobCleanupRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupRequests         (khaleesi.core.JobCleanupRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupErrors           (khaleesi.core.JobCleanupRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupBackgateRequests (khaleesi.core.JobCleanupRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupQueries          (khaleesi.core.JobCleanupRequest) returns (khaleesi.core.EmptyResponse);
+  rpc GetEvents               (LogFilter)                returns (EventsList);
+  rpc GetRequests             (LogFilter)                returns (RequestList);
+  rpc GetErrors               (LogFilter)                returns (ErrorList);
+  rpc GetBackgateRequests     (LogFilter)                returns (BackgateRequestList);
+  rpc GetQueries              (LogFilter)                returns (QueryList);
+  rpc CleanupEvents           (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupRequests         (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupErrors           (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupBackgateRequests (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupQueries          (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
 }
 
 message EmptyRequest {

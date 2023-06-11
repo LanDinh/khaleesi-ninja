@@ -14,7 +14,7 @@ from khaleesi.proto.core_pb2 import (
   JobActionConfiguration,
   JobCleanupActionConfiguration,
 )
-from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, Job as GrpcJob
+from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
     add_BellRingerServicer_to_server as add_to_server
@@ -26,10 +26,10 @@ from microservice.models import Job
 class Service(Servicer):
   """core_clocktower service."""
 
-  def CreateJob(self, request: GrpcJob, _: grpc.ServicerContext) -> IdMessage :
+  def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> IdMessage :
     """Create a new job."""
     LOGGER.info('Creating the new job.')
-    job = Job.objects.create_job(grpc_job = request)
+    job = Job.objects.create_job(grpc_job = request.job)
     response = IdMessage()
     response.id = job.job_id
     return response

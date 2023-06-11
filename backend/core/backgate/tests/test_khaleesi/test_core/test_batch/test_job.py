@@ -13,7 +13,7 @@ from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.batch.job import Job as BaseJob, CleanupJob as BaseCleanupJob
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.models.job import JobExecution
-from khaleesi.proto.core_pb2 import JobExecutionResponse, JobCleanupRequest
+from khaleesi.proto.core_pb2 import JobExecutionResponse, JobRequest
 
 
 class Job(BaseJob[JobExecution]):
@@ -44,11 +44,7 @@ class CleanupJob(BaseCleanupJob[JobExecution]):
 class JobTestMixin:
   """Common methods for all job tests."""
 
-  def _successfully_start_job(
-      self, *,
-      start    : MagicMock,
-      paginator: MagicMock,
-  ) -> JobCleanupRequest :
+  def _successfully_start_job(self, *, start: MagicMock, paginator: MagicMock) -> JobRequest :
     """Prepare successful job start"""
     job_execution = JobExecution()
     job_execution.status = JobExecutionResponse.Status.Name(JobExecutionResponse.Status.IN_PROGRESS)
@@ -57,7 +53,7 @@ class JobTestMixin:
     start.return_value                           = job_execution
     paginator.return_value.count = 6
     paginator.return_value.page_range = [ 1, 2, 3 ]
-    request = JobCleanupRequest()
+    request = JobRequest()
     request.action_configuration.batch_size = 2
     request.action_configuration.timelimit.FromSeconds(60)
     return request
@@ -72,7 +68,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
 
   job: Job
 
-  def _set_job(self, *, request: JobCleanupRequest) -> None :
+  def _set_job(self, *, request: JobRequest) -> None :
     self.job = Job(model = JobExecution, request = request)
     self.job.mock = MagicMock()
 
@@ -80,7 +76,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test that the batch size is specified."""
     # Execute test.
     with self.assertRaises(InvalidArgumentException) as context:
-      self.job = Job(model = JobExecution, request = JobCleanupRequest())
+      self.job = Job(model = JobExecution, request = JobRequest())
     # Assert result.
     self.assertIn('action_configuration.batch_size', context.exception.public_details)
     self.assertIn('action_configuration.batch_size', context.exception.private_message)
@@ -90,7 +86,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test that the timelimit is specified."""
     # Execute test.
     with self.assertRaises(InvalidArgumentException) as context:
-      request = JobCleanupRequest()
+      request = JobRequest()
       request.action_configuration.batch_size = 5
       self.job = Job(model = JobExecution, request = request)
     # Assert result.
@@ -111,7 +107,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     start.side_effect = Exception('start failure')
     job_execution.return_value = JobExecution()
     job_execution.return_value.save = MagicMock()  # type: ignore[assignment]
-    request = JobCleanupRequest()
+    request = JobRequest()
     request.action_configuration.batch_size = 2
     request.action_configuration.timelimit.FromSeconds(60)
     self._set_job(request = request)
@@ -144,7 +140,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
         start.return_value.status                         = status_label
         start.return_value.to_grpc_job_execution_response = MagicMock()  # type: ignore[assignment]
         start.return_value.save                           = MagicMock()  # type: ignore[assignment]
-        request = JobCleanupRequest()
+        request = JobRequest()
         request.action_configuration.batch_size = 2
         request.action_configuration.timelimit.FromSeconds(60)
         self._set_job(request = request)
@@ -295,7 +291,7 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
 
   job: CleanupJob
 
-  def _set_job(self, *, request: JobCleanupRequest) -> None :
+  def _set_job(self, *, request: JobRequest) -> None :
     self.job = CleanupJob(model = JobExecution, request = request)
     self.job.mock = MagicMock()
 

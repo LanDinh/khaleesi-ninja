@@ -7,7 +7,7 @@ import grpc
 from khaleesi.core.batch.executor import job_executor
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import EmptyResponse, JobCleanupRequest
+from khaleesi.proto.core_pb2 import EmptyResponse, JobRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogFilter,
@@ -34,7 +34,7 @@ from microservice.models.cleanup import CleanupJob
 class Service(Servicer):
   """Sawyer service."""
 
-  def CleanupEvents(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupEvents(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up events older than '
@@ -42,7 +42,7 @@ class Service(Servicer):
     )
     return job_executor(job = CleanupJob(model = DbEvent, request = request))
 
-  def CleanupRequests(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupRequests(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up requests older than '
@@ -50,7 +50,7 @@ class Service(Servicer):
     )
     return job_executor(job = CleanupJob(model = DbRequest, request = request))
 
-  def CleanupErrors(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupErrors(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up errors older than '
@@ -60,7 +60,7 @@ class Service(Servicer):
 
   def CleanupBackgateRequests(
       self,
-      request: JobCleanupRequest,
+      request: JobRequest,
       _: grpc.ServicerContext,
   ) -> EmptyResponse :
     """Clean up old data."""
@@ -70,7 +70,7 @@ class Service(Servicer):
     )
     return job_executor(job = CleanupJob(model = DbBackgateRequest, request = request))
 
-  def CleanupQueries(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupQueries(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up queries older than '
