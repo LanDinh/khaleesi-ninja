@@ -10,7 +10,7 @@ from microservice.models.cleanup import CleanupJob
 from tests.models import Metadata
 
 
-class TestRequestCleanupJob(SimpleTestCase):
+class TestCleanupJob(SimpleTestCase):
   """Test the request cleanup."""
 
   @patch('tests.test_microservice.test_models.test_cleanup.Metadata.objects.filter')
@@ -19,6 +19,7 @@ class TestRequestCleanupJob(SimpleTestCase):
     # Prepare data.
     request = JobCleanupRequest()
     request.action_configuration.batch_size = 1
+    request.action_configuration.timelimit.FromSeconds(60)
     job: CleanupJob[Metadata] = CleanupJob(model = Metadata, request = request)
     filter_requests.reset_mock()  # Is getting called in the __init__ method.
     # Execute test.

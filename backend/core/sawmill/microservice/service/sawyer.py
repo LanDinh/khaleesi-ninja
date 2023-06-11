@@ -36,14 +36,26 @@ class Service(Servicer):
 
   def CleanupEvents(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up events older than '
+      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+    )
     return job_executor(job = CleanupJob(model = DbEvent, request = request))
 
   def CleanupRequests(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up requests older than '
+      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+    )
     return job_executor(job = CleanupJob(model = DbRequest, request = request))
 
   def CleanupErrors(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up errors older than '
+      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+    )
     return job_executor(job = CleanupJob(model = DbError, request = request))
 
   def CleanupBackgateRequests(
@@ -52,10 +64,18 @@ class Service(Servicer):
       _: grpc.ServicerContext,
   ) -> EmptyResponse :
     """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up backgate requests older than '
+      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+    )
     return job_executor(job = CleanupJob(model = DbBackgateRequest, request = request))
 
   def CleanupQueries(self, request: JobCleanupRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up queries older than '
+      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+    )
     return job_executor(job = CleanupJob(model = DbQuery, request = request))
 
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
