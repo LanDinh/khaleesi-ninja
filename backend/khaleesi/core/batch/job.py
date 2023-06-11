@@ -64,7 +64,7 @@ class BaseJob(ABC, Generic[M]):
         private_message = 'action_configuration.batch_size is mandatory!',
         private_details = f'action_configuration.batch_size = {action.batch_size}',
       )
-    if not action.timelimit:
+    if not action.timelimit.ToNanoseconds() > 0:
       # Without the time limit, the job will not run at all.
       raise InvalidArgumentException(
         public_details  = f'action_configuration.timelimit = {action.timelimit}',
