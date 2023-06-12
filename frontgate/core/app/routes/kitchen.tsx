@@ -1,7 +1,7 @@
 import { Outlet } from '@remix-run/react'
 
 
-export default function KitchenRoute() {
+export default function KitchenRoute(): JSX.Element {
   return (
     <div>
       <h1>Kitchen</h1>

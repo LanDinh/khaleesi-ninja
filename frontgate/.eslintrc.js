@@ -6,6 +6,7 @@ module.exports = {
   rules: {
     "semi": [ 2, "never" ],
     "quotes": [ 2, "single" ],
-    "object-curly-spacing": [ 2, "always" ]
+    "object-curly-spacing": [ 2, "always" ],
+    "@typescript-eslint/explicit-function-return-type": 2
   }
 }

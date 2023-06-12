@@ -1,18 +1,18 @@
 import type { PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
-import { Meta, Links as RemixLinks, Scripts, ScrollRestoration } from '@remix-run/react'
+import {
+  Meta,
+  Links as RemixLinks,
+  Scripts,
+  ScrollRestoration,
+  Outlet,
+  useRouteError,
+} from '@remix-run/react'
+import { ErrorPage } from './error'
 import styles from '../styles/index.css'
 
 
-export const Links: LinksFunction = () => [
-  // Font.
-  { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap' },
-  // Style.
-  { rel: 'stylesheet', href: styles },
-]
-
-
-export function Document({ children }: PropsWithChildren<{}>): JSX.Element {
+function Document({ children }: PropsWithChildren<{}>): JSX.Element {
   return <html lang="en">
     <head>
       <meta charSet="utf-8" />
@@ -26,4 +26,25 @@ export function Document({ children }: PropsWithChildren<{}>): JSX.Element {
       <Scripts />
     </body>
   </html>
+}
+
+export const links: LinksFunction = () => [
+  // Font.
+  { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap' },
+  // Style.
+  { rel: 'stylesheet', href: styles },
+]
+
+export function ErrorBoundary(): JSX.Element {
+  const error = useRouteError()
+
+  return <Document>
+    <ErrorPage error={error} />
+  </Document>
+}
+
+export function App(): JSX.Element {
+  return <Document>
+    <Outlet />
+  </Document>
 }

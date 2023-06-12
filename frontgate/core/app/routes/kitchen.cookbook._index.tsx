@@ -14,7 +14,7 @@ export async function loader(): Promise<Recipe.AsObject[]> {
   return RECIPE_CLIENT_MOCK.getRecipes()
 }
 
-export default function RecipeIndex() {
+export default function RecipeIndex(): JSX.Element {
   const recipes = useLoaderData<typeof loader>()
 
   return (

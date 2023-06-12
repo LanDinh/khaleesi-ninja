@@ -1,3 +1,4 @@
+import type { TypedResponse } from '@remix-run/node'
 import {
   createCookieSessionStorage,
   redirect,
@@ -19,7 +20,10 @@ const storage = createCookieSessionStorage({
   },
 })
 
-export async function createUserSession(sessionId: string, redirectTo: string) {
+export async function createUserSession(
+  sessionId: string,
+  redirectTo: string,
+  ): Promise<TypedResponse<never>> {
   const session = await storage.getSession()
   session.set('sessionId', sessionId)
   console.log('session set')

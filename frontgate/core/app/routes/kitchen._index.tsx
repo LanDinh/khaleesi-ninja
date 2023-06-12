@@ -7,7 +7,7 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export default function KitchenIndex() {
+export default function KitchenIndex(): JSX.Element {
   return (
     <div><ul>
       <li><a href="/kitchen/recipe">Recipes</a></li>

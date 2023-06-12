@@ -13,7 +13,7 @@ function validate(data: any): string | void {
   }
 }
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionArgs): Promise<any> => {
   const form = await request.formData()
   const description = form.get('description')
   const name = form.get('name')
@@ -40,7 +40,7 @@ export const action = async ({ request }: ActionArgs) => {
   return redirect(`/kitchen/cookbook/${recipe.recipeId}`)
 }
 
-export default function NewRecipeRoute() {
+export default function NewRecipeRoute(): JSX.Element {
   const actionData = useActionData<typeof action>()
   return (
     <div>

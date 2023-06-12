@@ -1,5 +1,4 @@
-import type { V2_MetaFunction } from '@remix-run/node'
-import type { ActionArgs } from '@remix-run/node'
+import type { V2_MetaFunction, ActionArgs, TypedResponse } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { Form } from '@remix-run/react'
 import { createUserSession } from '../khaleesi/auth'
@@ -12,22 +11,19 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionArgs): Promise<TypedResponse<any>> => {
   const form = await request.formData()
   const user = form.get('user')
-
-  console.log('before validation')
 
   if ('string' !== typeof user) {
     return json({ fieldErrors: null, fields: null, formError: 'wrong type' }, { status: 400 })
   }
 
-  console.log('validation passed')
   return createUserSession(user, '/')
 }
 
 
-export default function LoginRoute() {
+export default function LoginRoute(): JSX.Element {
   return (
     <div>
       <h1>Login</h1>

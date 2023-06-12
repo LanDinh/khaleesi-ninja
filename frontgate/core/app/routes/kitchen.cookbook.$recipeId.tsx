@@ -11,7 +11,7 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-export function ErrorBoundary() {
+export function ErrorBoundary(): JSX.Element {
   const { recipeId } = useParams()
   return <div>
     There was an error loading the recipe with the ID { recipeId }.
@@ -22,7 +22,7 @@ export async function loader({ params }: LoaderArgs): Promise<Recipe.AsObject> {
   return RECIPE_CLIENT_MOCK.getRecipe(params.recipeId)
 }
 
-export default function RecipeInstanceRoute() {
+export default function RecipeInstanceRoute(): JSX.Element {
   const recipe = useLoaderData<typeof loader>()
   return (
     <div>

@@ -16,7 +16,7 @@ export const links: LinksFunction = () => [
 ]
 
 
-export default function Index() {
+export default function Index(): JSX.Element {
   return (
     <div><ul>
       <li><a href="/kitchen">Kitchen</a></li>

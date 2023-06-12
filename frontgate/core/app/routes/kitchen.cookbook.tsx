@@ -1,6 +1,6 @@
 import { Outlet } from '@remix-run/react'
 
-export default function RecipeRoute() {
+export default function RecipeRoute(): JSX.Element {
   return (
     <div>
       <h1>Cookbook</h1>
