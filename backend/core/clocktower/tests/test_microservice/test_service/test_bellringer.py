@@ -24,7 +24,7 @@ class BellRingerServiceTestCase(SimpleTestCase):
     # Execute test.
     result = self.service.CreateJob(request, MagicMock())
     # Assert result.
-    create.assert_called_once_with(grpc_job = request)
+    create.assert_called_once_with(grpc_job = request.job)
     self.assertEqual(create.return_value.job_id, result.id)
 
   @patch('microservice.service.bellringer.ACTUATOR')
