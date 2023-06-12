@@ -1,6 +1,7 @@
-import { useRouteError, isRouteErrorResponse } from '@remix-run/react'
+import { useRouteError } from '@remix-run/react'
 import { Outlet } from '@remix-run/react'
 import { Document, Links } from './khaleesi/components/document'
+import { ErrorPage } from './khaleesi/components/error'
 
 
 export const links = Links
@@ -8,16 +9,8 @@ export const links = Links
 export function ErrorBoundary() {
   const error = useRouteError()
 
-  if (isRouteErrorResponse(error)) {
-    return <Document>
-      <h1>{ error.status }</h1>
-      <div>{ error.statusText }</div>
-    </Document>
-  }
-
-  const errorMessage = error instanceof Error ? error.message : 'Unknown error'
   return <Document>
-    <div>An error happened: { errorMessage }</div>
+    <ErrorPage error={error} />
   </Document>
 }
 
