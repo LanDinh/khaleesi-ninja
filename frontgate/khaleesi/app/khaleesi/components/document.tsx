@@ -1,13 +1,6 @@
 import type { PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
-import {
-  Meta,
-  Links as RemixLinks,
-  Scripts,
-  ScrollRestoration,
-  Outlet,
-  useRouteError,
-} from '@remix-run/react'
+import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
 import { ErrorPage } from './error'
 import styles from '../styles/index.css'
 
@@ -36,10 +29,8 @@ export const links: LinksFunction = () => [
 ]
 
 export function ErrorBoundary(): JSX.Element {
-  const error = useRouteError()
-
   return <Document>
-    <ErrorPage error={error} />
+    <ErrorPage />
   </Document>
 }
 

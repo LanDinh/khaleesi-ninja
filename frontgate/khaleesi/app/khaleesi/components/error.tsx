@@ -1,7 +1,8 @@
-import { isRouteErrorResponse } from '@remix-run/react'
+import { isRouteErrorResponse, useRouteError } from '@remix-run/react'
 
 
-export function ErrorPage(error: any): JSX.Element {
+export function ErrorPage(): JSX.Element {
+  const error = useRouteError()
 
   let errorTitle = 'Woops! Some dragon went crazy...'
   let errorMessage = error instanceof Error ? error.message : 'Try again later.'
