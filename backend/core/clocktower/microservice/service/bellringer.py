@@ -6,14 +6,7 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.service_configuration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import (
-  IdRequest,
-  IdMessage,
-  EmptyResponse,
-  JobExecutionMetadata,
-  JobActionConfiguration,
-  JobCleanupActionConfiguration,
-)
+from khaleesi.proto.core_pb2 import IdRequest, IdMessage, EmptyResponse
 from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
@@ -37,16 +30,12 @@ class Service(Servicer):
   def ExecuteJob(self, request: IdRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Execute a job by ID."""
     LOGGER.info(f'Executing job "{request.id_message.id}".')
-    job = JobExecutionMetadata()
-    action = JobActionConfiguration()
-    cleanup = JobCleanupActionConfiguration()
-    action.batch_size = 5
-    action.timelimit.FromSeconds(600)
+    action, job_request = Job.objects.get_job_request(id_message = request.id_message)
     ACTUATOR.actuate(
-      action_name = 'core.sawmill.cleanup-requests',
-      job         = job,
-      action      = action,
-      cleanup     = cleanup,
+      action_name = action,
+      job         = job_request.job,
+      action      = job_request.action_configuration,
+      cleanup     = job_request.cleanup_configuration,
     )
     return EmptyResponse()
 

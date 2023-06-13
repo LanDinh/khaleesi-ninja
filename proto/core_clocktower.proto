@@ -14,8 +14,7 @@ message Job {
   string                               action                = 11;
   khaleesi.core.JobActionConfiguration action_configuration  = 12;
 
-  bool                                        is_cleanup_job        = 20;
-  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 21;
+  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 20;
 }
 
 message JobRequest {
