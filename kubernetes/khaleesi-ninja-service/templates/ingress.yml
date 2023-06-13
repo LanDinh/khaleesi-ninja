@@ -18,7 +18,7 @@ spec:
   tls:
     - secretName: tls-certificate
       hosts:
-      - {{ .Values.gate.name }}.{{ .Values.environment.domain }}
+      - {{ if not .Values.ingress.root }}{{ .Values.gate.name }}.{{ end }}{{ .Values.environment.domain }}
   rules:
     - host: {{ if not .Values.ingress.root }}{{ .Values.gate.name }}.{{ end }}{{ .Values.environment.domain }}
       http:

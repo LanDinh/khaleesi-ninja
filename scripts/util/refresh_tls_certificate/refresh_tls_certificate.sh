@@ -9,7 +9,7 @@ set -o pipefail # Make pipes fail
 # Options.
 letsencrypt_folder="/etc/letsencrypt"
 temp_folder="/data"
-domain="*.${KHALEESI_DOMAIN}"
+domain="*.${KHALEESI_DOMAIN},${KHALEESI_DOMAIN}"
 
 
 echo "Copying letsencrypt configuration..."

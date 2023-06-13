@@ -8,10 +8,6 @@ service:
   replicas: 1
   image_pull_policy: "Never"
 
-# Kubernetes.
-ingress:
-  root: false
-
 # Database.
 kubegres:
   replicas: 1
