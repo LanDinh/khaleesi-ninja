@@ -1,7 +1,7 @@
 # khaleesi-ninja
 
 ![latest version](https://img.shields.io/github/v/tag/LanDinh/khaleesi-ninja)
-[![CI badge](https://github.com/LanDinh/khaleesi-ninja/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/LanDinh/khaleesi-ninja/actions)
+[![CI badge](https://github.com/LanDinh/khaleesi-ninja/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/LanDinh/khaleesi-ninja/actions)
 [![codecov badge](https://codecov.io/gh/LanDinh/khaleesi-ninja/branch/main/graph/badge.svg?token=tQrhEsgApq)](https://codecov.io/gh/LanDinh/khaleesi-ninja)
 ![lines of code badge](https://img.shields.io/tokei/lines/github/LanDinh/khaleesi-ninja)
 [![licence badge](https://img.shields.io/github/license/LanDinh/khaleesi-ninja)](LICENSE)
