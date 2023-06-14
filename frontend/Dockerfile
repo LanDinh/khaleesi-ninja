@@ -87,6 +87,7 @@ ENV KHALEESI_GATE=${gate}
 
 # Data.
 WORKDIR /code/
+COPY execute.sh /code/execute.sh
 COPY --from=production-base /code/build/ /code/build/
 COPY --from=production-base /code/public/build/ /code/public/build/
 RUN chmod +x ./execute.sh
