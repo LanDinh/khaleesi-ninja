@@ -1,4 +1,6 @@
 service:
-  name: "backgate"
+  name: "frontend"
   version: "1.0.0"
   replicas: 1
+ingress:
+  root: true

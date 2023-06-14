@@ -8,11 +8,9 @@ FROM khaleesi/base/backend-construction:1.0.0 as base
 ARG gate
 ARG service
 ARG version
-ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_VERSION=${version}
-ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
@@ -30,11 +28,9 @@ FROM base as development-base
 ARG gate
 ARG service
 ARG version
-ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_VERSION=${version}
-ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
@@ -57,11 +53,9 @@ FROM khaleesi/base/backend-image:1.0.0 as development
 ARG gate
 ARG service
 ARG version
-ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_VERSION=${version}
-ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 ENV KHALEESI_DEBUG=true
 ENV KHALEESI_METRICS_PORT=8020
 ENV PORT=8000
@@ -86,11 +80,9 @@ FROM base as production-base
 ARG gate
 ARG service
 ARG version
-ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_VERSION=${version}
-ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 
 # Metadata.
 WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
@@ -110,11 +102,9 @@ FROM khaleesi/base/backend-image:1.0.0 as production
 ARG gate
 ARG service
 ARG version
-ARG frontgate_version
 ENV KHALEESI_GATE=${gate}
 ENV KHALEESI_SERVICE=${service}
 ENV KHALEESI_VERSION=${version}
-ENV KHALEESI_FRONTGATE_VERSION=${frontgate_version}
 ENV KHALEESI_METRICS_PORT=8020
 ENV PORT=8000
 ENV PYTHONPATH=/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/proto

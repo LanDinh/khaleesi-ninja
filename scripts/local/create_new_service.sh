@@ -19,7 +19,7 @@ if [[ "${CI:-false}" == "true" ]]; then
 fi
 
 # Options.
-symlink_frontgate_command=
+symlink_frontend_command=
 symlink_backend_command=
 
 
@@ -89,30 +89,30 @@ create_micro() {
 }
 
 
-# Frontgate.
-create_frontgate() {
+# Frontend.
+create_frontend() {
   local gate=${1}
-  local project_folder="frontgate/${gate}"
-  local template_folder="templates/frontgate"
+  local project_folder="frontend/${gate}"
+  local template_folder="templates/frontend"
 
-  if [[ -z "${SYMLINK_FRONTGATE}" ]]; then
-      symlink_frontgate_command="ln -nrs \"../../core/src/core\" \"frontgate/${gate}/src/core\""
+  if [[ -z "${SYMLINK_FRONTEND}" ]]; then
+      symlink_frontend_command="ln -nrs \"../../core/src/core\" \"frontend/${gate}/src/core\""
   else
-      symlink_frontgate_command="${SYMLINK_FRONTGATE}"
+      symlink_frontend_command="${SYMLINK_FRONTEND}"
   fi
 
   echo -e "${yellow}Creating react project...${clear_color}"
-  npx create-remix "${project_folder}" --template "${template_folder}/frontgate_template" --no-install --typescript
+  npx create-remix "${project_folder}" --template "${template_folder}/frontend_template" --no-install --typescript
 
   echo -e "${yellow}Removing unnecessary files...${clear_color}"
   rm "${project_folder}/package.json"
 
   echo -e "${yellow}Adding symlinks...${clear_color}"
   # shellcheck disable=SC2086
-  eval ${symlink_frontgate_command}
+  eval ${symlink_frontend_command}
 
   echo -e "${yellow}Adding service to list of services...${clear_color}"
-  add_metadata "${gate}" "frontgate" "frontgate"
+  add_metadata "${gate}" "frontend" "frontend"
 }
 
 
@@ -125,7 +125,7 @@ select input_type in gate micro; do
   case $input_type in
   gate)
     echo -e "${magenta}Creating gates...${clear_color}"
-    create_frontgate "${gate}"
+    create_frontend "${gate}"
     break
     ;;
   micro)

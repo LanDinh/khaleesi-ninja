@@ -24,20 +24,13 @@ type=${3}
 version=${4}
 container_mode=${6}
 location="backend"
-frontgate_version=
 
 
-if [[ "${type}" == "frontgate" ]]; then
-  location="frontgate"
+if [[ "${type}" == "frontend" ]]; then
+  location="frontend"
   cache="cache=./"
 else
   cache="pip_cache=$(pip cache dir)"
-  if [[ "${service}" == "backgate" ]]; then
-    echo -e "${yellow}Fetching the frontgate version...${clear_color}"
-    raw_frontgate=$(grep "\"gate\": \"${gate}\"" "${all_services_file}" | grep "\"type\": \"frontgate\"")
-    read -r -a frontgate <<< "$(./scripts/util/parse_service.sh "${raw_frontgate}")"
-    frontgate_version="${frontgate[3]}"
-  fi
 fi
 
 
@@ -47,7 +40,6 @@ DOCKER_BUILDKIT=1 docker buildx build "${location}" \
   --build-arg gate="${gate}" \
   --build-arg service="${service}" \
   --build-arg version="${version}" \
-  --build-arg frontgate_version="${frontgate_version}" \
   --target "${container_mode}" \
   -t "khaleesi-ninja/${gate}/${service}:latest-${container_mode}" \
   -t "khaleesi-ninja/${gate}/${service}:${version}-${container_mode}"

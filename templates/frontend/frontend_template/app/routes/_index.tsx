@@ -3,8 +3,8 @@ import styles from "../khaleesi/core/styles/index.css"
 
 export const meta: V2_MetaFunction = () => {
   return [
-    { title: "khaleesi.ninja | New Frontgate" },
-    { name: "description", content: "Khaleesi's New Frontgate." },
+    { title: "khaleesi.ninja | New Frontend" },
+    { name: "description", content: "Khaleesi's New Frontend." },
   ]
 }
 
@@ -15,6 +15,6 @@ export const links: LinksFunction = () => [
 
 export default function Index() {
   return (
-    <div>New Frontgate</div>
+    <div>New Frontend</div>
   )
 }

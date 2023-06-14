@@ -1,6 +1,6 @@
-# Frontgate
-/frontgate/node_modules/*
-/frontgate/khaleesi/app/khaleesi/proto/*
+# Frontend
+/frontend/node_modules/*
+/frontend/khaleesi/app/khaleesi/proto/*
 
 # Backend
 /backend/.venv/*

@@ -1,5 +1,5 @@
 type:
-  name: "frontgate"
+  name: "frontend"
 ingress:
   enabled: true
   path: "/"

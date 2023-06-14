@@ -52,8 +52,8 @@ ENV PORT=8000
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-WORKDIR /code/frontgate/${KHALEESI_GATE}/
-COPY --from=development-base /code/ /code/frontgate/${KHALEESI_GATE}/
+WORKDIR /code/frontend/${KHALEESI_GATE}/
+COPY --from=development-base /code/ /code/frontend/${KHALEESI_GATE}/
 RUN chmod +x ./execute.sh
 
 # Execute the tests.
@@ -70,7 +70,7 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-WORKDIR /code/frontgate/${KHALEESI_GATE}/
+WORKDIR /code/frontend/${KHALEESI_GATE}/
 RUN npm run build
 
 ################################################################################
