@@ -77,8 +77,6 @@ RUN npm run build
 #                            Production Server Base                            #
 ################################################################################
 # Data.
-COPY --from=production-base /code/build/ /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 FROM node:20.2.0-slim as production
 LABEL environment=production
 
