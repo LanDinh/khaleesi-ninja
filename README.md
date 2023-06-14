@@ -78,7 +78,8 @@ The logical structure is as follows:
     They communicate with each other via `grpc`.
     To create a new microservice, use its [custom template](/templates/backend/micro_template)
 * The different apps are:
-  * `core`: bundle common logic - [documentation](/documentation/logical-structure/core.md)
+  * `khaleesi`: contains logic shared by all services - [documentation](/documentation/logical-structure/khaleesi.md) 
+  * `core`: logic used by all apps - [documentation](/documentation/logical-structure/core.md)
 
 ### Starting the ecosystem locally
 
