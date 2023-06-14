@@ -41,10 +41,6 @@ probe:
   grpc:
     enabled: false
 
-nginx_prometheus_exporter:
-  enabled: false
-  version: "0.9.0"
-
 # gRPC.
 grpc_web:
   enabled: false
