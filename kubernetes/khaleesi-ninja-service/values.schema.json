@@ -243,7 +243,6 @@
     "kubegres",
     "django",
     "probe",
-    "nginx_prometheus_exporter",
     "grpc_web",
     "grpcui"
   ],
