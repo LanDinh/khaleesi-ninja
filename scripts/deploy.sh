@@ -33,7 +33,7 @@ installed=true
 
 if [[ ${deploy} == "false" ]]; then
   echo -e "${red}Skipping deployment for ${gate}-${service}!${clear_color}"
-  return 0
+  exit 0
 fi
 
 echo -e "${yellow}Checking if the service ${gate}-${service} is already deployed...${clear_color}"
