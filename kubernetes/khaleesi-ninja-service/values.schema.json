@@ -92,13 +92,18 @@
         "port": {
           "description": "the named port the ingress should access for requests",
           "type": "string"
+        },
+        "root": {
+          "description": "whether or not the frontend is hosted at the main domain",
+          "type": "boolean"
         }
       },
       "required": [
         "enabled",
         "path",
         "regex_path",
-        "port"
+        "port",
+        "root"
       ]
     },
     "kubegres": {
