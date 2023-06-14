@@ -1,14 +1,11 @@
 @startuml
 actor user as user #lightpink;line:darkred;text:darkred
 
-' GATE
-cloud       "frontgate"     as frontgate    #lavender;line:darkviolet;text:darkviolet
-cloud       "backgate"      as backgate     #lavender;line:darkviolet;text:darkviolet
+' APP
+cloud       "frontend"      as frontend     #lavender;line:darkviolet;text:darkviolet
 collections "microservices" as microservice #lavender;line:darkviolet;text:darkviolet
 
 ' CORE
-cloud       "core frontgate"     as core_frontgate    #aliceblue;line:darkblue;text:darkblue
-cloud       "core backgate"      as core_backgate     #aliceblue;line:darkblue;text:darkblue
 collections "core microservices" as core_microservice #lavender;line:darkviolet;text:darkviolet
 
 ' 3RD PARTY
@@ -17,31 +14,23 @@ card        "prometheus" as prometheus #bisque;line:saddlebrown;text:saddlebrown
 card        "grafana"    as grafana    #bisque;line:saddlebrown;text:saddlebrown
 collections "gRPC UI"    as grpcui     #bisque;line:saddlebrown;text:saddlebrown
 
-' gate connections
-user      --> frontgate         #saddlebrown;text:saddlebrown : https
-frontgate --> backgate          #darkviolet;text:darkviolet   : "grpc-web"
-backgate  --> core_microservice #darkviolet;text:darkviolet   : gGRPC
-backgate  --> microservice      #darkviolet;text:darkviolet   : gGRPC
-
-' gate inheritance
-core_frontgate ^-- frontgate #darkblue
-core_backgate  ^-- backgate  #darkblue
+' app connections
+user      --> frontend          #saddlebrown;text:saddlebrown : https
+frontend  --> core_microservice #darkviolet;text:darkviolet   : gGRPC
+frontend  --> microservice      #darkviolet;text:darkviolet   : gGRPC
 
 ' kubegres connection
-backgate          --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
 microservice      --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
 core_microservice --> kubegres #saddlebrown;text:saddlebrown : PostgreSQL
 
 ' grpcui connection
 user   --> grpcui            #saddlebrown;text:saddlebrown : https
-grpcui --> backgate          #saddlebrown;text:saddlebrown : gGRPC
 grpcui --> microservice      #saddlebrown;text:saddlebrown : gGRPC
 grpcui --> core_microservice #saddlebrown;text:saddlebrown : gGRPC
 
 ' prometheus connection
 user       --> grafana           #saddlebrown;text:saddlebrown : https
 grafana    --> prometheus        #saddlebrown;text:saddlebrown : http
-prometheus --> backgate          #saddlebrown;text:saddlebrown : http
 prometheus --> microservice      #saddlebrown;text:saddlebrown : http
 prometheus --> core_microservice #saddlebrown;text:saddlebrown : http
 prometheus --> kubegres          #saddlebrown;text:saddlebrown : http

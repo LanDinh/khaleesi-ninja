@@ -1,24 +1,20 @@
-# Templates for new gates
+# Templates for new apps
 
 ## `backend` folder
 
-This contains templates relevant for backgates.
-
-### `backgate_template` folder
-
-This is a `django-admin startproject` template for creating new backgates.
+This contains templates relevant for backends.
 
 ### `micro_template` folder
 
 This is a `django-admin startproject` template for creating new microservices.
 
-## `frontgate` folder
+## `frontend` folder
 
-This contains templates relevant for frontgates.
+This contains templates relevant for frontends.
 
-### `cra-template-khaleesi-ninja-frontgate`
+### `frontend_template`
 
-This is a `create-react-app` template for creating new frontgates.
+This is a `create-remix` template for creating new frontends.
 
 ## `kubernetes` folder
 

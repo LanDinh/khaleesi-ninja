@@ -14,23 +14,28 @@ rectangle {
 </style>
 
 ' ******************************************** OBJECTS *********************************************
-agent frontgate
-agent backgate
-rectangle guard
+agent frontend
+rectangle clocktower [
+  Clocktower
+  ====
+  configure batch jobs
+  execute batch jobs
+  check batch job results
+]
 rectangle sawmill [
   Sawmill
   ====
-  log event
-  log request
-  log response
+  logging
+  checking logs
+  cleanup logs
+  service call data
 ]
 
 ' ******************************************* RELATIONS ********************************************
-frontgate --> backgate #darkviolet;text:darkviolet : contact backgate
+frontend --> sawmill    #darkviolet;text:darkviolet : logging
 
-backgate --> guard #saddlebrown;text:saddlebrown : access permissions
+clocktower --> sawmill #saddlebrown;text:saddlebrown : cleanup
 
-backgate --> sawmill #saddlebrown;text:saddlebrown : logging
-guard    --> sawmill #saddlebrown;text:saddlebrown : logging
+clocktower --> sawmill #saddlebrown;text:saddlebrown : logging
 
 @enduml

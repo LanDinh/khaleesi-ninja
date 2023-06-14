@@ -17,26 +17,48 @@ rectangle {
 agent metadata[
   Metadata
   ====
-  meta_reported_timestamp
-  meta_logged_timestamp
+  reported_timestamp
+  logged_timestamp
   ----
-  meta_logger_khaleesi_gate
+  backgate_request_id
+  request_id
+  ----
+  user_id
+  user_type
+  ----
+  meta_logger_khaleesi_app
   meta_logger_khaleesi_service
   meta_logger_grpc_service
   meta_logger_grpc_method
+  ----
+  pod_id
+  errors
+]
+
+agent response [
+  ResponseMetadata
+  ====
+  response_status
+  ----
+  reported_timestamp
+  logged_timestamp
+  duration
+  ----
+  errors
 ]
 
 rectangle event [
   Event
   ====
+  event_id
+  ----
   target_type
   target_id
-  target_owner
+  target_owner_id
+  target_owner_type
   ----
-  origin_user
-  origin_system
-  ----
-  action_type
+  action_crud_type
+  action_custom_type
   action_result
   action_details
 ]
@@ -45,18 +67,71 @@ rectangle request [
   ====
   upstream_request_id
   ----
-  upstream_request_khaleesi_gate
+  upstream_request_khaleesi_app
   upstream_request_khaleesi_service
   upstream_request_grpc_service
   upstream_request_grpc_method
+]
+rectangle backgate_request [
+  BackgateRequest
+  ====
+  type
+  language
+  device_id
   ----
-  response_status
-  response_reported_timestamp
-  response_logged_timestamp
+  language
+  ip
+  useragent
+  ----
+  geolocation
+  browser
+  rendering_agent
+  os
+  device_type
+]
+
+rectangle error [
+  Error
+  ====
+  error_id
+  ----
+  status
+  loglevel
+  ----
+  app
+  service
+  ----
+  public_key
+  public_details
+  ----
+  private_message
+  private_details
+  stacktrace
+]
+rectangle query [
+  Query
+  ====
+  query_id
+  connection
+  ----
+  raw
+  normalized
+  ----
+  tables
+  columns
+  ----
+  reported_start
+  reported_end
 ]
 
 ' ******************************************* RELATIONS ********************************************
-metadata ^-- event #darkviolet;text:darkviolet
-metadata ^-- request #darkviolet;text:darkviolet
+metadata ^-- event            #darkviolet;text:darkviolet
+metadata ^-- request          #darkviolet;text:darkviolet
+metadata ^-- backgate_request #darkviolet;text:darkviolet
+metadata ^-- query            #darkviolet;text:darkviolet
+metadata ^-- error            #darkviolet;text:darkviolet
+
+response ^-- request          #darkviolet;text:darkviolet
+response ^-- backgate_request #darkviolet;text:darkviolet
 
 @enduml

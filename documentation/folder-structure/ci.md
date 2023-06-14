@@ -2,15 +2,43 @@
 
 ## Actions folder
 
+### `cache-image`
+
+Place a built image into the cache for reuse.
+
+### `clean-cache`
+
+Remove everything from the cache that was added within a specific build hash.
+
+### `get-cached-backend-data`
+
+Load backend base images located inside the cache.
+
+### `load-all-images`
+
+Load all images located inside the cache.
+
+### `load-image`
+
+Load a specific image located inside the cache.
+
 ### `set-json-output`
 
 This will read the json files in the `data` folder and make them available as output.
 
-### `setup-protoc`
-
-This will install protoc & plugins necessary for it
-
 ## Workflows folder
+
+### `clean-cache`
+
+Clean up cache from an old run in case cleanup failed at the end of the run.
+
+### `codeql-analysis`
+
+Github-provided code quality tool.
+
+### `delete-old-workflow-runs`
+
+Make it possible to remove old workflow results after a workflow got renamed.
 
 ### `tests`
 

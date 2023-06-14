@@ -1,14 +1,12 @@
 # core
 
-This gate contains the common logic shared by all gates.
+This app contains the common logic shared by all apps.
 
 ![Core Structure](/documentation/images/logical-structure/core.svg)
 
-## frontgate
+## frontend
 
-## backgate
-
-## guard
+## clocktower
 
 ## sawmill
 
@@ -18,6 +16,10 @@ This service is responsible for logging.
 
 The different types of logs are:
 
-* `Metadata` contains metadata shared by all log types and is inherited from by all log types
-* `Event` contains information relating to actions that might require auditing 
+* `Metadata` contains metadata shared by all log types
+* `ResponseMetadata` contains metadata shared by all request log types
+* `Error` contains information regarding errors that happened
+* `Event` contains information relating to actions that might require auditing
+* `Query` contains information regarding database queries
 * `Request` contains information regarding gRPC requests and their responses
+* `BackgateRequest` contains information regarding requests as they enter the ecosystem
