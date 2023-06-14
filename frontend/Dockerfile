@@ -70,19 +70,29 @@ ARG gate
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-WORKDIR /code/frontend/${KHALEESI_GATE}/
+WORKDIR /code/
 RUN npm run build
 
 ################################################################################
 #                            Production Server Base                            #
 ################################################################################
-FROM nginx:1.21-alpine AS production
+# Data.
+COPY --from=production-base /code/build/ /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+FROM node:20.2.0-slim as production
 LABEL environment=production
 
 # Arguments & environment.
 ARG gate
+ENV PORT=8000
 ENV KHALEESI_GATE=${gate}
 
 # Data.
-COPY --from=production-base /code/build/ /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /code/
+COPY --from=production-base /code/build/ /code/build/
+COPY --from=production-base /code/public/build/ /code/public/build/
+RUN chmod +x ./execute.sh
+
+# Execute the tests.
+ENTRYPOINT ["./execute.sh"]
+CMD ["run"]
