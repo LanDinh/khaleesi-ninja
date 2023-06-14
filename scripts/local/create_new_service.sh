@@ -20,7 +20,6 @@ fi
 
 # Options.
 symlink_frontgate_command=
-symlink_backgate_command=
 symlink_backend_command=
 
 
@@ -90,23 +89,6 @@ create_micro() {
 }
 
 
-create_backgate() {
-  local gate=${1}
-
-  if [[ -z "${SYMLINK_BACKGATE}" ]]; then
-      symlink_backgate_command="ln -nrs \"../../core/backgate/core\" \"backend/${gate}/backgate/core\""
-  else
-      symlink_backgate_command="${SYMLINK_BACKGATE}"
-  fi
-
-  create_backend "${gate}" "backgate" "backgate"
-
-  echo -e "${yellow}Adding backgate-specific symlinks...${clear_color}"
-  # shellcheck disable=SC2086
-  eval ${symlink_backgate_command}
-}
-
-
 # Frontgate.
 create_frontgate() {
   local gate=${1}
@@ -144,7 +126,6 @@ select input_type in gate micro; do
   gate)
     echo -e "${magenta}Creating gates...${clear_color}"
     create_frontgate "${gate}"
-    create_backgate "${gate}"
     break
     ;;
   micro)

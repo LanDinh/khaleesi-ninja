@@ -109,7 +109,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Get cached backend data
-        if: matrix.service.type == 'backgate' || matrix.service.type == 'micro'
+        if: matrix.service.type == 'micro'
         uses: ./.github/actions/get-cached-backend-data
         with:
           gate: ${{ matrix.service.gate }}
