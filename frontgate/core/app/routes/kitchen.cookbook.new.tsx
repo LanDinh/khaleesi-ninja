@@ -53,9 +53,14 @@ export default function NewRecipeRoute(): JSX.Element {
         </div>
         <div>
           <label>
-            Description: <textarea name="description" defaultValue={actionData?.fields?.description}/>
+            Description: <textarea
+              name="description"
+              defaultValue={actionData?.fields?.description}
+            />
           </label>
-          {actionData?.fieldErrors?.description ? <p>{actionData.fieldErrors.description}</p> : null}
+          {actionData?.fieldErrors?.description ?
+           <p>{actionData.fieldErrors.description}</p> :
+           null}
         </div>
         <div>
           <button type="submit" className="button">

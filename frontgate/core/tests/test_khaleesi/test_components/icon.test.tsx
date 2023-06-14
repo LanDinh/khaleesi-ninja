@@ -1,0 +1,25 @@
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
+import { MenuIcon, SettingsIcon, LoginIcon } from '../../../app/khaleesi/components/icon'
+
+
+test('Menu Icon gets rendered without errors.', () => {
+  // Execute test.
+  render(<MenuIcon />)
+  // Assert result.
+  expect(screen.getByRole('icon')).toBeInTheDocument()
+})
+
+test('Setting Icon gets rendered without errors.', () => {
+  // Execute test.
+  render(<SettingsIcon />)
+  // Assert result.
+  expect(screen.getByRole('icon')).toBeInTheDocument()
+})
+
+test('Login Icon gets rendered without errors.', () => {
+  // Execute test.
+  render(<LoginIcon />)
+  // Assert result.
+  expect(screen.getByRole('icon')).toBeInTheDocument()
+})

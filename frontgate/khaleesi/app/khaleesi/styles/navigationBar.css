@@ -1,0 +1,33 @@
+#khaleesi-navigation {
+  /* Grid. */
+  grid-area: navigation;
+
+  /* Flex. */
+  display       : flex;
+  flex-direction: column;
+
+  /* Colors. */
+  color: var(--background-light-color);
+}
+
+#khaleesi-navigation-menu {
+  /* Colors. */
+  color: var(--theme-light-color);
+}
+
+#khaleesi-navigation-breadcrumbs {
+  /* Flex. */
+  flex-grow: 1;
+  display       : flex;
+  flex-direction: column;
+}
+
+#khaleesi-navigation-breadcrumbs > a {
+  /* Colors. */
+  color: var(--background-light-color);
+}
+
+#khaleesi-navigation-breadcrumbs > a:hover {
+  /* Colors. */
+  color: var(--theme-light-color);
+}

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { ErrorPage } from '../../app/khaleesi/components/error'
-import { createRemixStub } from '../util/remixStub'
+import { ErrorPage } from '../../../app/khaleesi/components/error'
+import { createRemixStub } from '../../util/remixStub'
 
 
 afterAll(() => {

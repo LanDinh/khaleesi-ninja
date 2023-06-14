@@ -12,8 +12,8 @@ export function ErrorPage(): JSX.Element {
     errorMessage = error.statusText
   }
 
-  return <main>
-    <h1>{ errorTitle }</h1>
-    <div>{ errorMessage }</div>
-  </main>
+  return <>
+    <h1>{ errorTitle }</h1>,
+    <div>{ errorMessage }</div>,
+  </>
 }

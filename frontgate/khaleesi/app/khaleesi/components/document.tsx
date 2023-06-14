@@ -1,8 +1,10 @@
 import type { PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
 import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
+import { NavigationBar } from './navigation/navigationBar'
 import { ErrorPage } from './error'
-import styles from '../styles/index.css'
+import rootStyles from '../styles/index.css'
+import navigationBarStyles from '../styles/navigationBar.css'
 
 
 function Document({ children }: PropsWithChildren<{}>): JSX.Element {
@@ -14,7 +16,11 @@ function Document({ children }: PropsWithChildren<{}>): JSX.Element {
       <RemixLinks />
     </head>
     <body>
-      { children }
+      <div id="khaleesi-app">
+        <div id="khaleesi-title" className="khaleesi-bar">Title</div>
+        <NavigationBar />
+        <main id="khaleesi-content">{ children }</main>
+      </div>
       <ScrollRestoration />
       <Scripts />
     </body>
@@ -25,7 +31,8 @@ export const links: LinksFunction = () => [
   // Font.
   { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap' },
   // Style.
-  { rel: 'stylesheet', href: styles },
+  { rel: 'stylesheet', href: rootStyles },
+  { rel: 'stylesheet', href: navigationBarStyles },
 ]
 
 export function ErrorBoundary(): JSX.Element {
