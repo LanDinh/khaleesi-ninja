@@ -91,8 +91,8 @@ COPY ./package.json /code/
 COPY execute.sh /code/execute.sh
 COPY --from=production-base /code/build/ /code/build/
 COPY --from=production-base /code/public/build/ /code/public/build/
-COPY --from=production-base /code/node-modules/@remix-run/serve/ /code/node-modules/@remix-run/serve/
-COPY --from=production-base /code/node-modules/.bin/remix-serve /code/node-modules/.bin/remix-serve
+COPY --from=production-base /code/node_modules/@remix-run/serve/ /code/node_modules/@remix-run/serve/
+COPY --from=production-base /code/node_modules/.bin/remix-serve /code/node_modules/.bin/remix-serve
 RUN chmod +x ./execute.sh
 
 # Execute the tests.
