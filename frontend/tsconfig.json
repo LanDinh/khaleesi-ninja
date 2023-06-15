@@ -12,7 +12,7 @@
     "strict": true,
     "allowJs": false,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./core",
+    "baseUrl": "./",
     "paths": {
       "~/*": ["./app/*"]
     },

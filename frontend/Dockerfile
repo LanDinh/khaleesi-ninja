@@ -65,7 +65,7 @@ CMD ["run"]
 ################################################################################
 #                               Production Base                                #
 ################################################################################
-FROM base AS production-base
+FROM base AS production
 
 # Arguments & environment.
 ARG gate
@@ -73,31 +73,9 @@ ENV KHALEESI_GATE=${gate}
 
 # Data.
 WORKDIR /code/
-RUN npm run build
-RUN ls -al
-
-################################################################################
-#                            Production Server Base                            #
-################################################################################
-# Data.
-FROM node:20.2.0-slim as production
-LABEL environment=production
-
-# Arguments & environment.
-ARG gate
-ENV PORT=8000
-ENV KHALEESI_GATE=${gate}
-
-# Data.
-WORKDIR /code/
-COPY ./package.json /code/
 COPY ./execute.sh /code/execute.sh
-COPY ./remix.env.d.ts /code/
-COPY --from=production-base /code/build/ /code/build/
-COPY --from=production-base /code/public/build/ /code/public/build/
-COPY --from=production-base /code/node_modules/@remix-run/serve/ /code/node_modules/@remix-run/serve/
-COPY --from=production-base /code/node_modules/.bin/remix-serve /code/node_modules/.bin/remix-serve
 RUN chmod +x ./execute.sh
+RUN npm run build
 
 # Execute the tests.
 ENTRYPOINT ["./execute.sh"]
