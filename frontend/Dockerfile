@@ -63,12 +63,13 @@ ENTRYPOINT ["./execute.sh"]
 CMD ["run"]
 
 ################################################################################
-#                               Production Base                                #
+#                                  Production                                  #
 ################################################################################
 FROM base AS production
 
 # Arguments & environment.
 ARG gate
+ENV PORT=8000
 ENV KHALEESI_GATE=${gate}
 
 # Data.
