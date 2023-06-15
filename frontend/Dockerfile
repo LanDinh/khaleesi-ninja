@@ -15,6 +15,8 @@ WORKDIR /code
 COPY ./package.json /code/
 COPY ./package-lock.json /code/
 COPY ./tsconfig.json /code/
+COPY ./remix.config.js /code/
+COPY ./remix.env.d.ts /code/
 RUN sed -i "s/\${KHALEESI_GATE}/${KHALEESI_GATE}/" "/code/package.json"
 RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package.json"
 RUN sed -i "s/\${KHALEESI_GATE}/${KHALEESI_GATE}/" "/code/package-lock.json"
@@ -88,7 +90,8 @@ ENV KHALEESI_GATE=${gate}
 # Data.
 WORKDIR /code/
 COPY ./package.json /code/
-COPY execute.sh /code/execute.sh
+COPY ./execute.sh /code/execute.sh
+COPY ./remix.env.d.ts /code/
 COPY --from=production-base /code/build/ /code/build/
 COPY --from=production-base /code/public/build/ /code/public/build/
 COPY --from=production-base /code/node_modules/@remix-run/serve/ /code/node_modules/@remix-run/serve/
