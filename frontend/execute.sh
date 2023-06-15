@@ -10,7 +10,6 @@ command=${1}
 
 
 run() {
-  ls -al
   npm run start
 }
 

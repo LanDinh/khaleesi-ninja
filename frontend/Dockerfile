@@ -74,6 +74,7 @@ ENV KHALEESI_GATE=${gate}
 # Data.
 WORKDIR /code/
 RUN npm run build
+RUN ls -al
 
 ################################################################################
 #                            Production Server Base                            #
