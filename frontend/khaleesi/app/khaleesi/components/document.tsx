@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
 import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
-import { NavigationBar } from './navigation/navigationBar'
+import { Navigation } from './navigation/navigation'
 import { ErrorPage } from './error'
 import rootStyles from '../styles/index.css'
-import navigationBarStyles from '../styles/navigationBar.css'
+import navigationBarStyles from '../styles/navigation.css'
 
 
 function Document({ children }: PropsWithChildren<{}>): JSX.Element {
@@ -18,7 +18,7 @@ function Document({ children }: PropsWithChildren<{}>): JSX.Element {
     <body>
       <div id="khaleesi-app">
         <div id="khaleesi-title" className="khaleesi-bar">Title</div>
-        <NavigationBar />
+        <Navigation />
         <main id="khaleesi-content">{ children }</main>
       </div>
       <ScrollRestoration />

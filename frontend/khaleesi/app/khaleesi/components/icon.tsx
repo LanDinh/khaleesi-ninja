@@ -2,7 +2,8 @@ import type { PropsWithChildren } from 'react'
 
 
 export type IconProperties = {
-  id?: string
+  id?       : string
+  className?: string
 }
 
 

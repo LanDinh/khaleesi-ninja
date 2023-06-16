@@ -7,7 +7,13 @@ import { createRemixStub } from '../../../util/remixStub'
 test('', () => {
   // Prepare data.
   const Icon = <div>TEST</div>
-  let RemixStub = createRemixStub(breadcrumb({ path: '/some/path', icon: Icon }).breadcrumb())
+  const match = {
+    id: 'test',
+    pathname: '',
+    params  : {},
+    data    : null
+  }
+  let RemixStub = createRemixStub(breadcrumb({ path: '/some/path', icon: Icon }).breadcrumb(match))
   // Execute test.
   render(<RemixStub />)
   // Assert result.

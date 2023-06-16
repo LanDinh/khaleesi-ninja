@@ -12,6 +12,7 @@ type RemixStubOptions = {
 export function createRemixStub(
   element  : JSX.Element,
   childText: string = '',
+  path     : string = '/',
 ): (options: RemixStubOptions) => JSX.Element {
   const children = []
   if (0 < childText.length) {

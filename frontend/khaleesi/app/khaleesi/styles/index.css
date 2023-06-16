@@ -7,15 +7,17 @@
   --bad-color             : #FF2F00;
   --average-color         : #FFD000;
   --good-color            : #00FF2F;
-  --padding   : 8px;
+  --spacing   : 8px;
   --outer-size: 72px;
-  --inner-size: calc(var(--outer-size) - 2 * var(--padding));
+  --inner-size: calc(var(--outer-size) - 2 * var(--spacing));
+  --font-size: 16px;
 }
 
 html {
   /* Size & Positioning. */
   height: 100%;
   width : 100%;
+  box-sizing: border-box;
 }
 
 body {
@@ -32,6 +34,10 @@ body {
   margin: 0;
 }
 
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 a {
   color          : var(--theme-light-color);
   text-decoration: none;
@@ -42,11 +48,14 @@ a:hover {
   text-decoration: underline;
 }
 
+details > summary {
+  cursor: pointer;
+}
+
 .icon {
   /* Size & Positioning. */
-  height : var(--inner-size);
-  width  : var(--inner-size);
-  padding: var(--padding);
+  height: var(--font-size);
+  width : var(--font-size);
 }
 
 #khaleesi-app {

@@ -1,0 +1,94 @@
+#khaleesi-navigation {
+  /* Grid. */
+  grid-area: navigation;
+
+  /* Flex. */
+  display       : flex;
+  flex-direction: column;
+}
+
+#khaleesi-navigation a {
+  /* Colors. */
+  color: var(--background-light-color);
+  /* Size & Positioning. */
+  display    : inline-flex;
+  align-items: center;
+  gap        : var(--spacing);
+}
+
+#khaleesi-navigation a:hover {
+  /* Colors. */
+  color: var(--theme-light-color);
+}
+
+.khaleesi-navigation-icon .icon {
+  /* Size & Positioning. */
+  height : var(--outer-size);
+  width  : var(--outer-size);
+  padding: var(--spacing);
+}
+
+#khaleesi-navigation-menu-button {
+  /* Colors. */
+  color: var(--theme-light-color);
+  /* Details marker. */
+  list-style: none;
+  /* Size & Positioning. */
+  box-sizing: border-box;
+  height: var(--outer-size);
+}
+
+#khaleesi-navigation-breadcrumbs {
+  /* Flex. */
+  flex-grow: 1;
+  display       : flex;
+  flex-direction: column;
+}
+
+#khaleesi-navigation-menu-list {
+  /* Size & Positioning */
+  width   : calc(4 * var(--outer-size));
+  height  : 100%;
+  position: fixed;
+  top     : var(--outer-size);
+  padding : var(--spacing);
+  /* Colors. */
+  background-color: var(--theme-dark-color);
+}
+
+#khaleesi-navigation-menu-list summary {
+  /* Size & Positioning. */
+  width: 100%;
+  /* Details Marker. */
+  list-style: none;
+  /* Flex. */
+  display        : flex;
+  justify-content: space-between;
+}
+
+#khaleesi-navigation-menu-list summary::after {
+  /* Details Marker. */
+  content: " ►";
+}
+
+#khaleesi-navigation-menu-list details[open] > summary::after {
+  /* Details Marker. */
+  content: " ▼";
+}
+
+.khaleesi-navigation-menu-item {
+  /* Size & Positioning. */
+  box-sizing    : border-box;
+  padding-bottom: var(--spacing);
+}
+
+.khaleesi-navigation-menu-item-child {
+  /* Size & Positioning. */
+  box-sizing    : border-box;
+  padding-left  : calc(2 * var(--spacing));
+}
+
+#khaleesi-navigation-menu-list a.active {
+  /* Colors. */
+  color: var(--theme-light-color);
+}
