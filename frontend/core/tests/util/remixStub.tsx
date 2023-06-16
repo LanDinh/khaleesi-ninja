@@ -20,7 +20,7 @@ export function createRemixStub(
   }
 
   return unstable_createRemixStub([{
-    path    : '/',
+    path    : path,
     element : element,
     children: children,
   }])

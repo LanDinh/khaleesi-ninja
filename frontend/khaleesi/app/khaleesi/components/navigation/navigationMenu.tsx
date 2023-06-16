@@ -46,7 +46,7 @@ export function NavigationMenu(): JSX.Element {
   const closeMenu = (): void => setOpen(!open)
 
   useEffect(() => {
-    document.getElementById('khaleesi-navigation-menu')!.toggleAttribute("open")
+    document.getElementById('khaleesi-navigation-menu')!.toggleAttribute('open')
   }, [ open ])
 
   return <details id="khaleesi-navigation-menu">
