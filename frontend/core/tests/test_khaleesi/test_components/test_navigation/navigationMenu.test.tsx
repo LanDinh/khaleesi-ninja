@@ -6,25 +6,23 @@ import type { NavigationElement } from '../../../../app/navigationData'
 import { createRemixStub } from '../../../util/remixStub'
 
 
-beforeAll(() => {
-  jest.mock('../../../../app/khaleesi/components/icon')
-  jest.mock('../../../../app/navigationData', (): NavigationElement[] => (
-    [
-      {
-        path: 'alpha',
-        label: 'ALPHA',
-        icon: <>a</>,
-        children: [ { path: '1', label: 'ONE', icon: <>1</> } ],
-      },
-      {
-        path: 'beta',
-        label: 'BETA',
-        icon: <>b</>,
-        children: [ { path: '2', label: 'TWO', icon: <>2</> } ],
-      },
-    ]
-  ))
-})
+jest.mock('../../../../app/khaleesi/components/icon')
+jest.mock('../../../../app/navigationData', (): NavigationElement[] => (
+  [
+    {
+      path: 'alpha',
+      label: 'ALPHA',
+      icon: <>a</>,
+      children: [ { path: '1', label: 'ONE', icon: <>1</> } ],
+    },
+    {
+      path: 'beta',
+      label: 'BETA',
+      icon: <>b</>,
+      children: [ { path: '2', label: 'TWO', icon: <>2</> } ],
+    },
+  ]
+))
 
 test('Navigation menu renders without errors.', () => {
   // Prepare data.
@@ -43,6 +41,6 @@ test('Navigation menu renders without errors.', () => {
   expect(screen.getByText('b')).toBeInTheDocument()
   expect(screen.getByText('1')).toBeInTheDocument()
   expect(screen.getByText('2')).toBeInTheDocument()
-  expect(screen.getByText('ALPHA')).toHaveAttribute("open")
-  expect(screen.getByText('BETA')).not.toHaveAttribute("open")
+  expect(screen.getByText('ALPHA')).toHaveAttribute('open')
+  expect(screen.getByText('BETA')).not.toHaveAttribute('open')
 })

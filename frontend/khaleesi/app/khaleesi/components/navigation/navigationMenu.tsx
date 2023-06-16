@@ -43,10 +43,10 @@ function getNavigationElementWithChildren(
 export function NavigationMenu(): JSX.Element {
   const matches = useMatches()
   const [ open , setOpen ] = useState(false)
-  const closeMenu = () => setOpen(!open)
+  const closeMenu = (): void => setOpen(!open)
 
   useEffect(() => {
-    document.getElementById("khaleesi-navigation-menu")!.toggleAttribute("open")
+    document.getElementById('khaleesi-navigation-menu')!.toggleAttribute("open")
   }, [ open ])
 
   return <details id="khaleesi-navigation-menu">

@@ -6,10 +6,8 @@ import { SettingsIcon, LoginIcon } from '../../../../app/khaleesi/components/ico
 import { createRemixStub } from '../../../util/remixStub'
 
 
-beforeAll(() => {
-  jest.mock('../../../../app/khaleesi/components/navigation/navigationMenu')
-  jest.mock('../../../../app/khaleesi/components/icon')
-})
+jest.mock('../../../../app/khaleesi/components/navigation/navigationMenu')
+jest.mock('../../../../app/khaleesi/components/icon')
 
 
 test('Navigation gets rendered without errors.', () => {

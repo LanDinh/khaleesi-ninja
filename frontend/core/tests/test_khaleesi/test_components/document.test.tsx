@@ -8,10 +8,10 @@ import { createRemixStub } from '../../util/remixStub'
 
 
 const originalError = console.error.bind(console.error)
+jest.mock('../../../app/khaleesi/components/error')
+jest.mock('../../../app/khaleesi/components/navigation/navigation')
 
 beforeAll(() => {
-  jest.mock('../../../app/khaleesi/components/error')
-  jest.mock('../../../app/khaleesi/components/navigation/navigation')
   window.scrollTo = jest.fn()
   console.error = suppressConsoleFunction('validateDOMNesting', originalError)
 })
