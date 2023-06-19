@@ -1,11 +1,18 @@
 import type { PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
 import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
+import { breadcrumb } from './navigation/breadcrumb'
 import { Navigation } from './navigation/navigation'
+import { Content } from './content'
 import { ErrorPage } from './error'
 import rootStyles from '../styles/index.css'
 import navigationBarStyles from '../styles/navigation.css'
+import { navigationProperties } from './navigation/navigationData'
 
+
+export const handle = {
+  ...breadcrumb(navigationProperties),
+}
 
 function Document({ children }: PropsWithChildren<{}>): JSX.Element {
   return <html lang="en">
@@ -19,7 +26,9 @@ function Document({ children }: PropsWithChildren<{}>): JSX.Element {
       <div id="khaleesi-app">
         <div id="khaleesi-title" className="khaleesi-bar">Title</div>
         <Navigation />
-        <main id="khaleesi-content">{ children }</main>
+        <Content>
+          {children}
+        </Content>
       </div>
       <ScrollRestoration />
       <Scripts />

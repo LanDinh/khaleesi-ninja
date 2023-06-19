@@ -1,15 +1,15 @@
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { App, ErrorBoundary, links } from '../../../app/khaleesi/components/document'
-import { ErrorPage } from '../../../app/khaleesi/components/error'
 import { Navigation } from '../../../app/khaleesi/components/navigation/navigation'
+import { Content } from '../../../app/khaleesi/components/content'
 import { suppressConsoleFunction } from '../../util/consoleLogging'
 import { createRemixStub } from '../../util/remixStub'
 
 
 const originalError = console.error.bind(console.error)
-jest.mock('../../../app/khaleesi/components/error')
 jest.mock('../../../app/khaleesi/components/navigation/navigation')
+jest.mock('../../../app/khaleesi/components/content')
 
 beforeAll(() => {
   window.scrollTo = jest.fn()
@@ -20,27 +20,33 @@ afterAll(() => {
   jest.clearAllMocks()
 })
 
+
 test('App gets rendered without errors.', () => {
   // Prepare data.
   const mockNavigationBar = Navigation as jest.MockedFunction<typeof Navigation>
   mockNavigationBar.mockImplementation(() => <></>)
-  let RemixStub = createRemixStub(<App />, 'TEST')
+  const mockContent = Content as jest.MockedFunction<typeof  Content>
+  mockContent.mockImplementation(() => <></>)
+  let RemixStub = createRemixStub(<App />)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
-  expect(screen.getByText('TEST')).toBeInTheDocument()
   expect(mockNavigationBar).toHaveBeenCalled()
+  expect(mockContent).toHaveBeenCalled()
 })
 
 test('ErrorBoundary gets rendered without errors.', () => {
   // Prepare data.
-  const mockErrorPage = ErrorPage as jest.MockedFunction<typeof ErrorPage>
-  mockErrorPage.mockImplementation(() => <></>)
+  const mockNavigationBar = Navigation as jest.MockedFunction<typeof Navigation>
+  mockNavigationBar.mockImplementation(() => <></>)
+  const mockContent = Content as jest.MockedFunction<typeof  Content>
+  mockContent.mockImplementation(() => <></>)
   let RemixStub = createRemixStub(<ErrorBoundary />)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
-  expect(mockErrorPage).toHaveBeenCalled()
+  expect(mockNavigationBar).toHaveBeenCalled()
+  expect(mockContent).toHaveBeenCalled()
 })
 
 test('links contain all links.', () => {

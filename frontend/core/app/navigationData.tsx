@@ -1,20 +1,12 @@
-import { LoginIcon } from './khaleesi/components/icon'
-import { KitchenIcon, BookIcon } from './components/icon'
+import type {
+  NavigationElementProperties,
+} from './khaleesi/components/navigation/navigationElement'
+import { navigationProperties as home } from './khaleesi/components/navigation/navigationData'
+import { navigationProperties as kitchen } from './routes/kitchen'
+import { navigationProperties as cookbook } from './routes/kitchen.cookbook'
 
 
-export type NavigationElement = {
-  path     : string,
-  label    : string,
-  icon     : JSX.Element,
-  children?: NavigationElement[]
-}
-
-export const navigationData: NavigationElement[] = [
-  {
-    path    : 'kitchen',
-    label   : 'Kitchen',
-    icon    : <KitchenIcon />,
-    children: [ { path: 'cookbook', label: 'Cookbook', icon: <BookIcon /> } ],
-  },
-  { path: 'login', label: 'Login', icon: <LoginIcon /> },
+export const navigationData: NavigationElementProperties[] = [
+  { ...home },
+  { ...kitchen, children: [ cookbook ] },
 ]

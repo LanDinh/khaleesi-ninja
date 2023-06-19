@@ -1,23 +1,63 @@
+import { useState, useEffect } from 'react'
 import { useMatches } from '@remix-run/react'
-import { LoginIcon, SettingsIcon } from '../icon'
-import { NavigationMenu } from './navigationMenu'
+import { navigationData } from '../../../navigationData'
+import { MenuIcon } from '../icon'
+import type { RouteMatch } from './breadcrumb'
+import type { NavigationElementProperties } from './navigationElement'
+import { NavigationMenuElement } from './navigationElement'
+
+function NavigationMenuElementWithChildren({
+  element,
+  matches,
+  closeMenu,
+}: {
+  element: NavigationElementProperties,
+  matches: RouteMatch[],
+  closeMenu: () => void,
+}): JSX.Element {
+  if (!element.children) {
+    return <NavigationMenuElement element={element} onClick={closeMenu} />
+  }
+  const isOnPath = matches.map((match) => match.pathname).includes(element.path)
+  return <details open={isOnPath} >
+    <summary> <NavigationMenuElement element={element} onClick={closeMenu} /></summary>
+    <div className="khaleesi-navigation-item-child">
+      {element.children.map((child) => (
+        <NavigationMenuElementWithChildren
+          element={child}
+          matches={matches}
+          closeMenu={closeMenu}
+          key={element.path}
+        />
+      ))}
+    </div>
+  </details>
+}
 
 
 export function Navigation(): JSX.Element {
   const matches = useMatches()
+  const [ open , setOpen ] = useState(false)
+  const closeMenu = (): void => setOpen(!open)
 
-  return <nav id="khaleesi-navigation" className="khaleesi-bar">
-    <NavigationMenu />
-    <div id="khaleesi-navigation-breadcrumbs" className="khaleesi-navigation-icon">
-      {
-        matches
-          .filter((match) => match.handle && match.handle.breadcrumb)
-          .map((match) => match.handle!.breadcrumb(match))
-      }
-    </div>
-    <div id="khaleesi-navigation-common" className="khaleesi-navigation-icon">
-      <SettingsIcon />
-      <LoginIcon />
-    </div>
-  </nav>
+  useEffect(() => {
+    document.getElementById('khaleesi-navigation')!.toggleAttribute('open')
+  }, [ open ])
+
+  return <details id="khaleesi-navigation">
+    <div id="khaleesi-navigation-background" onClick={closeMenu}/>
+    <summary id="khaleesi-navigation-button" className="khaleesi-navigation-icon">
+      <MenuIcon />
+    </summary>
+    <nav id="khaleesi-navigation-list">
+      {navigationData.map((element) => (
+        <NavigationMenuElementWithChildren
+          element={element}
+          matches={matches}
+          closeMenu={closeMenu}
+          key={element.path}
+        />
+       ))}
+    </nav>
+  </details>
 }

@@ -1,10 +1,8 @@
 #khaleesi-navigation {
   /* Grid. */
   grid-area: navigation;
-
-  /* Flex. */
-  display       : flex;
-  flex-direction: column;
+  /* Colors. */
+  background-color: var(--theme-dark-color);
 }
 
 #khaleesi-navigation a {
@@ -28,35 +26,36 @@
   padding: var(--spacing);
 }
 
-#khaleesi-navigation-menu-button {
+#khaleesi-navigation-button {
   /* Colors. */
-  color: var(--theme-light-color);
+  color                  : var(--theme-light-color);
+  background-color       : var(--theme-dark-color);
+  border-top-left-radius : calc(2 * var(--spacing));
+  border-top-right-radius: calc(2 * var(--spacing));
   /* Details marker. */
   list-style: none;
   /* Size & Positioning. */
+  position  : relative;
   box-sizing: border-box;
-  height: var(--outer-size);
+  height    : var(--outer-size);
+  z-index   : 1;
 }
 
-#khaleesi-navigation-breadcrumbs {
-  /* Flex. */
-  flex-grow: 1;
-  display       : flex;
-  flex-direction: column;
-}
-
-#khaleesi-navigation-menu-list {
+#khaleesi-navigation-list {
   /* Size & Positioning */
-  width   : calc(4 * var(--outer-size));
-  height  : 100%;
-  position: fixed;
-  top     : var(--outer-size);
-  padding : var(--spacing);
+  width     : calc(4 * var(--outer-size));
+  height    : calc(100vh - var(--outer-size));
+  position  : fixed;
+  top       : var(--outer-size);
+  padding   : var(--spacing);
+  box-sizing: border-box;
   /* Colors. */
-  background-color: var(--theme-dark-color);
+  background-color          : var(--theme-dark-color);
+  border-top-right-radius   : calc(2 * var(--spacing));
+  border-bottom-right-radius: calc(2 * var(--spacing));
 }
 
-#khaleesi-navigation-menu-list summary {
+#khaleesi-navigation-list summary {
   /* Size & Positioning. */
   width: 100%;
   /* Details Marker. */
@@ -66,29 +65,56 @@
   justify-content: space-between;
 }
 
-#khaleesi-navigation-menu-list summary::after {
+#khaleesi-navigation-list summary::after {
   /* Details Marker. */
   content: " ►";
 }
 
-#khaleesi-navigation-menu-list details[open] > summary::after {
+#khaleesi-navigation-list details[open] > summary::after {
   /* Details Marker. */
   content: " ▼";
 }
 
-.khaleesi-navigation-menu-item {
+.khaleesi-navigation-item {
   /* Size & Positioning. */
   box-sizing    : border-box;
   padding-bottom: var(--spacing);
 }
 
-.khaleesi-navigation-menu-item-child {
+.khaleesi-navigation-item-child {
   /* Size & Positioning. */
   box-sizing    : border-box;
   padding-left  : calc(2 * var(--spacing));
 }
 
-#khaleesi-navigation-menu-list a.active {
+#khaleesi-navigation-list a.active {
   /* Colors. */
   color: var(--theme-light-color);
+}
+
+#khaleesi-navigation-breadcrumbs span {
+  /* Size & Positioning. */
+  display       : inline-flex;
+  gap           : var(--spacing);
+  padding-left  : var(--spacing);
+  padding-top   : var(--spacing);
+  padding-bottom: var(--spacing);
+}
+
+#khaleesi-navigation-breadcrumbs a {
+  /* Size & Positioning. */
+  display     : inline-flex;
+  align-items : center;
+  gap         : var(--spacing);
+}
+
+#khaleesi-navigation-background {
+  /* Size & Positioning. */
+  position: fixed;
+  height  : 100vh;
+  width   : 100vw;
+  top     : 0;
+  /* Colors. */
+  background-color: var(--background-dark-color);
+  opacity         : 0.5;
 }

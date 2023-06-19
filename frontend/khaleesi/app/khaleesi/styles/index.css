@@ -65,7 +65,7 @@ details > summary {
   grid-template-rows   : var(--outer-size) auto;
   grid-template-areas  :
     "navigation title"
-    "navigation content";
+    "content    content";
 
   /* Size & Positioning. */
   height: 100%;

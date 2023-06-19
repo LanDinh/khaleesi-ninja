@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { MenuIcon, SettingsIcon, LoginIcon } from '../../../app/khaleesi/components/icon'
+import { MenuIcon, SettingsIcon, LoginIcon, HomeIcon } from '../../../app/khaleesi/components/icon'
 
 
 test('Menu Icon gets rendered without errors.', () => {
@@ -20,6 +20,13 @@ test('Setting Icon gets rendered without errors.', () => {
 test('Login Icon gets rendered without errors.', () => {
   // Execute test.
   render(<LoginIcon />)
+  // Assert result.
+  expect(screen.getByRole('icon')).toBeInTheDocument()
+})
+
+test('Home Icon gets rendered without errors.', () => {
+  // Execute test.
+  render(<HomeIcon />)
   // Assert result.
   expect(screen.getByRole('icon')).toBeInTheDocument()
 })

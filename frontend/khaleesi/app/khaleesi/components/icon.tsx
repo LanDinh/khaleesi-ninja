@@ -6,12 +6,20 @@ export type IconProperties = {
   className?: string
 }
 
+type IconInternalProperties = IconProperties & {
+  viewBox?: string
+}
 
-export function Icon({ children, ...props }: PropsWithChildren<any>): JSX.Element {
+
+export function Icon({
+  viewBox = '0 0 24 24',
+  children,
+  ...props
+}: PropsWithChildren<IconInternalProperties>): JSX.Element {
   return <svg
     className="icon"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
+    viewBox={viewBox}
     fill="currentcolor"
     role="icon"
     {...props}
@@ -37,5 +45,10 @@ export function LoginIcon(props: IconProperties): JSX.Element {
   return <Icon {...props}>
     <g><rect fill="none" height="24" width="24"/></g>
     <g><path d="M10.3,7.7L10.3,7.7c-0.39,0.39-0.39,1.01,0,1.4l1.9,1.9H3c-0.55,0-1,0.45-1,1v0c0,0.55,0.45,1,1,1h9.2l-1.9,1.9 c-0.39,0.39-0.39,1.01,0,1.4l0,0c0.39,0.39,1.01,0.39,1.4,0l3.59-3.59c0.39-0.39,0.39-1.02,0-1.41L11.7,7.7 C11.31,7.31,10.69,7.31,10.3,7.7z M20,19h-7c-0.55,0-1,0.45-1,1v0c0,0.55,0.45,1,1,1h7c1.1,0,2-0.9,2-2V5c0-1.1-0.9-2-2-2h-7 c-0.55,0-1,0.45-1,1v0c0,0.55,0.45,1,1,1h7V19z"/></g>
+  </Icon>
+}
+export function HomeIcon(props: IconProperties): JSX.Element {
+  return <Icon viewBox="0 -960 960 960" {...props}>
+    <path d="M220-180h150v-250h220v250h150v-390L480-765 220-570v390Zm0 60q-24.75 0-42.375-17.625T160-180v-390q0-14.25 6.375-27T184-618l260-195q8.295-6 17.344-9 9.049-3 18.853-3 9.803 0 18.717 3 8.915 3 17.086 9l260 195q11.25 8.25 17.625 21T800-570v390q0 24.75-17.625 42.375T740-120H530v-250H430v250H220Zm260-353Z"/>
   </Icon>
 }

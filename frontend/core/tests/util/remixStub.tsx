@@ -10,18 +10,8 @@ type RemixStubOptions = {
   remixConfigFuture?: Partial<FutureConfig>
 }
 export function createRemixStub(
-  element  : JSX.Element,
-  childText: string = '',
-  path     : string = '/',
+  element: JSX.Element,
+  path   : string = '/',
 ): (options: RemixStubOptions) => JSX.Element {
-  const children = []
-  if (0 < childText.length) {
-    children.push({ path: '/', element: <div>{childText}</div> })
-  }
-
-  return unstable_createRemixStub([{
-    path    : path,
-    element : element,
-    children: children,
-  }])
+  return unstable_createRemixStub([{ path: path, element: element }])
 }
