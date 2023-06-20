@@ -57,12 +57,12 @@ class BaseJob(ABC, Generic[M]):
   ) -> None :
     """Initialize the job."""
     self.model = model
-    if not action.batch_size:
+    if not action.batchSize:
       # Without the batch size, the paginator tries to divide by 0.
       raise InvalidArgumentException(
-        public_details  = f'action_configuration.batch_size = {action.batch_size}',
+        public_details  = f'action_configuration.batch_size = {action.batchSize}',
         private_message = 'action_configuration.batch_size is mandatory!',
-        private_details = f'action_configuration.batch_size = {action.batch_size}',
+        private_details = f'action_configuration.batch_size = {action.batchSize}',
       )
     if not action.timelimit.ToNanoseconds() > 0:
       # Without the time limit, the job will not run at all.
@@ -81,7 +81,7 @@ class BaseJob(ABC, Generic[M]):
     """Execute the job."""
     # Start job execution.
     LOGGER.info(f'{self._logging_prefix()} Attempting to start.')
-    self.paginator = Paginator(self.get_queryset(), self.action.batch_size)
+    self.paginator = Paginator(self.get_queryset(), self.action.batchSize)
     try:
       self.job_execution = JobExecution.objects.start_job_execution(job = self.job)
     except Exception as exception:
@@ -260,7 +260,7 @@ class BaseJob(ABC, Generic[M]):
 
   def _logging_prefix(self) -> str :
     """Return uniform logging prefix."""
-    return f'Job execution "{self.job.execution_id}" for "{self.job.job_id}":'
+    return f'Job execution "{self.job.executionId}" for "{self.job.jobId}":'
 
 # noinspection PyAbstractClass
 class Job(BaseJob[M], Generic[M]):
@@ -268,7 +268,7 @@ class Job(BaseJob[M], Generic[M]):
 
   def __init__(self, *, model: Type[M], request : JobRequest) -> None :
     """Initialize the job."""
-    super().__init__(model = model, job = request.job, action = request.action_configuration)
+    super().__init__(model = model, job = request.job, action = request.actionConfiguration)
 
 
 # noinspection PyAbstractClass
@@ -280,9 +280,9 @@ class CleanupJob(BaseJob[M], Generic[M]):
 
   def __init__(self, *, model: Type[M], request : JobRequest) -> None :
     """Initialize the job."""
-    super().__init__(model = model, job = request.job, action = request.action_configuration)
-    self.cleanup_configuration = request.cleanup_configuration
-    self.cleanup_timestamp = self.start - request.cleanup_configuration.cleanup_delay.ToTimedelta()
+    super().__init__(model = model, job = request.job, action = request.actionConfiguration)
+    self.cleanup_configuration = request.cleanupConfiguration
+    self.cleanup_timestamp = self.start - request.cleanupConfiguration.cleanupDelay.ToTimedelta()
 
   def execute_batch(self, *, page: Page[M]) -> int :
     """Execute a batch deletion."""

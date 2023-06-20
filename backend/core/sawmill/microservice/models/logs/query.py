@@ -93,15 +93,15 @@ class Query(Metadata):
     """Map to gRPC query message."""
 
     grpc_query_response = GrpcQueryResponse()
-    self.request_metadata_to_grpc(request_metadata = grpc_query_response.query_request_metadata)
-    self.response_metadata_to_grpc(response_metadata = grpc_query_response.query_response_metadata)
+    self.request_metadata_to_grpc(request_metadata = grpc_query_response.queryRequestMetadata)
+    self.response_metadata_to_grpc(response_metadata = grpc_query_response.queryResponseMetadata)
     grpc_query_response.query.id         = self.query_id
     grpc_query_response.query.connection = self.connection
     grpc_query_response.query.raw        = self.raw
     grpc_query_response.normalized       = self.normalized
     grpc_query_response.query.start.FromDatetime(self.reported_start)
     grpc_query_response.query.end.FromDatetime(self.reported_end)
-    grpc_query_response.reported_duration.FromTimedelta(self.reported_duration)
+    grpc_query_response.reportedDuration.FromTimedelta(self.reported_duration)
     for table in self.tables.split(','):
       if table:
         grpc_query_response.tables.append(table)

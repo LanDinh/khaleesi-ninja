@@ -56,15 +56,15 @@ class EventData:
 class BaseMetricInitializer(ABC):
   """Collect info for initializing metrics."""
 
-  own_name           : str
-  backgate_request_id: str
-  request_id         : str
+  own_name       : str
+  http_request_id: str
+  grpc_request_id: str
 
   # noinspection PyUnusedLocal
-  def __init__(self, *, backgate_request_id: str) -> None :  # pylint: disable=unused-argument,line-too-long
+  def __init__(self, *, http_request_id: str) -> None :  # pylint: disable=unused-argument,line-too-long
     self.own_name = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
-    self.backgate_request_id = backgate_request_id
-    self.request_id          = str(uuid4())
+    self.http_request_id = http_request_id
+    self.grpc_request_id = str(uuid4())
 
   @abstractmethod
   def initialize_metrics(self) -> None :
@@ -83,20 +83,20 @@ class BaseMetricInitializer(ABC):
     """Fetch the data for request metrics."""
     request = EmptyRequest()
     add_grpc_server_system_request_metadata(
-      request             = request,
-      backgate_request_id = self.backgate_request_id,
-      request_id          = self.request_id,
-      grpc_method         = 'INITIALIZE_REQUEST_METRICS',
+      request         = request,
+      http_request_id = self.http_request_id,
+      grpc_request_id = self.grpc_request_id,
+      grpc_method     = 'INITIALIZE_REQUEST_METRICS',
     )
     return self.get_service_call_data(request = request)
 
   def _initialize_requests(self) -> None :
     """Initialize the request metrics to 0."""
     requests = self.requests()
-    for request in requests.call_list:
+    for request in requests.callList:
       request_metadata = RequestMetadata()
       self._build_request_metadata(request_metadata = request_metadata, caller = request.call)
-      if request_metadata.caller.grpc_service == self.own_name:
+      if request_metadata.caller.grpcService == self.own_name:
         user_list = [ (User.UserType.Name(User.UserType.SYSTEM), User.UserType.SYSTEM) ]
       else:
         user_list = User.UserType.items()
@@ -108,7 +108,7 @@ class BaseMetricInitializer(ABC):
             raw_peer = raw_peer,
             metric = OUTGOING_REQUESTS,
           )
-        for raw_peer in request.called_by:
+        for raw_peer in request.calledBy:
           self._register_request(
             request_metadata = request_metadata,
             raw_peer = raw_peer,
@@ -124,7 +124,7 @@ class BaseMetricInitializer(ABC):
     """Register the request to the specified metric."""
     peer = RequestMetadata()
     self._build_request_metadata(request_metadata = peer, caller = raw_peer)
-    if peer.caller.grpc_service == self.own_name and \
+    if peer.caller.grpcService == self.own_name and \
         request_metadata.user.type != User.UserType.SYSTEM:
       return
     for status in StatusCode:
@@ -137,10 +137,10 @@ class BaseMetricInitializer(ABC):
       caller: GrpcCallerDetails,
   ) -> None :
     """Build the request metadata to register metrics."""
-    request_metadata.caller.khaleesi_gate    = caller.khaleesi_gate
-    request_metadata.caller.khaleesi_service = caller.khaleesi_service
-    request_metadata.caller.grpc_service     = caller.grpc_service
-    request_metadata.caller.grpc_method      = caller.grpc_method
+    request_metadata.caller.khaleesiGate    = caller.khaleesiGate
+    request_metadata.caller.khaleesiService = caller.khaleesiService
+    request_metadata.caller.grpcService     = caller.grpcService
+    request_metadata.caller.grpcMethod      = caller.grpcMethod
 
   def _initialize_events(self, *, events: List[EventData]) -> None :
     """Initialize the event metrics to 0."""
@@ -177,18 +177,18 @@ class BaseMetricInitializer(ABC):
         private_details = '',
       )
     event = Event()
-    event.request_metadata.user.type               = user_type
-    event.request_metadata.caller.khaleesi_gate    = event_data.caller.khaleesi_gate
-    event.request_metadata.caller.khaleesi_service = event_data.caller.khaleesi_service
-    event.request_metadata.caller.grpc_service     = event_data.caller.grpc_service
-    event.request_metadata.caller.grpc_method      = event_data.caller.grpc_method
-    event.target.type                              = event_data.target_type
-    event.action.result                            = result_type
+    event.requestMetadata.user.type              = user_type
+    event.requestMetadata.caller.khaleesiGate    = event_data.caller.khaleesi_gate
+    event.requestMetadata.caller.khaleesiService = event_data.caller.khaleesi_service
+    event.requestMetadata.caller.grpcService     = event_data.caller.grpc_service
+    event.requestMetadata.caller.grpcMethod      = event_data.caller.grpc_method
+    event.target.type                            = event_data.target_type
+    event.action.result                          = result_type
 
     if action_crud_type:
-      event.action.crud_type = action_crud_type
+      event.action.crudType = action_crud_type
     if action_custom_type:
-      event.action.custom_type = action_custom_type
+      event.action.customType = action_custom_type
 
     AUDIT_EVENT.register(event = event)
 
@@ -199,8 +199,8 @@ class MetricInitializer(BaseMetricInitializer):
 
   stub    : ForesterStub
 
-  def __init__(self, *, backgate_request_id: str) -> None :
-    super().__init__(backgate_request_id = backgate_request_id)
+  def __init__(self, *, http_request_id: str) -> None :
+    super().__init__(http_request_id = http_request_id)
     channel = CHANNEL_MANAGER.get_channel(gate = 'core', service = 'sawmill')
     self.stub = ForesterStub(channel)  # type: ignore[no-untyped-call]
 

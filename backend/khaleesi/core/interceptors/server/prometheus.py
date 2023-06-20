@@ -26,10 +26,10 @@ class PrometheusServerInterceptor(ServerInterceptor):
   ) -> Any :
     """Collect the prometheus metrics."""
     request_metadata = RequestMetadata()
-    request_metadata.caller.grpc_service = STATE.request.grpc_service
-    request_metadata.caller.grpc_method  = STATE.request.grpc_method
-    if hasattr(request, 'request_metadata'):
-      peer: RequestMetadata = request.request_metadata
+    request_metadata.caller.grpcService = STATE.request.grpc_service
+    request_metadata.caller.grpcMethod  = STATE.request.grpc_method
+    if hasattr(request, 'requestMetadata'):
+      peer: RequestMetadata = request.requestMetadata
       request_metadata.user.id   = peer.user.id
       request_metadata.user.type = peer.user.type
     else:

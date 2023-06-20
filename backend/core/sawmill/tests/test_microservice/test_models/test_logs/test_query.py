@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.test_util.grpc import GrpcTestMixin
 from khaleesi.core.test_util.test_case import SimpleTestCase, TransactionTestCase
 from khaleesi.proto.core_pb2 import User, RequestMetadata
-from khaleesi.proto.core_sawmill_pb2 import ResponseRequest as GrpcQueries
+from khaleesi.proto.core_sawmill_pb2 import GrpcResponseRequest as GrpcGrpcQueries
 from microservice.models import Query
 from microservice.test_util import ModelRequestMetadataMixin
 
@@ -43,7 +43,7 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
         sql_parser.return_value.generalize = 'generalized'
         sql_parser.return_value.tables = [ 'table1', 'table2' ]
         sql_parser.return_value.columns = []
-        queries = GrpcQueries()
+        queries = GrpcGrpcQueries()
         queries.queries.add()
         queries.queries.add()
         request_metadata = RequestMetadata()
@@ -73,7 +73,7 @@ class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
     """Test logging queries."""
     # Execute test.
     result = Query.objects.log_queries(
-      queries = GrpcQueries().queries,
+      queries = GrpcGrpcQueries().queries,
       metadata = RequestMetadata(),
     )
     # Assert result.
@@ -104,8 +104,8 @@ class QueryTestCase(ModelRequestMetadataMixin, SimpleTestCase):
         # Assert result.
         self.assert_grpc_request_metadata(
           model = query,
-          grpc = result.query_request_metadata,
-          grpc_response = result.query_response_metadata,
+          grpc = result.queryRequestMetadata,
+          grpc_response = result.queryResponseMetadata,
         )
         self.assertEqual(query.query_id  , result.query.id)
         self.assertEqual(query.connection, result.query.connection)
@@ -122,7 +122,7 @@ class QueryTestCase(ModelRequestMetadataMixin, SimpleTestCase):
         self.assertEqual(query.reported_end.replace(tzinfo = None), result.query.end.ToDatetime())  # pylint: disable=unexpected-keyword-arg
         self.assertEqual(
           floor(query.reported_duration.total_seconds()),
-          result.reported_duration.seconds,
+          result.reportedDuration.seconds,
         )
 
   def test_empty_to_grpc_event(self) -> None :

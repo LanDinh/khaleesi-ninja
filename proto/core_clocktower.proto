@@ -10,15 +10,15 @@ message Job {
   string name        = 2;
   string description = 3;
 
-  string                               cron_expression       = 10;
-  string                               action                = 11;
-  khaleesi.core.JobActionConfiguration action_configuration  = 12;
+  string                               cronExpression       = 10;
+  string                               action               = 11;
+  khaleesi.core.JobActionConfiguration actionConfiguration  = 12;
 
-  khaleesi.core.JobCleanupActionConfiguration cleanup_configuration = 20;
+  khaleesi.core.JobCleanupActionConfiguration cleanupConfiguration = 20;
 }
 
 message JobRequest {
-  khaleesi.core.RequestMetadata request_metadata = 1;
+  khaleesi.core.RequestMetadata requestMetadata = 1;
   Job                           job              = 2;
 }
 

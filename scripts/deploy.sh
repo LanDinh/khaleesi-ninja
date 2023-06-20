@@ -67,7 +67,7 @@ if [[ "${installed}" == "true" ]]; then
       done
     fi
 
-    if [[ ${type} == "backgate" ]] || [[ ${type} == "micro" ]]; then
+    if [[ ${type} == "micro" ]]; then
       echo -e "${yellow}Restarting grpcui...${clear_color}"
       kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${gate}-${service}-grpcui"
     fi

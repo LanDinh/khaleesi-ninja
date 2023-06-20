@@ -79,12 +79,12 @@ class RequestsMetric(CounterMetric):
     """Transform the request metadata into arguments."""
     return {
         'user': request.user.type,
-        'grpc_service': self.string_or_unknown(request.caller.grpc_service),
-        'grpc_method' : self.string_or_unknown(request.caller.grpc_method),
-        'peer_khaleesi_gate'   : self.string_or_unknown(peer.caller.khaleesi_gate),
-        'peer_khaleesi_service': self.string_or_unknown(peer.caller.khaleesi_service),
-        'peer_grpc_service'    : self.string_or_unknown(peer.caller.grpc_service),
-        'peer_grpc_method'     : self.string_or_unknown(peer.caller.grpc_method),
+        'grpc_service': self.string_or_unknown(request.caller.grpcService),
+        'grpc_method' : self.string_or_unknown(request.caller.grpcMethod),
+        'peer_khaleesi_gate'   : self.string_or_unknown(peer.caller.khaleesiGate),
+        'peer_khaleesi_service': self.string_or_unknown(peer.caller.khaleesiService),
+        'peer_grpc_service'    : self.string_or_unknown(peer.caller.grpcService),
+        'peer_grpc_method'     : self.string_or_unknown(peer.caller.grpcMethod),
     }
 
   def _map_grpc_status(self, *, status: StatusCode) -> str :

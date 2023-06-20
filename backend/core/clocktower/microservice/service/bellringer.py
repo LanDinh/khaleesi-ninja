@@ -29,13 +29,13 @@ class Service(Servicer):
 
   def ExecuteJob(self, request: IdRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Execute a job by ID."""
-    LOGGER.info(f'Executing job "{request.id_message.id}".')
-    action, job_request = Job.objects.get_job_request(id_message = request.id_message)
+    LOGGER.info(f'Executing job "{request.idMessage.id}".')
+    action, job_request = Job.objects.get_job_request(id_message = request.idMessage)
     ACTUATOR.actuate(
       action_name = action,
       job         = job_request.job,
-      action      = job_request.action_configuration,
-      cleanup     = job_request.cleanup_configuration,
+      action      = job_request.actionConfiguration,
+      cleanup     = job_request.cleanupConfiguration,
     )
     return EmptyResponse()
 

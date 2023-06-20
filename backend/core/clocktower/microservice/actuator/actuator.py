@@ -57,11 +57,11 @@ class Actuator:
     """Build a JobRequest."""
     request = JobRequest()
     add_request_metadata(request = request)
-    request.job.job_id       = job.job_id
-    request.job.execution_id = job.execution_id
-    request.action_configuration.timelimit.FromTimedelta(action.timelimit.ToTimedelta())
-    request.action_configuration.batch_size = action.batch_size
-    request.cleanup_configuration.cleanup_delay.FromTimedelta(cleanup.cleanup_delay.ToTimedelta())
+    request.job.jobId       = job.jobId
+    request.job.executionId = job.executionId
+    request.actionConfiguration.timelimit.FromTimedelta(action.timelimit.ToTimedelta())
+    request.actionConfiguration.batchSize = action.batchSize
+    request.cleanupConfiguration.cleanupDelay.FromTimedelta(cleanup.cleanupDelay.ToTimedelta())
     return request
 
 

@@ -27,8 +27,8 @@ class RequestStateServerTestInterceptor(BaseRequestStateServerInterceptor):
 
   mock = MagicMock()
 
-  def set_backgate_request_id(self, *, upstream: RequestMetadata) -> None :
-    """Set the backgate request."""
+  def set_http_request_id(self, *, upstream: RequestMetadata) -> None :
+    """Set the HTTP request."""
     self.mock()
 
 
@@ -178,8 +178,8 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
 
   interceptor = RequestStateServerInterceptor()
 
-  def test_set_backgate_request_id_with_request_metadata(self) -> None :
-    """Test setting the backgate request id."""
+  def test_set_http_request_id_with_request_metadata(self) -> None :
+    """Test setting the HTTP request id."""
     for name, request_params in self.metadata_request_params:
       for user_label, user_type in User.UserType.items():
         with self.subTest(case = name, user = user_label):
@@ -191,12 +191,9 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
           )
           STATE.reset()
           # Execute test.
-          self.interceptor.set_backgate_request_id(upstream = request_metadata)
+          self.interceptor.set_http_request_id(upstream = request_metadata)
           # Assert result.
-          self.assertEqual(
-            request_metadata.caller.backgate_request_id,
-            STATE.request.backgate_request_id,
-          )
+          self.assertEqual(request_metadata.caller.httpRequestId, STATE.request.http_request_id)
 
 
 class RequestStateServerInterceptorInstantiationTest(SimpleTestCase):

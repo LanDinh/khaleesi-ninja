@@ -39,14 +39,14 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
     STATE.reset()  # Always start with a clean state.
     try:
       with query_logger():
-        STATE.request.request_id = str(uuid4())
+        STATE.request.grpc_request_id = str(uuid4())
         # Process request data.
         _, _, service_name, method_name = self.process_method_name(raw = method_name)
         STATE.request.grpc_service = service_name
         STATE.request.grpc_method  = method_name
 
         upstream = self.get_upstream_request(request = request)
-        self.set_backgate_request_id(upstream = upstream)
+        self.set_http_request_id(upstream = upstream)
         if upstream.user.id:
           STATE.user.user_id = upstream.user.id
         STATE.user.type    = UserType(upstream.user.type)
@@ -62,8 +62,8 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
       self._handle_exception(context = context, exception = new_exception)
 
   @abstractmethod
-  def set_backgate_request_id(self, *, upstream: RequestMetadata) -> None :
-    """Set the backgate request id."""
+  def set_http_request_id(self, *, upstream: RequestMetadata) -> None :
+    """Set the HTTP request id."""
 
   def _handle_exception(
       self, *,
@@ -80,10 +80,10 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
 class RequestStateServerInterceptor(BaseRequestStateServerInterceptor):
   """RequestStateServerInterceptor that reads the ID from the request metadata."""
 
-  def set_backgate_request_id(self, *, upstream: RequestMetadata) -> None :
-    """Set the backgate request id."""
-    if upstream.caller.backgate_request_id:
-      STATE.request.backgate_request_id = upstream.caller.backgate_request_id
+  def set_http_request_id(self, *, upstream: RequestMetadata) -> None :
+    """Set the HTTP request id."""
+    if upstream.caller.httpRequestId:
+      STATE.request.http_request_id = upstream.caller.httpRequestId
 
 
 def instantiate_request_state_interceptor() -> BaseRequestStateServerInterceptor :

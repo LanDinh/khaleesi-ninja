@@ -11,9 +11,9 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]
   Service,
   DbEvent,
-  DbRequest,
+  DbGrpcRequest,
   DbError,
-  DbBackgateRequest,
+  DbHttpRequest,
   DbQuery,
 )
 from tests.models import Metadata
@@ -35,60 +35,60 @@ class LumberjackServiceTestCase(SimpleTestCase):
     )
     service_registry.add_service.assert_called()
 
-  def test_log_backgate_request(self, *_: MagicMock) -> None :
+  def test_log_http_request(self, *_: MagicMock) -> None :
     """Test logging requests."""
     self._execute_logging_tests(
-      method = lambda : self.service.LogBackgateRequest(MagicMock(), MagicMock()),
-      logging_object = DbBackgateRequest.objects,
-      logging_method = 'log_backgate_request',
+      method = lambda : self.service.LogHttpRequest(MagicMock(), MagicMock()),
+      logging_object = DbHttpRequest.objects,
+      logging_method = 'log_request',
     )
 
-  def test_log_system_backgate_request(self, *_: MagicMock) -> None :
-    """Test logging system backgate requests."""
+  def test_log_system_http_request(self, *_: MagicMock) -> None :
+    """Test logging system HTTP requests."""
     self._execute_logging_tests(
-      method = lambda : self.service.LogSystemBackgateRequest(MagicMock(), MagicMock()),
-      logging_object = DbBackgateRequest.objects,
-      logging_method = 'log_system_backgate_request',
+      method = lambda : self.service.LogSystemHttpRequest(MagicMock(), MagicMock()),
+      logging_object = DbHttpRequest.objects,
+      logging_method = 'log_system_request',
     )
 
-  def test_log_backgate_response(self, *_: MagicMock) -> None :
+  def test_log_http_response(self, *_: MagicMock) -> None :
     """Test logging responses."""
     self._execute_logging_tests(
-      method = lambda : self.service.LogBackgateRequestResponse(MagicMock(), MagicMock()),
-      logging_object = DbBackgateRequest.objects,
+      method = lambda : self.service.LogHttpRequestResponse(MagicMock(), MagicMock()),
+      logging_object = DbHttpRequest.objects,
       logging_method = 'log_response',
     )
 
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
-  def test_log_request(self, service_registry: MagicMock, *_: MagicMock) -> None :
+  def test_log_grpc_request(self, service_registry: MagicMock, *_: MagicMock) -> None :
     """Test logging requests."""
     self._execute_logging_tests(
-      method = lambda : self.service.LogRequest(MagicMock(), MagicMock()),
-      logging_object = DbRequest.objects,
+      method = lambda : self.service.LogGrpcRequest(MagicMock(), MagicMock()),
+      logging_object = DbGrpcRequest.objects,
       logging_method = 'log_request',
     )
     service_registry.add_call.assert_called()
 
-  def test_log_response(self, *_: MagicMock) -> None :
+  def test_log_grpc_response(self, *_: MagicMock) -> None :
     """Test logging responses."""
-    with patch.object(DbRequest.objects, 'log_response') as logging_request:
-      with patch.object(DbBackgateRequest.objects, 'add_child_duration') as logging_backgate:
+    with patch.object(DbGrpcRequest.objects, 'log_response') as logging_grpc_request:
+      with patch.object(DbHttpRequest.objects, 'add_child_duration') as logging_http_request:
         with patch.object(DbQuery.objects, 'log_queries') as logging_query:
           # Prepare data.
           now = datetime.now().replace(tzinfo = timezone.utc)
-          logging_request.return_value = DbRequest()
-          logging_request.return_value.to_grpc_request_response = MagicMock()
-          logging_request.return_value.save = MagicMock()
+          logging_grpc_request.return_value = DbGrpcRequest()
+          logging_grpc_request.return_value.to_grpc_request_response = MagicMock()
+          logging_grpc_request.return_value.save = MagicMock()
           logging_query.return_value = [ DbQuery() ]
           logging_query.return_value[0].reported_start = now
           logging_query.return_value[0].reported_end = now + timedelta(days = 1)
           # Execute test.
-          self.service.LogResponse(MagicMock(), MagicMock())
+          self.service.LogGrpcResponse(MagicMock(), MagicMock())
           # Assert result.
-          logging_backgate.assert_called_once()
-          logging_request.assert_called_once()
+          logging_http_request.assert_called_once()
+          logging_grpc_request.assert_called_once()
           logging_query.assert_called_once()
-          logging_request.return_value.save.assert_called_once_with()
+          logging_grpc_request.return_value.save.assert_called_once_with()
 
   def test_log_error(self, *_: MagicMock) -> None :
     """Test logging events."""

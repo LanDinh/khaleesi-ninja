@@ -24,8 +24,8 @@ class Service(Servicer):
 
   def AbortBatchJob(self, request: IdRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Abort the specified job."""
-    LOGGER.info(f'Aborting job with ID {request.id_message.id}')
-    JobExecution.objects.stop_job(id_message = request.id_message)
+    LOGGER.info(f'Aborting job with ID {request.idMessage.id}')
+    JobExecution.objects.stop_job(id_message = request.idMessage)
     return EmptyResponse()
 
   def AbortAllBatchJobs(self, request: EmptyRequest, _: grpc.ServicerContext) -> EmptyResponse :

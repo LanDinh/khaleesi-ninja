@@ -36,7 +36,7 @@ class InterceptorTestMixin(GrpcTestMixin):
     """get request_metadata and final request."""
     if request is None:
       request_metadata = self.set_request_metadata(user = user, **request_params)
-      final_request = MagicMock(request_metadata = request_metadata)
+      final_request = MagicMock(requestMetadata = request_metadata)
     else:
       request_metadata = RequestMetadata()
       final_request = request

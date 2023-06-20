@@ -45,17 +45,17 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class Server:
   """The gRPC server."""
 
-  server                   : GrpcServer
-  health_servicer          : HealthServicer
-  metric_initializer       : MetricInitializer
-  service_names            : List[str]
-  start_backgate_request_id: str
+  server               : GrpcServer
+  health_servicer      : HealthServicer
+  metric_initializer   : MetricInitializer
+  service_names        : List[str]
+  start_http_request_id: str
 
-  def __init__(self, *, start_backgate_request_id: str, initialize_request_id: str) -> None :
+  def __init__(self, *, start_http_request_id: str, initialize_grpc_request_id: str) -> None :
     try:
-      self.start_backgate_request_id = start_backgate_request_id
+      self.start_http_request_id = start_http_request_id
       LOGGER.info('Initializing metrics...')
-      self.metric_initializer = MetricInitializer(backgate_request_id = start_backgate_request_id)
+      self.metric_initializer = MetricInitializer(http_request_id = start_http_request_id)
       self.metric_initializer.initialize_metrics()
       LOGGER.info('Initializing health servicer...')
       self.health_servicer = HealthServicer()
@@ -75,21 +75,21 @@ class Server:
       self._init_add_handlers()
     except KhaleesiException as exception:
       self._log_start_exception(
-        exception  = exception,
-        request_id = initialize_request_id,
-        activity   = 'initialization'
+        exception       = exception,
+        grpc_request_id = initialize_grpc_request_id,
+        activity        = 'initialization'
       )
       raise
     except Exception as exception:
       masked = MaskingInternalServerException(exception = exception)
       self._log_start_exception(
-        exception  = masked,
-        request_id = initialize_request_id,
-        activity   = 'initialization'
+        exception       = masked,
+        grpc_request_id = initialize_grpc_request_id,
+        activity        = 'initialization'
       )
       raise masked from exception
 
-  def start(self, *, start_request_id: str) -> None :
+  def start(self, *, start_grpc_request_id: str) -> None :
     """Start the server."""
     try:
       LOGGER.info('Starting server...')
@@ -99,23 +99,23 @@ class Server:
         self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]  # pylint: disable=line-too-long
       self.health_servicer.set('', HealthCheckResponse.SERVING)  # type: ignore[arg-type]
       self._log_server_start_event(
-        request_id = start_request_id,
-        result     = Event.Action.ResultType.SUCCESS,
-        details    = 'Server started successfully.',
+        grpc_request_id = start_grpc_request_id,
+        result          = Event.Action.ResultType.SUCCESS,
+        details         = 'Server started successfully.',
       )
     except KhaleesiException as exception:
       self._log_start_exception(
-        exception  = exception,
-        request_id = start_request_id,
-        activity   = 'start'
+        exception       = exception,
+        grpc_request_id = start_grpc_request_id,
+        activity        = 'start'
       )
       raise
     except Exception as exception:
       masked = MaskingInternalServerException(exception = exception)
       self._log_start_exception(
-        exception  = masked,
-        request_id = start_request_id,
-        activity   = 'start'
+        exception       = masked,
+        grpc_request_id = start_grpc_request_id,
+        activity        = 'start'
       )
       raise masked from exception
 
@@ -150,18 +150,18 @@ class Server:
     """Shutdown gracefully."""
     seconds_remaining = khaleesi_settings['GRPC']['SHUTDOWN_GRACE_SECS']
     end = datetime.now(tz = timezone.utc) + timedelta(seconds = seconds_remaining)
-    stop_backgate_request_id = str(uuid4())
-    request_id               = str(uuid4())
+    stop_http_request_id = str(uuid4())
+    grpc_request_id      = str(uuid4())
 
     try:
-      SINGLETON.structured_logger.log_system_backgate_request(
-        backgate_request_id = stop_backgate_request_id,
-        grpc_method         = 'LIFECYCLE',
+      SINGLETON.structured_logger.log_system_http_request(
+        http_request_id = stop_http_request_id,
+        grpc_method     = 'LIFECYCLE',
       )
-      SINGLETON.structured_logger.log_system_request(
-        backgate_request_id = stop_backgate_request_id,
-        request_id          = request_id,
-        grpc_method         = 'LIFECYCLE',
+      SINGLETON.structured_logger.log_system_grpc_request(
+        http_request_id = stop_http_request_id,
+        grpc_request_id = grpc_request_id,
+        grpc_method     = 'LIFECYCLE',
       )
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
       self.health_servicer.enter_graceful_shutdown()
@@ -183,16 +183,16 @@ class Server:
 
       if server_finished_gracefully and threads_finished_gracefully:
         self._log_server_state_event(
-          backgate_request_id = stop_backgate_request_id,
-          request_id          = request_id,
-          action              = Event.Action.ActionType.END,
-          result              = Event.Action.ResultType.SUCCESS,
-          details             = 'Server stopped successfully.'
+          http_request_id = stop_http_request_id,
+          grpc_request_id = grpc_request_id,
+          action          = Event.Action.ActionType.END,
+          result          = Event.Action.ResultType.SUCCESS,
+          details         = 'Server stopped successfully.'
         )
         self._log_shutdown(
-          backgate_request_id = stop_backgate_request_id,
-          request_id          = request_id,
-          status              = StatusCode.OK,
+          http_request_id = stop_http_request_id,
+          grpc_request_id = grpc_request_id,
+          status          = StatusCode.OK,
         )
         CHANNEL_MANAGER.close_all_channels()
         return
@@ -205,116 +205,116 @@ class Server:
       raise TimeoutException(private_details = f'Server stop timed out. - {reason}')
     except KhaleesiException as exception:
       self._log_end_exception(
-        exception           = exception,
-        action              = Event.Action.ActionType.END,
-        backgate_request_id = stop_backgate_request_id,
-        request_id          = request_id,
-        activity            = 'stop',
+        exception       = exception,
+        action          = Event.Action.ActionType.END,
+        http_request_id = stop_http_request_id,
+        grpc_request_id = grpc_request_id,
+        activity        = 'stop',
       )
       raise
     except Exception as exception:
       masked = MaskingInternalServerException(exception = exception)
       self._log_end_exception(
-        exception           = masked,
-        action              = Event.Action.ActionType.END,
-        backgate_request_id = stop_backgate_request_id,
-        request_id          = request_id,
-        activity            = 'stop',
+        exception       = masked,
+        action          = Event.Action.ActionType.END,
+        http_request_id = stop_http_request_id,
+        grpc_request_id = grpc_request_id,
+        activity        = 'stop',
       )
       raise
 
   def _log_start_exception(
       self, *,
-      exception : KhaleesiException,
-      request_id: str,
-      activity  : str,
+      exception      : KhaleesiException,
+      grpc_request_id: str,
+      activity       : str,
   ) -> None :
     """Log exceptions in the startup phase."""
     self._log_exception(
-      exception           = exception,
-      action              = Event.Action.ActionType.START,
-      backgate_request_id = self.start_backgate_request_id,
-      request_id          = request_id,
-      activity            = activity
+      exception       = exception,
+      action          = Event.Action.ActionType.START,
+      http_request_id = self.start_http_request_id,
+      grpc_request_id = grpc_request_id,
+      activity        = activity
     )
 
   def _log_end_exception(
       self, *,
-      exception          : KhaleesiException,
-      action             : 'Event.Action.ActionType.V',
-      backgate_request_id: str,
-      request_id         : str,
-      activity           : str,
+      exception      : KhaleesiException,
+      action         : 'Event.Action.ActionType.V',
+      http_request_id: str,
+      grpc_request_id: str,
+      activity       : str,
   ) -> None :
     """Log exceptions when turning down the server."""
     self._log_exception(
-      exception           = exception,
-      action              = action,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      activity            = activity,
+      exception       = exception,
+      action          = action,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      activity        = activity,
     )
     self._log_shutdown(
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      status              = StatusCode.INTERNAL,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      status          = StatusCode.INTERNAL,
     )
     CHANNEL_MANAGER.close_all_channels()
 
   def _log_exception(
       self, *,
-      exception          : KhaleesiException,
-      action             : 'Event.Action.ActionType.V',
-      backgate_request_id: str,
-      request_id         : str,
-      activity           : str,
+      exception      : KhaleesiException,
+      action         : 'Event.Action.ActionType.V',
+      http_request_id: str,
+      grpc_request_id: str,
+      activity       : str,
   ) -> None :
     """Log exceptions."""
     SINGLETON.structured_logger.log_system_error(
-      exception           = exception,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      grpc_method         = 'LIFECYCLE'
+      exception       = exception,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      grpc_method     = 'LIFECYCLE'
     )
     self._log_server_state_event(
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      action              = action,
-      result              = Event.Action.ResultType.FATAL,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      action          = action,
+      result          = Event.Action.ResultType.FATAL,
       details = f'Server {activity} failed.'
                 f' {exception.private_message}: {exception.private_details}',
     )
 
   def _log_server_start_event(
       self, *,
-      request_id: str,
-      result    : 'Event.Action.ResultType.V',
-      details   : str,
+      grpc_request_id: str,
+      result         : 'Event.Action.ResultType.V',
+      details        : str,
   ) -> None :
     """Log the server state during the startup phase."""
     self._log_server_state_event(
-      backgate_request_id = self.start_backgate_request_id,
-      request_id          = request_id,
-      action              = Event.Action.ActionType.START,
-      result              = result,
-      details             = details,
+      http_request_id = self.start_http_request_id,
+      grpc_request_id = grpc_request_id,
+      action          = Event.Action.ActionType.START,
+      result          = result,
+      details         = details,
     )
 
   def _log_server_state_event(
       self, *,
-      backgate_request_id: str,
-      request_id         : str,
-      action             : 'Event.Action.ActionType.V',
-      result             : 'Event.Action.ResultType.V',
-      details            : str,
+      http_request_id: str,
+      grpc_request_id: str,
+      action         : 'Event.Action.ActionType.V',
+      result         : 'Event.Action.ResultType.V',
+      details        : str,
   ) -> None :
     """Log the server state."""
     user = User()
     user.type = User.UserType.SYSTEM
     user.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
     SINGLETON.structured_logger.log_system_event(
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
+      http_request_id     = http_request_id,
+      grpc_request_id     = grpc_request_id,
       grpc_method         = 'LIFECYCLE',
       target              = khaleesi_settings['METADATA']['POD_ID'],
       owner               = user,
@@ -326,19 +326,19 @@ class Server:
 
   def _log_shutdown(
       self, *,
-      backgate_request_id: str,
-      request_id         : str,
-      status             : StatusCode,
+      http_request_id: str,
+      grpc_request_id: str,
+      status         : StatusCode,
   ) -> None :
     """Log shutdown of server."""
-    SINGLETON.structured_logger.log_system_response(
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      grpc_method         = 'LIFECYCLE',
-      status              = status,
+    SINGLETON.structured_logger.log_system_grpc_response(
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      grpc_method     = 'LIFECYCLE',
+      status          = status,
     )
-    SINGLETON.structured_logger.log_system_backgate_response(
-      backgate_request_id = backgate_request_id,
-      grpc_method         = 'LIFECYCLE',
-      status              = status,
+    SINGLETON.structured_logger.log_system_http_response(
+      http_request_id = http_request_id,
+      grpc_method     = 'LIFECYCLE',
+      status          = status,
     )

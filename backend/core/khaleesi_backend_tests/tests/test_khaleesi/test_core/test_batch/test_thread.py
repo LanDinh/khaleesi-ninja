@@ -52,9 +52,9 @@ class BatchJobThreadTestCase(SimpleTestCase):
   def test_is_job(self) -> None :
     """Test if stopping the thread works as expected."""
     # Prepare data.
-    metadata = JobExecutionMetadata()
-    metadata.job_id = 'job'
-    metadata.execution_id = 13
+    metadata             = JobExecutionMetadata()
+    metadata.jobId       = 'job'
+    metadata.executionId = 13
     job = MagicMock()
     job.job = metadata
     thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
@@ -66,15 +66,15 @@ class BatchJobThreadTestCase(SimpleTestCase):
   def test_is_not_job(self) -> None :
     """Test if stopping the thread works as expected."""
     # Prepare data.
-    job = MagicMock()
-    job.job.job_id = 'job'
-    job.job.execution_id = 13
+    job                 = MagicMock()
+    job.job.jobId       = 'job'
+    job.job.executionId = 13
     thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
     for job_id, execution_id in [ ('not-job', 13), ('job', 1337), ('not-job', 1337) ]:
       with self.subTest(job = job_id, execution = execution_id):
-        metadata = JobExecutionMetadata()
-        metadata.job_id = job_id
-        metadata.execution_id = execution_id
+        metadata             = JobExecutionMetadata()
+        metadata.jobId       = job_id
+        metadata.executionId = execution_id
         # Execute test.
         result = thread.is_job(job = metadata)
         # Assert result.

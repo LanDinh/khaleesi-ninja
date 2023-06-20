@@ -20,8 +20,8 @@ agent metadata[
   reported_timestamp
   logged_timestamp
   ----
-  backgate_request_id
-  request_id
+  http_request_id
+  grpc_request_id
   ----
   user_id
   user_type
@@ -62,8 +62,8 @@ rectangle event [
   action_result
   action_details
 ]
-rectangle request [
-  Request
+rectangle grpc_request [
+  GrpcRequest
   ====
   upstream_request_id
   ----
@@ -72,8 +72,8 @@ rectangle request [
   upstream_request_grpc_service
   upstream_request_grpc_method
 ]
-rectangle backgate_request [
-  BackgateRequest
+rectangle http_request [
+  HttpRequest
   ====
   type
   language
@@ -125,13 +125,13 @@ rectangle query [
 ]
 
 ' ******************************************* RELATIONS ********************************************
-metadata ^-- event            #darkviolet;text:darkviolet
-metadata ^-- request          #darkviolet;text:darkviolet
-metadata ^-- backgate_request #darkviolet;text:darkviolet
-metadata ^-- query            #darkviolet;text:darkviolet
-metadata ^-- error            #darkviolet;text:darkviolet
+metadata ^-- event        #darkviolet;text:darkviolet
+metadata ^-- grpc_request #darkviolet;text:darkviolet
+metadata ^-- http_request #darkviolet;text:darkviolet
+metadata ^-- query        #darkviolet;text:darkviolet
+metadata ^-- error        #darkviolet;text:darkviolet
 
-response ^-- request          #darkviolet;text:darkviolet
-response ^-- backgate_request #darkviolet;text:darkviolet
+response ^-- grpc_request #darkviolet;text:darkviolet
+response ^-- http_request #darkviolet;text:darkviolet
 
 @enduml

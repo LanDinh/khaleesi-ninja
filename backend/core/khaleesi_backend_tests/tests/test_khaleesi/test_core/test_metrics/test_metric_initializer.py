@@ -24,7 +24,7 @@ class MetricInitializer(BaseMetricInitializer):
 class BaseMetricInitializerTest(SimpleTestCase):
   """Test the metric initializer."""
 
-  metric_initializer = MetricInitializer(backgate_request_id = 'backgate-request')
+  metric_initializer = MetricInitializer(http_request_id = 'http-request')
 
   @patch('khaleesi.core.metrics.metric_initializer.add_grpc_server_system_request_metadata')
   def test_requests(self, add_metadata: MagicMock) -> None :
@@ -68,11 +68,11 @@ class BaseMetricInitializerTest(SimpleTestCase):
     results = set()
     for raw_argument in arguments:
       argument: Event = raw_argument.kwargs['event']
-      self.assert_caller(expected = event_data.caller, actual = argument.request_metadata.caller)
-      users.add(argument.request_metadata.user.type)
-      crud_actions.add(argument.action.crud_type)
-      if argument.action.custom_type:
-        custom_actions.add(argument.action.custom_type)
+      self.assert_caller(expected = event_data.caller, actual = argument.requestMetadata.caller)
+      users.add(argument.requestMetadata.user.type)
+      crud_actions.add(argument.action.crudType)
+      if argument.action.customType:
+        custom_actions.add(argument.action.customType)
       results.add(argument.action.result)
     self.assertEqual(users_count  , len(users))
     self.assertEqual(actions_count, len(crud_actions) + len(custom_actions))
@@ -89,12 +89,12 @@ class BaseMetricInitializerTest(SimpleTestCase):
     # Prepare data.
     self.metric_initializer.stub = MagicMock()
     service_call_data = ServiceCallData()
-    call_self = service_call_data.call_list.add()
-    call_self.call.grpc_service = 'grpc-server'
+    call_self = service_call_data.callList.add()
+    call_self.call.grpcService = 'grpc-server'
     call_self.calls.add()
-    call_other = service_call_data.call_list.add()
-    call_other.call.grpc_service = 'some-other-service'
-    call_other.called_by.add()
+    call_other = service_call_data.callList.add()
+    call_other.call.grpcService = 'some-other-service'
+    call_other.calledBy.add()
     self.metric_initializer.stub.GetServiceCallData.return_value = service_call_data
     # Execute test.
     self.metric_initializer.initialize_metrics_with_data(events = [])
@@ -104,7 +104,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
 
   def assert_caller(self, *, expected: GrpcData, actual: GrpcCallerDetails) -> None :
     """Assert the caller data is correct."""
-    self.assertEqual(expected.khaleesi_gate   , actual.khaleesi_gate)
-    self.assertEqual(expected.khaleesi_service, actual.khaleesi_service)
-    self.assertEqual(expected.grpc_service    , actual.grpc_service)
-    self.assertEqual(expected.grpc_method     , actual.grpc_method)
+    self.assertEqual(expected.khaleesi_gate   , actual.khaleesiGate)
+    self.assertEqual(expected.khaleesi_service, actual.khaleesiService)
+    self.assertEqual(expected.grpc_service    , actual.grpcService)
+    self.assertEqual(expected.grpc_method     , actual.grpcMethod)

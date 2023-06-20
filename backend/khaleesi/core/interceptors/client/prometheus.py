@@ -28,12 +28,12 @@ class PrometheusClientInterceptor(ClientInterceptor):
   ) -> Any :
     """Collect the prometheus metrics."""
     peer = RequestMetadata()
-    peer.caller.khaleesi_gate    = khaleesi_gate
-    peer.caller.khaleesi_service = khaleesi_service
-    peer.caller.grpc_service     = grpc_service
-    peer.caller.grpc_method      = grpc_method
-    if hasattr(request_or_iterator, 'request_metadata'):
-      request_metadata: RequestMetadata = request_or_iterator.request_metadata
+    peer.caller.khaleesiGate    = khaleesi_gate
+    peer.caller.khaleesiService = khaleesi_service
+    peer.caller.grpcService     = grpc_service
+    peer.caller.grpcMethod      = grpc_method
+    if hasattr(request_or_iterator, 'requestMetadata'):
+      request_metadata: RequestMetadata = request_or_iterator.requestMetadata
     else:
       request_metadata = RequestMetadata()
     response: Call = method(request_or_iterator, call_details)

@@ -16,17 +16,17 @@ def cleanup_events(request: JobRequest) -> EmptyResponse :
   """Cleanup requests."""
   return cast(EmptyResponse, STUB.CleanupEvents(request))
 
-def cleanup_requests(request: JobRequest) -> EmptyResponse :
+def cleanup_grpc_requests(request: JobRequest) -> EmptyResponse :
   """Cleanup requests."""
-  return cast(EmptyResponse, STUB.CleanupRequests(request))
+  return cast(EmptyResponse, STUB.CleanupGrpcRequests(request))
 
 def cleanup_errors(request: JobRequest) -> EmptyResponse :
   """Cleanup requests."""
   return cast(EmptyResponse, STUB.CleanupErrors(request))
 
-def cleanup_backgate_requests(request: JobRequest) -> EmptyResponse :
+def cleanup_http_requests(request: JobRequest) -> EmptyResponse :
   """Cleanup requests."""
-  return cast(EmptyResponse, STUB.CleanupBackgateRequests(request))
+  return cast(EmptyResponse, STUB.CleanupHttpRequests(request))
 
 def cleanup_queries(request: JobRequest) -> EmptyResponse :
   """Cleanup requests."""
@@ -34,9 +34,9 @@ def cleanup_queries(request: JobRequest) -> EmptyResponse :
 
 
 SAWMILL = {
-    'cleanup-events'           : cleanup_events,
-    'cleanup-requests'         : cleanup_requests,
-    'cleanup-errors'           : cleanup_errors,
-    'cleanup-backgate-requests': cleanup_backgate_requests,
-    'cleanup-queries'          : cleanup_queries,
+    'cleanup-events'       : cleanup_events,
+    'cleanup-grpc-requests': cleanup_grpc_requests,
+    'cleanup-errors'       : cleanup_errors,
+    'cleanup-http-requests': cleanup_http_requests,
+    'cleanup-queries'      : cleanup_queries,
 }

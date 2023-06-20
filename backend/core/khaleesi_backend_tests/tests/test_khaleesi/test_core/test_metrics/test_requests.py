@@ -65,8 +65,8 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           super_get_value.reset_mock()
           request = self._get_request_metadata(user = user_type, **request_attributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
           peer    = self._get_request_metadata(user = user_type, **request_attributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-          peer.caller.grpc_service = callee_grpc_service
-          peer.caller.grpc_method  = callee_grpc_method
+          peer.caller.grpcService = callee_grpc_service
+          peer.caller.grpcMethod  = callee_grpc_method
           # Execute test.
           self.metric.get_value(
             status  = status,
@@ -77,12 +77,12 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           super_get_value.assert_called_once_with(
             status                = status,
             user                  = user_type,
-            grpc_service          = request.caller.grpc_service     or 'UNKNOWN',
-            grpc_method           = request.caller.grpc_method      or 'UNKNOWN',
-            peer_khaleesi_gate    = peer.caller.khaleesi_gate       or 'UNKNOWN',
-            peer_khaleesi_service = peer.caller.khaleesi_service    or 'UNKNOWN',
-            peer_grpc_service     = peer.caller.grpc_service        or 'UNKNOWN',
-            peer_grpc_method      = peer.caller.grpc_method         or 'UNKNOWN',
+            grpc_service          = request.caller.grpcService  or 'UNKNOWN',
+            grpc_method           = request.caller.grpcMethod   or 'UNKNOWN',
+            peer_khaleesi_gate    = peer.caller.khaleesiGate    or 'UNKNOWN',
+            peer_khaleesi_service = peer.caller.khaleesiService or 'UNKNOWN',
+            peer_grpc_service     = peer.caller.grpcService     or 'UNKNOWN',
+            peer_grpc_method      = peer.caller.grpcMethod      or 'UNKNOWN',
           )
 
 
@@ -96,11 +96,11 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
   ) -> RequestMetadata :
     """Get the request metadata."""
     request_metadata = RequestMetadata()
-    request_metadata.caller.khaleesi_gate    = khaleesi_gate
-    request_metadata.caller.khaleesi_service = khaleesi_service
-    request_metadata.caller.grpc_service     = grpc_service
-    request_metadata.caller.grpc_method      = grpc_method
-    request_metadata.user.type               = user
+    request_metadata.caller.khaleesiGate    = khaleesi_gate
+    request_metadata.caller.khaleesiService = khaleesi_service
+    request_metadata.caller.grpcService     = grpc_service
+    request_metadata.caller.grpcMethod      = grpc_method
+    request_metadata.user.type              = user
     return request_metadata
 
 

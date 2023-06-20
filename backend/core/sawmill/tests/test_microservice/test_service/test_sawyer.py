@@ -13,12 +13,12 @@ from khaleesi.proto.core_pb2 import JobExecutionResponse, JobRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
   EventResponse as GrpcEventResponse,
-  RequestResponse as GrpcRequestResponse,
+  GrpcRequestResponse as GrpcGrpcRequestResponse,
   ErrorResponse as GrpcErrorResponse,
-  BackgateRequestResponse as GrpcBackgateResponse,
+  HttpRequestResponse as GrpcHttpResponse,
   QueryResponse as GrpcQueryResponse,
 )
-from microservice.models import Event, Request, Error, BackgateRequest, Query
+from microservice.models import Event, GrpcRequest, Error, HttpRequest, Query
 from microservice.service.sawyer import Service
 
 @patch('microservice.service.sawyer.LOGGER')
@@ -32,20 +32,20 @@ class SawyerServiceTestCase(SimpleTestCase):
     # Execute test.
     self._execute_cleanup_test(method  = self.service.CleanupEvents)  # pylint: disable=no-value-for-parameter
 
-  def test_cleanup_requests(self, *_: MagicMock) -> None :
+  def test_cleanup_grpc_requests(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method = self.service.CleanupRequests)  # pylint: disable=no-value-for-parameter
+    self._execute_cleanup_test(method = self.service.CleanupGrpcRequests)  # pylint: disable=no-value-for-parameter
 
   def test_cleanup_errors(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
     self._execute_cleanup_test(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
 
-  def test_cleanup_backgate_requests(self, *_: MagicMock) -> None :
+  def test_cleanup_http_requests(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._execute_cleanup_test(method = self.service.CleanupBackgateRequests)  # pylint: disable=no-value-for-parameter
+    self._execute_cleanup_test(method = self.service.CleanupHttpRequests)  # pylint: disable=no-value-for-parameter
 
   def test_cleanup_queries(self, *_: MagicMock) -> None :
     """Test cleaning up."""
@@ -66,29 +66,29 @@ class SawyerServiceTestCase(SimpleTestCase):
     db_events.assert_called_once_with()
     db_event.to_grpc_event_response.assert_called_once_with()
 
-  @patch.object(BackgateRequest.objects, 'filter')
-  def test_get_backgate_requests(self, db_requests: MagicMock, *_: MagicMock) -> None :
-    """Test getting logged backgate requests."""
+  @patch.object(HttpRequest.objects, 'filter')
+  def test_get_http_requests(self, db_requests: MagicMock, *_: MagicMock) -> None :
+    """Test getting logged HTTP requests."""
     # Prepare data.
     db_request = MagicMock()
-    db_request.to_grpc_backgate_request_response.return_value = GrpcBackgateResponse()
+    db_request.to_grpc_backgate_request_response.return_value = GrpcHttpResponse()
     db_requests.return_value = [ db_request ]
     # Execute test.
-    result = self.service.GetBackgateRequests(LogFilter(), MagicMock())
+    result = self.service.GetHttpRequests(LogFilter(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.requests))
     db_requests.assert_called_once_with()
     db_request.to_grpc_backgate_request_response.assert_called_once_with()
 
-  @patch.object(Request.objects, 'filter')
+  @patch.object(GrpcRequest.objects, 'filter')
   def test_get_requests(self, db_requests: MagicMock, *_: MagicMock) -> None :
     """Test getting logged requests."""
     # Prepare data.
     db_request = MagicMock()
-    db_request.to_grpc_request_response.return_value = GrpcRequestResponse()
+    db_request.to_grpc_request_response.return_value = GrpcGrpcRequestResponse()
     db_requests.return_value = [ db_request ]
     # Execute test.
-    result = self.service.GetRequests(LogFilter(), MagicMock())
+    result = self.service.GetGrpcRequests(LogFilter(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.requests))
     db_requests.assert_called_once_with()

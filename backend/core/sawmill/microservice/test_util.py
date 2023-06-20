@@ -28,7 +28,8 @@ class ModelRequestMetadataMixin:
   def model_full_request_metadata(self, *, user: 'User.UserType.V') -> Dict[str, Any] :
     """Fill model request metadata for testing purposes."""
     return {
-        'meta_caller_request_id'      : '1337',
+        'meta_caller_http_request_id' : 'http-request-id',
+        'meta_caller_grpc_request_id' : 'grpc-request-id',
         'meta_caller_khaleesi_gate'   : 'khaleesi-gate',
         'meta_caller_khaleesi_service': 'khaleesi-service',
         'meta_caller_grpc_service'    : 'grpc-service',
@@ -54,12 +55,13 @@ class ModelRequestMetadataMixin:
       grpc_response: GrpcResponseMetadata,
   ) -> None :
     """Assert that returned gRPC request metadata matches the original model metadata."""
-    self.assertEqual(model.meta_caller_request_id      , grpc.caller.request_id)
-    self.assertEqual(model.meta_caller_khaleesi_gate   , grpc.caller.khaleesi_gate)
-    self.assertEqual(model.meta_caller_khaleesi_service, grpc.caller.khaleesi_service)
-    self.assertEqual(model.meta_caller_grpc_service    , grpc.caller.grpc_service)
-    self.assertEqual(model.meta_caller_grpc_method     , grpc.caller.grpc_method)
-    self.assertEqual(model.meta_caller_pod_id          , grpc.caller.pod_id)
+    self.assertEqual(model.meta_caller_http_request_id , grpc.caller.httpRequestId)
+    self.assertEqual(model.meta_caller_grpc_request_id , grpc.caller.grpcRequestId)
+    self.assertEqual(model.meta_caller_khaleesi_gate   , grpc.caller.khaleesiGate)
+    self.assertEqual(model.meta_caller_khaleesi_service, grpc.caller.khaleesiService)
+    self.assertEqual(model.meta_caller_grpc_service    , grpc.caller.grpcService)
+    self.assertEqual(model.meta_caller_grpc_method     , grpc.caller.grpcMethod)
+    self.assertEqual(model.meta_caller_pod_id          , grpc.caller.podId)
     self.assertEqual(model.meta_user_id  , grpc.user.id)
     self.assertEqual(model.meta_user_type, grpc.user.type)
     self.assertEqual(
@@ -68,7 +70,7 @@ class ModelRequestMetadataMixin:
     )
     self.assertEqual(
       model.meta_logged_timestamp,
-      grpc_response.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+      grpc_response.loggedTimestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
 
 
@@ -132,12 +134,12 @@ class ModelResponseMetadataMixin(ModelRequestMetadataMixin):
     )
     self.assertEqual(
       model.meta_response_logged_timestamp,
-      grpc_response_response.logged_timestamp.ToDatetime().replace(tzinfo = timezone.utc),
+      grpc_response_response.loggedTimestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
     self.assertEqual(
       model.meta_child_duration.total_seconds(),
-      grpc_response_processed.child_duration_absolute.seconds,
+      grpc_response_processed.childDurationAbsolute.seconds,
     )
-    self.assertEqual(0.5, round(grpc_response_processed.child_duration_relative, 1))
-    self.assertLess(0, grpc_response_processed.logged_duration.nanos)
-    self.assertLess(0, grpc_response_processed.reported_duration.nanos)
+    self.assertEqual(0.5, round(grpc_response_processed.childDurationRelative, 1))
+    self.assertLess(0   , grpc_response_processed.loggedDuration.nanos)
+    self.assertLess(0   , grpc_response_processed.reportedDuration.nanos)

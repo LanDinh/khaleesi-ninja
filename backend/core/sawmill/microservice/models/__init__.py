@@ -2,11 +2,11 @@
 
 # pylint: disable=useless-import-alias
 
-from .logs.backgate_request import BackgateRequest as BackgateRequest
+from .logs.http_request import HttpRequest as HttpRequest
 from .logs.error import Error as Error
 from .logs.event import Event as Event
 from .logs.query import Query as Query
-from .logs.request import Request as Request
+from .logs.grpc_request import GrpcRequest as GrpcRequest
 from .service_registry import (
   ServiceRegistryKhaleesiGate    as ServiceRegistryKhaleesiGate,
   ServiceRegistryKhaleesiService as ServiceRegistryKhaleesiService,

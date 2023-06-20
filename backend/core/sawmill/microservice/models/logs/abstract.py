@@ -17,13 +17,13 @@ class Metadata(models.Model):
   """Common metadata."""
 
   # Caller.
-  meta_caller_backgate_request_id = models.TextField(default = 'UNKNOWN')
-  meta_caller_request_id          = models.TextField(default = 'UNKNOWN')
-  meta_caller_khaleesi_gate       = models.TextField(default = 'UNKNOWN')
-  meta_caller_khaleesi_service    = models.TextField(default = 'UNKNOWN')
-  meta_caller_grpc_service        = models.TextField(default = 'UNKNOWN')
-  meta_caller_grpc_method         = models.TextField(default = 'UNKNOWN')
-  meta_caller_pod_id              = models.TextField(default = 'UNKNOWN')
+  meta_caller_http_request_id  = models.TextField(default = 'UNKNOWN')
+  meta_caller_grpc_request_id  = models.TextField(default = 'UNKNOWN')
+  meta_caller_khaleesi_gate    = models.TextField(default = 'UNKNOWN')
+  meta_caller_khaleesi_service = models.TextField(default = 'UNKNOWN')
+  meta_caller_grpc_service     = models.TextField(default = 'UNKNOWN')
+  meta_caller_grpc_method      = models.TextField(default = 'UNKNOWN')
+  meta_caller_pod_id           = models.TextField(default = 'UNKNOWN')
 
   # User.
   meta_user_id   = models.TextField(default = 'UNKNOWN')
@@ -42,38 +42,38 @@ class Metadata(models.Model):
     """Parse common metadata."""
     return {
         # Caller.
-        'meta_caller_backgate_request_id': parse_string(
-          raw    = metadata.caller.backgate_request_id,
-          name   = 'meta_caller_backgate_request_id',
+        'meta_caller_http_request_id': parse_string(
+          raw    = metadata.caller.httpRequestId,
+          name   = 'meta_caller_http_request_id',
           errors = errors,
         ),
-        'meta_caller_request_id': parse_string(
-          raw    = metadata.caller.request_id,
-          name   = 'meta_caller_request_id',
+        'meta_caller_grpc_request_id': parse_string(
+          raw    = metadata.caller.grpcRequestId,
+          name   = 'meta_caller_grpc_request_id',
           errors = errors,
         ),
         'meta_caller_khaleesi_gate': parse_string(
-          raw    = metadata.caller.khaleesi_gate,
+          raw    = metadata.caller.khaleesiGate,
           name   = 'meta_caller_khaleesi_gate',
           errors = errors,
         ),
         'meta_caller_khaleesi_service': parse_string(
-          raw    = metadata.caller.khaleesi_service,
+          raw    = metadata.caller.khaleesiService,
           name   = 'meta_caller_khaleesi_service',
           errors = errors,
         ),
         'meta_caller_grpc_service': parse_string(
-          raw    = metadata.caller.grpc_service,
+          raw    = metadata.caller.grpcService,
           name   = 'meta_caller_grpc_service',
           errors = errors,
         ),
         'meta_caller_grpc_method': parse_string(
-          raw    = metadata.caller.grpc_method,
+          raw    = metadata.caller.grpcMethod,
           name   = 'meta_caller_grpc_method',
           errors = errors,
         ),
         'meta_caller_pod_id': parse_string(
-          raw    = metadata.caller.pod_id,
+          raw    = metadata.caller.podId,
           name   = 'meta_caller_pod_id',
           errors = errors,
         ),
@@ -97,13 +97,13 @@ class Metadata(models.Model):
   def request_metadata_to_grpc(self, *, request_metadata: RequestMetadata) -> None :
     """Fill in the request metadata for grpc."""
     # Caller.
-    request_metadata.caller.backgate_request_id = self.meta_caller_backgate_request_id
-    request_metadata.caller.request_id          = self.meta_caller_request_id
-    request_metadata.caller.khaleesi_gate       = self.meta_caller_khaleesi_gate
-    request_metadata.caller.khaleesi_service    = self.meta_caller_khaleesi_service
-    request_metadata.caller.grpc_service        = self.meta_caller_grpc_service
-    request_metadata.caller.grpc_method         = self.meta_caller_grpc_method
-    request_metadata.caller.pod_id              = self.meta_caller_pod_id
+    request_metadata.caller.httpRequestId   = self.meta_caller_http_request_id
+    request_metadata.caller.grpcRequestId   = self.meta_caller_grpc_request_id
+    request_metadata.caller.khaleesiGate    = self.meta_caller_khaleesi_gate
+    request_metadata.caller.khaleesiService = self.meta_caller_khaleesi_service
+    request_metadata.caller.grpcService     = self.meta_caller_grpc_service
+    request_metadata.caller.grpcMethod      = self.meta_caller_grpc_method
+    request_metadata.caller.podId           = self.meta_caller_pod_id
     # User.
     request_metadata.user.id   = self.meta_user_id
     request_metadata.user.type = self.meta_user_type  # type: ignore[assignment]
@@ -112,7 +112,7 @@ class Metadata(models.Model):
 
   def response_metadata_to_grpc(self, *, response_metadata: ResponseMetadata) -> None :
     """Fill in the request metadata for grpc."""
-    response_metadata.logged_timestamp.FromDatetime(self.meta_logged_timestamp)
+    response_metadata.loggedTimestamp.FromDatetime(self.meta_logged_timestamp)
     response_metadata.errors = self.meta_logging_errors
 
   class Meta:

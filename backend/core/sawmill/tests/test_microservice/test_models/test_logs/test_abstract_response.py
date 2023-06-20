@@ -12,7 +12,7 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import (
   Response as GrpcResponse,
-  RequestResponse as GrpcRequestResponse,
+  GrpcRequestResponse as GrpcGrpcRequestResponse,
 )
 from microservice.test_util import ModelResponseMetadataMixin
 from tests.models import ResponseMetadata
@@ -94,19 +94,19 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
           request = ResponseMetadata(
             **self.model_full_request_metadata(user = user_type, status = status),
           )
-          result = GrpcRequestResponse()
+          result = GrpcGrpcRequestResponse()
           # Execute test.
           request.response_to_grpc(
-            metadata = result.response_metadata,
+            metadata = result.responseMetadata,
             response = result.response,
-            processed = result.processed_response,
+            processed = result.processedResponse,
           )
           # Assert result.
           self.assert_grpc_response_metadata(
             model                   = request,
             grpc_response           = result.response,
-            grpc_response_response  = result.response_metadata,
-            grpc_response_processed = result.processed_response,
+            grpc_response_response  = result.responseMetadata,
+            grpc_response_processed = result.processedResponse,
           )
 
 
@@ -114,14 +114,14 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
     request = ResponseMetadata(**self.model_empty_request_metadata())
-    result = GrpcRequestResponse()
+    result = GrpcGrpcRequestResponse()
     # Execute test.
     request.response_to_grpc(
-      metadata = result.response_metadata,
-      response = result.response,
-      processed = result.processed_response,
+      metadata  = result.responseMetadata,
+      response  = result.response,
+      processed = result.processedResponse,
     )
     # Assert result.
     self.assertIsNotNone(result)
-    self.assertEqual(0            , result.processed_response.logged_duration.nanos)
-    self.assertEqual(0            , result.processed_response.reported_duration.nanos)
+    self.assertEqual(0, result.processedResponse.loggedDuration.nanos)
+    self.assertEqual(0, result.processedResponse.reportedDuration.nanos)

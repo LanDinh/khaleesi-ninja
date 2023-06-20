@@ -13,75 +13,75 @@ class TestStructuredDbLogger(SimpleTestCase):
 
   logger = StructuredDbLogger()
 
-  @patch('microservice.structured_logger.DbBackgateRequest')
-  def test_send_log_system_backgate_request(self, db_backgate_request: MagicMock) -> None :
+  @patch('microservice.structured_logger.DbHttpRequest')
+  def test_send_log_system_http_request(self, db_http_request: MagicMock) -> None :
     """Test sending a log request."""
     # Prepare data.
     request = MagicMock()
     # Perform test.
-    self.logger.send_log_system_backgate_request(backgate_request = request)
+    self.logger.send_log_system_http_request(http_request = request)
     # Assert result.
-    db_backgate_request.objects.log_system_backgate_request.assert_called_once_with(
-      grpc_backgate_request = request,
-    )
+    db_http_request.objects.log_system_request.assert_called_once_with(grpc_request = request)
 
-  @patch('microservice.structured_logger.DbBackgateRequest')
-  def test_send_log_backgate_request(self, db_backgate_request: MagicMock) -> None :
+  @patch('microservice.structured_logger.DbHttpRequest')
+  def test_send_log_http_request(self, db_http_request: MagicMock) -> None :
     """Test sending a log request."""
     # Prepare data.
     request = MagicMock()
     # Perform test.
-    self.logger.send_log_backgate_request(backgate_request = request)
+    self.logger.send_log_http_request(http_request = request)
     # Assert result.
-    db_backgate_request.objects.log_backgate_request.assert_called_once_with(
-      grpc_backgate_request = request,
-    )
+    db_http_request.objects.log_request.assert_called_once_with(grpc_request = request)
 
-  @patch('microservice.structured_logger.DbBackgateRequest')
-  def test_send_log_backgate_response(self, db_backgate_request: MagicMock) -> None :
-    """Test sending a log request."""
+  @patch('microservice.structured_logger.DbHttpRequest')
+  def test_send_log_http_response(self, db_http_request: MagicMock) -> None :
+    """Test sending a log response."""
     # Prepare data.
     response = MagicMock()
     # Perform test.
-    self.logger.send_log_backgate_response(response = response)
+    self.logger.send_log_http_response(http_response = response)
     # Assert result.
-    db_backgate_request.objects.log_response.assert_called_once_with(grpc_response = response)
+    db_http_request.objects.log_response.assert_called_once_with(grpc_response = response)
 
   @patch('microservice.structured_logger.SERVICE_REGISTRY')
-  @patch('microservice.structured_logger.DbRequest')
-  def test_send_log_request(self, db_request: MagicMock, service_registry: MagicMock) -> None :
-    """Test sending a log request."""
-    # Prepare data.
-    request = MagicMock()
-    # Perform test.
-    self.logger.send_log_request(request = request)
-    # Assert result.
-    db_request.objects.log_request.assert_called_once_with(grpc_request = request)
-    service_registry.add_call.assert_called_once()
-
-  @patch('microservice.structured_logger.DbQuery')
-  @patch('microservice.structured_logger.DbRequest')
-  @patch('microservice.structured_logger.DbBackgateRequest')
-  def test_send_log_response(
+  @patch('microservice.structured_logger.DbGrpcRequest')
+  def test_send_log_grpc_request(
       self,
-      db_backgate_request: MagicMock,
-      db_request         : MagicMock,
-      db_query           : MagicMock,
+      db_grpc_request : MagicMock,
+      service_registry: MagicMock,
   ) -> None :
     """Test sending a log request."""
     # Prepare data.
+    grpc_request = MagicMock()
+    # Perform test.
+    self.logger.send_log_grpc_request(grpc_request = grpc_request)
+    # Assert result.
+    db_grpc_request.objects.log_request.assert_called_once_with(grpc_request = grpc_request)
+    service_registry.add_call.assert_called_once()
+
+  @patch('microservice.structured_logger.DbQuery')
+  @patch('microservice.structured_logger.DbGrpcRequest')
+  @patch('microservice.structured_logger.DbHttpRequest')
+  def test_send_log_grpc_response(
+      self,
+      db_http_request: MagicMock,
+      db_grpc_request: MagicMock,
+      db_query       : MagicMock,
+  ) -> None :
+    """Test sending a log response."""
+    # Prepare data.
     response = MagicMock()
     # Perform test.
-    self.logger.send_log_response(response = response)
+    self.logger.send_log_grpc_response(grpc_response = response)
     # Assert result.
-    db_backgate_request.objects.add_child_duration.assert_called_once()
-    db_request.objects.log_response.assert_called_once_with(grpc_response = response)
-    db_request.objects.log_response.return_value.save.assert_called_once_with()
+    db_http_request.objects.add_child_duration.assert_called_once()
+    db_grpc_request.objects.log_response.assert_called_once_with(grpc_response = response)
+    db_grpc_request.objects.log_response.return_value.save.assert_called_once_with()
     db_query.objects.log_queries.assert_called_once()
 
   @patch('microservice.structured_logger.DbError')
   def test_send_log_error(self, db_error: MagicMock) -> None :
-    """Test sending a log request."""
+    """Test sending a log error."""
     # Prepare data.
     error = MagicMock()
     # Perform test.
@@ -91,7 +91,7 @@ class TestStructuredDbLogger(SimpleTestCase):
 
   @patch('microservice.structured_logger.DbEvent')
   def test_send_log_event(self, db_event: MagicMock) -> None :
-    """Test sending a log request."""
+    """Test sending a log event."""
     # Prepare data.
     event = MagicMock()
     # Perform test.

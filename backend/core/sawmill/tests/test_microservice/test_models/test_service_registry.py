@@ -27,10 +27,10 @@ class ServiceRegistryTestCase(TransactionTestCase):
     """Test adding new services to the registry."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'new-khaleesi-gate'
-    caller_details.khaleesi_service = 'new-khaleesi-service'
-    caller_details.grpc_service     = 'new-grpc-service'
-    caller_details.grpc_method      = 'new-grpc-method'
+    caller_details.khaleesiGate    = 'new-khaleesi-gate'
+    caller_details.khaleesiService = 'new-khaleesi-service'
+    caller_details.grpcService     = 'new-grpc-service'
+    caller_details.grpcMethod      = 'new-grpc-method'
     khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
@@ -43,19 +43,19 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(khaleesi_service_count + 1, ServiceRegistryKhaleesiService.objects.count())
     self.assertEqual(grpc_service_count     + 1, ServiceRegistryGrpcService.objects.count())
     self.assertEqual(grpc_method_count      + 1, ServiceRegistryGrpcMethod.objects.count())
-    ServiceRegistryKhaleesiGate.objects.get(name = caller_details.khaleesi_gate)
-    ServiceRegistryKhaleesiService.objects.get(name = caller_details.khaleesi_service)
-    ServiceRegistryGrpcService.objects.get(name = caller_details.grpc_service)
-    ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpc_method)
+    ServiceRegistryKhaleesiGate.objects.get(name = caller_details.khaleesiGate)
+    ServiceRegistryKhaleesiService.objects.get(name = caller_details.khaleesiService)
+    ServiceRegistryGrpcService.objects.get(name = caller_details.grpcService)
+    ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpcMethod)
 
   def test_adding_khaleesi_service(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
-    caller_details.khaleesi_service = 'new-khaleesi-service'
-    caller_details.grpc_service     = 'new-grpc-service'
-    caller_details.grpc_method      = 'new-grpc-method'
+    caller_details.khaleesiGate    = 'khaleesi-gate-1'
+    caller_details.khaleesiService = 'new-khaleesi-service'
+    caller_details.grpcService     = 'new-grpc-service'
+    caller_details.grpcMethod      = 'new-grpc-method'
     khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
@@ -68,18 +68,18 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(khaleesi_service_count + 1, ServiceRegistryKhaleesiService.objects.count())
     self.assertEqual(grpc_service_count     + 1, ServiceRegistryGrpcService.objects.count())
     self.assertEqual(grpc_method_count      + 1, ServiceRegistryGrpcMethod.objects.count())
-    ServiceRegistryKhaleesiService.objects.get(name = caller_details.khaleesi_service)
-    ServiceRegistryGrpcService.objects.get(name = caller_details.grpc_service)
-    ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpc_method)
+    ServiceRegistryKhaleesiService.objects.get(name = caller_details.khaleesiService)
+    ServiceRegistryGrpcService.objects.get(name = caller_details.grpcService)
+    ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpcMethod)
 
   def test_adding_grpc_service(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
-    caller_details.khaleesi_service = 'khaleesi-service-1'
-    caller_details.grpc_service     = 'new-grpc-service'
-    caller_details.grpc_method      = 'new-grpc-method'
+    caller_details.khaleesiGate    = 'khaleesi-gate-1'
+    caller_details.khaleesiService = 'khaleesi-service-1'
+    caller_details.grpcService     = 'new-grpc-service'
+    caller_details.grpcMethod      = 'new-grpc-method'
     khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
@@ -92,17 +92,17 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
     self.assertEqual(grpc_service_count + 1, ServiceRegistryGrpcService.objects.count())
     self.assertEqual(grpc_method_count  + 1, ServiceRegistryGrpcMethod.objects.count())
-    ServiceRegistryGrpcService.objects.get(name = caller_details.grpc_service)
-    ServiceRegistryGrpcMethod.objects.get( name = caller_details.grpc_method)
+    ServiceRegistryGrpcService.objects.get(name = caller_details.grpcService)
+    ServiceRegistryGrpcMethod.objects.get( name = caller_details.grpcMethod)
 
   def test_adding_grpc_method(self, *_: MagicMock) -> None :
     """Test adding new services to the registry."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
-    caller_details.khaleesi_service = 'khaleesi-service-1'
-    caller_details.grpc_service     = 'grpc-service-1'
-    caller_details.grpc_method      = 'new-grpc-method'
+    caller_details.khaleesiGate    = 'khaleesi-gate-1'
+    caller_details.khaleesiService = 'khaleesi-service-1'
+    caller_details.grpcService     = 'grpc-service-1'
+    caller_details.grpcMethod      = 'new-grpc-method'
     khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
@@ -115,21 +115,21 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(khaleesi_service_count, ServiceRegistryKhaleesiService.objects.count())
     self.assertEqual(grpc_service_count    , ServiceRegistryGrpcService.objects.count())
     self.assertEqual(grpc_method_count  + 1, ServiceRegistryGrpcMethod.objects.count())
-    ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpc_method)
+    ServiceRegistryGrpcMethod.objects.get(name = caller_details.grpcMethod)
 
   def test_add_call(self, *_: MagicMock) -> None :
     """Test adding a call."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
-    caller_details.khaleesi_service = 'khaleesi-service-1'
-    caller_details.grpc_service     = 'grpc-service-1'
-    caller_details.grpc_method      = 'grpc-method-1'
+    caller_details.khaleesiGate    = 'khaleesi-gate-1'
+    caller_details.khaleesiService = 'khaleesi-service-1'
+    caller_details.grpcService     = 'grpc-service-1'
+    caller_details.grpcMethod      = 'grpc-method-1'
     called_details = GrpcCallerDetails()
-    called_details.khaleesi_gate    = 'khaleesi-gate-2'
-    called_details.khaleesi_service = 'khaleesi-service-3'
-    called_details.grpc_service     = 'grpc-service-3'
-    called_details.grpc_method      = 'grpc-method-3'
+    called_details.khaleesiGate    = 'khaleesi-gate-2'
+    called_details.khaleesiService = 'khaleesi-service-3'
+    called_details.grpcService     = 'grpc-service-3'
+    called_details.grpcMethod      = 'grpc-method-3'
     khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
     grpc_service_count     = ServiceRegistryGrpcService.objects.count()
@@ -145,8 +145,8 @@ class ServiceRegistryTestCase(TransactionTestCase):
     self.assertEqual(grpc_method_count     , ServiceRegistryGrpcMethod.objects.count())
     self.assertEqual(call_count + 1        , ServiceRegistryGrpcCall.objects.count())
     ServiceRegistryGrpcCall.objects.get(
-      caller__name = caller_details.grpc_method,
-      called__name = called_details.grpc_method,
+      caller__name = caller_details.grpcMethod,
+      called__name = called_details.grpcMethod,
     )
 
   def test_reload(self, *_: MagicMock) -> None :
@@ -210,10 +210,10 @@ class ServiceRegistryTestCase(TransactionTestCase):
     """Test exiting early from adding services."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
-    caller_details.khaleesi_service = 'khaleesi-service-1'
-    caller_details.grpc_service     = 'grpc-service-1'
-    caller_details.grpc_method      = 'grpc-method-1'
+    caller_details.khaleesiGate    = 'khaleesi-gate-1'
+    caller_details.khaleesiService = 'khaleesi-service-1'
+    caller_details.grpcService     = 'grpc-service-1'
+    caller_details.grpcMethod      = 'grpc-method-1'
     called_details = GrpcCallerDetails()
     khaleesi_gate_count    = ServiceRegistryKhaleesiGate.objects.count()
     khaleesi_service_count = ServiceRegistryKhaleesiService.objects.count()
@@ -232,19 +232,19 @@ class ServiceRegistryTestCase(TransactionTestCase):
     """Test fetching the call data for a given khaleesi service."""
     # Prepare data.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = 'khaleesi-gate-1'
-    caller_details.khaleesi_service = 'khaleesi-service-1'
-    caller_details.grpc_service     = 'grpc-service-1'
-    caller_details.grpc_method      = 'grpc-method-1'
-    calls                           = 'grpc-method-2'
+    caller_details.khaleesiGate    = 'khaleesi-gate-1'
+    caller_details.khaleesiService = 'khaleesi-service-1'
+    caller_details.grpcService     = 'grpc-service-1'
+    caller_details.grpcMethod      = 'grpc-method-1'
+    calls                          = 'grpc-method-2'
     # Execute test.
     result = SERVICE_REGISTRY.get_call_data(owner = caller_details)
     # Assert result.
-    self.assertEqual(1, len(result.call_list))
-    self.assertEqual(1, len(result.call_list[0].calls))
-    self.assertEqual(0, len(result.call_list[0].called_by))
-    self.assertEqual(caller_details.grpc_method, result.call_list[0].call.grpc_method)
-    self.assertEqual(calls                     , result.call_list[0].calls[0].grpc_method)
+    self.assertEqual(1, len(result.callList))
+    self.assertEqual(1, len(result.callList[0].calls))
+    self.assertEqual(0, len(result.callList[0].calledBy))
+    self.assertEqual(caller_details.grpcMethod, result.callList[0].call.grpcMethod)
+    self.assertEqual(calls                    , result.callList[0].calls[0].grpcMethod)
 
   @patch.object(SERVICE_REGISTRY, 'cache')
   def test_get_service_registry_no_cache(self, cache: MagicMock, *_: MagicMock) -> None :

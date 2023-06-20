@@ -27,13 +27,13 @@ from khaleesi.core.logging.text_logger import LOGGER
 from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import (
-  Request,
-  ResponseRequest,
+  GrpcRequest,
+  GrpcResponseRequest,
   Error,
   Event,
   EmptyRequest,
-  BackgateRequest,
-  BackgateResponseRequest,
+  HttpRequest,
+  HttpResponseRequest,
   Response,
   Query,
 )
@@ -46,79 +46,79 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class StructuredLogger(ABC):
   """Basic structured logger."""
 
-  def log_request(self, *, upstream_request: RequestMetadata) -> None :
+  def log_grpc_request(self, *, upstream_request: RequestMetadata) -> None :
     """Log a microservice request."""
     LOGGER.info(
       f'User "{STATE.user.user_id}" started request '
       f'{STATE.request.grpc_service}.{STATE.request.grpc_method}.'
     )
     LOGGER.info(
-      f'Upstream request "{upstream_request.caller.request_id}" caller data: '
-      f'{upstream_request.caller.khaleesi_gate}-{upstream_request.caller.khaleesi_service}: '
-      f'{upstream_request.caller.grpc_service}.{upstream_request.caller.grpc_method}'
+      f'Upstream request "{upstream_request.caller.grpcRequestId}" caller data: '
+      f'{upstream_request.caller.khaleesiGate}-{upstream_request.caller.khaleesiService}: '
+      f'{upstream_request.caller.grpcService}.{upstream_request.caller.grpcMethod}'
     )
 
-    request = Request()
-    add_request_metadata(request = request)
-    request.upstream_request.request_id       = upstream_request.caller.request_id
-    request.upstream_request.khaleesi_gate    = upstream_request.caller.khaleesi_gate
-    request.upstream_request.khaleesi_service = upstream_request.caller.khaleesi_service
-    request.upstream_request.grpc_service     = upstream_request.caller.grpc_service
-    request.upstream_request.grpc_method      = upstream_request.caller.grpc_method
+    grpc_request = GrpcRequest()
+    add_request_metadata(request = grpc_request)
+    grpc_request.upstreamRequest.grpcRequestId   = upstream_request.caller.grpcRequestId
+    grpc_request.upstreamRequest.khaleesiGate    = upstream_request.caller.khaleesiGate
+    grpc_request.upstreamRequest.khaleesiService = upstream_request.caller.khaleesiService
+    grpc_request.upstreamRequest.grpcService     = upstream_request.caller.grpcService
+    grpc_request.upstreamRequest.grpcMethod      = upstream_request.caller.grpcMethod
 
-    self.send_log_request(request = request)
+    self.send_log_grpc_request(grpc_request = grpc_request)
 
-  def log_system_request(
+  def log_system_grpc_request(
       self, *,
-      backgate_request_id: str,
-      request_id         : str,
-      grpc_method        : str,
+      http_request_id: str,
+      grpc_request_id: str,
+      grpc_method    : str,
   ) -> None :
     """Log a microservice request."""
-    LOGGER.info(f'System started request "{request_id}".')
-    request = Request()
+    LOGGER.info(f'System started request "{grpc_request_id}".')
+    grpc_request = GrpcRequest()
     add_grpc_server_system_request_metadata(
-      request             = request,
-      grpc_method         = grpc_method,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
+      request         = grpc_request,
+      grpc_method     = grpc_method,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
     )
-    self.send_log_request(request = request)
+    self.send_log_grpc_request(grpc_request = grpc_request)
 
-  def log_system_response(
+  def log_system_grpc_response(
       self, *,
-      backgate_request_id: str,
-      request_id         : str,
-      grpc_method        : str,
-      status             : StatusCode,
+      http_request_id: str,
+      grpc_request_id: str,
+      grpc_method    : str,
+      status         : StatusCode,
   ) -> None :
     """Log a microservice system response."""
-    response = ResponseRequest()
+    grpc_response = GrpcResponseRequest()
     add_grpc_server_system_request_metadata(
-      request             = response,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      grpc_method         = grpc_method,
+      request         = grpc_response,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      grpc_method     = grpc_method,
     )
     self._log_response_object(
       status       = status,
       request_name = 'Request',
-      response     = response.response,
+      response     = grpc_response.response,
     )
-    self._log_queries(queries = response.queries)
-    self.send_log_response(response = response)
+    self._log_queries(queries = grpc_response.queries)
+    self.send_log_grpc_response(grpc_response = grpc_response)
 
-  def log_response(self, *, status: StatusCode) -> None :
+  def log_grpc_response(self, *, status: StatusCode) -> None :
     """Log a microservice response."""
-    response = ResponseRequest()
-    add_request_metadata(request = response)
+    grpc_response = GrpcResponseRequest()
+    add_request_metadata(request = grpc_response)
     self._log_response_object(
       status       = status,
       request_name = 'Request',
-      response     = response.response,
+      response     = grpc_response.response,
     )
-    self._log_queries(queries = response.queries)
-    self.send_log_response(response = response)
+    self._log_queries(queries = grpc_response.queries)
+    self.send_log_grpc_response(grpc_response = grpc_response)
 
   def log_error(self, *, exception: KhaleesiException) -> None :
     """Log an exception."""
@@ -128,93 +128,93 @@ class StructuredLogger(ABC):
 
   def log_system_error(
       self, *,
-      exception          : KhaleesiException,
-      backgate_request_id: str,
-      request_id         : str,
-      grpc_method        : str,
+      exception      : KhaleesiException,
+      http_request_id: str,
+      grpc_request_id: str,
+      grpc_method    : str,
   ) -> None :
     """Log an exception."""
     error = self._log_error_object(exception = exception)
     add_grpc_server_system_request_metadata(
-      request             = error,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
-      grpc_method         = grpc_method,
+      request         = error,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
+      grpc_method     = grpc_method,
     )
     self.send_log_error(error = error)
 
-  def log_system_backgate_request(self, *, backgate_request_id: str, grpc_method: str) -> None :
-    """Log a backgate request for system requests."""
+  def log_system_http_request(self, *, http_request_id: str, grpc_method: str) -> None :
+    """Log a HTTP request for system requests."""
     LOGGER.info(
-      f'Backgate request "{backgate_request_id}" started.'
+      f'HTTP request "{http_request_id}" started.'
     )
-    backgate_request = EmptyRequest()
+    http_request = EmptyRequest()
     add_grpc_server_system_request_metadata(
-      request             = backgate_request,
-      grpc_method         = grpc_method,
-      backgate_request_id = backgate_request_id,
-      request_id          = 'system',
+      request         = http_request,
+      grpc_method     = grpc_method,
+      http_request_id = http_request_id,
+      grpc_request_id = 'system',
     )
-    self.send_log_system_backgate_request(backgate_request = backgate_request)
+    self.send_log_system_http_request(http_request = http_request)
 
-  def log_backgate_request(self) -> None :
-    """Log a backgate request for system requests."""
-    LOGGER.info(f'Backgate request "{STATE.request.backgate_request_id}" started.')
-    backgate_request = BackgateRequest()
-    add_request_metadata(request = backgate_request)
-    self.send_log_backgate_request(backgate_request = backgate_request)
+  def log_http_request(self) -> None :
+    """Log a HTTP request for system requests."""
+    LOGGER.info(f'HTTP request "{STATE.request.http_request_id}" started.')
+    http_request = HttpRequest()
+    add_request_metadata(request = http_request)
+    self.send_log_http_request(http_request = http_request)
 
-  def log_system_backgate_response(
+  def log_system_http_response(
       self, *,
-      backgate_request_id: str,
-      grpc_method        : str,
-      status             : StatusCode,
+      http_request_id: str,
+      grpc_method    : str,
+      status         : StatusCode,
   ) -> None :
-    """Log a microservice system backgate response."""
-    response = BackgateResponseRequest()
+    """Log a microservice system HTTP response."""
+    http_response = HttpResponseRequest()
     add_grpc_server_system_request_metadata(
-      request             = response,
-      grpc_method         = grpc_method,
-      backgate_request_id = backgate_request_id,
-      request_id          = 'system',
+      request         = http_response,
+      grpc_method     = grpc_method,
+      http_request_id = http_request_id,
+      grpc_request_id = 'system',
     )
     self._log_response_object(
       status       = status,
-      request_name = f'Backgate request "{backgate_request_id}"',
-      response     = response.response,
+      request_name = f'HTTP request "{http_request_id}"',
+      response     = http_response.response,
     )
-    self.send_log_backgate_response(response = response)
+    self.send_log_http_response(http_response = http_response)
 
-  def log_backgate_response(self, *, status: StatusCode) -> None :
-    """Log a microservice backgate response."""
-    response = BackgateResponseRequest()
-    add_request_metadata(request = response)
+  def log_http_response(self, *, status: StatusCode) -> None :
+    """Log a microservice HTTP response."""
+    http_response = HttpResponseRequest()
+    add_request_metadata(request = http_response)
     self._log_response_object(
       status       = status,
-      request_name = f'Backgate request "{STATE.request.backgate_request_id}"',
-      response     = response.response,
+      request_name = f'HTTP request "{STATE.request.http_request_id}"',
+      response     = http_response.response,
     )
-    self.send_log_backgate_response(response = response)
+    self.send_log_http_response(http_response = http_response)
 
   def log_system_event(
       self, *,
-      backgate_request_id: str,
-      request_id         : str,
-      grpc_method        : str,
-      target             : str,
-      owner              : User,
-      action             : 'Event.Action.ActionType.V',
-      result             : 'Event.Action.ResultType.V',
-      details            : str,
-      logger_send_metric : bool,
+      http_request_id   : str,
+      grpc_request_id   : str,
+      grpc_method       : str,
+      target            : str,
+      owner             : User,
+      action            : 'Event.Action.ActionType.V',
+      result            : 'Event.Action.ResultType.V',
+      details           : str,
+      logger_send_metric: bool,
   ) -> None :
     """Log a system event."""
     event = Event()
     add_grpc_server_system_request_metadata(
-      request             = event,
-      grpc_method         = grpc_method,
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
+      request         = event,
+      grpc_method     = grpc_method,
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
     )
     self._log_event(
       event              = event,
@@ -282,16 +282,16 @@ class StructuredLogger(ABC):
     else:
       LOGGER.fatal(log_string)
 
-    event.id                 = str(uuid4())
-    event.target.type        = target_type
-    event.target.id          = target
-    event.target.owner.id    = owner.id
-    event.target.owner.type  = owner.type
-    event.action.custom_type = action
-    event.action.crud_type   = action_crud
-    event.action.result      = result
-    event.action.details     = details
-    event.logger_send_metric = logger_send_metric
+    event.id                = str(uuid4())
+    event.target.type       = target_type
+    event.target.id         = target
+    event.target.owner.id   = owner.id
+    event.target.owner.type = owner.type
+    event.action.customType = action
+    event.action.crudType   = action_crud
+    event.action.result     = result
+    event.action.details    = details
+    event.loggerSendMetric  = logger_send_metric
 
     self.send_log_event(event = event)
 
@@ -329,37 +329,37 @@ class StructuredLogger(ABC):
     LOGGER.log(exception.to_json(), loglevel = exception.loglevel)
     LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
     error = Error()
-    error.id              = str(uuid4())
-    error.status          = exception.status.name
-    error.loglevel        = exception.loglevel.name
-    error.gate            = exception.gate
-    error.service         = exception.service
-    error.public_key      = exception.public_key
-    error.public_details  = exception.public_details
-    error.private_message = exception.private_message
-    error.private_details = exception.private_details
-    error.stacktrace      = exception.stacktrace
+    error.id             = str(uuid4())
+    error.status         = exception.status.name
+    error.loglevel       = exception.loglevel.name
+    error.gate           = exception.gate
+    error.service        = exception.service
+    error.publicKey      = exception.public_key
+    error.publicDetails  = exception.public_details
+    error.privateMessage = exception.private_message
+    error.privateDetails = exception.private_details
+    error.stacktrace     = exception.stacktrace
     return error
 
   @abstractmethod
-  def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
-    """Send the backgate log request to the logging facility."""
+  def send_log_system_http_request(self, *, http_request: EmptyRequest) -> None :
+    """Send the HTTP log request to the logging facility."""
 
   @abstractmethod
-  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None :
-    """Send the backgate log request to the logging facility."""
+  def send_log_http_request(self, *, http_request: HttpRequest) -> None :
+    """Send the HTTP log request to the logging facility."""
 
   @abstractmethod
-  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
-    """Send the log response to the logging facility."""
+  def send_log_http_response(self, *, http_response: HttpResponseRequest) -> None :
+    """Send the HTTP log response to the logging facility."""
 
   @abstractmethod
-  def send_log_request(self, *, request: Request) -> None :
-    """Send the log request to the logging facility."""
+  def send_log_grpc_request(self, *, grpc_request: GrpcRequest) -> None :
+    """Send the gRPC log request to the logging facility."""
 
   @abstractmethod
-  def send_log_response(self, *, response: ResponseRequest) -> None :
-    """Send the log response to the logging facility."""
+  def send_log_grpc_response(self, *, grpc_response: GrpcResponseRequest) -> None :
+    """Send the gRPC log response to the logging facility."""
 
   @abstractmethod
   def send_log_error(self, *, error: Error) -> None :
@@ -379,25 +379,25 @@ class StructuredGrpcLogger(StructuredLogger):
     channel = CHANNEL_MANAGER.get_channel(gate = 'core', service = 'sawmill')
     self.stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
 
-  def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
-    """Send the log request to the logging facility."""
-    self.stub.LogSystemBackgateRequest(backgate_request)
+  def send_log_system_http_request(self, *, http_request: EmptyRequest) -> None:
+    """Send the HTTP log request to the logging facility."""
+    self.stub.LogSystemHttpRequest(http_request)
 
-  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None:
-    """Send the log request to the logging facility."""
-    self.stub.LogBackgateRequest(backgate_request)
+  def send_log_http_request(self, *, http_request: HttpRequest) -> None:
+    """Send the HTTP log request to the logging facility."""
+    self.stub.LogHttpRequest(http_request)
 
-  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
-    """Send the log response to the logging facility."""
-    self.stub.LogBackgateRequestResponse(response)
+  def send_log_http_response(self, *, http_response: HttpResponseRequest) -> None :
+    """Send the HTTP log response to the logging facility."""
+    self.stub.LogHttpRequestResponse(http_response)
 
-  def send_log_request(self, *, request: Request) -> None :
-    """Send the log request to the logging facility."""
-    self.stub.LogRequest(request)
+  def send_log_grpc_request(self, *, grpc_request: GrpcRequest) -> None :
+    """Send the gRPC log request to the logging facility."""
+    self.stub.LogGrpcRequest(grpc_request)
 
-  def send_log_response(self, *, response: ResponseRequest) -> None :
-    """Send the log response to the logging facility."""
-    self.stub.LogResponse(response)
+  def send_log_grpc_response(self, *, grpc_response: GrpcResponseRequest) -> None :
+    """Send the gRPC log response to the logging facility."""
+    self.stub.LogGrpcResponse(grpc_response)
 
   def send_log_error(self, *, error: Error) -> None :
     """Send the log error to the logging facility."""

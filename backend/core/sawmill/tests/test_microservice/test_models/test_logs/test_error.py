@@ -35,30 +35,30 @@ class ErrorManagerTestCase(GrpcTestMixin, TransactionTestCase):
             now = datetime.now(tz = timezone.utc)
             grpc_error = GrpcError()
             self.set_request_metadata(
-              request_metadata = grpc_error.request_metadata,
+              request_metadata = grpc_error.requestMetadata,
               now = now,
               user = user_type,
             )
-            grpc_error.id              = 'error-id'
-            grpc_error.status          = status.name
-            grpc_error.loglevel        = loglevel.name
-            grpc_error.gate            = 'gate'
-            grpc_error.service         = 'service'
-            grpc_error.public_key      = 'public-key'
-            grpc_error.public_details  = 'public-details'
-            grpc_error.private_message = 'private-message'
-            grpc_error.private_details = 'private-details'
-            grpc_error.stacktrace      = 'stacktrace'
+            grpc_error.id             = 'error-id'
+            grpc_error.status         = status.name
+            grpc_error.loglevel       = loglevel.name
+            grpc_error.gate           = 'gate'
+            grpc_error.service        = 'service'
+            grpc_error.publicKey      = 'public-key'
+            grpc_error.publicDetails  = 'public-details'
+            grpc_error.privateMessage = 'private-message'
+            grpc_error.privateDetails = 'private-details'
+            grpc_error.stacktrace     = 'stacktrace'
             # Execute test.
             result = Error.objects.log_error(grpc_error = grpc_error)
             # Assert result.
             metadata.assert_called_once()
-            self.assertEqual(grpc_error.request_metadata, metadata.call_args.kwargs['metadata'])
-            self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
-            self.assertEqual(grpc_error.public_details  , result.public_details)
-            self.assertEqual(grpc_error.private_message , result.private_message)
-            self.assertEqual(grpc_error.private_details , result.private_details)
-            self.assertEqual(grpc_error.stacktrace      , result.stacktrace)
+            self.assertEqual(grpc_error.requestMetadata, metadata.call_args.kwargs['metadata'])
+            self.assertEqual([]                        , metadata.call_args.kwargs['errors'])
+            self.assertEqual(grpc_error.publicDetails  , result.public_details)
+            self.assertEqual(grpc_error.privateMessage , result.private_message)
+            self.assertEqual(grpc_error.privateDetails , result.private_details)
+            self.assertEqual(grpc_error.stacktrace     , result.stacktrace)
 
   def test_log_error_empty(
       self,
@@ -106,18 +106,18 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
             # Assert result.
             self.assert_grpc_request_metadata(
               model = error,
-              grpc = result.error.request_metadata,
-              grpc_response = result.error_metadata,
+              grpc = result.error.requestMetadata,
+              grpc_response = result.errorMetadata,
             )
-            self.assertEqual(error.error_id             , result.error.id)
+            self.assertEqual(error.error_id       , result.error.id)
             self.assertEqual(error.status         , result.error.status)
             self.assertEqual(error.loglevel       , result.error.loglevel)
             self.assertEqual(error.gate           , result.error.gate)
             self.assertEqual(error.service        , result.error.service)
-            self.assertEqual(error.public_key     , result.error.public_key)
-            self.assertEqual(error.public_details , result.error.public_details)
-            self.assertEqual(error.private_message, result.error.private_message)
-            self.assertEqual(error.private_details, result.error.private_details)
+            self.assertEqual(error.public_key     , result.error.publicKey)
+            self.assertEqual(error.public_details , result.error.publicDetails)
+            self.assertEqual(error.private_message, result.error.privateMessage)
+            self.assertEqual(error.private_details, result.error.privateDetails)
             self.assertEqual(error.stacktrace     , result.error.stacktrace)
 
   def test_empty_to_grpc_error(self) -> None :

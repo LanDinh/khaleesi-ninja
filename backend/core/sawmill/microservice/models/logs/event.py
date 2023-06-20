@@ -25,7 +25,7 @@ class EventManager(models.Manager['Event']):
 
   def log_event(self, *, grpc_event: GrpcEvent) -> Event :
     """Log a gRPC event."""
-    if grpc_event.logger_send_metric:
+    if grpc_event.loggerSendMetric:
       AUDIT_EVENT.inc(event = grpc_event)
 
     errors: List[str] = []
@@ -50,12 +50,12 @@ class EventManager(models.Manager['Event']):
       ),
       target_owner_type = User.UserType.Name(grpc_event.target.owner.type),
       # Action.
-      action_crud_type   = GrpcEvent.Action.ActionType.Name(grpc_event.action.crud_type),
-      action_custom_type = grpc_event.action.custom_type,
+      action_crud_type   = GrpcEvent.Action.ActionType.Name(grpc_event.action.crudType),
+      action_custom_type = grpc_event.action.customType,
       action_result      = GrpcEvent.Action.ResultType.Name(grpc_event.action.result),
       action_details     = grpc_event.action.details,
       # Metadata.
-      **self.model.log_metadata(metadata = grpc_event.request_metadata, errors = errors),
+      **self.model.log_metadata(metadata = grpc_event.requestMetadata, errors = errors),
     )
 
 
@@ -81,8 +81,8 @@ class Event(Metadata):
     """Map to gRPC event message."""
 
     grpc_event_response = GrpcEventResponse()
-    self.request_metadata_to_grpc(request_metadata = grpc_event_response.event.request_metadata)
-    self.response_metadata_to_grpc(response_metadata = grpc_event_response.event_metadata)
+    self.request_metadata_to_grpc(request_metadata = grpc_event_response.event.requestMetadata)
+    self.response_metadata_to_grpc(response_metadata = grpc_event_response.eventMetadata)
     grpc_event_response.event.id = self.event_id
     # Target.
     grpc_event_response.event.target.type       = self.target_type
@@ -90,9 +90,9 @@ class Event(Metadata):
     grpc_event_response.event.target.owner.id   = self.target_owner_id
     grpc_event_response.event.target.owner.type = User.UserType.Value(self.target_owner_type)
     # Action.
-    grpc_event_response.event.action.crud_type =\
+    grpc_event_response.event.action.crudType =\
         GrpcEvent.Action.ActionType.Value(self.action_crud_type)
-    grpc_event_response.event.action.custom_type = self.action_custom_type
+    grpc_event_response.event.action.customType = self.action_custom_type
     grpc_event_response.event.action.result =\
         GrpcEvent.Action.ResultType.Value(self.action_result)
     grpc_event_response.event.action.details = self.action_details

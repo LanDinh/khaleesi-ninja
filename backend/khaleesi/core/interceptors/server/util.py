@@ -37,6 +37,6 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
 
   def get_upstream_request(self, *, request: Any) -> RequestMetadata :
     """Get the upstream request."""
-    if hasattr(request, 'request_metadata'):
-      return cast(RequestMetadata, request.request_metadata)
+    if hasattr(request, 'requestMetadata'):
+      return cast(RequestMetadata, request.requestMetadata)
     return RequestMetadata()

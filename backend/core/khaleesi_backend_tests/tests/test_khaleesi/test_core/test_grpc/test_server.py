@@ -43,7 +43,10 @@ class ServerTestCase(SimpleTestCase):
   def test_initialization_success(self, *_: MagicMock) -> None :
     """Test initialization success."""
     # Execute test & assert result.
-    Server(start_backgate_request_id = 'backgate-request', initialize_request_id = 'request-id')
+    Server(
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
+    )
 
   def test_initialization_khaleesi_failure(
       self,
@@ -61,8 +64,8 @@ class ServerTestCase(SimpleTestCase):
           # Execute test.
           with self.assertRaises(KhaleesiException):
             Server(
-              start_backgate_request_id = 'backgate-request',
-              initialize_request_id = 'request-id',
+              start_http_request_id      = 'http-request-id',
+              initialize_grpc_request_id = 'grpc-request-id',
             )
           # Assert result.
           self._assert_server_state_event(
@@ -87,7 +90,7 @@ class ServerTestCase(SimpleTestCase):
     grpc_server.side_effect = Exception('test')
     # Execute test.
     with self.assertRaises(Exception):
-      Server(start_backgate_request_id = 'backgate-request', initialize_request_id = 'request-id')
+      Server(start_http_request_id = 'http-request', initialize_grpc_request_id = 'grpc-request')
     # Assert result.
     self._assert_server_state_event(
       action    = Event.Action.ActionType.START,
@@ -105,8 +108,8 @@ class ServerTestCase(SimpleTestCase):
     """Test sigterm success."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
@@ -120,10 +123,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.SUCCESS,
       singleton = singleton,
     )
-    singleton.structured_logger.log_system_backgate_request.assert_called_once()
-    singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_system_response.assert_called_once()
-    singleton.structured_logger.log_system_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_http_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_response.assert_called_once()
+    singleton.structured_logger.log_system_http_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_sigterm_failure_server_timeout(
@@ -137,8 +140,8 @@ class ServerTestCase(SimpleTestCase):
     """Test sigterm failure."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     grpc_server.return_value.stop.side_effect = Exception('test')
     threads_to_stop.return_value = []
@@ -151,10 +154,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.FATAL,
       singleton = singleton,
     )
-    singleton.structured_logger.log_system_backgate_request.assert_called_once()
-    singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_system_response.assert_called_once()
-    singleton.structured_logger.log_system_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_http_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_response.assert_called_once()
+    singleton.structured_logger.log_system_http_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_sigterm_failure_thread_timeout(
@@ -168,8 +171,8 @@ class ServerTestCase(SimpleTestCase):
     """Test sigterm failure."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
@@ -186,10 +189,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.FATAL,
       singleton = singleton,
     )
-    singleton.structured_logger.log_system_backgate_request.assert_called_once()
-    singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_system_response.assert_called_once()
-    singleton.structured_logger.log_system_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_http_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_response.assert_called_once()
+    singleton.structured_logger.log_system_http_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_sigterm_timeout(
@@ -202,8 +205,8 @@ class ServerTestCase(SimpleTestCase):
     """Test sigterm timeout."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     event = threading.Event()
     grpc_server.return_value.stop.return_value = event
@@ -216,21 +219,21 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.FATAL,
       singleton = singleton,
     )
-    singleton.structured_logger.log_system_backgate_request.assert_called_once()
-    singleton.structured_logger.log_system_request.assert_called_once()
-    singleton.structured_logger.log_system_response.assert_called_once()
-    singleton.structured_logger.log_system_backgate_response.assert_called_once()
+    singleton.structured_logger.log_system_http_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_request.assert_called_once()
+    singleton.structured_logger.log_system_grpc_response.assert_called_once()
+    singleton.structured_logger.log_system_http_response.assert_called_once()
     channel_manager.close_all_channels.assert_called_once_with()
 
   def test_start(self, grpc_server: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :
     """Test that server start works correctly."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     # Execute test.
-    server.start(start_request_id = 'request-id')
+    server.start(start_grpc_request_id = 'grpc-request-id')
     # Assert result.
     grpc_server.return_value.start.assert_called_once_with()
     self._assert_server_state_event(
@@ -243,8 +246,8 @@ class ServerTestCase(SimpleTestCase):
     """Test that server wait for termination works correctly."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     # Execute test.
     server.wait_for_termination()
@@ -264,13 +267,13 @@ class ServerTestCase(SimpleTestCase):
           # Prepare data.
           exception = default_khaleesi_exception(status = status, loglevel = loglevel)
           server = Server(
-            start_backgate_request_id = 'backgate-request',
-            initialize_request_id = 'request-id',
+            start_http_request_id      = 'http-request-id',
+            initialize_grpc_request_id = 'grpc-request-id',
           )
           grpc_server.return_value.start.side_effect = exception
           # Execute test.
           with self.assertRaises(KhaleesiException):
-            server.start(start_request_id = 'request-id')
+            server.start(start_grpc_request_id = 'grpc-request-id')
           # Assert result.
           self._assert_server_state_event(
             action    = Event.Action.ActionType.START,
@@ -292,13 +295,13 @@ class ServerTestCase(SimpleTestCase):
     """Test that server start fails correctly."""
     # Prepare data.
     server = Server(
-      start_backgate_request_id = 'backgate-request',
-      initialize_request_id = 'request-id',
+      start_http_request_id      = 'http-request-id',
+      initialize_grpc_request_id = 'grpc-request-id',
     )
     grpc_server.return_value.start.side_effect = Exception('test')
     # Execute test.
     with self.assertRaises(Exception):
-      server.start(start_request_id = 'request-id')
+      server.start(start_grpc_request_id = 'grpc-request-id')
     # Assert result.
     self._assert_server_state_event(
       action    = Event.Action.ActionType.START,

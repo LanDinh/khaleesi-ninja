@@ -68,10 +68,10 @@ class GrpcServerTestCase(SimpleTestCase):
     # Execute test.
     self.command.khaleesi_handle()
     # Assert result.
-    singleton.structured_logger.log_system_backgate_request.assert_called_once()
-    singleton.structured_logger.log_system_backgate_response.assert_called_once()
-    self.assertEqual(3, singleton.structured_logger.log_system_request.call_count)
-    self.assertEqual(3, singleton.structured_logger.log_system_response.call_count)
+    singleton.structured_logger.log_system_http_request.assert_called_once()
+    singleton.structured_logger.log_system_http_response.assert_called_once()
+    self.assertEqual(3, singleton.structured_logger.log_system_grpc_request.call_count)
+    self.assertEqual(3, singleton.structured_logger.log_system_grpc_response.call_count)
     self.assertEqual(migration_calls, migrate.handle.call_count)
     server.return_value.start.assert_called_once()
     metrics_server.assert_called_once()
@@ -104,10 +104,10 @@ class GrpcServerTestCase(SimpleTestCase):
             # Execute test.
             self.command.khaleesi_handle()
             # Assert result.
-            singleton.structured_logger.log_system_backgate_request.assert_called_once()
-            singleton.structured_logger.log_system_backgate_response.assert_called_once()
-            self.assertEqual(3, singleton.structured_logger.log_system_request.call_count)
-            self.assertEqual(3, singleton.structured_logger.log_system_response.call_count)
+            singleton.structured_logger.log_system_http_request.assert_called_once()
+            singleton.structured_logger.log_system_http_response.assert_called_once()
+            self.assertEqual(3, singleton.structured_logger.log_system_grpc_request.call_count)
+            self.assertEqual(3, singleton.structured_logger.log_system_grpc_response.call_count)
             self.assertEqual(migration_calls, migrate.handle.call_count)
             server.return_value.start.assert_called_once_with()
             metrics_server.assert_called_once()
@@ -136,10 +136,10 @@ class GrpcServerTestCase(SimpleTestCase):
       # Execute test.
       self.command.khaleesi_handle()
       # Assert result.
-      singleton.structured_logger.log_system_backgate_request.assert_called_once()
-      singleton.structured_logger.log_system_backgate_response.assert_called_once()
-      self.assertEqual(3, singleton.structured_logger.log_system_request.call_count)
-      self.assertEqual(3, singleton.structured_logger.log_system_response.call_count)
+      singleton.structured_logger.log_system_http_request.assert_called_once()
+      singleton.structured_logger.log_system_http_response.assert_called_once()
+      self.assertEqual(3, singleton.structured_logger.log_system_grpc_request.call_count)
+      self.assertEqual(3, singleton.structured_logger.log_system_grpc_response.call_count)
       self.assertEqual(migration_calls, migrate.handle.call_count)
       server.return_value.start.assert_called_once_with()
       metrics_server.assert_called_once()
@@ -165,10 +165,10 @@ class GrpcServerTestCase(SimpleTestCase):
       # Execute test.
       self.command.khaleesi_handle()
       # Assert result.
-      singleton.structured_logger.log_system_backgate_request.assert_called_once()
-      singleton.structured_logger.log_system_backgate_response.assert_called_once()
-      self.assertEqual(3, singleton.structured_logger.log_system_request.call_count)
-      self.assertEqual(3, singleton.structured_logger.log_system_response.call_count)
+      singleton.structured_logger.log_system_http_request.assert_called_once()
+      singleton.structured_logger.log_system_http_response.assert_called_once()
+      self.assertEqual(3, singleton.structured_logger.log_system_grpc_request.call_count)
+      self.assertEqual(3, singleton.structured_logger.log_system_grpc_response.call_count)
       self.assertEqual(migration_calls, migrate.handle.call_count)
       server.return_value.start.assert_called_once_with()
       metrics_server.assert_called_once()

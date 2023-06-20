@@ -93,16 +93,16 @@ class ResponseMetadata(Metadata):
   ) -> None :
     """Fill in the request metadata for grpc."""
     # Metadata.
-    metadata.logged_timestamp.FromDatetime(self.meta_response_logged_timestamp)
+    metadata.loggedTimestamp.FromDatetime(self.meta_response_logged_timestamp)
     metadata.errors = self.meta_response_logging_errors
     # Response.
     response.timestamp.FromDatetime(self.meta_response_reported_timestamp)
     response.status = self.meta_response_status
     # Processed data.
-    processed.logged_duration.FromTimedelta(self.logged_duration)
-    processed.reported_duration.FromTimedelta(self.reported_duration)
-    processed.child_duration_absolute.FromTimedelta(self.meta_child_duration)
-    processed.child_duration_relative = self.child_duration_relative
+    processed.loggedDuration.FromTimedelta(self.logged_duration)
+    processed.reportedDuration.FromTimedelta(self.reported_duration)
+    processed.childDurationAbsolute.FromTimedelta(self.meta_child_duration)
+    processed.childDurationRelative = self.child_duration_relative
 
   class Meta:
     """Abstract class."""

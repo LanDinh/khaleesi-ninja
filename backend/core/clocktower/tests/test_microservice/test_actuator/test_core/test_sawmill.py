@@ -8,9 +8,9 @@ from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import JobRequest
 from microservice.actuator.core.sawmill import (
   cleanup_events,
-  cleanup_requests,
+  cleanup_grpc_requests,
   cleanup_errors,
-  cleanup_backgate_requests,
+  cleanup_http_requests,
   cleanup_queries,
 )
 
@@ -28,14 +28,14 @@ class SawmillJobTestCase(SimpleTestCase):
     # Assert result.
     stub.CleanupEvents.assert_called_once_with(request)
 
-  def test_cleanup_requests(self, stub: MagicMock) -> None :
+  def test_cleanup_grpc_requests(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
     request = JobRequest()
     # Execute test.
-    cleanup_requests(request)
+    cleanup_grpc_requests(request)
     # Assert result.
-    stub.CleanupRequests.assert_called_once_with(request)
+    stub.CleanupGrpcRequests.assert_called_once_with(request)
 
   def test_cleanup_errors(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
@@ -46,14 +46,14 @@ class SawmillJobTestCase(SimpleTestCase):
     # Assert result.
     stub.CleanupErrors.assert_called_once_with(request)
 
-  def test_cleanup_backgate_requests(self, stub: MagicMock) -> None :
+  def test_cleanup_http_requests(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
     request = JobRequest()
     # Execute test.
-    cleanup_backgate_requests(request)
+    cleanup_http_requests(request)
     # Assert result.
-    stub.CleanupBackgateRequests.assert_called_once_with(request)
+    stub.CleanupHttpRequests.assert_called_once_with(request)
 
   def test_cleanup_queries(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""

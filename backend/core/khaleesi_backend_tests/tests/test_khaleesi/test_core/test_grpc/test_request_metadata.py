@@ -22,19 +22,19 @@ class GrpcTestCase(SimpleTestCase):
     """Test adding request metadata for grpc server system actions."""
     # Prepare data.
     request = MagicMock()
-    request.request_metadata = RequestMetadata()
+    request.requestMetadata = RequestMetadata()
     expected = RequestMetadata()
-    expected.caller.backgate_request_id = 'backgate-request'
-    expected.caller.request_id          = 'request'
-    expected.caller.grpc_service        = 'grpc-server'
-    expected.caller.grpc_method         = 'lifecycle'
-    expected.user.id                    = 'grpc-server'
+    expected.caller.httpRequestId = 'http-request'
+    expected.caller.grpcRequestId = 'grpc-request'
+    expected.caller.grpcService   = 'grpc-server'
+    expected.caller.grpcMethod    = 'lifecycle'
+    expected.user.id              = 'grpc-server'
     # Execute test.
     add_grpc_server_system_request_metadata(
-      request             = request,
-      grpc_method         = 'LIFECYCLE',
-      backgate_request_id = 'backgate-request',
-      request_id          = 'request',
+      request         = request,
+      grpc_method     = 'LIFECYCLE',
+      http_request_id = 'http-request',
+      grpc_request_id = 'grpc-request',
     )
     # Assert result
     self._assert_metadata(request = request, expected = expected, user_type = UserType.SYSTEM)
@@ -43,20 +43,20 @@ class GrpcTestCase(SimpleTestCase):
     """Test adding request metadata."""
     # Prepare data.
     expected = RequestMetadata()
-    expected.caller.backgate_request_id = 'backgate-request'
-    expected.caller.request_id          = 'request-id'
-    expected.caller.grpc_service        = 'grpc-service'
-    expected.caller.grpc_method         = 'grpc-method'
-    expected.user.id                    = 'user-id'
+    expected.caller.httpRequestId = 'http-request'
+    expected.caller.grpcRequestId = 'grpc-request-id'
+    expected.caller.grpcService   = 'grpc-service'
+    expected.caller.grpcMethod    = 'grpc-method'
+    expected.user.id              = 'user-id'
     for user_type in UserType:
       with self.subTest(user = user_type.name):
         request = MagicMock()
-        request.request_metadata = RequestMetadata()
+        request.requestMetadata = RequestMetadata()
         STATE.reset()
-        STATE.request.backgate_request_id = expected.caller.backgate_request_id
-        STATE.request.request_id          = expected.caller.request_id
-        STATE.request.grpc_service        = expected.caller.grpc_service
-        STATE.request.grpc_method         = expected.caller.grpc_method
+        STATE.request.http_request_id = expected.caller.httpRequestId
+        STATE.request.grpc_request_id = expected.caller.grpcRequestId
+        STATE.request.grpc_service    = expected.caller.grpcService
+        STATE.request.grpc_method     = expected.caller.grpcMethod
         STATE.user.type    = user_type
         STATE.user.user_id = expected.user.id
         # Execute test.
@@ -73,18 +73,15 @@ class GrpcTestCase(SimpleTestCase):
   ) -> None :
     """Asset that the metadata is as expected."""
     # Manual values.
-    self.assertEqual(
-      expected.caller.backgate_request_id,
-      request.request_metadata.caller.backgate_request_id,
-    )
-    self.assertEqual(expected.caller.request_id  , request.request_metadata.caller.request_id)
-    self.assertEqual(expected.caller.grpc_service, request.request_metadata.caller.grpc_service)
-    self.assertEqual(expected.caller.grpc_method , request.request_metadata.caller.grpc_method)
-    self.assertEqual(expected.user.id            , request.request_metadata.user.id)
-    self.assertEqual(user_type                   , UserType(request.request_metadata.user.type))
+    self.assertEqual(expected.caller.httpRequestId, request.requestMetadata.caller.httpRequestId)
+    self.assertEqual(expected.caller.grpcRequestId, request.requestMetadata.caller.grpcRequestId)
+    self.assertEqual(expected.caller.grpcService  , request.requestMetadata.caller.grpcService)
+    self.assertEqual(expected.caller.grpcMethod   , request.requestMetadata.caller.grpcMethod)
+    self.assertEqual(expected.user.id             , request.requestMetadata.user.id)
+    self.assertEqual(user_type                    , UserType(request.requestMetadata.user.type))
     # Automatic values.
-    self.assertEqual('core'    , request.request_metadata.caller.khaleesi_gate)
-    self.assertEqual('khaleesi_backend_tests', request.request_metadata.caller.khaleesi_service)
-    self.assertIsNotNone(request.request_metadata.caller.pod_id)
+    self.assertEqual('core'                  , request.requestMetadata.caller.khaleesiGate)
+    self.assertEqual('khaleesi_backend_tests', request.requestMetadata.caller.khaleesiService)
+    self.assertIsNotNone(request.requestMetadata.caller.podId)
     now = datetime.now(tz = timezone.utc)
-    self.assertEqual(now.date(), request.request_metadata.timestamp.ToDatetime().date())
+    self.assertEqual(now.date(), request.requestMetadata.timestamp.ToDatetime().date())

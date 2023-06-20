@@ -8,8 +8,8 @@ import "core.proto";
 
 
 message ResponseMetadata {
-  google.protobuf.Timestamp logged_timestamp = 1;
-  string                    errors           = 2;
+  google.protobuf.Timestamp loggedTimestamp = 1;
+  string                    errors          = 2;
 }
 
 
@@ -28,14 +28,14 @@ message Event {
       CUSTOM         = 1;
 
       // CRUD.
-      CREATE         = 10;
-      READ           = 11;
-      UPDATE         = 12;
-      DELETE         = 13;
+      CREATE = 10;
+      READ   = 11;
+      UPDATE = 12;
+      DELETE = 13;
 
       // Processes.
-      START          = 20;
-      END            = 21;
+      START = 20;
+      END   = 21;
     }
 
     enum ResultType {
@@ -46,37 +46,38 @@ message Event {
       FATAL          = 4;
     }
 
-    ActionType crud_type   = 1;
-    string     custom_type = 2;
-    ResultType result      = 3;
-    string     details     = 4;
+    ActionType crudType   = 1;
+    string     customType = 2;
+    ResultType result     = 3;
+    string     details    = 4;
   }
 
-  khaleesi.core.RequestMetadata request_metadata   = 1;
-  string                        id                 = 2;
-  Target                        target             = 3;
-  Action                        action             = 4;
-  bool                          logger_send_metric = 10;
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  string                        id              = 2;
+  Target                        target          = 3;
+  Action                        action          = 4;
+
+  bool loggerSendMetric = 10;
 }
 
 
-message BackgateRequest {
+message HttpRequest {
   // Metadata.
-  khaleesi.core.RequestMetadata request_metadata = 1;
+  khaleesi.core.RequestMetadata requestMetadata = 1;
 
   // khaleesi.ninja.
-  string language  = 10;
-  string device_id = 11;
+  string language = 10;
+  string deviceId = 11;
 
   // HTTP.
-  string language_header = 20;
-  string ip              = 21;
-  string useragent       = 22;
+  string languageHeader = 20;
+  string ip             = 21;
+  string useragent      = 22;
 }
 
-message Request {
-  khaleesi.core.RequestMetadata   request_metadata = 1;
-  khaleesi.core.GrpcCallerDetails upstream_request = 2;
+message GrpcRequest {
+  khaleesi.core.RequestMetadata   requestMetadata = 1;
+  khaleesi.core.GrpcCallerDetails upstreamRequest = 2;
 }
 
 message Query {
@@ -89,53 +90,53 @@ message Query {
 }
 
 message Error {
-  khaleesi.core.RequestMetadata request_metadata = 1;
-  string                        id               = 2;
-  string                        status           = 3;
-  string                        loglevel         = 4;
-  string                        gate             = 5;
-  string                        service          = 6;
-  string                        public_key       = 7;
-  string                        public_details   = 8;
-  string                        private_message  = 9;
-  string                        private_details  = 10;
-  string                        stacktrace       = 11;
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  string                        id              = 2;
+  string                        status          = 3;
+  string                        loglevel        = 4;
+  string                        gate            = 5;
+  string                        service         = 6;
+  string                        publicKey       = 7;
+  string                        publicDetails   = 8;
+  string                        privateMessage  = 9;
+  string                        privateDetails  = 10;
+  string                        stacktrace      = 11;
 }
 
 
 message Response {
-  string                    status     = 1;
-  google.protobuf.Timestamp timestamp  = 2;
+  string                    status    = 1;
+  google.protobuf.Timestamp timestamp = 2;
 }
 
-message BackgateResponseRequest {
-  khaleesi.core.RequestMetadata request_metadata = 1;
+message HttpResponseRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
   Response                      response         = 2;
 }
 
-message ResponseRequest {
-  khaleesi.core.RequestMetadata request_metadata = 1;
-  Response                      response         = 2;
-  repeated Query                queries          = 3;
+message GrpcResponseRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  Response                      response        = 2;
+  repeated Query                queries         = 3;
 }
 
 
 message LogStandardResponse {}
 
 service Lumberjack {
-  rpc LogEvent                   (Event)                   returns (LogStandardResponse);
-  rpc LogRequest                 (Request)                 returns (LogStandardResponse);
-  rpc LogResponse                (ResponseRequest)         returns (LogStandardResponse);
-  rpc LogError                   (Error)                   returns (LogStandardResponse);
-  rpc LogBackgateRequest         (BackgateRequest)         returns (LogStandardResponse);
-  rpc LogSystemBackgateRequest   (EmptyRequest)            returns (LogStandardResponse);
-  rpc LogBackgateRequestResponse (BackgateResponseRequest) returns (LogStandardResponse);
+  rpc LogEvent               (Event)               returns (LogStandardResponse);
+  rpc LogGrpcRequest         (GrpcRequest)         returns (LogStandardResponse);
+  rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
+  rpc LogError               (Error)               returns (LogStandardResponse);
+  rpc LogHttpRequest         (HttpRequest)         returns (LogStandardResponse);
+  rpc LogSystemHttpRequest   (EmptyRequest)        returns (LogStandardResponse);
+  rpc LogHttpRequestResponse (HttpResponseRequest) returns (LogStandardResponse);
 }
 
 
 message EventResponse {
-  ResponseMetadata event_metadata = 1;
-  Event            event          = 2;
+  ResponseMetadata eventMetadata = 1;
+  Event            event         = 2;
 }
 
 message EventsList {
@@ -143,14 +144,14 @@ message EventsList {
 }
 
 message QueryResponse {
-  khaleesi.core.RequestMetadata query_request_metadata  = 1;
-  ResponseMetadata              query_response_metadata = 2;
-  Query                         query                   = 3;
+  khaleesi.core.RequestMetadata queryRequestMetadata  = 1;
+  ResponseMetadata              queryResponseMetadata = 2;
+  Query                         query                 = 3;
 
-  string                   normalized        = 10;
-  repeated string          tables            = 11;
-  repeated string          columns           = 12;
-  google.protobuf.Duration reported_duration = 20;
+  string                   normalized       = 10;
+  repeated string          tables           = 11;
+  repeated string          columns          = 12;
+  google.protobuf.Duration reportedDuration = 20;
 
 }
 
@@ -160,18 +161,18 @@ message QueryList{
 
 
 message ProcessedResponse {
-  google.protobuf.Duration reported_duration       = 1;
-  google.protobuf.Duration logged_duration         = 2;
-  google.protobuf.Duration child_duration_absolute = 10;
-  double                   child_duration_relative = 11;
+  google.protobuf.Duration reportedDuration = 1;
+  google.protobuf.Duration loggedDuration   = 2;
+  google.protobuf.Duration childDurationAbsolute = 10;
+  double                   childDurationRelative = 11;
 }
 
 
-message BackgateRequestResponse {
-  ResponseMetadata request_metadata  = 1;
-  BackgateRequest  request           = 2;
-  ResponseMetadata response_metadata = 3;
-  Response         response          = 4;
+message HttpRequestResponse {
+  ResponseMetadata requestMetadata  = 1;
+  HttpRequest      request          = 2;
+  ResponseMetadata responseMetadata = 3;
+  Response         response         = 4;
 
   enum RequestType {
     UNKNOWN = 0;
@@ -180,35 +181,36 @@ message BackgateRequestResponse {
   }
 
   // Processed data.
-  RequestType              type               = 10;
-  ProcessedResponse        processed_response = 11;
-  string                   geolocation        = 20;
-  string                   browser            = 21;
-  string                   rendering_agent    = 22;
-  string                   os                 = 23;
-  string                   device_type        = 24;
+  RequestType       type              = 10;
+  ProcessedResponse processedResponse = 11;
+
+  string geolocation    = 20;
+  string browser        = 21;
+  string renderingAgent = 22;
+  string os             = 23;
+  string deviceType     = 24;
 }
 
-message BackgateRequestList {
-  repeated BackgateRequestResponse requests = 1;
+message HttpRequestList {
+  repeated HttpRequestResponse requests = 1;
 }
 
 
-message RequestResponse {
-  ResponseMetadata         request_metadata   = 1;
-  Request                  request            = 2;
-  ResponseMetadata         response_metadata  = 3;
-  Response                 response           = 4;
-  ProcessedResponse        processed_response = 5;
+message GrpcRequestResponse {
+  ResponseMetadata  requestMetadata   = 1;
+  GrpcRequest       request           = 2;
+  ResponseMetadata  responseMetadata  = 3;
+  Response          response          = 4;
+  ProcessedResponse processedResponse = 5;
 }
 
-message RequestList {
-  repeated RequestResponse requests = 1;
+message GrpcRequestList {
+  repeated GrpcRequestResponse requests = 1;
 }
 
 message ErrorResponse {
-  ResponseMetadata error_metadata = 1;
-  Error            error          = 2;
+  ResponseMetadata errorMetadata = 1;
+  Error            error         = 2;
 }
 
 message ErrorList {
@@ -217,35 +219,35 @@ message ErrorList {
 
 
 message LogFilter {
-  khaleesi.core.RequestMetadata request_metadata = 1;
+  khaleesi.core.RequestMetadata requestMetadata = 1;
 }
 
 
 service Sawyer {
-  rpc GetEvents               (LogFilter)                returns (EventsList);
-  rpc GetRequests             (LogFilter)                returns (RequestList);
-  rpc GetErrors               (LogFilter)                returns (ErrorList);
-  rpc GetBackgateRequests     (LogFilter)                returns (BackgateRequestList);
-  rpc GetQueries              (LogFilter)                returns (QueryList);
-  rpc CleanupEvents           (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupRequests         (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupErrors           (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupBackgateRequests (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupQueries          (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc GetEvents           (LogFilter)                returns (EventsList);
+  rpc GetGrpcRequests     (LogFilter)                returns (GrpcRequestList);
+  rpc GetErrors           (LogFilter)                returns (ErrorList);
+  rpc GetHttpRequests     (LogFilter)                returns (HttpRequestList);
+  rpc GetQueries          (LogFilter)                returns (QueryList);
+  rpc CleanupEvents       (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupGrpcRequests (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupErrors       (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupHttpRequests (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
+  rpc CleanupQueries      (khaleesi.core.JobRequest) returns (khaleesi.core.EmptyResponse);
 }
 
 message EmptyRequest {
-  khaleesi.core.RequestMetadata   request_metadata = 1;
+  khaleesi.core.RequestMetadata requestMetadata = 1;
 }
 
 message CallData {
-  khaleesi.core.GrpcCallerDetails          call      = 1;
-  repeated khaleesi.core.GrpcCallerDetails calls     = 2;
-  repeated khaleesi.core.GrpcCallerDetails called_by = 3;
+  khaleesi.core.GrpcCallerDetails          call     = 1;
+  repeated khaleesi.core.GrpcCallerDetails calls    = 2;
+  repeated khaleesi.core.GrpcCallerDetails calledBy = 3;
 }
 
 message ServiceCallData {
-  repeated CallData call_list = 1;
+  repeated CallData callList = 1;
 }
 
 service Forester {

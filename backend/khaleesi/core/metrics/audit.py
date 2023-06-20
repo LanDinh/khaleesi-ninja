@@ -57,14 +57,14 @@ class AuditEventMetric(CounterMetric):
   def _get_arguments(self, *, event: Event) -> Dict[str, Any] :
     """Transform the event into arguments."""
     return {
-        'user'              : event.request_metadata.user.type,
-        'khaleesi_gate'     : event.request_metadata.caller.khaleesi_gate,
-        'khaleesi_service'  : event.request_metadata.caller.khaleesi_service,
-        'grpc_service'      : event.request_metadata.caller.grpc_service,
-        'grpc_method'       : event.request_metadata.caller.grpc_method,
+        'user'              : event.requestMetadata.user.type,
+        'khaleesi_gate'     : event.requestMetadata.caller.khaleesiGate,
+        'khaleesi_service'  : event.requestMetadata.caller.khaleesiService,
+        'grpc_service'      : event.requestMetadata.caller.grpcService,
+        'grpc_method'       : event.requestMetadata.caller.grpcMethod,
         'target'            : event.target.type,
-        'action_crud_type'  : event.action.crud_type,
-        'action_custom_type': event.action.custom_type,
+        'action_crud_type'  : event.action.crudType,
+        'action_custom_type': event.action.customType,
         'result'            : event.action.result,
     }
 

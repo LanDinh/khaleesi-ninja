@@ -12,9 +12,9 @@ from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogFilter,
   EventsList,
-  RequestList,
+  GrpcRequestList,
   ErrorList,
-  BackgateRequestList,
+  HttpRequestList,
   QueryList,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
@@ -23,9 +23,9 @@ from khaleesi.proto.core_sawmill_pb2_grpc import (
 )
 from microservice.models import (
   Event as DbEvent,
-  Request as DbRequest,
+  GrpcRequest as DbGrpcRequest,
   Error as DbError,
-  BackgateRequest as DbBackgateRequest,
+  HttpRequest as DbHttpRequest,
   Query as DbQuery,
 )
 from microservice.models.cleanup import CleanupJob
@@ -38,43 +38,39 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up events older than '
-      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return job_executor(job = CleanupJob(model = DbEvent, request = request))
 
-  def CleanupRequests(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupGrpcRequests(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up requests older than '
-      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return job_executor(job = CleanupJob(model = DbRequest, request = request))
+    return job_executor(job = CleanupJob(model = DbGrpcRequest, request = request))
 
   def CleanupErrors(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up errors older than '
-      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return job_executor(job = CleanupJob(model = DbError, request = request))
 
-  def CleanupBackgateRequests(
-      self,
-      request: JobRequest,
-      _: grpc.ServicerContext,
-  ) -> EmptyResponse :
+  def CleanupHttpRequests(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
-      'Cleaning up backgate requests older than '
-      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+      'Cleaning up HTTP requests older than '
+      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return job_executor(job = CleanupJob(model = DbBackgateRequest, request = request))
+    return job_executor(job = CleanupJob(model = DbHttpRequest, request = request))
 
   def CleanupQueries(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up queries older than '
-      f'{request.cleanup_configuration.cleanup_delay.ToTimedelta()}.',
+      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return job_executor(job = CleanupJob(model = DbQuery, request = request))
 
@@ -86,19 +82,19 @@ class Service(Servicer):
       result.events.append(event.to_grpc_event_response())
     return result
 
-  def GetBackgateRequests(self, request: LogFilter, _: grpc.ServicerContext) -> BackgateRequestList:
+  def GetHttpRequests(self, request: LogFilter, _: grpc.ServicerContext) -> HttpRequestList:
     """Get logged requests."""
-    result = BackgateRequestList()
-    LOGGER.info('Getting all backgate requests.')
-    for db_backgate_request in DbBackgateRequest.objects.filter():
-      result.requests.append(db_backgate_request.to_grpc_backgate_request_response())
+    result = HttpRequestList()
+    LOGGER.info('Getting all HTTP requests.')
+    for db_http_request in DbHttpRequest.objects.filter():
+      result.requests.append(db_http_request.to_grpc_backgate_request_response())
     return result
 
-  def GetRequests(self, request: LogFilter, _: grpc.ServicerContext) -> RequestList :
+  def GetGrpcRequests(self, request: LogFilter, _: grpc.ServicerContext) -> GrpcRequestList :
     """Get logged requests."""
-    result = RequestList()
+    result = GrpcRequestList()
     LOGGER.info('Getting all requests.')
-    for db_request in DbRequest.objects.filter():
+    for db_request in DbGrpcRequest.objects.filter():
       result.requests.append(db_request.to_grpc_request_response())
     return result
 

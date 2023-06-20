@@ -18,53 +18,53 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 def add_grpc_server_system_request_metadata(
     *,
-    request            : Any,
-    backgate_request_id: str,
-    request_id         : str,
-    grpc_method        : str,
+    request        : Any,
+    http_request_id: str,
+    grpc_request_id: str,
+    grpc_method    : str,
 ) -> None :
   """Add request metadata to request protobufs."""
   _add_request_metadata(
-    request             = request,
-    backgate_request_id = backgate_request_id,
-    request_id          = request_id,
-    grpc_service        = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME'],
-    grpc_method         = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['METHOD'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
-    user_id             = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['USER_ID'],
-    user_type           = UserType.SYSTEM,
+    request         = request,
+    http_request_id = http_request_id,
+    grpc_request_id = grpc_request_id,
+    grpc_service    = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME'],
+    grpc_method     = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES'][grpc_method]['METHOD'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
+    user_id         = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['USER_ID'],
+    user_type       = UserType.SYSTEM,
   )
 
 def add_request_metadata(*, request : Any) -> None :
   """Add request metadata to request protobufs."""
   _add_request_metadata(
-    request             = request,
-    backgate_request_id = STATE.request.backgate_request_id,
-    request_id          = STATE.request.request_id,
-    grpc_service        = STATE.request.grpc_service,
-    grpc_method         = STATE.request.grpc_method,
-    user_id             = STATE.user.user_id,
-    user_type           = STATE.user.type,
+    request         = request,
+    http_request_id = STATE.request.http_request_id,
+    grpc_request_id = STATE.request.grpc_request_id,
+    grpc_service    = STATE.request.grpc_service,
+    grpc_method     = STATE.request.grpc_method,
+    user_id         = STATE.user.user_id,
+    user_type       = STATE.user.type,
   )
 
 def _add_request_metadata(
     *,
-    request            : Any,
-    backgate_request_id: str,
-    request_id         : str,
-    grpc_service       : str,
-    grpc_method        : str,
-    user_id            : str,
-    user_type          : UserType,
+    request        : Any,
+    http_request_id: str,
+    grpc_request_id: str,
+    grpc_service   : str,
+    grpc_method    : str,
+    user_id        : str,
+    user_type      : UserType,
 ) -> None :
   """Add request metadata to request protobufs."""
-  request_metadata = cast(RequestMetadata, request.request_metadata)
-  request_metadata.caller.backgate_request_id = backgate_request_id
-  request_metadata.caller.request_id          = request_id
-  request_metadata.caller.khaleesi_gate       = khaleesi_settings['METADATA']['GATE']
-  request_metadata.caller.khaleesi_service    = khaleesi_settings['METADATA']['SERVICE']
-  request_metadata.caller.grpc_service        = grpc_service
-  request_metadata.caller.grpc_method         = grpc_method
-  request_metadata.caller.pod_id              = khaleesi_settings['METADATA']['POD_ID']
-  request_metadata.user.id                    = user_id
-  request_metadata.user.type                  = user_type.value  # type: ignore[assignment]
+  request_metadata = cast(RequestMetadata, request.requestMetadata)
+  request_metadata.caller.httpRequestId   = http_request_id
+  request_metadata.caller.grpcRequestId   = grpc_request_id
+  request_metadata.caller.khaleesiGate    = khaleesi_settings['METADATA']['GATE']
+  request_metadata.caller.khaleesiService = khaleesi_settings['METADATA']['SERVICE']
+  request_metadata.caller.grpcService     = grpc_service
+  request_metadata.caller.grpcMethod      = grpc_method
+  request_metadata.caller.podId           = khaleesi_settings['METADATA']['POD_ID']
+  request_metadata.user.id                = user_id
+  request_metadata.user.type              = user_type.value  # type: ignore[assignment]
   request_metadata.timestamp.FromDatetime(datetime.now(tz = timezone.utc))

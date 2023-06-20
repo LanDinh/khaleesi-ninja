@@ -3,20 +3,20 @@
 # khaleesi.ninja.
 from khaleesi.core.logging.structured_logger import StructuredLogger
 from khaleesi.proto.core_sawmill_pb2 import (
-  Request,
-  ResponseRequest,
+  GrpcRequest,
+  GrpcResponseRequest,
   Error,
   Event,
   EmptyRequest,
-  BackgateRequest,
-  BackgateResponseRequest,
+  HttpRequest,
+  HttpResponseRequest,
 )
 from microservice.models.service_registry import SERVICE_REGISTRY
 from microservice.models import (
-  Request as DbRequest,
+  GrpcRequest as DbGrpcRequest,
   Error as DbError,
   Event as DbEvent,
-  BackgateRequest as DbBackgateRequest,
+  HttpRequest as DbHttpRequest,
   Query as DbQuery,
 )
 
@@ -24,39 +24,39 @@ from microservice.models import (
 class StructuredDbLogger(StructuredLogger):
   """Structured logger using gRPC."""
 
-  def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None:
+  def send_log_system_http_request(self, *, http_request: EmptyRequest) -> None:
     """Send the log request to the logging facility."""
-    DbBackgateRequest.objects.log_system_backgate_request(grpc_backgate_request = backgate_request)
+    DbHttpRequest.objects.log_system_request(grpc_request = http_request)
 
-  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None:
+  def send_log_http_request(self, *, http_request: HttpRequest) -> None:
     """Send the log request to the logging facility."""
-    DbBackgateRequest.objects.log_backgate_request(grpc_backgate_request = backgate_request)
+    DbHttpRequest.objects.log_request(grpc_request = http_request)
 
-  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
+  def send_log_http_response(self, *, http_response: HttpResponseRequest) -> None :
     """Send the log response to the logging facility."""
-    DbBackgateRequest.objects.log_response(grpc_response = response)
+    DbHttpRequest.objects.log_response(grpc_response = http_response)
 
-  def send_log_request(self, *, request: Request) -> None :
+  def send_log_grpc_request(self, *, grpc_request: GrpcRequest) -> None :
     """Send the log request to the logging facility."""
-    DbRequest.objects.log_request(grpc_request = request)
+    DbGrpcRequest.objects.log_request(grpc_request = grpc_request)
     SERVICE_REGISTRY.add_call(
-      caller_details = request.upstream_request,
-      called_details = request.request_metadata.caller,
+      caller_details = grpc_request.upstreamRequest,
+      called_details = grpc_request.requestMetadata.caller,
     )
 
-  def send_log_response(self, *, response: ResponseRequest) -> None :
+  def send_log_grpc_response(self, *, grpc_response: GrpcResponseRequest) -> None :
     """Send the log response to the logging facility."""
-    result = DbRequest.objects.log_response(grpc_response = response)
+    result = DbGrpcRequest.objects.log_response(grpc_response = grpc_response)
     # noinspection PyBroadException
     try:
-      DbBackgateRequest.objects.add_child_duration(request = result)
+      DbHttpRequest.objects.add_child_duration(request = result)
     except Exception:  # pylint: disable=broad-except
       # TODO(45) - remove this hack
       pass
 
     queries = DbQuery.objects.log_queries(
-      queries = response.queries,
-      metadata = result.to_grpc_request_response().request.request_metadata,
+      queries = grpc_response.queries,
+      metadata = result.to_grpc_request_response().request.requestMetadata,
     )
     for query in queries:
       result.meta_child_duration += query.reported_duration

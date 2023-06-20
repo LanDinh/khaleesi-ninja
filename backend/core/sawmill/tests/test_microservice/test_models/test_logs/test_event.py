@@ -46,31 +46,31 @@ class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
                 now = datetime.now(tz = timezone.utc)
                 grpc_event = GrpcEvent()
                 self.set_request_metadata(
-                  request_metadata = grpc_event.request_metadata,
+                  request_metadata = grpc_event.requestMetadata,
                   now              = now,
                   user             = user_type,
                 )
-                grpc_event.id                 = 'event-id'
-                grpc_event.target.type        = 'target-type'
-                grpc_event.target.id          = 'target-id'
-                grpc_event.target.owner.id    = 'target-owner'
-                grpc_event.target.owner.type  = owner_type
-                grpc_event.action.crud_type   = action_type
-                grpc_event.action.custom_type = 'action-type'
-                grpc_event.action.result      = result_type
-                grpc_event.action.details     = 'action-description'
-                grpc_event.logger_send_metric = log_event_metric
+                grpc_event.id                = 'event-id'
+                grpc_event.target.type       = 'target-type'
+                grpc_event.target.id         = 'target-id'
+                grpc_event.target.owner.id   = 'target-owner'
+                grpc_event.target.owner.type = owner_type
+                grpc_event.action.crudType   = action_type
+                grpc_event.action.customType = 'action-type'
+                grpc_event.action.result     = result_type
+                grpc_event.action.details    = 'action-description'
+                grpc_event.loggerSendMetric  = log_event_metric
                 # Execute test.
                 result = Event.objects.log_event(grpc_event = grpc_event)
                 # Assert result.
                 metadata.assert_called_once()
-                self.assertEqual(grpc_event.request_metadata, metadata.call_args.kwargs['metadata'])
-                self.assertEqual([]                           , metadata.call_args.kwargs['errors'])
-                self.assertEqual(owner_label                  , result.target_owner_type)
-                self.assertEqual(action_label                 , result.action_crud_type)
-                self.assertEqual(grpc_event.action.custom_type, result.action_custom_type)
-                self.assertEqual(result_label                 , result.action_result)
-                self.assertEqual(grpc_event.action.details    , result.action_details)
+                self.assertEqual(grpc_event.requestMetadata, metadata.call_args.kwargs['metadata'])
+                self.assertEqual([]                          , metadata.call_args.kwargs['errors'])
+                self.assertEqual(owner_label                 , result.target_owner_type)
+                self.assertEqual(action_label                , result.action_crud_type)
+                self.assertEqual(grpc_event.action.customType, result.action_custom_type)
+                self.assertEqual(result_label                , result.action_result)
+                self.assertEqual(grpc_event.action.details   , result.action_details)
                 if log_event_metric:
                   audit_metric.inc.assert_called_once()
                 else:
@@ -129,14 +129,14 @@ class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
               # Assert result.
               self.assert_grpc_request_metadata(
                 model = event,
-                grpc = result.event.request_metadata,
-                grpc_response = result.event_metadata,
+                grpc = result.event.requestMetadata,
+                grpc_response = result.eventMetadata,
               )
               self.assertEqual(event.event_id          , result.event.id)
               self.assertEqual(event.target_type       , result.event.target.type)
               self.assertEqual(owner_type              , result.event.target.owner.type)
-              self.assertEqual(action_type             , result.event.action.crud_type)
-              self.assertEqual(event.action_custom_type, result.event.action.custom_type)
+              self.assertEqual(action_type             , result.event.action.crudType)
+              self.assertEqual(event.action_custom_type, result.event.action.customType)
               self.assertEqual(result_type             , result.event.action.result)
               self.assertEqual(event.action_details    , result.event.action.details)
 

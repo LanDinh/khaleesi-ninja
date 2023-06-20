@@ -144,10 +144,10 @@ class ServiceRegistry:
     should_add_call = should_add_caller or should_add_called
     # If neither the caller nor the called was added, we need to check if the call should be added.
     if not should_add_call:
-      khaleesi_gate    = service_registry[caller_details.khaleesi_gate]
-      khaleesi_service = khaleesi_gate.services[caller_details.khaleesi_service]
-      grpc_service     = khaleesi_service.services[caller_details.grpc_service]
-      grpc_method      = grpc_service.methods[caller_details.grpc_method]
+      khaleesi_gate    = service_registry[caller_details.khaleesiGate]
+      khaleesi_service = khaleesi_gate.services[caller_details.khaleesiService]
+      grpc_service     = khaleesi_service.services[caller_details.grpcService]
+      grpc_method      = grpc_service.methods[caller_details.grpcMethod]
       should_add_call = self._should_add_service_registry_entry(
           service_registry = grpc_method.calls,
           caller_details = called_details,
@@ -172,8 +172,8 @@ class ServiceRegistry:
 
   def _should_exit_early(self, *, caller_details: GrpcCallerDetails) -> bool :
     return not (
-        caller_details.khaleesi_gate and caller_details.khaleesi_service
-        and caller_details.grpc_service and caller_details.grpc_method
+        caller_details.khaleesiGate and caller_details.khaleesiService
+        and caller_details.grpcService and caller_details.grpcMethod
     )
 
   def _should_add_service_registry_entry(
@@ -181,19 +181,19 @@ class ServiceRegistry:
       service_registry: Dict[str, KhaleesiGate],
       caller_details: GrpcCallerDetails,
   ) -> bool :
-    khaleesi_gate = service_registry.get(caller_details.khaleesi_gate, None)
+    khaleesi_gate = service_registry.get(caller_details.khaleesiGate, None)
     if not khaleesi_gate:
       return True
 
-    khaleesi_service = khaleesi_gate.services.get(caller_details.khaleesi_service, None)
+    khaleesi_service = khaleesi_gate.services.get(caller_details.khaleesiService, None)
     if not khaleesi_service:
       return True
 
-    grpc_service = khaleesi_service.services.get(caller_details.grpc_service, None)
+    grpc_service = khaleesi_service.services.get(caller_details.grpcService, None)
     if not grpc_service:
       return True
 
-    grpc_method = grpc_service.methods.get(caller_details.grpc_method, None)
+    grpc_method = grpc_service.methods.get(caller_details.grpcMethod, None)
     if not grpc_method:
       return True
 
@@ -230,18 +230,18 @@ class ServiceRegistry:
     """Get call data for the affected service."""
     service_call_data = ServiceCallData()
     self.add_service(caller_details = owner)
-    own_service = self.get_service_registry()[owner.khaleesi_gate].services[owner.khaleesi_service]
+    own_service = self.get_service_registry()[owner.khaleesiGate].services[owner.khaleesiService]
 
     for service_name, service in own_service.services.items():
       for method_name, method in service.methods.items():
         call_data = CallData()
-        call_data.call.khaleesi_gate    = owner.khaleesi_gate
-        call_data.call.khaleesi_service = owner.khaleesi_service
-        call_data.call.grpc_service     = service_name
-        call_data.call.grpc_method      = method_name
+        call_data.call.khaleesiGate    = owner.khaleesiGate
+        call_data.call.khaleesiService = owner.khaleesiService
+        call_data.call.grpcService     = service_name
+        call_data.call.grpcMethod      = method_name
         self._add_data_to_call(full_list = method.calls    , result_list = call_data.calls)
-        self._add_data_to_call(full_list = method.called_by, result_list = call_data.called_by)
-        service_call_data.call_list.append(call_data)
+        self._add_data_to_call(full_list = method.called_by, result_list = call_data.calledBy)
+        service_call_data.callList.append(call_data)
 
     return service_call_data
 
@@ -255,10 +255,10 @@ class ServiceRegistry:
         for grpc_service_name, grpc_service in khaleesi_service.services.items():
           for grpc_method_name, _ in grpc_service.methods.items():
             called = GrpcCallerDetails()
-            called.khaleesi_gate    = khaleesi_gate_name
-            called.khaleesi_service = khaleesi_service_name
-            called.grpc_service     = grpc_service_name
-            called.grpc_method      = grpc_method_name
+            called.khaleesiGate    = khaleesi_gate_name
+            called.khaleesiService = khaleesi_service_name
+            called.grpcService     = grpc_service_name
+            called.grpcMethod      = grpc_method_name
             result_list.append(called)
 
   def _reload_grpc_method(
@@ -307,22 +307,22 @@ class ServiceRegistry:
   ) -> ServiceRegistryGrpcMethod :
     LOGGER.debug(
       'Add new service registry entry: '
-      f'{caller_details.khaleesi_gate} {caller_details.khaleesi_service} '
-      f'{caller_details.grpc_service} {caller_details.grpc_method}')
+      f'{caller_details.khaleesiGate} {caller_details.khaleesiService} '
+      f'{caller_details.grpcService} {caller_details.grpcMethod}')
 
     khaleesi_gate, _ = ServiceRegistryKhaleesiGate.objects.get_or_create(
-      name = caller_details.khaleesi_gate,
+      name = caller_details.khaleesiGate,
     )
     khaleesi_service, _ = ServiceRegistryKhaleesiService.objects.get_or_create(
-      name              = caller_details.khaleesi_service,
+      name              = caller_details.khaleesiService,
       khaleesi_gate_id = khaleesi_gate.pk,
     )
     grpc_service, _ = ServiceRegistryGrpcService.objects.get_or_create(
-      name                 = caller_details.grpc_service,
+      name                 = caller_details.grpcService,
       khaleesi_service_id = khaleesi_service.pk,
     )
     grpc_method, _ = ServiceRegistryGrpcMethod.objects.get_or_create(
-      name             = caller_details.grpc_method,
+      name             = caller_details.grpcMethod,
       grpc_service_id = grpc_service.pk,
     )
     return grpc_method

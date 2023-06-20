@@ -21,5 +21,5 @@ The different types of logs are:
 * `Error` contains information regarding errors that happened
 * `Event` contains information relating to actions that might require auditing
 * `Query` contains information regarding database queries
-* `Request` contains information regarding gRPC requests and their responses
-* `BackgateRequest` contains information regarding requests as they enter the ecosystem
+* `GrpcRequest` contains information regarding gRPC requests and their responses
+* `HttpRequest` contains information regarding requests as they enter the ecosystem

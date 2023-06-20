@@ -20,14 +20,14 @@ khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class MetricInitializer(BaseMetricInitializer):
   """Collect info for initializing metrics."""
 
-  def __init__(self, *, backgate_request_id: str) -> None :
-    super().__init__(backgate_request_id = backgate_request_id)
+  def __init__(self, *, http_request_id: str) -> None :
+    super().__init__(http_request_id = http_request_id)
     # No gRPC call is executed for the gRPC lifecycle methods, so we need to manually add them.
     caller_details = GrpcCallerDetails()
-    caller_details.khaleesi_gate    = khaleesi_settings['METADATA']['GATE']
-    caller_details.khaleesi_service = khaleesi_settings['METADATA']['SERVICE']
-    caller_details.grpc_service = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
-    caller_details.grpc_method  = \
+    caller_details.khaleesiGate    = khaleesi_settings['METADATA']['GATE']
+    caller_details.khaleesiService = khaleesi_settings['METADATA']['SERVICE']
+    caller_details.grpcService = khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
+    caller_details.grpcMethod  = \
         khaleesi_settings['GRPC']['SERVER_METHOD_NAMES']['LIFECYCLE']['METHOD']
     SERVICE_REGISTRY.add_service(caller_details = caller_details)
 
@@ -40,7 +40,7 @@ class MetricInitializer(BaseMetricInitializer):
 
   def get_service_call_data(self, *, request: EmptyRequest) -> ServiceCallData :
     """Fetch the data for request metrics."""
-    return SERVICE_REGISTRY.get_call_data(owner = request.request_metadata.caller)
+    return SERVICE_REGISTRY.get_call_data(owner = request.requestMetadata.caller)
 
   def _server_state_events(self) -> List[EventData] :
     events = []

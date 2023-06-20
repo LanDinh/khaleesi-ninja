@@ -19,9 +19,9 @@ class Service(Servicer):
 
   def GetServiceCallData(self, request: EmptyRequest, _: grpc.ServicerContext) -> ServiceCallData :
     """Get the call data of the calling service."""
-    owner = request.request_metadata.caller
+    owner = request.requestMetadata.caller
     LOGGER.info(
-      f'Getting service registry call data for {owner.khaleesi_gate}-{owner.khaleesi_service}.',
+      f'Getting service registry call data for {owner.khaleesiGate}-{owner.khaleesiService}.',
     )
     return SERVICE_REGISTRY.get_call_data(owner = owner)
 

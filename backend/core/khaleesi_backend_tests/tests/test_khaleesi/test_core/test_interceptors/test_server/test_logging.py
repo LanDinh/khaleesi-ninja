@@ -141,11 +141,11 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     """Assert the logging calls were correct."""
     upstream_request = cast(
       RequestMetadata,
-      singleton.structured_logger.log_request.call_args.kwargs['upstream_request'],
+      singleton.structured_logger.log_grpc_request.call_args.kwargs['upstream_request'],
     )
     status = cast(
       StatusCode,
-      singleton.structured_logger.log_response.call_args.kwargs['status'],
+      singleton.structured_logger.log_grpc_response.call_args.kwargs['status'],
     )
     context.set_code.assert_not_called()
     context.set_details.assert_not_called()
@@ -161,7 +161,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     """Assert the logging calls were correct."""
     status = cast(
       StatusCode,
-      singleton.structured_logger.log_response.call_args.kwargs['status'],
+      singleton.structured_logger.log_grpc_response.call_args.kwargs['status'],
     )
     logged_exception = cast(
       KhaleesiException,

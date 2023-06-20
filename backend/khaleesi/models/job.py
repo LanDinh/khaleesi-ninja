@@ -21,10 +21,10 @@ class JobExecutionManager(models.Manager['JobExecution']):
   def start_job_execution(self, *, job: JobExecutionMetadata) -> 'JobExecution' :
     """Register job start. Returns whether the job should start or not."""
     with transaction.atomic(using = 'write'):
-      in_progress_count = self.filter(job_id = job.job_id, status = IN_PROGRESS).count()
+      in_progress_count = self.filter(job_id = job.jobId, status = IN_PROGRESS).count()
       if in_progress_count > 0:
-        return self.create(job_id = job.job_id, execution_id = job.execution_id, status = 'SKIPPED')
-      return self.create(job_id = job.job_id, execution_id = job.execution_id, status = IN_PROGRESS)
+        return self.create(job_id = job.jobId, execution_id = job.executionId, status = 'SKIPPED')
+      return self.create(job_id = job.jobId, execution_id = job.executionId, status = IN_PROGRESS)
 
   def stop_job(self, *, id_message: IdMessage) -> None :
     """Stop the job with the given job ID."""
@@ -32,8 +32,8 @@ class JobExecutionManager(models.Manager['JobExecution']):
     jobs: List[JobExecutionMetadata] = []
     for job_object in job_objects:
       job = JobExecutionMetadata()
-      job.job_id = job_object.job_id
-      job.execution_id = job_object.execution_id
+      job.jobId = job_object.job_id
+      job.executionId = job_object.execution_id
       jobs.append(job)
     for thread in threading_enumerate():
       if hasattr(thread, 'is_batch_job_thread'):
@@ -91,11 +91,11 @@ class JobExecution(models.Model):
     """Transform into gRPC."""
     response = JobExecutionResponse()
     add_request_metadata(request = response)
-    response.execution_metadata.job_id       = self.job_id
-    response.execution_metadata.execution_id = self.execution_id
+    response.executionMetadata.jobId       = self.job_id
+    response.executionMetadata.executionId = self.execution_id
     response.status          = JobExecutionResponse.Status.Value(self.status)
-    response.items_processed = self.items_processed
-    response.total_items     = self.total_items
-    response.details         = self.details
+    response.itemsProcessed = self.items_processed
+    response.totalItems     = self.total_items
+    response.details        = self.details
     response.end.FromDatetime(self.end)
     return response

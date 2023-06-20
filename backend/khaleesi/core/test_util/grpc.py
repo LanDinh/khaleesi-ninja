@@ -21,12 +21,12 @@ class GrpcTestMixin:
       grpc_method     : str               = 'metadata-grpc-method',
   ) -> RequestMetadata :
     """Fill gRPC request metadata for testing purposes."""
-    request_metadata.caller.backgate_request_id = 'backgate-request'
-    request_metadata.caller.request_id          = 'request-id'
-    request_metadata.caller.khaleesi_gate       = khaleesi_gate
-    request_metadata.caller.khaleesi_service    = khaleesi_service
-    request_metadata.caller.grpc_service        = grpc_service
-    request_metadata.caller.grpc_method         = grpc_method
+    request_metadata.caller.httpRequestId   = 'http-request-id'
+    request_metadata.caller.grpcRequestId   = 'grpc-request-id'
+    request_metadata.caller.khaleesiGate    = khaleesi_gate
+    request_metadata.caller.khaleesiService = khaleesi_service
+    request_metadata.caller.grpcService     = grpc_service
+    request_metadata.caller.grpcMethod      = grpc_method
     request_metadata.user.id   = 'metadata-user-id'
     request_metadata.user.type = user
     request_metadata.timestamp.FromDatetime(now)

@@ -21,13 +21,13 @@ from khaleesi.core.test_util.exceptions import default_khaleesi_exception
 from khaleesi.core.test_util.test_case import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import (
-  Request,
-  ResponseRequest,
+  GrpcRequest,
+  GrpcResponseRequest,
   Error,
   Event,
   EmptyRequest,
-  BackgateRequest,
-  BackgateResponseRequest,
+  HttpRequest,
+  HttpResponseRequest,
 )
 
 
@@ -36,25 +36,25 @@ class StructuredTestLogger(StructuredLogger):
 
   sender = MagicMock()
 
-  def send_log_system_backgate_request(self, *, backgate_request: EmptyRequest) -> None :
+  def send_log_system_http_request(self, *, http_request: EmptyRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = backgate_request)
+    self.sender.send(request = http_request)
 
-  def send_log_backgate_request(self, *, backgate_request: BackgateRequest) -> None :
+  def send_log_http_request(self, *, http_request: HttpRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = backgate_request)
+    self.sender.send(request = http_request)
 
-  def send_log_backgate_response(self, *, response: BackgateResponseRequest) -> None :
+  def send_log_http_response(self, *, http_response: HttpResponseRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(response = response)
+    self.sender.send(response = http_response)
 
-  def send_log_request(self, *, request: Request) -> None :
+  def send_log_grpc_request(self, *, grpc_request: GrpcRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = request)
+    self.sender.send(request = grpc_request)
 
-  def send_log_response(self, *, response: ResponseRequest) -> None :
+  def send_log_grpc_response(self, *, grpc_response: GrpcResponseRequest) -> None :
     """Send the log response to the logging facility."""
-    self.sender.send(response = response)
+    self.sender.send(response = grpc_response)
 
   def send_log_error(self, *, error: Error) -> None :
     """Send the log error to the logging facility."""
@@ -72,26 +72,26 @@ class TestStructuredLogger(SimpleTestCase):
   logger = StructuredTestLogger()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
-  def test_log_request(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def test_log_grpc_request(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
     metadata.reset_mock()
     upstream_request = RequestMetadata()
-    upstream_request.caller.request_id       = 'request-id'
-    upstream_request.caller.khaleesi_gate    = 'khaleesi-gate'
-    upstream_request.caller.khaleesi_service = 'khaleesi-service'
-    upstream_request.caller.grpc_service     = 'grpc-service'
-    upstream_request.caller.grpc_method      = 'grpc-method'
+    upstream_request.caller.grpcRequestId   = 'request-id'
+    upstream_request.caller.khaleesiGate    = 'khaleesi-gate'
+    upstream_request.caller.khaleesiService = 'khaleesi-service'
+    upstream_request.caller.grpcService     = 'grpc-service'
+    upstream_request.caller.grpcMethod      = 'grpc-method'
     # Perform test.
-    self.logger.log_request(upstream_request = upstream_request)
+    self.logger.log_grpc_request(upstream_request = upstream_request)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     self.assertEqual(2, logger.info.call_count)
     metadata.assert_called_once()
-    log_request = cast(Request, self.logger.sender.send.call_args.kwargs['request'])
-    self.assertEqual(upstream_request.caller, log_request.upstream_request)
+    log_grpc_request = cast(GrpcRequest, self.logger.sender.send.call_args.kwargs['request'])
+    self.assertEqual(upstream_request.caller, log_grpc_request.upstreamRequest)
 
   @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
   def test_log_system_request(self, metadata: MagicMock, logger: MagicMock) -> None :
@@ -100,13 +100,13 @@ class TestStructuredLogger(SimpleTestCase):
     self.logger.sender.reset_mock()
     logger.reset_mock()
     metadata.reset_mock()
-    backgate_request_id = 'backgate-request'
-    request_id          = 'request'
-    grpc_method         = 'grpc-method'
+    http_request_id = 'http-request'
+    grpc_request_id = 'grpc-request'
+    grpc_method     = 'grpc-method'
     # Perform test.
-    self.logger.log_system_request(
-      backgate_request_id = backgate_request_id,
-      request_id          = request_id,
+    self.logger.log_system_grpc_request(
+      http_request_id = http_request_id,
+      grpc_request_id = grpc_request_id,
       grpc_method         = grpc_method,
     )
     # Assert result.
@@ -115,16 +115,16 @@ class TestStructuredLogger(SimpleTestCase):
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
-  def test_log_system_backgate_request(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def test_log_system_http_request(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
-    backgate_request_id = 'backgate-request'
+    http_request_id = 'http-request'
     # Perform test.
-    self.logger.log_system_backgate_request(
-      backgate_request_id = backgate_request_id,
-      grpc_method = 'LIFECYCLE',
+    self.logger.log_system_http_request(
+      http_request_id = http_request_id,
+      grpc_method     = 'LIFECYCLE',
     )
     # Assert result.
     self.logger.sender.send.assert_called_once()
@@ -132,20 +132,20 @@ class TestStructuredLogger(SimpleTestCase):
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
-  def test_log_backgate_request(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def test_log_http_request(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
     # Perform test.
-    self.logger.log_backgate_request()
+    self.logger.log_http_request()
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
-  def test_log_not_ok_system_backgate_response(
+  def test_log_not_ok_system_http_response(
       self,
       metadata: MagicMock,
       logger: MagicMock,
@@ -158,45 +158,45 @@ class TestStructuredLogger(SimpleTestCase):
         logger.reset_mock()
         metadata.reset_mock()
         # Perform test.
-        self.logger.log_system_backgate_response(
-          backgate_request_id = 'backgate-request',
-          status              = status,
-          grpc_method         = 'grpc-method',
+        self.logger.log_system_http_response(
+          http_request_id = 'http-request',
+          status          = status,
+          grpc_method     = 'grpc-method',
         )
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
         log_response = cast(
-          BackgateResponseRequest,
+          HttpResponseRequest,
           self.logger.sender.send.call_args.kwargs['response'],
         )
         self.assertEqual(status.name, log_response.response.status)
         metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
-  def test_log_ok_system_backgate_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def test_log_ok_system_http_response(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
     # Perform test.
-    self.logger.log_system_backgate_response(
-      backgate_request_id = 'backgate-request',
-      grpc_method         = 'grpc-method',
-      status              = StatusCode.OK,
+    self.logger.log_system_http_response(
+      http_request_id = 'http-request',
+      grpc_method     = 'grpc-method',
+      status          = StatusCode.OK,
     )
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
     log_response = cast(
-      BackgateResponseRequest,
+      HttpResponseRequest,
       self.logger.sender.send.call_args.kwargs['response'],
     )
     self.assertEqual(StatusCode.OK.name, log_response.response.status)
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
-  def test_log_not_ok_backgate_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def test_log_not_ok_http_response(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     for status in [s for s in StatusCode if s != StatusCode.OK]:
       with self.subTest(status = status.name):
@@ -205,30 +205,30 @@ class TestStructuredLogger(SimpleTestCase):
         logger.reset_mock()
         metadata.reset_mock()
         # Perform test.
-        self.logger.log_backgate_response(status = status)
+        self.logger.log_http_response(status = status)
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
         log_response = cast(
-          BackgateResponseRequest,
+          HttpResponseRequest,
           self.logger.sender.send.call_args.kwargs['response'],
         )
         self.assertEqual(status.name, log_response.response.status)
         metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
-  def test_log_ok_backgate_response(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def test_log_ok_http_response(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
     # Perform test.
-    self.logger.log_backgate_response(status = StatusCode.OK)
+    self.logger.log_http_response(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
     log_response = cast(
-      BackgateResponseRequest,
+      HttpResponseRequest,
       self.logger.sender.send.call_args.kwargs['response'],
     )
     self.assertEqual(StatusCode.OK.name, log_response.response.status)
@@ -245,16 +245,19 @@ class TestStructuredLogger(SimpleTestCase):
         metadata.reset_mock()
         STATE.reset()
         # Perform test.
-        self.logger.log_system_response(
-          backgate_request_id = 'backgate-request',
-          request_id          = 'request-id',
-          grpc_method         = 'grpc_method',
-          status              = status,
+        self.logger.log_system_grpc_response(
+          http_request_id = 'http-request-id',
+          grpc_request_id = 'grpc-request-id',
+          grpc_method     = 'grpc_method',
+          status          = status,
         )
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
-        log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        log_response = cast(
+          GrpcResponseRequest,
+          self.logger.sender.send.call_args.kwargs['response'],
+        )
         self.assertEqual(status.name, log_response.response.status)
         self.assertEqual(0, len(log_response.queries))
         metadata.assert_called_once()
@@ -276,16 +279,16 @@ class TestStructuredLogger(SimpleTestCase):
         'zero': [],
     }
     # Perform test.
-    self.logger.log_system_response(
-      backgate_request_id = 'backgate-request',
-      request_id          = 'request-id',
-      grpc_method         = 'grpc-method',
-      status              = StatusCode.OK,
+    self.logger.log_system_grpc_response(
+      http_request_id = 'http-request-id',
+      grpc_request_id = 'grpc-request-id',
+      grpc_method     = 'grpc-method',
+      status          = StatusCode.OK,
     )
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called()
-    log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    log_response = cast(GrpcResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
     self.assertEqual(StatusCode.OK.name, log_response.response.status)
     self.assertEqual(3, len(log_response.queries))
     for query_id in ids:
@@ -307,11 +310,14 @@ class TestStructuredLogger(SimpleTestCase):
         metadata.reset_mock()
         STATE.reset()
         # Perform test.
-        self.logger.log_response(status = status)
+        self.logger.log_grpc_response(status = status)
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
-        log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        log_response = cast(
+          GrpcResponseRequest,
+          self.logger.sender.send.call_args.kwargs['response'],
+        )
         self.assertEqual(status.name, log_response.response.status)
         self.assertEqual(0, len(log_response.queries))
         metadata.assert_called_once()
@@ -333,11 +339,11 @@ class TestStructuredLogger(SimpleTestCase):
         'zero': [],
     }
     # Perform test.
-    self.logger.log_response(status = StatusCode.OK)
+    self.logger.log_grpc_response(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called()
-    log_response = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    log_response = cast(GrpcResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
     self.assertEqual(StatusCode.OK.name, log_response.response.status)
     self.assertEqual(3, len(log_response.queries))
     for query_id in ids:
@@ -370,9 +376,9 @@ class TestStructuredLogger(SimpleTestCase):
   @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
   def test_log_system_error(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging an error."""
-    backgate_request_id = 'backgate-request'
-    request_id          = 'request'
-    grpc_method         = 'grpc-method'
+    http_request_id = 'http-request'
+    grpc_request_id = 'grpc-request'
+    grpc_method     = 'grpc-method'
     for status in StatusCode:
       for loglevel in LogLevel:
         with self.subTest(status = status.name, loglevel = loglevel.name):
@@ -384,9 +390,9 @@ class TestStructuredLogger(SimpleTestCase):
           # Perform test.
           self.logger.log_system_error(
             exception = exception,
-            backgate_request_id = backgate_request_id,
-            request_id = request_id,
-            grpc_method = grpc_method,
+            http_request_id = http_request_id,
+            grpc_request_id = grpc_request_id,
+            grpc_method     = grpc_method,
           )
           # Assert result.
           self.logger.sender.send.assert_called_once()
@@ -401,11 +407,11 @@ class TestStructuredLogger(SimpleTestCase):
   @patch('khaleesi.core.logging.structured_logger.add_grpc_server_system_request_metadata')
   def test_log_system_event(self, request_metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a system event."""
-    method              = 'LIFECYCLE'
-    details             = 'details'
-    backgate_request_id = 'backgate-request'
-    request_id          = 'request'
-    target              = 'target'
+    method          = 'LIFECYCLE'
+    details         = 'details'
+    http_request_id = 'http-request'
+    grpc_request_id = 'grpc-request'
+    target          = 'target'
     for action_label, action_type in Event.Action.ActionType.items():
       for result_label, result_type in Event.Action.ResultType.items():
         for user_label, user_type in User.UserType.items():
@@ -425,15 +431,15 @@ class TestStructuredLogger(SimpleTestCase):
               owner.id   = 'user'
               # Perform test.
               self.logger.log_system_event(
-                grpc_method         = method,
-                backgate_request_id = backgate_request_id,
-                request_id          = request_id,
-                target              = target,
-                owner               = owner,
-                action              = action_type,
-                result              = result_type,
-                details             = details,
-                logger_send_metric  = logger_send_metric,
+                grpc_method        = method,
+                http_request_id    = http_request_id,
+                grpc_request_id    = grpc_request_id,
+                target             = target,
+                owner              = owner,
+                action             = action_type,
+                result             = result_type,
+                details            = details,
+                logger_send_metric = logger_send_metric,
               )
               # Assert result.
               request_metadata.assert_called_once()
@@ -449,11 +455,11 @@ class TestStructuredLogger(SimpleTestCase):
               self.assertEqual(target            , log_event.target.id)
               self.assertEqual(owner.id          , log_event.target.owner.id)
               self.assertEqual(owner.type        , log_event.target.owner.type)
-              self.assertEqual(''                , log_event.action.custom_type)
-              self.assertEqual(action_type       , log_event.action.crud_type)
+              self.assertEqual(''                , log_event.action.customType)
+              self.assertEqual(action_type       , log_event.action.crudType)
               self.assertEqual(result_type       , log_event.action.result)
               self.assertEqual(details           , log_event.action.details)
-              self.assertEqual(logger_send_metric, log_event.logger_send_metric)
+              self.assertEqual(logger_send_metric, log_event.loggerSendMetric)
 
   @patch('khaleesi.core.logging.structured_logger.add_request_metadata')
   def test_log_event(self, request_metadata: MagicMock, logger: MagicMock) -> None :
@@ -493,23 +499,23 @@ class TestStructuredLogger(SimpleTestCase):
             )
             log_event = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
             self.assertIsNotNone(log_event.id)
-            self.assertEqual(target            , log_event.target.id)
-            self.assertEqual(target_type       , log_event.target.type)
-            self.assertEqual(owner.id          , log_event.target.owner.id)
-            self.assertEqual(owner.type        , log_event.target.owner.type)
-            self.assertEqual(action            , log_event.action.custom_type)
-            self.assertEqual(action_type       , log_event.action.crud_type)
-            self.assertEqual(result_type       , log_event.action.result)
-            self.assertEqual(details           , log_event.action.details)
-            self.assertEqual(False             , log_event.logger_send_metric)
+            self.assertEqual(target     , log_event.target.id)
+            self.assertEqual(target_type, log_event.target.type)
+            self.assertEqual(owner.id   , log_event.target.owner.id)
+            self.assertEqual(owner.type , log_event.target.owner.type)
+            self.assertEqual(action     , log_event.action.customType)
+            self.assertEqual(action_type, log_event.action.crudType)
+            self.assertEqual(result_type, log_event.action.result)
+            self.assertEqual(details    , log_event.action.details)
+            self.assertEqual(False      , log_event.loggerSendMetric)
 
   def _assert_error(self, exception: KhaleesiException, log_error: Error) -> None :
     self.assertEqual(exception.gate           , log_error.gate)
     self.assertEqual(exception.service        , log_error.service)
-    self.assertEqual(exception.public_key     , log_error.public_key)
-    self.assertEqual(exception.public_details , log_error.public_details)
-    self.assertEqual(exception.private_message, log_error.private_message)
-    self.assertEqual(exception.private_details, log_error.private_details)
+    self.assertEqual(exception.public_key     , log_error.publicKey)
+    self.assertEqual(exception.public_details , log_error.publicDetails)
+    self.assertEqual(exception.private_message, log_error.privateMessage)
+    self.assertEqual(exception.private_details, log_error.privateDetails)
     self.assertEqual(exception.stacktrace     , log_error.stacktrace)
 
 
@@ -518,50 +524,50 @@ class TestStructuredGrpcLogger(SimpleTestCase):
 
   logger = StructuredGrpcLogger()
 
-  def test_send_log_system_backgate_request(self) -> None :
+  def test_send_log_system_http_request(self) -> None :
     """Test sending a log request."""
     # Prepare data.
-    self.logger.stub.LogSystemBackgateRequest = MagicMock()
+    self.logger.stub.LogSystemHttpRequest = MagicMock()
     # Perform test.
-    self.logger.send_log_system_backgate_request(backgate_request = MagicMock())
+    self.logger.send_log_system_http_request(http_request = MagicMock())
     # Assert result.
-    self.logger.stub.LogSystemBackgateRequest.assert_called_once()
+    self.logger.stub.LogSystemHttpRequest.assert_called_once()
 
-  def test_send_log_backgate_request(self) -> None :
+  def test_send_log_http_request(self) -> None :
     """Test sending a log request."""
     # Prepare data.
-    self.logger.stub.LogBackgateRequest = MagicMock()
+    self.logger.stub.LogHttpRequest = MagicMock()
     # Perform test.
-    self.logger.send_log_backgate_request(backgate_request = MagicMock())
+    self.logger.send_log_http_request(http_request = MagicMock())
     # Assert result.
-    self.logger.stub.LogBackgateRequest.assert_called_once()
+    self.logger.stub.LogHttpRequest.assert_called_once()
 
-  def test_send_log_backgate_response(self) -> None :
+  def test_send_log_http_response(self) -> None :
     """Test sending a log request."""
     # Prepare data.
-    self.logger.stub.LogBackgateRequestResponse = MagicMock()
+    self.logger.stub.LogHttpRequestResponse = MagicMock()
     # Perform test.
-    self.logger.send_log_backgate_response(response = MagicMock())
+    self.logger.send_log_http_response(http_response = MagicMock())
     # Assert result.
-    self.logger.stub.LogBackgateRequestResponse.assert_called_once()
+    self.logger.stub.LogHttpRequestResponse.assert_called_once()
 
-  def test_send_log_request(self) -> None :
+  def test_send_log_grpc_request(self) -> None :
     """Test sending a log request."""
     # Prepare data.
-    self.logger.stub.LogRequest = MagicMock()
+    self.logger.stub.LogGrpcRequest = MagicMock()
     # Perform test.
-    self.logger.send_log_request(request = MagicMock())
+    self.logger.send_log_grpc_request(grpc_request = MagicMock())
     # Assert result.
-    self.logger.stub.LogRequest.assert_called_once()
+    self.logger.stub.LogGrpcRequest.assert_called_once()
 
-  def test_send_log_response(self) -> None :
+  def test_send_log_grpc_response(self) -> None :
     """Test sending a log request."""
     # Prepare data.
-    self.logger.stub.LogResponse = MagicMock()
+    self.logger.stub.LogGrpcResponse = MagicMock()
     # Perform test.
-    self.logger.send_log_response(response = MagicMock())
+    self.logger.send_log_grpc_response(grpc_response = MagicMock())
     # Assert result.
-    self.logger.stub.LogResponse.assert_called_once()
+    self.logger.stub.LogGrpcResponse.assert_called_once()
 
   def test_send_log_error(self) -> None :
     """Test sending a log request."""

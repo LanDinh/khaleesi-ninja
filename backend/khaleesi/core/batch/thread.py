@@ -33,4 +33,4 @@ class BatchJobThread(Thread, Generic[M]):
 
   def is_job(self, *, job: JobExecutionMetadata) -> bool :
     """Check if the job is the one asked for."""
-    return self.job.job.job_id == job.job_id and self.job.job.execution_id == job.execution_id
+    return self.job.job.jobId == job.jobId and self.job.job.executionId == job.executionId

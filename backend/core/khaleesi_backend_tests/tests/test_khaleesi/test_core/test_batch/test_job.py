@@ -54,8 +54,8 @@ class JobTestMixin:
     paginator.return_value.count = 6
     paginator.return_value.page_range = [ 1, 2, 3 ]
     request = JobRequest()
-    request.action_configuration.batch_size = 2
-    request.action_configuration.timelimit.FromSeconds(60)
+    request.actionConfiguration.batchSize = 2
+    request.actionConfiguration.timelimit.FromSeconds(60)
     return request
 
 
@@ -87,7 +87,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Execute test.
     with self.assertRaises(InvalidArgumentException) as context:
       request = JobRequest()
-      request.action_configuration.batch_size = 5
+      request.actionConfiguration.batchSize = 5
       self.job = Job(model = JobExecution, request = request)
     # Assert result.
     self.assertIn('action_configuration.timelimit', context.exception.public_details)
@@ -108,8 +108,8 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     job_execution.return_value = JobExecution()
     job_execution.return_value.save = MagicMock()  # type: ignore[assignment]
     request = JobRequest()
-    request.action_configuration.batch_size = 2
-    request.action_configuration.timelimit.FromSeconds(60)
+    request.actionConfiguration.batchSize = 2
+    request.actionConfiguration.timelimit.FromSeconds(60)
     self._set_job(request = request)
     # Execute test.
     with self.assertRaises(Exception):
@@ -141,8 +141,8 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
         start.return_value.to_grpc_job_execution_response = MagicMock()  # type: ignore[assignment]
         start.return_value.save                           = MagicMock()  # type: ignore[assignment]
         request = JobRequest()
-        request.action_configuration.batch_size = 2
-        request.action_configuration.timelimit.FromSeconds(60)
+        request.actionConfiguration.batchSize = 2
+        request.actionConfiguration.timelimit.FromSeconds(60)
         self._set_job(request = request)
         # Execute test.
         self.job.execute(stop_event = Event())
@@ -216,7 +216,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test job timeout."""
     # Prepare data.
     request = self._successfully_start_job(start = start, paginator = paginator)
-    request.action_configuration.timelimit.FromNanoseconds(1)
+    request.actionConfiguration.timelimit.FromNanoseconds(1)
     self._set_job(request = request)
     # Execute test.
     self.job.execute(stop_event = Event())
