@@ -46,14 +46,11 @@ This workflow is executed for every push.
 It contains the following jobs:
 
 1. `matrix` will read data lists to make those available to other jobs for use in their strategy matrix.
-1. `test-helm-cluster` will verify the helm template for the cluster.
 1. `update-pip-cache` will ensure that the shared pip caches are available.
 1. `generate-protos` will generate the protobuf code.
 1. `build-backend-base-images` will build the backend base images which speeds up the build.
 1. `build` will build all images.
-1. `test-helm-environment` will verify the helm template for the environments.
-1. `test-helm-gate` will verify the helm template for the gates.
-1. `test-helm-service` will verify the helm template for the services.
+1. `test-helm` will verify the helm templates.
 1. `unit-test` will execute the unit tests of all services.
 1. `e2e-tests` will spin up all deployments and execute the E2E tests on them.
 1. `clean-cache` ensures that the cache is always as empty as possible.
