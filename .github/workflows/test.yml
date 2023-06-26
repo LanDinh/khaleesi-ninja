@@ -137,6 +137,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.matrix.outputs.deploy-gates) }}
+        environment: ${{ fromJson(needs.matrix.outputs.all-environments) }}
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
@@ -153,6 +154,7 @@ jobs:
     strategy:
       matrix:
         service: ${{ fromJson(needs.matrix.outputs.deploy-services) }}
+        environment: ${{ fromJson(needs.matrix.outputs.all-environments) }}
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
