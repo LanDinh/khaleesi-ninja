@@ -1,5 +1,4 @@
 [
   { "name": "development", "deploy": "true", "container_mode": "development" },
-  { "name": "integration", "deploy": "true", "container_mode": "production" },
-  { "name": "production", "deploy": "false", "container_mode": "production" }
+  { "name": "integration", "deploy": "true", "container_mode": "production" }
 ]

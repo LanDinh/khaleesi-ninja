@@ -143,7 +143,7 @@ jobs:
       - name: "Helm lint gate"
         run: |
           helm lint ./kubernetes/khaleesi-ninja-gate \
-          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml
+          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml \
           --values ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
 
   # Verify the helm templates.
@@ -159,9 +159,9 @@ jobs:
       - name: "Helm lint service"
         run: |
           helm lint ./kubernetes/khaleesi-ninja-service \
-          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml
-          --values ./kubernetes/configuration/type/${{ matrix.service.type }}.yml
-          --values ./kubernetes/configuration/service/${{ matrix.service.gate }}/${{ matrix.service.name }}.yml
+          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml \
+          --values ./kubernetes/configuration/type/${{ matrix.service.type }}.yml \
+          --values ./kubernetes/configuration/service/${{ matrix.service.gate }}/${{ matrix.service.name }}.yml \
           --values ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
   
   # Build the images for reuse.
