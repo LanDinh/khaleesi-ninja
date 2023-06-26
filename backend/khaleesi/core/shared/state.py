@@ -27,24 +27,24 @@ class UserType(Enum):
 @dataclass
 class Request:
   """Request meta."""
-  http_request_id: str = 'UNKNOWN'
-  grpc_request_id: str = 'system'
-  grpc_service   : str = 'UNKNOWN'
-  grpc_method    : str = 'UNKNOWN'
+  httpRequestId: str = 'UNKNOWN'
+  grpcRequestId: str = 'system'
+  grpcService  : str = 'UNKNOWN'
+  grpcMethod   : str = 'UNKNOWN'
 
 @dataclass
 class User:
   """User data."""
-  user_id: str      = 'UNKNOWN'
-  type   : UserType = UserType.UNKNOWN
+  userId: str      = 'UNKNOWN'
+  type  : UserType = UserType.UNKNOWN
 
 @dataclass
 class Query:
   """Query data."""
-  query_id  : str
-  raw       : str
-  start     : datetime
-  end       : datetime = datetime.max.replace(tzinfo = timezone.utc)
+  queryId  : str
+  raw      : str
+  start    : datetime
+  end      : datetime = datetime.max.replace(tzinfo = timezone.utc)
 
 class State(threading.local):
   """Per-request state."""

@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, Page
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.logging.text_logger import LOGGER
+from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import (
   KhaleesiException,
@@ -32,7 +32,7 @@ from khaleesi.proto.core_pb2 import (
 from khaleesi.proto.core_sawmill_pb2 import Event
 
 
-khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
+khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 M = TypeVar('M', bound = models.Model)
@@ -41,13 +41,13 @@ M = TypeVar('M', bound = models.Model)
 class BaseJob(ABC, Generic[M]):
   """Generic job logic."""
 
-  job             = JobExecutionMetadata()
-  action          = JobActionConfiguration()
-  items_processed = 0
-  start           = datetime.now(tz = timezone.utc)
-  job_execution   = JobExecution()
-  model     : Type[M]
-  paginator : Paginator  # type: ignore[type-arg]
+  job            = JobExecutionMetadata()
+  action         = JobActionConfiguration()
+  itemsProcessed = 0
+  start          = datetime.now(tz = timezone.utc)
+  jobExecution   = JobExecution()
+  model    : Type[M]
+  paginator: Paginator  # type: ignore[type-arg]
 
   def __init__(
       self, *,
@@ -60,205 +60,205 @@ class BaseJob(ABC, Generic[M]):
     if not action.batchSize:
       # Without the batch size, the paginator tries to divide by 0.
       raise InvalidArgumentException(
-        public_details  = f'action_configuration.batch_size = {action.batchSize}',
-        private_message = 'action_configuration.batch_size is mandatory!',
-        private_details = f'action_configuration.batch_size = {action.batchSize}',
+        publicDetails  = f'actionConfiguration.batchSize = {action.batchSize}',
+        privateMessage = 'actionConfiguration.batchSize is mandatory!',
+        privateDetails = f'actionConfiguration.batchSize = {action.batchSize}',
       )
     if not action.timelimit.ToNanoseconds() > 0:
       # Without the time limit, the job will not run at all.
       raise InvalidArgumentException(
-        public_details  = f'action_configuration.timelimit = {action.timelimit}',
-        private_message = 'action_configuration.timelimit is mandatory!',
-        private_details = f'action_configuration.timelimit = {action.timelimit}',
+        publicDetails  = f'actionConfiguration.timelimit = {action.timelimit}',
+        privateMessage = 'actionConfiguration.timelimit is mandatory!',
+        privateDetails = f'actionConfiguration.timelimit = {action.timelimit}',
       )
-    self.start           = datetime.now(tz = timezone.utc)
-    self.items_processed = 0
-    self.job             = job
-    self.action          = action
-    self.job_execution   = JobExecution()
+    self.start          = datetime.now(tz = timezone.utc)
+    self.itemsProcessed = 0
+    self.job            = job
+    self.action         = action
+    self.jobExecution   = JobExecution()
 
-  def execute(self, *, stop_event: ThreadingEvent) -> JobExecutionResponse :
+  def execute(self, *, stopEvent: ThreadingEvent) -> JobExecutionResponse :
     """Execute the job."""
     # Start job execution.
-    LOGGER.info(f'{self._logging_prefix()} Attempting to start.')
-    self.paginator = Paginator(self.get_queryset(), self.action.batchSize)
+    LOGGER.info(f'{self._loggingPrefix()} Attempting to start.')
+    self.paginator = Paginator(self.getQueryset(), self.action.batchSize)
     try:
-      self.job_execution = JobExecution.objects.start_job_execution(job = self.job)
+      self.jobExecution = JobExecution.objects.startJobExecution(job = self.job)
     except Exception as exception:
-      LOGGER.fatal(f'{self._logging_prefix()} Failed to start.')
-      self._log_event(
+      LOGGER.fatal(f'{self._loggingPrefix()} Failed to start.')
+      self._logEvent(
         action  = Event.Action.ActionType.START,
         result  = Event.Action.ResultType.FATAL,
         details = 'Job failed to start.',
       )
-      self._handle_fatal_exception(exception = exception, details = 'Job failed to start.')
+      self._handleFatalException(exception = exception, details = 'Job failed to start.')
       raise
-    self._log_event(
+    self._logEvent(
       action  = Event.Action.ActionType.START,
       result  = Event.Action.ResultType.SUCCESS,
       details = 'Job started.',
     )
 
     # Determine if skipping happens.
-    if not self.job_execution.in_progress:
-      self._handle_job_end(
-        details          = 'Job skipped because a different job execution is in progress.',
-        execution_status = JobExecutionResponse.Status.SKIPPED,
+    if not self.jobExecution.inProgress:
+      self._handleJobEnd(
+        details         = 'Job skipped because a different job execution is in progress.',
+        executionStatus = JobExecutionResponse.Status.SKIPPED,
       )
-      return self.job_execution.to_grpc_job_execution_response()
-    LOGGER.info(f'{self._logging_prefix()} Job not getting skipped.')
+      return self.jobExecution.toGrpc()
+    LOGGER.info(f'{self._loggingPrefix()} Job not getting skipped.')
 
 
     # Determine total amount of affected items.
     try:
       total = self.paginator.count
-      LOGGER.info(f'{self._logging_prefix()} The total amount of affected items is {total}.')
-      self.job_execution.set_total(total = total)
+      LOGGER.info(f'{self._loggingPrefix()} The total amount of affected items is {total}.')
+      self.jobExecution.setTotal(total = total)
     except Exception as exception:  # pylint: disable=broad-except
-      self._handle_fatal_exception(
+      self._handleFatalException(
         exception = exception,
         details   = 'Could not determine total amount of affected items.',
       )
-      return self.job_execution.to_grpc_job_execution_response()
-    self.job_execution.set_total(total = total)
+      return self.jobExecution.toGrpc()
+    self.jobExecution.setTotal(total = total)
 
     # Execute loop.
     try:
-      for page_number in self.paginator.page_range:
+      for pageNumber in self.paginator.page_range:
         # Abort check.
-        if stop_event.is_set():
-          self._handle_job_end(
-            details          = 'Job aborted.',
-            execution_status = JobExecutionResponse.Status.ABORT,
+        if stopEvent.is_set():
+          self._handleJobEnd(
+            details         = 'Job aborted.',
+            executionStatus = JobExecutionResponse.Status.ABORT,
           )
-          return self.job_execution.to_grpc_job_execution_response()
+          return self.jobExecution.toGrpc()
         # Timeout check.
         if datetime.now(tz = timezone.utc) > \
             self.start + self.action.timelimit.ToTimedelta():
-          self._handle_job_end(
-            details          = 'Job timed out.',
-            execution_status = JobExecutionResponse.Status.TIMEOUT,
+          self._handleJobEnd(
+            details         = 'Job timed out.',
+            executionStatus = JobExecutionResponse.Status.TIMEOUT,
           )
-          return self.job_execution.to_grpc_job_execution_response()
+          return self.jobExecution.toGrpc()
 
         # Execute loop.
-        LOGGER.info(f'{self._logging_prefix()} Executing next batch.')
-        self.items_processed += self.execute_batch(page = self.get_page(page_number = page_number))
-        LOGGER.info(f'{self._logging_prefix()} {self.items_processed} items processed so far.')
+        LOGGER.info(f'{self._loggingPrefix()} Executing next batch.')
+        self.itemsProcessed += self.executeBatch(page = self.getPage(pageNumber = pageNumber))
+        LOGGER.info(f'{self._loggingPrefix()} {self.itemsProcessed} items processed so far.')
 
       # Job is done.
-      self._handle_job_end(
-        details          = 'Job finished successfully.',
-        execution_status = JobExecutionResponse.Status.SUCCESS,
-        event_result     = Event.Action.ResultType.SUCCESS,
+      self._handleJobEnd(
+        details         = 'Job finished successfully.',
+        executionStatus = JobExecutionResponse.Status.SUCCESS,
+        eventResult     = Event.Action.ResultType.SUCCESS,
       )
-      return self.job_execution.to_grpc_job_execution_response()
+      return self.jobExecution.toGrpc()
 
     except Exception as exception:  # pylint: disable=broad-except
-      self._handle_error_exception(
+      self._handleErrorException(
         exception = MaskingInternalServerException(exception = exception),
         details   = 'Exception happened during job execution.',
       )
-      return self.job_execution.to_grpc_job_execution_response()
+      return self.jobExecution.toGrpc()
 
-  def get_page(self, *, page_number: int) -> Page[M] :
+  def getPage(self, *, pageNumber: int) -> Page[M] :
     """Get the next page to be worked on."""
-    return self.paginator.get_page(page_number)
+    return self.paginator.get_page(pageNumber)
 
   @abstractmethod
-  def execute_batch(self, *, page: Page[M]) -> int :
+  def executeBatch(self, *, page: Page[M]) -> int :
     """Execute one batch of the job and return the number of items that were processed."""
 
   @abstractmethod
-  def get_queryset(self) -> models.QuerySet[M] :
+  def getQueryset(self) -> models.QuerySet[M] :
     """Return the full queryset to be iterated over."""
 
   def target(self) -> str :
     """Return the target resource. By default, this is should be the affected model name."""
     return self.model.__name__
 
-  def target_type(self) -> str :
+  def targetType(self) -> str :
     """Return the target resource type. By default, this is table."""
-    return khaleesi_settings['BATCH']['TARGET_TYPE']
+    return khaleesiSettings['BATCH']['TARGET_TYPE']
 
   def owner(self) -> User :
     """Return the owner of the target resources. By default, this is the service."""
     owner = User()
-    owner.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
+    owner.id   = f'{khaleesiSettings["METADATA"]["GATE"]}-{khaleesiSettings["METADATA"]["SERVICE"]}'
     owner.type = User.UserType.SYSTEM
     return owner
 
-  def _handle_fatal_exception(self, *, exception: Exception, details: str) -> None :
+  def _handleFatalException(self, *, exception: Exception, details: str) -> None :
     """Handle exceptions during job execution."""
-    self._handle_error_exception(
-      exception    = exception,
-      details      = details,
-      event_result = Event.Action.ResultType.FATAL,
+    self._handleErrorException(
+      exception   = exception,
+      details     = details,
+      eventResult = Event.Action.ResultType.FATAL,
     )
 
-  def _handle_error_exception(
+  def _handleErrorException(
       self, *,
-      exception   : Exception,
-      details     : str,
-      event_result: 'Event.Action.ResultType.V' = Event.Action.ResultType.ERROR,
+      exception  : Exception,
+      details    : str,
+      eventResult: 'Event.Action.ResultType.V' = Event.Action.ResultType.ERROR,
   ) -> None :
     """Handle exceptions during job execution."""
-    khaleesi_exception: KhaleesiException
+    khaleesiException: KhaleesiException
     if isinstance(exception, KhaleesiException):
-      khaleesi_exception = exception
+      khaleesiException = exception
     else:
-      khaleesi_exception = MaskingInternalServerException(exception = exception)
-    self._handle_job_end(
-      details          = details,
-      execution_status = JobExecutionResponse.Status.ERROR,
-      event_result     = event_result,
+      khaleesiException = MaskingInternalServerException(exception = exception)
+    self._handleJobEnd(
+      details         = details,
+      executionStatus = JobExecutionResponse.Status.ERROR,
+      eventResult     = eventResult,
     )
-    SINGLETON.structured_logger.log_error(exception = khaleesi_exception)
+    SINGLETON.structuredLogger.logError(exception = khaleesiException)
 
-  def _handle_job_end(
+  def _handleJobEnd(
       self, *,
-      details         : str,
-      execution_status: 'JobExecutionResponse.Status.V',
-      event_result    : 'Event.Action.ResultType.V' = Event.Action.ResultType.WARNING,
+      details        : str,
+      executionStatus: 'JobExecutionResponse.Status.V',
+      eventResult    : 'Event.Action.ResultType.V' = Event.Action.ResultType.WARNING,
   ) -> None :
     """Handle the job finishing."""
-    if event_result == Event.Action.ResultType.WARNING:
-      LOGGER.warning(f'{self._logging_prefix()} {details}')
-    elif event_result == Event.Action.ResultType.ERROR:
-      LOGGER.error(f'{self._logging_prefix()} {details}')
-    elif event_result == Event.Action.ResultType.FATAL:
-      LOGGER.fatal(f'{self._logging_prefix()} {details}')
+    if eventResult == Event.Action.ResultType.WARNING:
+      LOGGER.warning(f'{self._loggingPrefix()} {details}')
+    elif eventResult == Event.Action.ResultType.ERROR:
+      LOGGER.error(f'{self._loggingPrefix()} {details}')
+    elif eventResult == Event.Action.ResultType.FATAL:
+      LOGGER.fatal(f'{self._loggingPrefix()} {details}')
 
-    self.job_execution.finish(
-      status          = execution_status,
-      items_processed = self.items_processed,
-      details         = details,
+    self.jobExecution.finish(
+      status         = executionStatus,
+      itemsProcessed = self.itemsProcessed,
+      details        = details,
     )
-    self._log_event(
+    self._logEvent(
       action  = Event.Action.ActionType.END,
-      result  = event_result,
+      result  = eventResult,
       details = details,
     )
 
-  def _log_event(
+  def _logEvent(
       self, *,
       action : 'Event.Action.ActionType.V',
       result : 'Event.Action.ResultType.V',
       details: str,
   ) -> None :
     """Log start and end events."""
-    SINGLETON.structured_logger.log_event(
-      target      = self.target(),
-      target_type = self.target_type(),
-      owner       = self.owner(),
-      action      = '',  # Batch jobs use START and END crud types.
-      action_crud = action,
-      result      = result,
-      details     = f'{self._logging_prefix()} '
-                    f'{details} {self.items_processed} items processed so far.',
+    SINGLETON.structuredLogger.logEvent(
+      target     = self.target(),
+      targetType = self.targetType(),
+      owner      = self.owner(),
+      action     = '',  # Batch jobs use START and END crud types.
+      actionCrud = action,
+      result     = result,
+      details    = f'{self._loggingPrefix()} '
+                   f'{details} {self.itemsProcessed} items processed so far.',
     )
 
-  def _logging_prefix(self) -> str :
+  def _loggingPrefix(self) -> str :
     """Return uniform logging prefix."""
     return f'Job execution "{self.job.executionId}" for "{self.job.jobId}":'
 
@@ -275,23 +275,23 @@ class Job(BaseJob[M], Generic[M]):
 class CleanupJob(BaseJob[M], Generic[M]):
   """Job specifically for cleaning up."""
 
-  cleanup_configuration = JobCleanupActionConfiguration()
-  cleanup_timestamp = datetime.now(tz = timezone.utc)
+  cleanupConfiguration = JobCleanupActionConfiguration()
+  cleanupTimestamp     = datetime.now(tz = timezone.utc)
 
   def __init__(self, *, model: Type[M], request : JobRequest) -> None :
     """Initialize the job."""
     super().__init__(model = model, job = request.job, action = request.actionConfiguration)
-    self.cleanup_configuration = request.cleanupConfiguration
-    self.cleanup_timestamp = self.start - request.cleanupConfiguration.cleanupDelay.ToTimedelta()
+    self.cleanupConfiguration = request.cleanupConfiguration
+    self.cleanupTimestamp     = self.start - request.cleanupConfiguration.cleanupDelay.ToTimedelta()
 
-  def execute_batch(self, *, page: Page[M]) -> int :
+  def executeBatch(self, *, page: Page[M]) -> int :
     """Execute a batch deletion."""
-    count, _ = self.get_queryset().filter(
+    count, _ = self.getQueryset().filter(
       pk__in = models.Subquery(page.object_list.values('pk')),  # type: ignore[attr-defined]
     ).delete()
     return count
 
-  def get_page(self, *, page_number: int) -> Page[M] :
+  def getPage(self, *, pageNumber: int) -> Page[M] :
     """Get the next page to be worked on."""
     # Since the data gets deleted, we continue with the next first page.
     return self.paginator.get_page(1)  # 1-based index.

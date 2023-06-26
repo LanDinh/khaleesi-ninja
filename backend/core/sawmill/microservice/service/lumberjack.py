@@ -8,8 +8,8 @@ import grpc
 
 # khaleesi-ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
-from khaleesi.core.logging.text_logger import LOGGER
-from khaleesi.core.shared.service_configuration import ServiceConfiguration
+from khaleesi.core.logging.textLogger import LOGGER
+from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogStandardResponse,
@@ -23,7 +23,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
-    add_LumberjackServicer_to_server as add_to_server
+    add_LumberjackServicer_to_server as addToServer
 )
 from microservice.models import (
   Event as DbEvent,
@@ -33,7 +33,7 @@ from microservice.models import (
   Query as DbQuery,
 )
 from microservice.models.logs.abstract import Metadata
-from microservice.models.service_registry import SERVICE_REGISTRY
+from microservice.models.serviceRegistry import SERVICE_REGISTRY
 
 
 class Service(Servicer):
@@ -43,14 +43,14 @@ class Service(Servicer):
     """Log events."""
     def method() -> Metadata :
       LOGGER.info('Adding service to service registry.')
-      SERVICE_REGISTRY.add_service(caller_details = request.requestMetadata.caller)
+      SERVICE_REGISTRY.addService(callerDetails = request.requestMetadata.caller)
       LOGGER.info(
         f'Saving an event to the request "{request.requestMetadata.caller.grpcRequestId}" '
         f'to the database.',
       )
-      return DbEvent.objects.log_event(grpc_event = request)
+      return DbEvent.objects.logEvent(grpcEvent = request)
 
-    return self._handle_response(method = method)
+    return self._handleResponse(method = method)
 
   def LogHttpRequest(self, request: HttpRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log HTTP request."""
@@ -59,13 +59,13 @@ class Service(Servicer):
         f'Saving the HTTP request "{request.requestMetadata.caller.httpRequestId}" '
         'to the database.',
       )
-      return DbHttpRequest.objects.log_request(grpc_request = request)
-    return self._handle_response(method = method)
+      return DbHttpRequest.objects.logRequest(grpcRequest = request)
+    return self._handleResponse(method = method)
 
   def LogSystemHttpRequest(
       self,
       request: EmptyRequest,
-      _: grpc.ServicerContext,
+      _      : grpc.ServicerContext,
   ) -> LogStandardResponse :
     """Log HTTP request."""
     def method() -> Metadata :
@@ -73,13 +73,13 @@ class Service(Servicer):
         'Saving the system HTTP request '
         f'"{request.requestMetadata.caller.httpRequestId}" to the database.',
       )
-      return DbHttpRequest.objects.log_system_request(grpc_request = request)
-    return self._handle_response(method = method)
+      return DbHttpRequest.objects.logSystemRequest(grpcRequest = request)
+    return self._handleResponse(method = method)
 
   def LogHttpRequestResponse(
       self,
       request: HttpResponseRequest,
-      _: grpc.ServicerContext,
+      _      : grpc.ServicerContext,
   ) -> LogStandardResponse :
     """Log HTTP request responses."""
     def method() -> Metadata :
@@ -87,28 +87,28 @@ class Service(Servicer):
         'Saving the response to the HTTP request '
         f'"{request.requestMetadata.caller.httpRequestId}" to the database.',
       )
-      return DbHttpRequest.objects.log_response(grpc_response = request)
-    return self._handle_response(method = method)
+      return DbHttpRequest.objects.logResponse(grpcResponse = request)
+    return self._handleResponse(method = method)
 
   def LogGrpcRequest(self, request: GrpcRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log requests."""
     def method() -> Metadata :
       LOGGER.info('Adding call to service registry.')
-      SERVICE_REGISTRY.add_call(
-        caller_details = request.upstreamRequest,
-        called_details = request.requestMetadata.caller,
+      SERVICE_REGISTRY.addCall(
+        callerDetails = request.upstreamRequest,
+        calledDetails = request.requestMetadata.caller,
       )
       LOGGER.info(
         f'Saving the request "{request.requestMetadata.caller.grpcRequestId}" to the database.',
       )
-      return DbGrpcRequest.objects.log_request(grpc_request = request)
+      return DbGrpcRequest.objects.logRequest(grpcRequest = request)
 
-    return self._handle_response(method = method)
+    return self._handleResponse(method = method)
 
   def LogGrpcResponse(
       self,
       request: GrpcResponseRequest,
-      _: grpc.ServicerContext,
+      _      : grpc.ServicerContext,
   ) -> LogStandardResponse :
     """Log request responses."""
     def method() -> Metadata :
@@ -116,26 +116,26 @@ class Service(Servicer):
         f'Saving the response to the request "{request.requestMetadata.caller.grpcRequestId}" '
         f'to the database.',
       )
-      result = DbGrpcRequest.objects.log_response(grpc_response = request)
+      result = DbGrpcRequest.objects.logResponse(grpcResponse = request)
       try:
-        DbHttpRequest.objects.add_child_duration(request = result)
+        DbHttpRequest.objects.addChildDuration(request = result)
       except Exception:  # pylint: disable=broad-except
         # TODO(45) - remove this hack
         pass
       LOGGER.info('Saving the queries to the database.')
-      queries = DbQuery.objects.log_queries(
-        queries = request.queries,
-        metadata = result.to_grpc_request_response().request.requestMetadata,
+      queries = DbQuery.objects.logQueries(
+        queries  = request.queries,
+        metadata = result.toGrpc().request.requestMetadata,
       )
-      errors = result.meta_logging_errors
+      errors = result.metaLoggingErrors
       LOGGER.info('Processing the query times and errors.')
       for query in queries:
-        errors += query.meta_logging_errors
-        result.meta_child_duration += query.reported_duration
+        errors += query.metaLoggingErrors
+        result.metaChildDuration += query.reportedDuration
       result.save()
-      result.meta_logging_errors = errors
+      result.metaLoggingErrors = errors
       return result
-    return self._handle_response(method = method)
+    return self._handleResponse(method = method)
 
   def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log errors."""
@@ -144,23 +144,23 @@ class Service(Servicer):
         f'Saving an error to the request "{request.requestMetadata.caller.grpcRequestId}" '
         'to the database.',
       )
-      return DbError.objects.log_error(grpc_error = request)
-    return self._handle_response(method = method)
+      return DbError.objects.logError(grpcError = request)
+    return self._handleResponse(method = method)
 
 
-  def _handle_response(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :
+  def _handleResponse(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :
     """Wrap responses for logging."""
     metadata = method()
-    if metadata.meta_logging_errors:
+    if metadata.metaLoggingErrors:
       raise InvalidArgumentException(
-        private_message = 'Error when parsing the metadata fields.',
-        private_details = metadata.meta_logging_errors,
+        privateMessage = 'Error when parsing the metadata fields.',
+        privateDetails = metadata.metaLoggingErrors,
       )
     return LogStandardResponse()
 
 
-service_configuration = ServiceConfiguration[Service](
-  name = DESCRIPTOR.services_by_name['Lumberjack'].full_name,
-  add_service_to_server = add_to_server,
-  service = Service()
+serviceConfiguration = ServiceConfiguration[Service](
+  name               = DESCRIPTOR.services_by_name['Lumberjack'].full_name,
+  addServiceToServer = addToServer,
+  service            = Service()
 )

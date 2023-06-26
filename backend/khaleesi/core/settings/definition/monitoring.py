@@ -7,4 +7,4 @@ from typing import TypedDict
 class Monitoring(TypedDict):
   """Monitoring configuration for khaleesi.ninja services."""
 
-  PORT : int
+  PORT: int

@@ -11,42 +11,40 @@ from grpc_interceptor import ClientCallDetails
 # khaleesi.ninja.
 from khaleesi.core.interceptors.client.util import ClientInterceptor
 from khaleesi.core.shared.exceptions import UpstreamGrpcException
-from khaleesi.core.logging.text_logger import LOGGER
+from khaleesi.core.logging.textLogger import LOGGER
 
 
 class LoggingClientInterceptor(ClientInterceptor):
   """Interceptor to collect prometheus metrics."""
 
-  def khaleesi_intercept(
+  def khaleesiIntercept(
       self, *,
-      method             : Callable[[Any, ClientCallDetails], Any],
-      request_or_iterator: Any,
-      call_details       : ClientCallDetails,
-      khaleesi_gate      : str,
-      khaleesi_service   : str,
-      grpc_service       : str,
-      grpc_method        : str,
+      method           : Callable[[Any, ClientCallDetails], Any],
+      requestOrIterator: Any,
+      callDetails      : ClientCallDetails,
+      khaleesiGate     : str,
+      khaleesiService  : str,
+      grpcService      : str,
+      grpcMethod       : str,
   ) -> Any :
     """Log data."""
-    LOGGER.info(f'Calling {khaleesi_gate}-{khaleesi_service}: {grpc_service}.{grpc_method}...')
+    LOGGER.info(f'Calling {khaleesiGate}-{khaleesiService}: {grpcService}.{grpcMethod}...')
 
-    response: Call = method(request_or_iterator, call_details)
+    response: Call = method(requestOrIterator, callDetails)
 
     if response.code() == StatusCode.OK:
-      LOGGER.info(
-        f'Call to {khaleesi_gate}-{khaleesi_service}: {grpc_service}.{grpc_method} was ok.'
-      )
+      LOGGER.info(f'Call to {khaleesiGate}-{khaleesiService}: {grpcService}.{grpcMethod} was ok.')
       return response
     LOGGER.warning(
-      f'Call to {khaleesi_gate}-{khaleesi_service}: {grpc_service}.{grpc_method} '
+      f'Call to {khaleesiGate}-{khaleesiService}: {grpcService}.{grpcMethod} '
       f'returned {response.code()}.'
     )
     raise UpstreamGrpcException(
-      status = response.code(),
-      private_details = self.exception_details(response = response)
+      status         = response.code(),
+      privateDetails = self.exceptionDetails(response = response)
     )
 
-  def exception_details(self, *, response: Call) -> str :
+  def exceptionDetails(self, *, response: Call) -> str :
     """Return a pretty-print of the exception."""
     if hasattr(response, 'exception') and response.exception and response.exception():  # type: ignore[attr-defined]  # pylint: disable=line-too-long
       return ''.join(traceback.format_exception(response.exception()))  # type: ignore[attr-defined]

@@ -15,37 +15,37 @@ from khaleesi.core.shared.singleton import SINGLETON
 class LoggingServerInterceptor(ServerInterceptor):
   """Interceptor to log requests."""
 
-  def khaleesi_intercept(
+  def khaleesiIntercept(
       self, *,
-      method: Callable[[Any, ServicerContext], Any],
+      method : Callable[[Any, ServicerContext], Any],
       request: Any,
       context: ServicerContext,
-      **_: Any,
+      **_    : Any,
   ) -> Any :
     """Log the incoming request."""
 
-    SINGLETON.structured_logger.log_grpc_request(
-      upstream_request = self.get_upstream_request(request = request),
+    SINGLETON.structuredLogger.logGrpcRequest(
+      upstreamRequest = self.getUpstreamRequest(request = request),
     )
 
     try:
       response = method(request, context)
-      SINGLETON.structured_logger.log_grpc_response(status = StatusCode.OK)
+      SINGLETON.structuredLogger.logGrpcResponse(status = StatusCode.OK)
       return response
     except KhaleesiException as exception:
-      self._handle_exception(exception = exception)
+      self._handleException(exception = exception)
       raise
     except Exception as exception:
-      new_exception = MaskingInternalServerException(exception = exception)
-      self._handle_exception(exception = new_exception)
-      raise new_exception from exception
+      newException = MaskingInternalServerException(exception = exception)
+      self._handleException(exception = newException)
+      raise newException from exception
 
-  def _handle_exception(self, *, exception: KhaleesiException) -> None :
+  def _handleException(self, *, exception: KhaleesiException) -> None :
     """Properly handle the exception."""
-    SINGLETON.structured_logger.log_error(exception = exception)
-    SINGLETON.structured_logger.log_grpc_response(status = exception.status)
+    SINGLETON.structuredLogger.logError(exception = exception)
+    SINGLETON.structuredLogger.logGrpcResponse(status = exception.status)
 
 
-def instantiate_logging_interceptor() -> LoggingServerInterceptor:
+def instantiateLoggingInterceptor() -> LoggingServerInterceptor:
   """Instantiate the logging interceptor."""
   return LoggingServerInterceptor()

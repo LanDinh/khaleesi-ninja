@@ -1,7 +1,7 @@
 """Actuate batch jobs."""
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.request_metadata import add_request_metadata
+from khaleesi.core.grpc.requestMetadata import addRequestMetadata
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.proto.core_pb2 import (
   JobExecutionMetadata,
@@ -22,18 +22,18 @@ class Actuator:
 
   def actuate(
       self, *,
-      action_name: str,
-      job        : JobExecutionMetadata,
-      action     : JobActionConfiguration,
-      cleanup    : JobCleanupActionConfiguration,
+      actionName: str,
+      job       : JobExecutionMetadata,
+      action    : JobActionConfiguration,
+      cleanup   : JobCleanupActionConfiguration,
   ) -> EmptyResponse :
     """Actuate a batch job request."""
-    parts        = action_name.split('.')
+    parts        = actionName.split('.')
     if len(parts) != 3:
       raise InvalidArgumentException(
-        public_details  = f'action_name = ${action_name}',
-        private_message = 'action_name has the wrong format.',
-        private_details = f'action_name = ${action_name}',
+        publicDetails  = f'actionName = ${actionName}',
+        privateMessage = 'actionName has the wrong format.',
+        privateDetails = f'actionName = ${actionName}',
       )
     gate    = parts[0]
     service = parts[1]
@@ -43,9 +43,9 @@ class Actuator:
       return method(self._request(job = job, action = action, cleanup = cleanup))
     except KeyError as exception:
       raise InvalidArgumentException(
-        public_details  = f'gate = ${gate}, service = ${service}, action = ${action}',
-        private_message = 'No such action exists.',
-        private_details = f'gate = ${gate}, service = ${service}, action = ${action}',
+        publicDetails  = f'gate = ${gate}, service = ${service}, action = ${action}',
+        privateMessage = 'No such action exists.',
+        privateDetails = f'gate = ${gate}, service = ${service}, action = ${action}',
       ) from exception
 
   def _request(
@@ -56,7 +56,7 @@ class Actuator:
   ) -> JobRequest :
     """Build a JobRequest."""
     request = JobRequest()
-    add_request_metadata(request = request)
+    addRequestMetadata(request = request)
     request.job.jobId       = job.jobId
     request.job.executionId = job.executionId
     request.actionConfiguration.timelimit.FromTimedelta(action.timelimit.ToTimedelta())

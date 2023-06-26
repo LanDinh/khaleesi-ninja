@@ -17,9 +17,9 @@ L = TypeVar('L', bound = Metadata)
 class CleanupJob(BaseCleanupJob[L], Generic[L]):
   """Clean up requests."""
 
-  def get_queryset(self) -> QuerySet[L] :
+  def getQueryset(self) -> QuerySet[L] :
     """Count the total number of items that should be executed."""
     return cast(
       QuerySet[L],
-      self.model.objects.filter(meta_logged_timestamp__lt = self.cleanup_timestamp),
+      self.model.objects.filter(metaLoggedTimestamp__lt = self.cleanupTimestamp),
     )

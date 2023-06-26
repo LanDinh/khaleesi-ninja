@@ -4,8 +4,8 @@
 import grpc
 
 # khaleesi.ninja.
-from khaleesi.core.logging.text_logger import LOGGER
-from khaleesi.core.shared.service_configuration import ServiceConfiguration
+from khaleesi.core.logging.textLogger import LOGGER
+from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
 from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import (
   IdRequest,
@@ -15,7 +15,7 @@ from khaleesi.proto.core_pb2 import (
 )
 from khaleesi.proto.core_pb2_grpc import (
   MaidServicer as Servicer,
-  add_MaidServicer_to_server as add_to_server
+  add_MaidServicer_to_server as addToServer
 )
 
 
@@ -25,17 +25,17 @@ class Service(Servicer):
   def AbortBatchJob(self, request: IdRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Abort the specified job."""
     LOGGER.info(f'Aborting job with ID {request.idMessage.id}')
-    JobExecution.objects.stop_job(id_message = request.idMessage)
+    JobExecution.objects.stopJob(idMessage = request.idMessage)
     return EmptyResponse()
 
   def AbortAllBatchJobs(self, request: EmptyRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Abort all running batch jobs."""
-    JobExecution.objects.stop_all_jobs()
+    JobExecution.objects.stopAllJobs()
     return EmptyResponse()
 
 
-service_configuration = ServiceConfiguration[Service](
-  name = DESCRIPTOR.services_by_name['Maid'].full_name,
-  add_service_to_server = add_to_server,
-  service = Service()
+serviceConfiguration = ServiceConfiguration[Service](
+  name               = DESCRIPTOR.services_by_name['Maid'].full_name,
+  addServiceToServer = addToServer,
+  service            = Service()
 )

@@ -4,18 +4,18 @@
 import threading
 
 # khaleesi.ninja.
-from khaleesi.core.logging.structured_logger import StructuredLogger, instantiate_structured_logger
+from khaleesi.core.logging.structuredLogger import StructuredLogger, instantiateStructuredLogger
 
 
 class Singleton(threading.local):
   """Per-request state."""
 
-  structured_logger: StructuredLogger
+  structuredLogger: StructuredLogger
 
   def __init__(self) -> None :
     """Set the default state."""
     super().__init__()
-    self.structured_logger = instantiate_structured_logger()
+    self.structuredLogger = instantiateStructuredLogger()
 
 
 SINGLETON = Singleton()

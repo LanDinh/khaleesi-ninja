@@ -19,11 +19,11 @@ from grpc_reflection.v1alpha import reflection
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import CHANNEL_MANAGER
-from khaleesi.core.grpc.import_util import register_service
-from khaleesi.core.interceptors.server.logging import instantiate_logging_interceptor
-from khaleesi.core.interceptors.server.prometheus import instantiate_prometheus_interceptor
-from khaleesi.core.interceptors.server.request_state import instantiate_request_state_interceptor
-from khaleesi.core.logging.text_logger import LOGGER
+from khaleesi.core.grpc.importUtil import registerService
+from khaleesi.core.interceptors.server.logging import instantiateLoggingInterceptor
+from khaleesi.core.interceptors.server.prometheus import instantiatePrometheusInterceptor
+from khaleesi.core.interceptors.server.requestState import instantiateRequestStateInterceptor
+from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.metrics.health import HEALTH as HEALTH_METRIC, HealthMetricType
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import (
@@ -36,90 +36,90 @@ from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences
-from microservice.metric_initializer import MetricInitializer
+from microservice.metricInitializer import MetricInitializer
 
 
-khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
+khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class Server:
   """The gRPC server."""
 
-  server               : GrpcServer
-  health_servicer      : HealthServicer
-  metric_initializer   : MetricInitializer
-  service_names        : List[str]
-  start_http_request_id: str
+  server              : GrpcServer
+  healthServicer      : HealthServicer
+  metricInitializer   : MetricInitializer
+  serviceNames        : List[str]
+  startHttpRequestId: str
 
-  def __init__(self, *, start_http_request_id: str, initialize_grpc_request_id: str) -> None :
+  def __init__(self, *, startHttpRequestId: str, initializeGrpcRequestId: str) -> None :
     try:
-      self.start_http_request_id = start_http_request_id
+      self.startHttpRequestId = startHttpRequestId
       LOGGER.info('Initializing metrics...')
-      self.metric_initializer = MetricInitializer(http_request_id = start_http_request_id)
-      self.metric_initializer.initialize_metrics()
+      self.metricInitializer = MetricInitializer(httpRequestId = startHttpRequestId)
+      self.metricInitializer.initializeMetrics()
       LOGGER.info('Initializing health servicer...')
-      self.health_servicer = HealthServicer()
+      self.healthServicer = HealthServicer()
       LOGGER.info('Initializing server...')
       self.server = server(
-        ThreadPoolExecutor(khaleesi_settings['GRPC']['THREADS']),
+        ThreadPoolExecutor(khaleesiSettings['GRPC']['THREADS']),
         interceptors = [
-            instantiate_request_state_interceptor(),  # Outer.
-            instantiate_prometheus_interceptor(),
-            instantiate_logging_interceptor(),  # Inner.
+            instantiateRequestStateInterceptor(),  # Outer.
+            instantiatePrometheusInterceptor(),
+            instantiateLoggingInterceptor(),  # Inner.
         ],
       )
       LOGGER.info('Initializing configure server...')
-      self.server.add_insecure_port(f'[::]:{khaleesi_settings["GRPC"]["PORT"]}')
-      signal(SIGTERM, self._handle_sigterm)
+      self.server.add_insecure_port(f'[::]:{khaleesiSettings["GRPC"]["PORT"]}')
+      signal(SIGTERM, self._handleSigterm)
       LOGGER.info('Adding service handlers...')
-      self._init_add_handlers()
+      self._initAddHandlers()
     except KhaleesiException as exception:
-      self._log_start_exception(
-        exception       = exception,
-        grpc_request_id = initialize_grpc_request_id,
-        activity        = 'initialization'
+      self._logStartException(
+        exception     = exception,
+        grpcRequestId = initializeGrpcRequestId,
+        activity      = 'initialization'
       )
       raise
     except Exception as exception:
       masked = MaskingInternalServerException(exception = exception)
-      self._log_start_exception(
-        exception       = masked,
-        grpc_request_id = initialize_grpc_request_id,
-        activity        = 'initialization'
+      self._logStartException(
+        exception     = masked,
+        grpcRequestId = initializeGrpcRequestId,
+        activity      = 'initialization'
       )
       raise masked from exception
 
-  def start(self, *, start_grpc_request_id: str) -> None :
+  def start(self, *, startGrpcRequestId: str) -> None :
     """Start the server."""
     try:
       LOGGER.info('Starting server...')
       self.server.start()
       LOGGER.info('Setting health state...')
-      for service_name in self.service_names:
-        self.health_servicer.set(service_name, HealthCheckResponse.SERVING)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-      self.health_servicer.set('', HealthCheckResponse.SERVING)  # type: ignore[arg-type]
-      self._log_server_start_event(
-        grpc_request_id = start_grpc_request_id,
-        result          = Event.Action.ResultType.SUCCESS,
-        details         = 'Server started successfully.',
+      for serviceName in self.serviceNames:
+        self.healthServicer.set(serviceName, HealthCheckResponse.SERVING)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+      self.healthServicer.set('', HealthCheckResponse.SERVING)  # type: ignore[arg-type]
+      self._logServerStartEvent(
+        grpcRequestId = startGrpcRequestId,
+        result        = Event.Action.ResultType.SUCCESS,
+        details       = 'Server started successfully.',
       )
     except KhaleesiException as exception:
-      self._log_start_exception(
-        exception       = exception,
-        grpc_request_id = start_grpc_request_id,
-        activity        = 'start'
+      self._logStartException(
+        exception     = exception,
+        grpcRequestId = startGrpcRequestId,
+        activity      = 'start'
       )
       raise
     except Exception as exception:
       masked = MaskingInternalServerException(exception = exception)
-      self._log_start_exception(
-        exception       = masked,
-        grpc_request_id = start_grpc_request_id,
-        activity        = 'start'
+      self._logStartException(
+        exception     = masked,
+        grpcRequestId = startGrpcRequestId,
+        activity      = 'start'
       )
       raise masked from exception
 
-  def wait_for_termination(self) -> None :
+  def waitForTermination(self) -> None :
     """Wait for termination. No more log messages will be called in this thread."""
     LOGGER.info('')
     LOGGER.info('       \\****__              ____')
@@ -135,210 +135,210 @@ class Server:
     LOGGER.info('')
     self.server.wait_for_termination()
 
-  def _init_add_handlers(self) -> None :
+  def _initAddHandlers(self) -> None :
     """Attempt to import handlers from string representations."""
-    raw_handlers = khaleesi_settings['GRPC']['HANDLERS']
-    self.service_names = [reflection.SERVICE_NAME]
-    for raw_handler in raw_handlers:
-      self.service_names.append(register_service(raw_handler = raw_handler, server = self.server))
+    rawHandlers = khaleesiSettings['GRPC']['HANDLERS']
+    self.serviceNames = [reflection.SERVICE_NAME]
+    for rawHandler in rawHandlers:
+      self.serviceNames.append(registerService(rawHandler = rawHandler, server = self.server))
     LOGGER.debug('Adding reflection service...')
-    reflection.enable_server_reflection(self.service_names, self.server)
+    reflection.enable_server_reflection(self.serviceNames, self.server)
     LOGGER.debug('Adding health service...')
-    add_HealthServicer_to_server(self.health_servicer, self.server)
+    add_HealthServicer_to_server(self.healthServicer, self.server)
 
-  def _handle_sigterm(self, *_: Any) -> None :
+  def _handleSigterm(self, *_: Any) -> None :
     """Shutdown gracefully."""
-    seconds_remaining = khaleesi_settings['GRPC']['SHUTDOWN_GRACE_SECS']
-    end = datetime.now(tz = timezone.utc) + timedelta(seconds = seconds_remaining)
-    stop_http_request_id = str(uuid4())
-    grpc_request_id      = str(uuid4())
+    secondsRemaining  = khaleesiSettings['GRPC']['SHUTDOWN_GRACE_SECS']
+    end               = datetime.now(tz = timezone.utc) + timedelta(seconds = secondsRemaining)
+    stopHttpRequestId = str(uuid4())
+    grpcRequestId     = str(uuid4())
 
     try:
-      SINGLETON.structured_logger.log_system_http_request(
-        http_request_id = stop_http_request_id,
-        grpc_method     = 'LIFECYCLE',
+      SINGLETON.structuredLogger.logSystemHttpRequest(
+        httpRequestId = stopHttpRequestId,
+        grpcMethod    = 'LIFECYCLE',
       )
-      SINGLETON.structured_logger.log_system_grpc_request(
-        http_request_id = stop_http_request_id,
-        grpc_request_id = grpc_request_id,
-        grpc_method     = 'LIFECYCLE',
+      SINGLETON.structuredLogger.logSystemGrpcRequest(
+        httpRequestId = stopHttpRequestId,
+        grpcRequestId = grpcRequestId,
+        grpcMethod    = 'LIFECYCLE',
       )
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
-      self.health_servicer.enter_graceful_shutdown()
+      self.healthServicer.enter_graceful_shutdown()
 
-      seconds_remaining = (end - datetime.now(tz = timezone.utc)).seconds
-      done_event = self.server.stop(seconds_remaining)
+      secondsRemaining = (end - datetime.now(tz = timezone.utc)).seconds
+      doneEvent = self.server.stop(secondsRemaining)
 
-      threads = JobExecution.objects.stop_all_jobs()
+      threads = JobExecution.objects.stopAllJobs()
       for thread in threads:
-        seconds_remaining = (end - datetime.now(tz = timezone.utc)).seconds
-        thread.join(seconds_remaining)
-      threads_finished_gracefully = True
+        secondsRemaining = (end - datetime.now(tz = timezone.utc)).seconds
+        thread.join(secondsRemaining)
+      threadsFinishedGracefully = True
       for thread in threads:
         if not thread.is_alive():
-          threads_finished_gracefully = False
+          threadsFinishedGracefully = False
 
-      seconds_remaining = (end - datetime.now(tz = timezone.utc)).seconds
-      server_finished_gracefully = done_event.wait(seconds_remaining)
+      secondsRemaining         = (end - datetime.now(tz = timezone.utc)).seconds
+      serverFinishedGracefully = doneEvent.wait(secondsRemaining)
 
-      if server_finished_gracefully and threads_finished_gracefully:
-        self._log_server_state_event(
-          http_request_id = stop_http_request_id,
-          grpc_request_id = grpc_request_id,
-          action          = Event.Action.ActionType.END,
-          result          = Event.Action.ResultType.SUCCESS,
-          details         = 'Server stopped successfully.'
+      if serverFinishedGracefully and threadsFinishedGracefully:
+        self._logServerStateEvent(
+          httpRequestId = stopHttpRequestId,
+          grpcRequestId = grpcRequestId,
+          action        = Event.Action.ActionType.END,
+          result        = Event.Action.ResultType.SUCCESS,
+          details       = 'Server stopped successfully.'
         )
-        self._log_shutdown(
-          http_request_id = stop_http_request_id,
-          grpc_request_id = grpc_request_id,
-          status          = StatusCode.OK,
+        self._logShutdown(
+          httpRequestId = stopHttpRequestId,
+          grpcRequestId = grpcRequestId,
+          status        = StatusCode.OK,
         )
-        CHANNEL_MANAGER.close_all_channels()
+        CHANNEL_MANAGER.closeAllChannels()
         return
 
       reason = ''
-      if not threads_finished_gracefully:
+      if not threadsFinishedGracefully:
         reason += 'Threads didn\'t terminate. '
-      if not server_finished_gracefully:
+      if not serverFinishedGracefully:
         reason += 'Server didn\'t terminate. '
-      raise TimeoutException(private_details = f'Server stop timed out. - {reason}')
+      raise TimeoutException(privateDetails = f'Server stop timed out. - {reason}')
     except KhaleesiException as exception:
-      self._log_end_exception(
-        exception       = exception,
-        action          = Event.Action.ActionType.END,
-        http_request_id = stop_http_request_id,
-        grpc_request_id = grpc_request_id,
-        activity        = 'stop',
+      self._logEndException(
+        exception     = exception,
+        action        = Event.Action.ActionType.END,
+        httpRequestId = stopHttpRequestId,
+        grpcRequestId = grpcRequestId,
+        activity      = 'stop',
       )
       raise
     except Exception as exception:
       masked = MaskingInternalServerException(exception = exception)
-      self._log_end_exception(
-        exception       = masked,
-        action          = Event.Action.ActionType.END,
-        http_request_id = stop_http_request_id,
-        grpc_request_id = grpc_request_id,
-        activity        = 'stop',
+      self._logEndException(
+        exception     = masked,
+        action        = Event.Action.ActionType.END,
+        httpRequestId = stopHttpRequestId,
+        grpcRequestId = grpcRequestId,
+        activity      = 'stop',
       )
       raise
 
-  def _log_start_exception(
+  def _logStartException(
       self, *,
-      exception      : KhaleesiException,
-      grpc_request_id: str,
-      activity       : str,
+      exception    : KhaleesiException,
+      grpcRequestId: str,
+      activity     : str,
   ) -> None :
     """Log exceptions in the startup phase."""
-    self._log_exception(
-      exception       = exception,
-      action          = Event.Action.ActionType.START,
-      http_request_id = self.start_http_request_id,
-      grpc_request_id = grpc_request_id,
-      activity        = activity
+    self._logException(
+      exception     = exception,
+      action        = Event.Action.ActionType.START,
+      httpRequestId = self.startHttpRequestId,
+      grpcRequestId = grpcRequestId,
+      activity      = activity
     )
 
-  def _log_end_exception(
+  def _logEndException(
       self, *,
-      exception      : KhaleesiException,
-      action         : 'Event.Action.ActionType.V',
-      http_request_id: str,
-      grpc_request_id: str,
-      activity       : str,
+      exception    : KhaleesiException,
+      action       : 'Event.Action.ActionType.V',
+      httpRequestId: str,
+      grpcRequestId: str,
+      activity     : str,
   ) -> None :
     """Log exceptions when turning down the server."""
-    self._log_exception(
-      exception       = exception,
-      action          = action,
-      http_request_id = http_request_id,
-      grpc_request_id = grpc_request_id,
-      activity        = activity,
+    self._logException(
+      exception     = exception,
+      action        = action,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      activity      = activity,
     )
-    self._log_shutdown(
-      http_request_id = http_request_id,
-      grpc_request_id = grpc_request_id,
-      status          = StatusCode.INTERNAL,
+    self._logShutdown(
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      status        = StatusCode.INTERNAL,
     )
-    CHANNEL_MANAGER.close_all_channels()
+    CHANNEL_MANAGER.closeAllChannels()
 
-  def _log_exception(
+  def _logException(
       self, *,
-      exception      : KhaleesiException,
-      action         : 'Event.Action.ActionType.V',
-      http_request_id: str,
-      grpc_request_id: str,
-      activity       : str,
+      exception    : KhaleesiException,
+      action       : 'Event.Action.ActionType.V',
+      httpRequestId: str,
+      grpcRequestId: str,
+      activity     : str,
   ) -> None :
     """Log exceptions."""
-    SINGLETON.structured_logger.log_system_error(
-      exception       = exception,
-      http_request_id = http_request_id,
-      grpc_request_id = grpc_request_id,
-      grpc_method     = 'LIFECYCLE'
+    SINGLETON.structuredLogger.logSystemError(
+      exception     = exception,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = 'LIFECYCLE'
     )
-    self._log_server_state_event(
-      http_request_id = http_request_id,
-      grpc_request_id = grpc_request_id,
-      action          = action,
-      result          = Event.Action.ResultType.FATAL,
+    self._logServerStateEvent(
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      action        = action,
+      result        = Event.Action.ResultType.FATAL,
       details = f'Server {activity} failed.'
-                f' {exception.private_message}: {exception.private_details}',
+                f' {exception.privateMessage}: {exception.privateDetails}',
     )
 
-  def _log_server_start_event(
+  def _logServerStartEvent(
       self, *,
-      grpc_request_id: str,
-      result         : 'Event.Action.ResultType.V',
-      details        : str,
+      grpcRequestId: str,
+      result       : 'Event.Action.ResultType.V',
+      details      : str,
   ) -> None :
     """Log the server state during the startup phase."""
-    self._log_server_state_event(
-      http_request_id = self.start_http_request_id,
-      grpc_request_id = grpc_request_id,
-      action          = Event.Action.ActionType.START,
-      result          = result,
-      details         = details,
+    self._logServerStateEvent(
+      httpRequestId = self.startHttpRequestId,
+      grpcRequestId = grpcRequestId,
+      action        = Event.Action.ActionType.START,
+      result        = result,
+      details       = details,
     )
 
-  def _log_server_state_event(
+  def _logServerStateEvent(
       self, *,
-      http_request_id: str,
-      grpc_request_id: str,
-      action         : 'Event.Action.ActionType.V',
-      result         : 'Event.Action.ResultType.V',
-      details        : str,
+      httpRequestId: str,
+      grpcRequestId: str,
+      action       : 'Event.Action.ActionType.V',
+      result       : 'Event.Action.ResultType.V',
+      details      : str,
   ) -> None :
     """Log the server state."""
     user = User()
     user.type = User.UserType.SYSTEM
-    user.id = f'{khaleesi_settings["METADATA"]["GATE"]}-{khaleesi_settings["METADATA"]["SERVICE"]}'
-    SINGLETON.structured_logger.log_system_event(
-      http_request_id     = http_request_id,
-      grpc_request_id     = grpc_request_id,
-      grpc_method         = 'LIFECYCLE',
-      target              = khaleesi_settings['METADATA']['POD_ID'],
-      owner               = user,
-      action              = action,
-      result              = result,
-      details             = details,
-      logger_send_metric  = True,
+    user.id   = f'{khaleesiSettings["METADATA"]["GATE"]}-{khaleesiSettings["METADATA"]["SERVICE"]}'
+    SINGLETON.structuredLogger.logSystemEvent(
+      httpRequestId    = httpRequestId,
+      grpcRequestId    = grpcRequestId,
+      grpcMethod       = 'LIFECYCLE',
+      target           = khaleesiSettings['METADATA']['POD_ID'],
+      owner            = user,
+      action           = action,
+      result           = result,
+      details          = details,
+      loggerSendMetric = True,
     )
 
-  def _log_shutdown(
+  def _logShutdown(
       self, *,
-      http_request_id: str,
-      grpc_request_id: str,
-      status         : StatusCode,
+      httpRequestId: str,
+      grpcRequestId: str,
+      status       : StatusCode,
   ) -> None :
     """Log shutdown of server."""
-    SINGLETON.structured_logger.log_system_grpc_response(
-      http_request_id = http_request_id,
-      grpc_request_id = grpc_request_id,
-      grpc_method     = 'LIFECYCLE',
-      status          = status,
+    SINGLETON.structuredLogger.logSystemGrpcResponse(
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = 'LIFECYCLE',
+      status        = status,
     )
-    SINGLETON.structured_logger.log_system_http_response(
-      http_request_id = http_request_id,
-      grpc_method     = 'LIFECYCLE',
-      status          = status,
+    SINGLETON.structuredLogger.logSystemHttpResponse(
+      httpRequestId = httpRequestId,
+      grpcMethod    = 'LIFECYCLE',
+      status        = status,
     )

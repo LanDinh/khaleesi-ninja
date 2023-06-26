@@ -15,27 +15,27 @@ from khaleesi.proto.core_pb2 import RequestMetadata
 class ServerInterceptor(Interceptor, GrpcServerInterceptor):
   """Server interceptor utility."""
 
-  khaleesi_intercept: Callable  # type: ignore[type-arg]
+  khaleesiIntercept: Callable  # type: ignore[type-arg]
 
   def intercept(
       self,
-      method: Callable[[Any, ServicerContext], Any],
+      method             : Callable[[Any, ServicerContext], Any],
       request_or_iterator: Any,
-      context: ServicerContext,
-      method_name: str,
+      context            : ServicerContext,
+      method_name        : str,
   ) -> Any :
     """Intercept the method call."""
-    if self.skip_interceptors(raw = method_name):
+    if self.skipInterceptors(raw = method_name):
       return method(request_or_iterator, context)
 
-    return self.khaleesi_intercept(
-      method      = method,
-      request     = request_or_iterator,
-      context     = context,
-      method_name = method_name,
+    return self.khaleesiIntercept(
+      method     = method,
+      request    = request_or_iterator,
+      context    = context,
+      methodName = method_name,
     )
 
-  def get_upstream_request(self, *, request: Any) -> RequestMetadata :
+  def getUpstreamRequest(self, *, request: Any) -> RequestMetadata :
     """Get the upstream request."""
     if hasattr(request, 'requestMetadata'):
       return cast(RequestMetadata, request.requestMetadata)

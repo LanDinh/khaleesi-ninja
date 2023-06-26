@@ -17,7 +17,7 @@ SECRET_KEY = 'development-keys-are-not-secret-change-before-production!'
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 TEST_DATABASE = {
   'ENGINE': 'django.db.backends.sqlite3',
-  'NAME': PROJECT_DIR / 'db.sqlite3',
+  'NAME'  : PROJECT_DIR / 'db.sqlite3',
 }
 TEST_DATABASE_TEST_SETTINGS: Dict[str, Any] = {
   'DEPENDENCIES': []

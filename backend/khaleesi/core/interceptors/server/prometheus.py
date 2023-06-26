@@ -17,35 +17,35 @@ from khaleesi.proto.core_pb2 import RequestMetadata
 class PrometheusServerInterceptor(ServerInterceptor):
   """Interceptor to collect prometheus metrics."""
 
-  def khaleesi_intercept(
+  def khaleesiIntercept(
       self, *,
-      method  : Callable[[Any, ServicerContext], Any],
-      request : Any,
-      context : ServicerContext,
-      **_     : Any,
+      method : Callable[[Any, ServicerContext], Any],
+      request: Any,
+      context: ServicerContext,
+      **_    : Any,
   ) -> Any :
     """Collect the prometheus metrics."""
-    request_metadata = RequestMetadata()
-    request_metadata.caller.grpcService = STATE.request.grpc_service
-    request_metadata.caller.grpcMethod  = STATE.request.grpc_method
+    requestMetadata = RequestMetadata()
+    requestMetadata.caller.grpcService = STATE.request.grpcService
+    requestMetadata.caller.grpcMethod  = STATE.request.grpcMethod
     if hasattr(request, 'requestMetadata'):
       peer: RequestMetadata = request.requestMetadata
-      request_metadata.user.id   = peer.user.id
-      request_metadata.user.type = peer.user.type
+      requestMetadata.user.id   = peer.user.id
+      requestMetadata.user.type = peer.user.type
     else:
       peer = RequestMetadata()
     try:
       response = method(request, context)
-      INCOMING_REQUESTS.inc(status = StatusCode.OK, request = request_metadata, peer = peer)
+      INCOMING_REQUESTS.inc(status = StatusCode.OK, request = requestMetadata, peer = peer)
       return response
     except KhaleesiException as exception:
-      INCOMING_REQUESTS.inc(status = exception.status, request = request_metadata, peer = peer)
+      INCOMING_REQUESTS.inc(status = exception.status, request = requestMetadata, peer = peer)
       raise
     except Exception:
-      INCOMING_REQUESTS.inc(status = StatusCode.UNKNOWN, request = request_metadata, peer = peer)
+      INCOMING_REQUESTS.inc(status = StatusCode.UNKNOWN, request = requestMetadata, peer = peer)
       raise
 
 
-def instantiate_prometheus_interceptor() -> PrometheusServerInterceptor :
+def instantiatePrometheusInterceptor() -> PrometheusServerInterceptor :
   """Instantiate the prometheus interceptor."""
   return PrometheusServerInterceptor()

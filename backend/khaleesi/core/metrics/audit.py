@@ -14,58 +14,58 @@ class AuditEventMetric(CounterMetric):
 
   def __init__(self) -> None :
     super().__init__(
-      metric_id         = Metric.KHALEESI_AUDIT_EVENT,
-      description       ='Audit event count.',
-      additional_labels = [
+      metricId         = Metric.KHALEESI_AUDIT_EVENT,
+      description      ='Audit event count.',
+      additionalLabels = [
           'user',
-          'grpc_service',
-          'grpc_method',
+          'grpcService',
+          'grpcMethod',
           'target',
-          'action_crud_type',
-          'action_custom_type',
+          'actionCrudType',
+          'actionCustomType',
           'result',
       ],
     )
 
   def inc(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""
-    super().inc(**self._get_arguments(event = event))
+    super().inc(**self._getArguments(event = event))
 
   def register(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""
-    super().register(**self._get_arguments(event = event))  # pragma: no cover
+    super().register(**self._getArguments(event = event))  # pragma: no cover
 
-  def get_value(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def getValue(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
     """Increment the metric."""
-    return super().get_value(**self._get_arguments(event = event))
+    return super().getValue(**self._getArguments(event = event))
 
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,
-      user               : 'User.UserType.V',
-      action_crud_type   : 'Event.Action.ActionType.V',
-      result             : 'Event.Action.ResultType.V',
-      **additional_labels: str,
+      user              : 'User.UserType.V',
+      actionCrudType    : 'Event.Action.ActionType.V',
+      result            : 'Event.Action.ResultType.V',
+      **additionalLabels: str,
   ) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return super().labels(
-      user             = User.UserType.Name(user).lower(),
-      action_crud_type = Event.Action.ActionType.Name(action_crud_type).lower(),
-      result           = Event.Action.ResultType.Name(result).lower(),
-      **additional_labels,
+      user           = User.UserType.Name(user).lower(),
+      actionCrudType = Event.Action.ActionType.Name(actionCrudType).lower(),
+      result         = Event.Action.ResultType.Name(result).lower(),
+      **additionalLabels,
     )
 
-  def _get_arguments(self, *, event: Event) -> Dict[str, Any] :
+  def _getArguments(self, *, event: Event) -> Dict[str, Any] :
     """Transform the event into arguments."""
     return {
-        'user'              : event.requestMetadata.user.type,
-        'khaleesi_gate'     : event.requestMetadata.caller.khaleesiGate,
-        'khaleesi_service'  : event.requestMetadata.caller.khaleesiService,
-        'grpc_service'      : event.requestMetadata.caller.grpcService,
-        'grpc_method'       : event.requestMetadata.caller.grpcMethod,
-        'target'            : event.target.type,
-        'action_crud_type'  : event.action.crudType,
-        'action_custom_type': event.action.customType,
-        'result'            : event.action.result,
+        'user'            : event.requestMetadata.user.type,
+        'khaleesiGate'    : event.requestMetadata.caller.khaleesiGate,
+        'khaleesiService' : event.requestMetadata.caller.khaleesiService,
+        'grpcService'     : event.requestMetadata.caller.grpcService,
+        'grpcMethod'      : event.requestMetadata.caller.grpcMethod,
+        'target'          : event.target.type,
+        'actionCrudType'  : event.action.crudType,
+        'actionCustomType': event.action.customType,
+        'result'          : event.action.result,
     }
 
 

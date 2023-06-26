@@ -2,7 +2,7 @@
 
 # khaleesi.ninja.
 from microservice.models.logs.abstract import Metadata as AbstractMetadata
-from microservice.models.logs.abstract_response import ResponseMetadata as AbstractResponseMetadata
+from microservice.models.logs.abstractResponse import ResponseMetadata as AbstractResponseMetadata
 
 
 class Metadata(AbstractMetadata):

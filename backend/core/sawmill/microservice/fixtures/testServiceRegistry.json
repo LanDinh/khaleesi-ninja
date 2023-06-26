@@ -1,0 +1,120 @@
+[
+  {
+    "model": "microservice.ServiceRegistryKhaleesiGate",
+    "pk": 1,
+    "fields": {
+      "name": "khaleesi-gate-1"
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryKhaleesiGate",
+    "pk": 2,
+    "fields": {
+      "name": "khaleesi-gate-2"
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryKhaleesiService",
+    "pk": 1,
+    "fields": {
+      "name": "khaleesi-service-1",
+      "khaleesiGate": 1
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryKhaleesiService",
+    "pk": 2,
+    "fields": {
+      "name": "khaleesi-service-2",
+      "khaleesiGate": 2
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryKhaleesiService",
+    "pk": 3,
+    "fields": {
+      "name": "khaleesi-service-3",
+      "khaleesiGate": 2
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcService",
+    "pk": 1,
+    "fields": {
+      "name": "grpc-service-1",
+      "khaleesiService": 1
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcService",
+    "pk": 2,
+    "fields": {
+      "name": "grpc-service-2",
+      "khaleesiService": 2
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcService",
+    "pk": 3,
+    "fields": {
+      "name": "grpc-service-3",
+      "khaleesiService": 3
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcService",
+    "pk": 4,
+    "fields": {
+      "name": "grpc-service-4",
+      "khaleesiService": 3
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcMethod",
+    "pk": 1,
+    "fields": {
+      "name": "grpc-method-1",
+      "grpcService": 1
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcMethod",
+    "pk": 2,
+    "fields": {
+      "name": "grpc-method-2",
+      "grpcService": 2
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcMethod",
+    "pk": 3,
+    "fields": {
+      "name": "grpc-method-3",
+      "grpcService": 3
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcMethod",
+    "pk": 4,
+    "fields": {
+      "name": "grpc-method-4",
+      "grpcService": 4
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcMethod",
+    "pk": 5,
+    "fields": {
+      "name": "grpc-method-5",
+      "grpcService": 4
+    }
+  },
+  {
+    "model": "microservice.ServiceRegistryGrpcCall",
+    "pk": 1,
+    "fields": {
+      "caller": 1,
+      "called": 2
+    }
+  }
+]

@@ -8,8 +8,8 @@ from typing import Any
 from django.core.management.base import BaseCommand as DjangoBaseCommand
 
 # khaleesi.ninja.
-from khaleesi.core.logging.query_logger import query_logger
-from khaleesi.core.logging.text_logger import STDOUT_WRITER, STDERR_WRITER
+from khaleesi.core.logging.queryLogger import queryLogger
+from khaleesi.core.logging.textLogger import STDOUT_WRITER, STDERR_WRITER
 
 
 class BaseCommand(DjangoBaseCommand, ABC):
@@ -23,9 +23,9 @@ class BaseCommand(DjangoBaseCommand, ABC):
 
   def handle(self, *args: Any, **options: Any) -> None :
     """Make sure that all management commands use the query logger."""
-    with query_logger():
-      self.khaleesi_handle(*args, **options)
+    with queryLogger():
+      self.khaleesiHandle(*args, **options)
 
   @abstractmethod
-  def khaleesi_handle(self, *args: Any, **options: Any) -> None :
+  def khaleesiHandle(self, *args: Any, **options: Any) -> None :
     """Handle the command."""

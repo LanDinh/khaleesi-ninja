@@ -11,7 +11,7 @@ from django.conf import settings
 from grpc import StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.logging.text_logger import LogLevel
+from khaleesi.core.logging.textLogger import LogLevel
 
 
 class KhaleesiException(Exception):
@@ -19,44 +19,44 @@ class KhaleesiException(Exception):
 
   def __init__(
       self, *,
-      status         : StatusCode,
-      gate           : str,
-      service        : str,
-      public_key     : str,
-      public_details : str,
-      private_message: str,
-      private_details: str,
-      loglevel       : LogLevel,
+      status        : StatusCode,
+      gate          : str,
+      service       : str,
+      publicKey     : str,
+      publicDetails : str,
+      privateMessage: str,
+      privateDetails: str,
+      loglevel      : LogLevel,
   ) -> None :
     """Initialize the exception."""
-    super().__init__(private_message)
-    self.status          = status
-    self.gate            = gate
-    self.service         = service
-    self.public_key      = public_key
-    self.public_details  = public_details
-    self.private_message = private_message
-    self.private_details = private_details
-    self.loglevel        = loglevel
+    super().__init__(privateMessage)
+    self.status         = status
+    self.gate           = gate
+    self.service        = service
+    self.publicKey      = publicKey
+    self.publicDetails  = publicDetails
+    self.privateMessage = privateMessage
+    self.privateDetails = privateDetails
+    self.loglevel       = loglevel
 
   @property
   def stacktrace(self) -> str :
     """Return the stacktrace of the exception."""
     return ''.join(format_exception(None, self, self.__traceback__))
 
-  def to_json(self) -> str :
+  def toJson(self) -> str :
     """Return a json string to encode this object."""
     result = {
-        'status'         : self.status.name,
-        'gate'           : self.gate,
-        'service'        : self.service,
-        'public_key'     : self.public_key,
-        'public_details' : self.public_details,
+        'status'        : self.status.name,
+        'gate'          : self.gate,
+        'service'       : self.service,
+        'publicKey'     : self.publicKey,
+        'publicDetails' : self.publicDetails,
     }
     if settings.DEBUG:
-      result['private_message'] = self.private_message
-      result['private_details'] = self.private_details
-      result['stacktrace']      = self.stacktrace
+      result['privateMessage'] = self.privateMessage
+      result['privateDetails'] = self.privateDetails
+      result['stacktrace']     = self.stacktrace
     return dumps(result)
 
 
@@ -65,23 +65,23 @@ class KhaleesiCoreException(KhaleesiException):
 
   def __init__(
       self, *,
-      status         : StatusCode,
-      public_key     : str,
-      public_details : str,
-      private_message: str,
-      private_details: str,
-      loglevel       : LogLevel,
+      status        : StatusCode,
+      publicKey     : str,
+      publicDetails : str,
+      privateMessage: str,
+      privateDetails: str,
+      loglevel      : LogLevel,
   ) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = status,
-      gate            = 'core',
-      service         = 'core',
-      public_key      = public_key,
-      public_details  = public_details,
-      private_message = private_message,
-      private_details = private_details,
-      loglevel        = loglevel,
+      status         = status,
+      gate           = 'core',
+      service        = 'core',
+      publicKey      = publicKey,
+      publicDetails  = publicDetails,
+      privateMessage = privateMessage,
+      privateDetails = privateDetails,
+      loglevel       = loglevel,
     )
 
 
@@ -90,33 +90,33 @@ class InvalidArgumentException(KhaleesiCoreException):
 
   def __init__(
       self, *,
-      public_details: str = '',
-      private_message: str,
-      private_details: str,
+      publicDetails : str = '',
+      privateMessage: str,
+      privateDetails: str,
   ) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = StatusCode.INVALID_ARGUMENT,
-      public_key      = 'core-invalid-argument',
-      public_details  = public_details,
-      private_message = private_message,
-      private_details = private_details,
-      loglevel        = LogLevel.WARNING,
+      status         = StatusCode.INVALID_ARGUMENT,
+      publicKey      = 'core-invalid-argument',
+      publicDetails  = publicDetails,
+      privateMessage = privateMessage,
+      privateDetails = privateDetails,
+      loglevel       = LogLevel.WARNING,
     )
 
 
 class InternalServerException(KhaleesiCoreException):
   """Internal server errors."""
 
-  def __init__(self, *, private_message: str, private_details: str, loglevel: LogLevel) -> None :
+  def __init__(self, *, privateMessage: str, privateDetails: str, loglevel: LogLevel) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = StatusCode.INTERNAL,
-      public_key      = 'core-internal-server-error',
-      public_details  = '',
-      private_message = private_message,
-      private_details = private_details,
-      loglevel        = loglevel,
+      status         = StatusCode.INTERNAL,
+      publicKey      = 'core-internal-server-error',
+      publicDetails  = '',
+      privateMessage = privateMessage,
+      privateDetails = privateDetails,
+      loglevel       = loglevel,
     )
 
 class MaskingInternalServerException(InternalServerException):
@@ -125,9 +125,9 @@ class MaskingInternalServerException(InternalServerException):
   def __init__(self, *, exception: Exception) -> None :
     """Initialize the exception."""
     super().__init__(
-      private_message = type(exception).__name__,
-      private_details = str(exception),
-      loglevel        = LogLevel.FATAL,
+      privateMessage = type(exception).__name__,
+      privateDetails = str(exception),
+      loglevel       = LogLevel.FATAL,
     )
     self.__traceback__ = exception.__traceback__
 
@@ -135,42 +135,42 @@ class MaskingInternalServerException(InternalServerException):
 class ProgrammingException(InternalServerException):
   """Programming errors."""
 
-  def __init__(self, *, private_message: str, private_details: str) -> None :
+  def __init__(self, *, privateMessage: str, privateDetails: str) -> None :
     """Initialize the exception."""
     super().__init__(
-      private_message = private_message,
-      private_details = private_details,
-      loglevel        = LogLevel.FATAL,
+      privateMessage = privateMessage,
+      privateDetails = privateDetails,
+      loglevel       = LogLevel.FATAL,
     )
 
 
 class UpstreamGrpcException(KhaleesiCoreException):
   """Error in upstream gRPC request."""
 
-  def __init__(self, *, status: StatusCode, private_details: str) -> None :
+  def __init__(self, *, status: StatusCode, privateDetails: str) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = status,
-      public_key      = 'core-upstream-grpc-error',
-      public_details  = '',
-      private_message = f'Upstream error {status} received.',
-      private_details = private_details,
-      loglevel        = LogLevel.ERROR
+      status         = status,
+      publicKey      = 'core-upstream-grpc-error',
+      publicDetails  = '',
+      privateMessage = f'Upstream error {status} received.',
+      privateDetails = privateDetails,
+      loglevel       = LogLevel.ERROR
     )
 
 
 class TimeoutException(KhaleesiCoreException):
   """Timeouts."""
 
-  def __init__(self, *, private_details: str) -> None :
+  def __init__(self, *, privateDetails: str) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = StatusCode.DEADLINE_EXCEEDED,
-      public_key      = 'core-timeout-error',
-      public_details  = '',
-      private_message = 'Timeout happened.',
-      private_details = private_details,
-      loglevel        = LogLevel.ERROR,
+      status         = StatusCode.DEADLINE_EXCEEDED,
+      publicKey      = 'core-timeout-error',
+      publicDetails  = '',
+      privateMessage = 'Timeout happened.',
+      privateDetails = privateDetails,
+      loglevel       = LogLevel.ERROR,
     )
 
 
@@ -183,17 +183,17 @@ class DbObjectNotFoundException(DbException):
 
   def __init__(
       self, *,
-      object_type: str,
+      objectType: str,
       loglevel   : LogLevel = LogLevel.WARNING,
   ) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = StatusCode.NOT_FOUND,
-      public_key      = 'core-db-object-not-found',
-      public_details  = object_type,
-      private_message = f'{object_type} not found in the DB.',
-      private_details = object_type,
-      loglevel        = loglevel,
+      status         = StatusCode.NOT_FOUND,
+      publicKey      = 'core-db-object-not-found',
+      publicDetails  = objectType,
+      privateMessage = f'{objectType} not found in the DB.',
+      privateDetails = objectType,
+      loglevel       = loglevel,
     )
 
 
@@ -202,15 +202,15 @@ class DbObjectTwinException(DbException):
 
   def __init__(
       self, *,
-      object_type: str,
-      object_id  : str,
+      objectType: str,
+      objectId  : str,
   ) -> None :
     """Initialize the exception."""
     super().__init__(
-      status          = StatusCode.FAILED_PRECONDITION,
-      public_key      = 'core-db-object-twin',
-      public_details  = object_type,
-      private_message = f'{object_type} found multiple times in the DB.',
-      private_details = f'object_type: {object_type}, object_id: {object_id}',
-      loglevel        = LogLevel.ERROR,
+      status         = StatusCode.FAILED_PRECONDITION,
+      publicKey      = 'core-db-object-twin',
+      publicDetails  = objectType,
+      privateMessage = f'{objectType} found multiple times in the DB.',
+      privateDetails = f'objectType: {objectType}, objectId: {objectId}',
+      loglevel       = LogLevel.ERROR,
     )

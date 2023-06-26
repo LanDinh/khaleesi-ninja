@@ -16,12 +16,12 @@ from prometheus_client.registry import REGISTRY
 from khaleesi.core.settings.definition import Metadata
 
 
-khaleesi_settings: Metadata = settings.KHALEESI_NINJA['METADATA']
-server_labels = {
-    'khaleesi_gate'    : khaleesi_settings['GATE'],
-    'khaleesi_service' : khaleesi_settings['SERVICE'],
-    'khaleesi_type'    : khaleesi_settings['TYPE'].name.lower(),
-    'khaleesi_version' : khaleesi_settings['VERSION'],
+khaleesiSettings: Metadata = settings.KHALEESI_NINJA['METADATA']
+serverLabels = {
+    'khaleesiGate'    : khaleesiSettings['GATE'],
+    'khaleesiService' : khaleesiSettings['SERVICE'],
+    'khaleesiType'    : khaleesiSettings['TYPE'].name.lower(),
+    'khaleesiVersion' : khaleesiSettings['VERSION'],
 }
 
 
@@ -42,21 +42,21 @@ class AbstractMetric:
 
   def __init__(
       self, *,
-      metric_id        : Metric,
-      description      : str,
-      metric_type      : Type[MetricWrapperBase],
-      additional_labels: List[str],
+      metricId        : Metric,
+      description     : str,
+      metricType      : Type[MetricWrapperBase],
+      additionalLabels: List[str],
   ) -> None :
     """Initialize the metric."""
-    self._metric = metric_type(
-      metric_id.name.lower(),
+    self._metric = metricType(
+      metricId.name.lower(),
       description,
-      list(server_labels.keys()) + additional_labels,
+      list(serverLabels.keys()) + additionalLabels,
       registry = REGISTRY,
     )
-    self._id = metric_id
+    self._id = metricId
 
-  def get_value(self, **kwargs: Any) -> int :
+  def getValue(self, **kwargs: Any) -> int :
     """Return the current value of the metric."""
     # noinspection PyProtectedMember
     return int(self._metric.labels(**self.labels(**kwargs))._value.get())  # type: ignore[attr-defined]  # pylint: disable=protected-access,line-too-long
@@ -64,12 +64,12 @@ class AbstractMetric:
   def labels(self, **kwargs: str) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return {
-        **server_labels,
+        **serverLabels,
         **{ key: value for key, value in kwargs.items() if not value.startswith('unknown') },
         **{ key: value.upper() for key, value in kwargs.items() if value.startswith('unknown') },
     }
 
-  def string_or_unknown(self, value: str) -> str :
+  def stringOrUnknown(self, value: str) -> str :
     """Either return the value, or UNKNOWN if empty."""
     if value:
       return value
@@ -80,18 +80,18 @@ class GaugeMetric(AbstractMetric):
 
   _metric: Gauge
 
-  def __init__(self, *, metric_id: Metric, description: str, additional_labels: List[str]) -> None :
+  def __init__(self, *, metricId: Metric, description: str, additionalLabels: List[str]) -> None :
     """Initialize the enum metric."""
     super().__init__(
-      metric_id         = metric_id,
-      description       = description,
-      metric_type       = Gauge,
-      additional_labels = additional_labels,
+      metricId         = metricId,
+      description      = description,
+      metricType       = Gauge,
+      additionalLabels = additionalLabels,
     )
 
-  def set(self, *, gauge_value: int, **kwargs: Any) -> None :
+  def set(self, *, gaugeValue: int, **kwargs: Any) -> None :
     """Set the metric to the given value."""
-    self._metric.labels(**self.labels(**kwargs)).set(gauge_value)
+    self._metric.labels(**self.labels(**kwargs)).set(gaugeValue)
 
 
 class CounterMetric(AbstractMetric):
@@ -99,13 +99,13 @@ class CounterMetric(AbstractMetric):
 
   _metric: Counter
 
-  def __init__(self, *, metric_id: Metric, description: str, additional_labels: List[str]) -> None :
+  def __init__(self, *, metricId: Metric, description: str, additionalLabels: List[str]) -> None :
     """Initialize the enum metric."""
     super().__init__(
-      metric_id         = metric_id,
-      description       = description,
-      metric_type       = Counter,
-      additional_labels = additional_labels,
+      metricId         = metricId,
+      description      = description,
+      metricType       = Counter,
+      additionalLabels = additionalLabels,
     )
 
   def inc(self, **kwargs: Any) -> None :
@@ -121,24 +121,24 @@ EnumType = TypeVar('EnumType', bound = Enum)  # pylint: disable=invalid-name
 class EnumMetric(Generic[EnumType], GaugeMetric):
   """Metric representing enum data."""
 
-  def __init__(self, *, metric_id: Metric, description: str) -> None :
+  def __init__(self, *, metricId: Metric, description: str) -> None :
     """Initialize the enum metric."""
     super().__init__(
-      metric_id         = metric_id,
-      description       = description,
-      additional_labels = [ metric_id.name.lower() ],
+      metricId         = metricId,
+      description      = description,
+      additionalLabels = [ metricId.name.lower() ],
     )
 
   # noinspection PyMethodOverriding
   def set(self, *, value: EnumType) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ
     """Set the metric to the given value."""
     for enum in type(value):
-      super().set(gauge_value = 0, value = enum)
-    super().set(gauge_value = 1, value = value)
+      super().set(gaugeValue = 0, value = enum)
+    super().set(gaugeValue = 1, value = value)
 
-  def get_value(self, *, value: EnumType) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
+  def getValue(self, *, value: EnumType) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
     """Return the current value of the metric."""
-    return super().get_value(value = value)
+    return super().getValue(value = value)
 
   def labels(self, *, value: EnumType) -> Dict[str, str] :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ
     """Shortcut to get all labels."""

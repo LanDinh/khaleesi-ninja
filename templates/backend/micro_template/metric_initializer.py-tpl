@@ -9,4 +9,4 @@ class MetricInitializer(BaseMetricInitializer):
 
   def initialize_metrics(self) -> None :
     """Initialize the metrics."""
-    super().initialize_metrics_with_data(events = [])
+    super().initializeMetricsWithData(events = [])

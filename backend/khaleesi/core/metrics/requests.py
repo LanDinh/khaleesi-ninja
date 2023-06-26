@@ -15,19 +15,19 @@ from khaleesi.proto.core_pb2 import User, RequestMetadata
 class RequestsMetric(CounterMetric):
   """Request metric."""
 
-  def __init__(self, *, metric_id: Metric) -> None :
+  def __init__(self, *, metricId: Metric) -> None :
     super().__init__(
-      metric_id         = metric_id,
-      description       ='Request count.',
-      additional_labels = [
+      metricId         = metricId,
+      description      ='Request count.',
+      additionalLabels = [
           'status',
           'user',
-          'grpc_service',
-          'grpc_method',
-          'peer_khaleesi_gate',
-          'peer_khaleesi_service',
-          'peer_grpc_service',
-          'peer_grpc_method',
+          'grpcService',
+          'grpcMethod',
+          'peerKhaleesiGate',
+          'peerKhaleesiService',
+          'peerGrpcService',
+          'peerGrpcMethod',
       ],
     )
 
@@ -38,7 +38,7 @@ class RequestsMetric(CounterMetric):
       status : StatusCode,
   ) -> None :
     """Increment the metric."""
-    super().inc(status = status, **self._get_arguments(request = request, peer = peer))
+    super().inc(status = status, **self._getArguments(request = request, peer = peer))
 
   def register(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
@@ -47,47 +47,47 @@ class RequestsMetric(CounterMetric):
       status : StatusCode,
   ) -> None :
     """Increment the metric."""
-    super().register(status = status, **self._get_arguments(request = request, peer = peer))  # pragma: no cover  # pylint: disable=line-too-long
+    super().register(status = status, **self._getArguments(request = request, peer = peer))  # pragma: no cover  # pylint: disable=line-too-long
 
-  def get_value(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def getValue(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
       self, *,
       request: RequestMetadata,
       peer   : RequestMetadata,
       status : StatusCode,
   ) -> int :
     """Increment the metric."""
-    return super().get_value(status = status, **self._get_arguments(request = request, peer = peer))
+    return super().getValue(status = status, **self._getArguments(request = request, peer = peer))
 
   def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
       self, *,
-      status             : StatusCode,
-      user               : 'User.UserType.V',
-      **additional_labels: str,
+      status            : StatusCode,
+      user              : 'User.UserType.V',
+      **additionalLabels: str,
   ) -> Dict[str, str] :
     """Shortcut to get all labels."""
     return super().labels(
-      status = self._map_grpc_status(status = status),
+      status = self._mapGrpcStatus(status = status),
       user   = User.UserType.Name(user).lower(),
-      **additional_labels,
+      **additionalLabels,
     )
 
-  def _get_arguments(
+  def _getArguments(
       self, *,
       request: RequestMetadata,
       peer   : RequestMetadata,
   ) -> Dict[str, Any] :
     """Transform the request metadata into arguments."""
     return {
-        'user': request.user.type,
-        'grpc_service': self.string_or_unknown(request.caller.grpcService),
-        'grpc_method' : self.string_or_unknown(request.caller.grpcMethod),
-        'peer_khaleesi_gate'   : self.string_or_unknown(peer.caller.khaleesiGate),
-        'peer_khaleesi_service': self.string_or_unknown(peer.caller.khaleesiService),
-        'peer_grpc_service'    : self.string_or_unknown(peer.caller.grpcService),
-        'peer_grpc_method'     : self.string_or_unknown(peer.caller.grpcMethod),
+        'user'               : request.user.type,
+        'grpcService'        : self.stringOrUnknown(request.caller.grpcService),
+        'grpcMethod'         : self.stringOrUnknown(request.caller.grpcMethod),
+        'peerKhaleesiGate'   : self.stringOrUnknown(peer.caller.khaleesiGate),
+        'peerKhaleesiService': self.stringOrUnknown(peer.caller.khaleesiService),
+        'peerGrpcService'    : self.stringOrUnknown(peer.caller.grpcService),
+        'peerGrpcMethod'     : self.stringOrUnknown(peer.caller.grpcMethod),
     }
 
-  def _map_grpc_status(self, *, status: StatusCode) -> str :
+  def _mapGrpcStatus(self, *, status: StatusCode) -> str :
     """Group status codes."""
     if status == StatusCode.OK:
       return 'ok'
@@ -118,10 +118,10 @@ class RequestsMetric(CounterMetric):
       return 'unknown'
 
     raise ProgrammingException(
-      private_message = 'Unknown gRPC status returned',
-      private_details = str(status),
+      privateMessage = 'Unknown gRPC status returned',
+      privateDetails = str(status),
     )
 
 
-OUTGOING_REQUESTS = RequestsMetric(metric_id = Metric.KHALEESI_OUTGOING_REQUESTS)
-INCOMING_REQUESTS = RequestsMetric(metric_id = Metric.KHALEESI_INCOMING_REQUESTS)
+OUTGOING_REQUESTS = RequestsMetric(metricId = Metric.KHALEESI_OUTGOING_REQUESTS)
+INCOMING_REQUESTS = RequestsMetric(metricId = Metric.KHALEESI_INCOMING_REQUESTS)

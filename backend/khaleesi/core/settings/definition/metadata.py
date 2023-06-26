@@ -8,7 +8,7 @@ from typing import TypedDict
 class ServiceType(Enum):
   """Types of khaleesi.ninja services."""
 
-  MICRO    = 1
+  MICRO = 1
 
 class Metadata(TypedDict):
   """Metadata for khaleesi.ninja services."""

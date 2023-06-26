@@ -12,9 +12,9 @@ class TestDatabaseRouter(DatabaseRouter):
 
   def allow_migrate(
       self,
-      db: str,
-      _app_label: str,
+      db         : str,
+      _app_label : str,
       _model_name: Optional[str] = None,
-      **_: Any
+      **_        : Any
   ) -> bool :
     return 'write' == db

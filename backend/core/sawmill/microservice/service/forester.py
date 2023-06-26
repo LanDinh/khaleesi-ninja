@@ -4,14 +4,14 @@
 import grpc
 
 # khaleesi-ninja.
-from khaleesi.core.logging.text_logger import LOGGER
-from khaleesi.core.shared.service_configuration import ServiceConfiguration
+from khaleesi.core.logging.textLogger import LOGGER
+from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
 from khaleesi.proto.core_sawmill_pb2 import DESCRIPTOR, EmptyRequest, ServiceCallData
 from khaleesi.proto.core_sawmill_pb2_grpc import (
   ForesterServicer as Servicer,
-  add_ForesterServicer_to_server as add_to_server
+  add_ForesterServicer_to_server as addToServer
 )
-from microservice.models.service_registry import SERVICE_REGISTRY
+from microservice.models.serviceRegistry import SERVICE_REGISTRY
 
 
 class Service(Servicer):
@@ -23,11 +23,11 @@ class Service(Servicer):
     LOGGER.info(
       f'Getting service registry call data for {owner.khaleesiGate}-{owner.khaleesiService}.',
     )
-    return SERVICE_REGISTRY.get_call_data(owner = owner)
+    return SERVICE_REGISTRY.getCallData(owner = owner)
 
 
-service_configuration = ServiceConfiguration[Service](
-  name = DESCRIPTOR.services_by_name['Forester'].full_name,
-  add_service_to_server = add_to_server,
-  service = Service()
+serviceConfiguration = ServiceConfiguration[Service](
+  name               = DESCRIPTOR.services_by_name['Forester'].full_name,
+  addServiceToServer = addToServer,
+  service            = Service()
 )

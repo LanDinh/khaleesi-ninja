@@ -22,131 +22,130 @@ from khaleesi.core.shared.singleton import SINGLETON
 from khaleesi.management.commands._base import BaseCommand
 
 
-khaleesi_settings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
+khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
 class Command(BaseCommand, DjangoMigrateCommand):
   """Command to start the gRPC server."""
 
   help = 'Starts the gRPC server.'
-  server_start_http_request_id: str
-  server                      : Server
+  serverStartHttpRequestId: str
+  server                  : Server
 
-  def khaleesi_handle(self, *args: Any, **options: Any) -> None :
+  def khaleesiHandle(self, *args: Any, **options: Any) -> None :
     """Start the gRPC server."""
     # Starting server start.
-    self.server_start_http_request_id = str(uuid4())
+    self.serverStartHttpRequestId = str(uuid4())
     try:
-      if khaleesi_settings['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['REQUIRED']:
-        options_copy = options.copy()
-        options_copy['database']  = 'migrate'
-        options_copy['app_label'] = 'microservice'
-        options_copy['migration_name'] = \
-          khaleesi_settings['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['MIGRATION']
-        DjangoMigrateCommand.handle(self, *args, **options_copy)
+      if khaleesiSettings['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['REQUIRED']:
+        optionsCopy = options.copy()
+        optionsCopy['database']  = 'migrate'
+        optionsCopy['app_label'] = 'microservice'
+        optionsCopy['migration_name'] = \
+          khaleesiSettings['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['MIGRATION']
+        DjangoMigrateCommand.handle(self, *args, **optionsCopy)
 
-      SINGLETON.structured_logger.log_system_http_request(
-        http_request_id = self.server_start_http_request_id,
-        grpc_method     = 'LIFECYCLE',
+      SINGLETON.structuredLogger.logSystemHttpRequest(
+        httpRequestId = self.serverStartHttpRequestId,
+        grpcMethod    = 'LIFECYCLE',
       )
 
-      self._log_system_request(**options, method = self._migrate   , grpc_method = 'MIGRATE')
-      self._log_system_request(**options, method = self._initialize, grpc_method = 'INITIALIZE')
-      self._log_system_request(**options, method = self._start     , grpc_method = 'LIFECYCLE')
+      self._logSystemRequest(**options, method = self._migrate   , grpcMethod = 'MIGRATE')
+      self._logSystemRequest(**options, method = self._initialize, grpcMethod = 'INITIALIZE')
+      self._logSystemRequest(**options, method = self._start     , grpcMethod = 'LIFECYCLE')
 
-      SINGLETON.structured_logger.log_system_http_response(
-        http_request_id = self.server_start_http_request_id,
-        grpc_method     = 'LIFECYCLE',
-        status          = StatusCode.OK,
+      SINGLETON.structuredLogger.logSystemHttpResponse(
+        httpRequestId = self.serverStartHttpRequestId,
+        grpcMethod    = 'LIFECYCLE',
+        status        = StatusCode.OK,
       )
 
-      self.server.wait_for_termination()
+      self.server.waitForTermination()
     except KhaleesiException as exception:
-      SINGLETON.structured_logger.log_system_http_response(
-        http_request_id = self.server_start_http_request_id,
-        grpc_method     = 'LIFECYCLE',
-        status          = exception.status,
+      SINGLETON.structuredLogger.logSystemHttpResponse(
+        httpRequestId = self.serverStartHttpRequestId,
+        grpcMethod    = 'LIFECYCLE',
+        status        = exception.status,
       )
       raise
     except Exception:
-      SINGLETON.structured_logger.log_system_http_response(
-        http_request_id = self.server_start_http_request_id,
-        grpc_method     = 'LIFECYCLE',
-        status          = StatusCode.INTERNAL,
+      SINGLETON.structuredLogger.logSystemHttpResponse(
+        httpRequestId = self.serverStartHttpRequestId,
+        grpcMethod    = 'LIFECYCLE',
+        status        = StatusCode.INTERNAL,
       )
       raise
 
   # noinspection PyUnusedLocal
-  def _migrate(self, grpc_request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument
+  def _migrate(self, grpcRequestId: str, **options: Any) -> None :  # pylint: disable=unused-argument
     """Perform migration."""
-    options_copy = options.copy()
-    options_copy['database']  = 'migrate'
-    options_copy['app_label'] = 'microservice'
-    DjangoMigrateCommand.handle(self, **options_copy)
-    options_copy['app_label'] = 'khaleesi'
-    DjangoMigrateCommand.handle(self, **options_copy)
+    optionsCopy = options.copy()
+    optionsCopy['database']  = 'migrate'
+    optionsCopy['app_label'] = 'microservice'
+    DjangoMigrateCommand.handle(self, **optionsCopy)
+    optionsCopy['app_label'] = 'khaleesi'
+    DjangoMigrateCommand.handle(self, **optionsCopy)
 
   # noinspection PyUnusedLocal
-  def _initialize(self, grpc_request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument
+  def _initialize(self, grpcRequestId: str, **options: Any) -> None :  # pylint: disable=unused-argument
     """Initialize the server."""
     self.server = Server(
-      start_http_request_id      = self.server_start_http_request_id,
-      initialize_grpc_request_id = grpc_request_id,
+      startHttpRequestId      = self.serverStartHttpRequestId,
+      initializeGrpcRequestId = grpcRequestId,
     )
 
   # noinspection PyUnusedLocal
-  def _start(self, grpc_request_id: str, **options: Any) -> None :  # pylint: disable=unused-argument
+  def _start(self, grpcRequestId: str, **options: Any) -> None :  # pylint: disable=unused-argument
     """Start the server."""
-    start_http_server(int(khaleesi_settings['MONITORING']['PORT']))
-    self.server.start(start_grpc_request_id = grpc_request_id)
+    start_http_server(int(khaleesiSettings['MONITORING']['PORT']))
+    self.server.start(startGrpcRequestId = grpcRequestId)
 
-  def _log_system_request(self, *, method: Callable, grpc_method: str, **options: Any) -> None :  # type: ignore[type-arg]  # pylint: disable=line-too-long
+  def _logSystemRequest(self, *, method: Callable, grpcMethod: str, **options: Any) -> None :  # type: ignore[type-arg]  # pylint: disable=line-too-long
     """Log the passed method as system request."""
-    grpc_request_id = str(uuid4())
-    SINGLETON.structured_logger.log_system_grpc_request(
-      http_request_id = self.server_start_http_request_id,
-      grpc_request_id = grpc_request_id,
-      grpc_method     = grpc_method,
+    grpcRequestId = str(uuid4())
+    SINGLETON.structuredLogger.logSystemGrpcRequest(
+      httpRequestId = self.serverStartHttpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = grpcMethod,
     )
     try:
-      method(grpc_request_id = grpc_request_id, **options)
-      SINGLETON.structured_logger.log_system_grpc_response(
-        http_request_id = self.server_start_http_request_id,
-        grpc_request_id = grpc_request_id,
-        grpc_method     = grpc_method,
-        status          = StatusCode.OK,
+      method(grpcRequestId = grpcRequestId, **options)
+      SINGLETON.structuredLogger.logSystemGrpcResponse(
+        httpRequestId = self.serverStartHttpRequestId,
+        grpcRequestId = grpcRequestId,
+        grpcMethod    = grpcMethod,
+        status        = StatusCode.OK,
       )
     except KhaleesiException as exception:
-      self._log_exception(
-        exception       = exception,
-        grpc_request_id = grpc_request_id,
-        grpc_method     = grpc_method,
+      self._logException(
+        exception     = exception,
+        grpcRequestId = grpcRequestId,
+        grpcMethod    = grpcMethod,
       )
       raise
     except Exception as exception:
-      khaleesi_exception = MaskingInternalServerException(exception = exception)
-      self._log_exception(
-        exception       = khaleesi_exception,
-        grpc_request_id = grpc_request_id,
-        grpc_method     = grpc_method,
+      khaleesiException = MaskingInternalServerException(exception = exception)
+      self._logException(
+        exception     = khaleesiException,
+        grpcRequestId = grpcRequestId,
+        grpcMethod    = grpcMethod,
       )
-      raise khaleesi_exception from exception
+      raise khaleesiException from exception
 
-  def _log_exception(
-      self, *,
-      exception      : KhaleesiException,
-      grpc_request_id: str,
-      grpc_method    : str,
+  def _logException(self, *,
+      exception    : KhaleesiException,
+      grpcRequestId: str,
+      grpcMethod   : str,
   ) -> None :
-    SINGLETON.structured_logger.log_system_error(
-      exception       = exception,
-      http_request_id = self.server_start_http_request_id,
-      grpc_request_id = grpc_request_id,
-      grpc_method     = grpc_method,
+    SINGLETON.structuredLogger.logSystemError(
+      exception     = exception,
+      httpRequestId = self.serverStartHttpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = grpcMethod,
     )
-    SINGLETON.structured_logger.log_system_grpc_response(
-      http_request_id = self.server_start_http_request_id,
-      grpc_request_id = grpc_request_id,
-      grpc_method     = grpc_method,
-      status          = exception.status,
+    SINGLETON.structuredLogger.logSystemGrpcResponse(
+      httpRequestId = self.serverStartHttpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = grpcMethod,
+      status        = exception.status,
     )

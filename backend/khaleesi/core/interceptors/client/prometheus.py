@@ -16,27 +16,27 @@ from khaleesi.proto.core_pb2 import RequestMetadata
 class PrometheusClientInterceptor(ClientInterceptor):
   """Interceptor to collect prometheus metrics."""
 
-  def khaleesi_intercept(
+  def khaleesiIntercept(
       self, *,
-      method             : Callable[[Any, ClientCallDetails], Any],
-      request_or_iterator: Any,
-      call_details       : ClientCallDetails,
-      khaleesi_gate      : str,
-      khaleesi_service   : str,
-      grpc_service       : str,
-      grpc_method        : str,
+      method           : Callable[[Any, ClientCallDetails], Any],
+      requestOrIterator: Any,
+      callDetails      : ClientCallDetails,
+      khaleesiGate     : str,
+      khaleesiService  : str,
+      grpcService      : str,
+      grpcMethod       : str,
   ) -> Any :
     """Collect the prometheus metrics."""
     peer = RequestMetadata()
-    peer.caller.khaleesiGate    = khaleesi_gate
-    peer.caller.khaleesiService = khaleesi_service
-    peer.caller.grpcService     = grpc_service
-    peer.caller.grpcMethod      = grpc_method
-    if hasattr(request_or_iterator, 'requestMetadata'):
-      request_metadata: RequestMetadata = request_or_iterator.requestMetadata
+    peer.caller.khaleesiGate    = khaleesiGate
+    peer.caller.khaleesiService = khaleesiService
+    peer.caller.grpcService     = grpcService
+    peer.caller.grpcMethod      = grpcMethod
+    if hasattr(requestOrIterator, 'requestMetadata'):
+      requestMetadata: RequestMetadata = requestOrIterator.requestMetadata
     else:
-      request_metadata = RequestMetadata()
-    response: Call = method(request_or_iterator, call_details)
-    OUTGOING_REQUESTS.inc(status = response.code(), request = request_metadata, peer = peer)
+      requestMetadata = RequestMetadata()
+    response: Call = method(requestOrIterator, callDetails)
+    OUTGOING_REQUESTS.inc(status = response.code(), request = requestMetadata, peer = peer)
 
     return response

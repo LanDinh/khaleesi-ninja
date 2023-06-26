@@ -9,9 +9,9 @@ from . import definition as definition  # pylint: disable=useless-import-alias
 
 
 # Base definition.
-DEBUG = 'KHALEESI_DEBUG' in environ
+DEBUG     = 'KHALEESI_DEBUG' in environ
 TIME_ZONE = 'UTC'
-USE_TZ = True
+USE_TZ    = True
 
 
 # Installed apps.
@@ -36,7 +36,7 @@ LOGGING = {
     'formatters': {
         'khaleesi': {
             'format':
-              '| {levelname: >8} | {asctime} | {thread:d} | {request_id: <36} | {message}',
+              '| {levelname: >8} | {asctime} | {thread:d} | {grpcRequestId: <36} | {message}',
             'style': '{',
         },
     },
@@ -73,8 +73,8 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     POD_ID  = environ['HOSTNAME'],
   ),
   GRPC = definition.Grpc(
-    PORT     = cast(int, environ.get('PORT', 8000)),
-    THREADS  = cast(int, environ.get('THREADS', 10)),
+    PORT                = cast(int, environ.get('PORT', 8000)),
+    THREADS             = cast(int, environ.get('THREADS', 10)),
     SHUTDOWN_GRACE_SECS = 30,
     SERVER_METHOD_NAMES = definition.GrpcServerMethodNames(
       SERVICE_NAME = 'grpc-server',
@@ -98,10 +98,10 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     ),
     INTERCEPTORS = definition.GrpcInterceptors(
       STRUCTURED_LOGGER = definition.GrpcServerInterceptor(
-        NAME = 'khaleesi.core.logging.structured_logger.StructuredGrpcLogger',
+        NAME = 'khaleesi.core.logging.structuredLogger.StructuredGrpcLogger',
       ),
       REQUEST_STATE = definition.GrpcServerInterceptor(
-        NAME = 'khaleesi.core.interceptors.server.request_state.RequestStateServerInterceptor',
+        NAME = 'khaleesi.core.interceptors.server.requestState.RequestStateServerInterceptor',
       ),
     ),
     HANDLERS = [ 'khaleesi.core.service.maid' ],

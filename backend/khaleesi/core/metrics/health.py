@@ -20,7 +20,7 @@ class HealthMetric(EnumMetric[HealthMetricType]):
   """Health metric."""
 
   def __init__(self) -> None :
-    super().__init__(metric_id= Metric.KHALEESI_HEALTH, description ='Health state.')
+    super().__init__(metricId = Metric.KHALEESI_HEALTH, description = 'Health state.')
     self.set(value = HealthMetricType.HEALTHY)
 
 
