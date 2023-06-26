@@ -22,6 +22,7 @@ class RecipeClientMock {
   }
   async getRecipes(): Promise<Recipe.AsObject[]> {
 
+    // noinspection JSUnusedLocalSymbols
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(this.recipes)
@@ -40,6 +41,7 @@ class RecipeClientMock {
 
     for (let recipe of this.recipes) {
       if (recipe.recipeId === id) {
+        // noinspection JSUnusedLocalSymbols
         return new Promise((resolve, reject) => {
           setTimeout(() => {
             resolve(recipe)
@@ -62,6 +64,7 @@ class RecipeClientMock {
     newRecipe.setDescription(description)
     this.recipes.push(newRecipe.toObject())
 
+    // noinspection JSUnusedLocalSymbols
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(newRecipe.toObject())

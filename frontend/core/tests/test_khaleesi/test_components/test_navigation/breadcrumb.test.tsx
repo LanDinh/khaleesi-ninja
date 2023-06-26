@@ -1,9 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import type {
-  NavigationElementProperties,
-} from '../../../../app/khaleesi/components/navigation/navigationElement'
 import { NavigationElement } from '../../../../app/khaleesi/components/navigation/navigationElement'
 import { breadcrumb, BreadCrumbs } from '../../../../app/khaleesi/components/navigation/breadcrumb'
 
@@ -23,7 +20,7 @@ test('BreadCrumbs render without errors.', () => {
     params  : {},
     data    : null,
     handle  : {
-      breadcrumb: (element: NavigationElementProperties): JSX.Element => <div>TEST</div>
+      breadcrumb: (): JSX.Element => <div>TEST</div>
     }
   }
   jest.spyOn(router, 'useMatches').mockReturnValue([match])
@@ -42,14 +39,8 @@ test('Providing breadcrumb data works as expected.', () => {
     label: 'TEST',
     icon: <div>Icon</div>,
   }
-  const match = {
-    id: 'test',
-    pathname: '',
-    params  : {},
-    data    : null
-  }
   // Execute test.
-  render(breadcrumb(navigationElementProperties).breadcrumb(match))
+  render(breadcrumb(navigationElementProperties).breadcrumb())
   // Assert result.
   expect(mockNavigationElement).toHaveBeenCalled()
 })

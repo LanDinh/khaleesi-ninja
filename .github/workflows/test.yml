@@ -186,7 +186,7 @@ jobs:
         uses: ./.github/actions/load-all-images
         with:
           services: ${{ needs.matrix.outputs.deploy-services }}
-          container_mode: ${{ matrix.environment.container_mode }}
+          containerMode: ${{ matrix.environment.container_mode }}
       - name: Wait for the environment to be ready
         run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m
       - name: Spin up the environment

@@ -9,13 +9,13 @@ export type RouteMatch = {
   pathname: string
   params  : Params<string>
   data    : any
-  handle? : { breadcrumb?: (match: RouteMatch) => JSX.Element }
+  handle? : { breadcrumb?: () => JSX.Element }
 }
 export function breadcrumb(
   element: NavigationElementProperties,
-): { breadcrumb: (match: RouteMatch) => JSX.Element } {
+): { breadcrumb: () => JSX.Element } {
   return {
-    breadcrumb: (match): JSX.Element => <NavigationElement element={element} />,
+    breadcrumb: (): JSX.Element => <NavigationElement element={element} />,
   }
 }
 

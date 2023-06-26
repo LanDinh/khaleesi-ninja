@@ -1,31 +1,31 @@
 {{- if .Values.grpcui.enabled }}
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: "networking.k8s.io/v1"
+kind: "Ingress"
 metadata:
-  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
   labels:
-    khaleesi-ninja: service
-    gate: {{ .Values.gate.name }}
-    name: {{ .Values.service.name }}
-    type: grpcui
+    khaleesi-ninja: "service"
+    gate: "{{ .Values.gate.name }}"
+    name: "{{ .Values.service.name }}"
+    type: "grpcui"
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
 spec:
-  ingressClassName: ingress-class-{{ .Values.environment.name }}
+  ingressClassName: "ingress-class-{{ .Values.environment.name }}"
   tls:
-    - secretName: tls-certificate
+    - secretName: "tls-certificate"
       hosts:
-      - admin.{{ .Values.environment.domain }}
+      - "admin.{{ .Values.environment.domain }}"
   rules:
-    - host: admin.{{ .Values.environment.domain }}
+    - host: "admin.{{ .Values.environment.domain }}"
       http:
         paths:
-          - path: /grpcui/{{ .Values.gate.name }}/{{ .Values.service.name }}/(.*)
-            pathType: Prefix
+          - path: "/grpcui/{{ .Values.gate.name }}/{{ .Values.service.name }}/(.*)"
+            pathType: "Prefix"
             backend:
               service:
-                name: {{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui
+                name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-grpcui"
                 port:
-                  name: grpcui
+                  name: "grpcui"
 {{- end }}

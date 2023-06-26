@@ -1,13 +1,13 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: "v1"
+kind: "ConfigMap"
 metadata:
-  name: {{ .Values.gate.name }}-kubegres
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  name: "{{ .Values.gate.name }}-kubegres"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
   labels:
-    khaleesi-ninja: service
-    infrastructure: kubegres
-    gate: {{ .Values.gate.name }}
+    khaleesi-ninja: "service"
+    infrastructure: "kubegres"
+    gate: "{{ .Values.gate.name }}"
 data:
   host: "{{ .Values.gate.name }}-kubegres"
   port: "{{ .Values.kubegres.port }}"
-  superUser: postgres
+  superUser: "postgres"

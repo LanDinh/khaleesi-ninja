@@ -1,30 +1,30 @@
 commonLabels:
-  khaleesi-ninja: monitoring
-  infrastructure: kube-prometheus-stack
+  khaleesi-ninja: "monitoring"
+  infrastructure: "kube-prometheus-stack"
 
 grafana:
   service:
     port: 3000
   sidecar:
     datasources:
-      label: grafana_datasource
+      label: "grafana_datasource"
     dashboards:
-      label: grafana_dashboard
-      folderAnnotation: khaleesi_folder
+      label: "grafana_dashboard"
+      folderAnnotation: "khaleesi_folder"
       provider:
-        name: kubernetes
+        name: "kubernetes"
         disableDelete: true
         foldersFromFilesStructure: true
       annotations:
-        khaleesi_folder: kubernetes
+        khaleesi_folder: "kubernetes"
   grafana.ini:
     server:
-      root_url: https://localhost/grafana
+      root_url: "https://localhost/grafana"
       serve_from_sub_path: true
     auth.anonymous:
       enabled: true
-      org_name: Main Org.
-      org_role: Viewer
+      org_name: "Main Org."
+      org_role: "Viewer"
 
 prometheus-node-exporter:
   hostRootFsMount:

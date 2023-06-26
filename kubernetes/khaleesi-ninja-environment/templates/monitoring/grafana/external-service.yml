@@ -1,13 +1,13 @@
-kind: Service
-apiVersion: v1
+kind: "Service"
+apiVersion: "v1"
 metadata:
-  name: grafana
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  name: "grafana"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
 spec:
-  type: ExternalName
-  externalName: kube-prometheus-grafana.khaleesi-monitoring.svc.cluster.local
+  type: "ExternalName"
+  externalName: "kube-prometheus-grafana.khaleesi-monitoring.svc.cluster.local"
   ports:
-    - name: webui
-      protocol: TCP
+    - name: "webui"
+      protocol: "TCP"
       port: 8000
       targetPort: 3000

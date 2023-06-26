@@ -1,18 +1,18 @@
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+apiVersion: "monitoring.coreos.com/v1"
+kind: "ServiceMonitor"
 metadata:
-  name: prometheus
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}-monitoring
+  name: "prometheus"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}-monitoring"
   labels:
-    khaleesi-ninja: monitoring
-    environment: {{ .Values.environment.name }}
-    infrastructure: prometheus
-    monitoring: khaleesi-ninja-{{ .Values.environment.name }}
+    khaleesi-ninja: "monitoring"
+    environment: "{{ .Values.environment.name }}"
+    infrastructure: "prometheus"
+    monitoring: "khaleesi-ninja-{{ .Values.environment.name }}"
 spec:
   endpoints:
-    - port: metrics
+    - port: "metrics"
   selector:
     matchLabels:
-      khaleesi-ninja: monitoring
-      environment: {{ .Values.environment.name }}
-      infrastructure: prometheus
+      khaleesi-ninja: "monitoring"
+      environment: "{{ .Values.environment.name }}"
+      infrastructure: "prometheus"

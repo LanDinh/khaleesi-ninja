@@ -4,7 +4,7 @@ inputs:
   services:
     description: JSON object containing all services.
     required: true
-  container_mode:
+  containerMode:
     description: Container mode.
     required: true
   commit:

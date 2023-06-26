@@ -40,6 +40,7 @@ jest.mock(
 
 test('Navigation menu renders without errors.', () => {
   // Prepare data.
+  // noinspection JSUnusedLocalSymbols
   const match = {
     id: 'test',
     pathname: '/alpha',

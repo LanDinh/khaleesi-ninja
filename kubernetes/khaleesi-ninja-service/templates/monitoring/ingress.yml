@@ -1,31 +1,31 @@
 {{- if and .Values.ingress.enabled .Values.probe.http.enabled }}
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: "networking.k8s.io/v1"
+kind: "Ingress"
 metadata:
-  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-monitoring
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-monitoring"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
   labels:
-    khaleesi-ninja: service
-    gate: {{ .Values.gate.name }}
-    name: {{ .Values.service.name }}
-    type: {{ .Values.type.name }}
+    khaleesi-ninja: "service"
+    gate: "{{ .Values.gate.name }}"
+    name: "{{ .Values.service.name }}"
+    type: "{{ .Values.type.name }}"
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /404
+    nginx.ingress.kubernetes.io/rewrite-target: "/404"
 spec:
-  ingressClassName: ingress-class-{{ .Values.environment.name }}
+  ingressClassName: "ingress-class-{{ .Values.environment.name }}"
   tls:
-    - secretName: tls-certificate
+    - secretName: "tls-certificate"
       hosts:
-      - {{ .Values.gate.name }}.{{ .Values.environment.domain }}
+      - "{{ .Values.gate.name }}.{{ .Values.environment.domain }}"
   rules:
-    - host: {{ .Values.gate.name }}.{{ .Values.environment.domain }}
+    - host: "{{ .Values.gate.name }}.{{ .Values.environment.domain }}"
       http:
         paths:
-          - path: {{ .Values.ingress.path }}monitoring
-            pathType: Prefix
+          - path: "{{ .Values.ingress.path }}monitoring"
+            pathType: "Prefix"
             backend:
               service:
-                name: {{ .Values.gate.name }}-{{ .Values.service.name }}
+                name: "{{ .Values.gate.name }}-{{ .Values.service.name }}"
                 port:
-                  name: {{ .Values.ingress.port }}
+                  name: "{{ .Values.ingress.port }}"
 {{- end }}

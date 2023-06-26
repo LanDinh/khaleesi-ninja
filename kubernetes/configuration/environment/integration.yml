@@ -4,7 +4,7 @@ environment:
   development_credentials: true
 kubegres:
   replicas: 1
-  size: 200Mi
+  size: "200Mi"
 service:
   version: "latest-production"
   replicas: 1

@@ -1,14 +1,14 @@
 {{- if .Values.kubegres.enabled }}
-apiVersion: batch/v1
-kind: Job
+apiVersion: "batch/v1"
+kind: "Job"
 metadata:
-  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-initialization
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}
+  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres-initialization"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
   labels:
-    khaleesi-ninja: service
-    gate: {{ .Values.gate.name }}
-    name: {{ .Values.service.name }}
-    type: kubegres
+    khaleesi-ninja: "service"
+    gate: "{{ .Values.gate.name }}"
+    name: "{{ .Values.service.name }}"
+    type: "kubegres"
 spec:
   ttlSecondsAfterFinished: 600
   template:
@@ -17,73 +17,73 @@ spec:
         job: "true"
     spec:
       containers:
-        - name: create-user-and-database
-          image: {{ .Values.kubegres.image }}
+        - name: "create-user-and-database"
+          image: "{{ .Values.kubegres.image }}"
           command: [ "bin/bash", "/config/perform-initialization.sh"{{ if .Values.service.drop_database }}, "drop_database"{{ end }} ]
           volumeMounts:
-            - name: kubegres-initialization
+            - name: "kubegres-initialization"
               readOnly: true
-              mountPath: /config
+              mountPath: "/config"
           env:
-            - name: PGHOST
+            - name: "PGHOST"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres
-                  key: host
-            - name: PGPORT
+                  name: "{{ .Values.gate.name }}-kubegres"
+                  key: "host"
+            - name: "PGPORT"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres
-                  key: port
-            - name: PGUSER
+                  name: "{{ .Values.gate.name }}-kubegres"
+                  key: "port"
+            - name: "PGUSER"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres
-                  key: superUser
-            - name: PGPASSWORD
+                  name: "{{ .Values.gate.name }}-kubegres"
+                  key: "superUser"
+            - name: "PGPASSWORD"
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres
-                  key: superUserPassword
-            - name: KHALEESI_DATABASE_NAME
+                  name: "{{ .Values.gate.name }}-kubegres"
+                  key: "superUserPassword"
+            - name: "KHALEESI_DATABASE_NAME"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
-                  key: database
-            - name: KHALEESI_DATABASE_SUPERUSER
+                  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
+                  key: "database"
+            - name: "KHALEESI_DATABASE_SUPERUSER"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres
-                  key: superUser
-            - name: KHALEESI_DATABASE_SUPERUSER_PASSWORD
+                  name: "{{ .Values.gate.name }}-kubegres"
+                  key: "superUser"
+            - name: "KHALEESI_DATABASE_SUPERUSER_PASSWORD"
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-kubegres
-                  key: superUserPassword
-            - name: KHALEESI_DATABASE_WRITE_USER
+                  name: "{{ .Values.gate.name }}-kubegres"
+                  key: "superUserPassword"
+            - name: "KHALEESI_DATABASE_WRITE_USER"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
-                  key: writeUser
-            - name: KHALEESI_DATABASE_WRITE_PASSWORD
+                  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
+                  key: "writeUser"
+            - name: "KHALEESI_DATABASE_WRITE_PASSWORD"
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
-                  key: writePassword
-            - name: KHALEESI_DATABASE_READ_USER
+                  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
+                  key: "writePassword"
+            - name: "KHALEESI_DATABASE_READ_USER"
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
-                  key: readUser
-            - name: KHALEESI_DATABASE_READ_PASSWORD
+                  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
+                  key: "readUser"
+            - name: "KHALEESI_DATABASE_READ_PASSWORD"
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres
-                  key: readPassword
+                  name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
+                  key: "readPassword"
       volumes:
-        - name: kubegres-initialization
+        - name: "kubegres-initialization"
           configMap:
-            name: kubegres-initialization
-      restartPolicy: Never
+            name: "kubegres-initialization"
+      restartPolicy: "Never"
   backoffLimit: 1
 {{- end }}

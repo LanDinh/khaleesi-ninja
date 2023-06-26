@@ -204,7 +204,7 @@ class HttpRequestTestCase(ModelResponseMetadataMixin, SimpleTestCase):
             self.assertEqual(typeType              , result.type)
 
 
-  def testEmptytoGrpc(self) -> None :
+  def testEmptyToGrpc(self) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
     request = HttpRequest(**self.modelEmptyRequestMetadata())

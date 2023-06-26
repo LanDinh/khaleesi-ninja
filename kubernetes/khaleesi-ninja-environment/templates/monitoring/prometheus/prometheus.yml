@@ -1,39 +1,39 @@
-apiVersion: monitoring.coreos.com/v1
-kind: Prometheus
+apiVersion: "monitoring.coreos.com/v1"
+kind: "Prometheus"
 metadata:
-  name: prometheus
-  namespace: khaleesi-ninja-{{ .Values.environment.name }}-monitoring
+  name: "prometheus"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}-monitoring"
   labels:
-    khaleesi-ninja: monitoring
-    environment: {{ .Values.environment.name }}
-    infrastructure: prometheus
+    khaleesi-ninja: "monitoring"
+    environment: "{{ .Values.environment.name }}"
+    infrastructure: "prometheus"
 spec:
   alerting:
     alertmanagers:
-      - name: {{ .Values.alertmanager.name }}
-        namespace: {{ .Values.alertmanager.namespace }}
-        port: {{ .Values.alertmanager.port }}
-        pathPrefix: {{ .Values.alertmanager.pathPrefix }}
-        apiVersion: {{ .Values.alertmanager.apiVersion }}
-  image: quay.io/prometheus/prometheus:{{ .Values.prometheus.version }}
-  logLevel: info
+      - name: "{{ .Values.alertmanager.name }}"
+        namespace: "{{ .Values.alertmanager.namespace }}"
+        port: "{{ .Values.alertmanager.port }}"
+        pathPrefix: "{{ .Values.alertmanager.pathPrefix }}"
+        apiVersion: "{{ .Values.alertmanager.apiVersion }}"
+  image: "quay.io/prometheus/prometheus:{{ .Values.prometheus.version }}"
+  logLevel: "info"
   paused: false
-  replicas: {{ .Values.prometheus.replicas }}
-  retention: {{ .Values.prometheus.retention }}
+  replicas: "{{ .Values.prometheus.replicas }}"
+  retention: "{{ .Values.prometheus.retention }}"
   {{- if .Values.prometheus.ingress }}
-  externalUrl: https://monitoring.{{ .Values.environment.domain }}/prometheus/
-  routePrefix: /prometheus
+  externalUrl: "https://monitoring.{{ .Values.environment.domain }}/prometheus/"
+  routePrefix: "/prometheus"
   {{- end }}
   ruleSelector:
     matchLabels:
-      app: kube-prometheus-stack
-      release: kube-prometheus
-  serviceAccountName: prometheus
+      app: "kube-prometheus-stack"
+      release: "kube-prometheus"
+  serviceAccountName: "prometheus"
   serviceMonitorSelector:
     matchLabels:
-      monitoring: khaleesi-ninja-{{ .Values.environment.name }}
+      monitoring: "khaleesi-ninja-{{ .Values.environment.name }}"
   podMetadata:
     labels:
-      khaleesi-ninja: monitoring
-      environment: {{ .Values.environment.name }}
-      infrastructure: prometheus
+      khaleesi-ninja: "monitoring"
+      environment: "{{ .Values.environment.name }}"
+      infrastructure: "prometheus"

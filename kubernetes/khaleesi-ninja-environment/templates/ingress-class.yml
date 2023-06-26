@@ -1,15 +1,15 @@
-apiVersion: networking.k8s.io/v1
-kind: IngressClass
+apiVersion: "networking.k8s.io/v1"
+kind: "IngressClass"
 metadata:
-  name: ingress-class-{{ .Values.environment.name }}
+  name: "ingress-class-{{ .Values.environment.name }}"
   labels:
-    khaleesi-ninja: environment
-    environment: {{ .Values.environment.name }}
-    infrastructure: ingress-class
+    khaleesi-ninja: "environment"
+    environment: "{{ .Values.environment.name }}"
+    infrastructure: "ingress-class"
 spec:
-  controller: k8s.io/ingress-nginx
+  controller: "k8s.io/ingress-nginx"
   parameters:
-    kind: IngressParameters
-    name: ingress-class
-    namespace: khaleesi-ninja-{{ .Values.environment.name }}
-    scope: Namespace
+    kind: "IngressParameters"
+    name: "ingress-class"
+    namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
+    scope: "Namespace"

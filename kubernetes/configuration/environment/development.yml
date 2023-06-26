@@ -11,7 +11,7 @@ service:
 # Database.
 kubegres:
   replicas: 1
-  size: 200Mi
+  size: "200Mi"
 
 # Monitoring.
 prometheus:
