@@ -31,6 +31,7 @@ add_metadata() {
   local type=${3}
 
   add_service_to_list_of_services "${gate}" "${service}" "${type}"
+  add_service_to_list_of_gates "${gate}"
   add_kubernetes_manifest "${gate}" "${service}"
 }
 
@@ -40,6 +41,12 @@ add_service_to_list_of_services() {
   local type=${3}
 
   sed -i "1 a \ \ {\ \"gate\":\ \"${gate}\",\ \"name\":\ \"${service}\",\ \"type\":\ \"${type}\",\ \"version\":\ \"1.0.0\",\ \"deploy\":\ \"true\"\ }," data/services.json
+}
+
+add_service_to_list_of_gates() {
+  local gate=${1}
+
+  sed -i "1 a \ \ {\ \"name\":\ \"${gate}\",\ \"deploy\":\ \"true\"\ }," data/gates.json
 }
 
 add_kubernetes_manifest() {

@@ -88,6 +88,7 @@ It will prompt the user for some information:
 Afterwards, it will do the following:
 
 1. Add the new service to `data/services.json`
+1. Add the new gate to `data/gates.json`
 1. Add kubernetes manifests for the service
 
 For frontends, it will additionally create a `remix` project to hold the frontend code.

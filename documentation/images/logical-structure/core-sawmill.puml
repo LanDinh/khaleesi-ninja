@@ -17,31 +17,31 @@ rectangle {
 agent metadata[
   Metadata
   ====
-  reported_timestamp
-  logged_timestamp
+  reportedTimestamp
+  loggedTimestamp
   ----
-  http_request_id
-  grpc_request_id
+  httpRequestId
+  grpcRequestId
   ----
-  user_id
-  user_type
+  userId
+  userType
   ----
-  meta_logger_khaleesi_app
-  meta_logger_khaleesi_service
-  meta_logger_grpc_service
-  meta_logger_grpc_method
+  metaLoggerKhaleesiApp
+  metaLoggerKhaleesiService
+  metaLoggerGrpcService
+  metaLoggerGrpcMethod
   ----
-  pod_id
+  podId
   errors
 ]
 
 agent response [
   ResponseMetadata
   ====
-  response_status
+  responseStatus
   ----
-  reported_timestamp
-  logged_timestamp
+  reportedTimestamp
+  loggedTimestamp
   duration
   ----
   errors
@@ -50,34 +50,34 @@ agent response [
 rectangle event [
   Event
   ====
-  event_id
+  eventId
   ----
-  target_type
-  target_id
-  target_owner_id
-  target_owner_type
+  targetType
+  targetId
+  targetOwnerId
+  targetOwnerType
   ----
-  action_crud_type
-  action_custom_type
-  action_result
-  action_details
+  actionCrudType
+  actionCustomType
+  actionResult
+  actionDetails
 ]
 rectangle grpc_request [
   GrpcRequest
   ====
-  upstream_request_id
+  upstreamRequestId
   ----
-  upstream_request_khaleesi_app
-  upstream_request_khaleesi_service
-  upstream_request_grpc_service
-  upstream_request_grpc_method
+  upstreamRequestKhaleesiApp
+  upstreamRequestKhaleesiService
+  upstreamRequestGrpcService
+  upstreamRequestGrpcMethod
 ]
 rectangle http_request [
   HttpRequest
   ====
   type
   language
-  device_id
+  deviceId
   ----
   language
   ip
@@ -85,15 +85,15 @@ rectangle http_request [
   ----
   geolocation
   browser
-  rendering_agent
+  renderingAgent
   os
-  device_type
+  deviceType
 ]
 
 rectangle error [
   Error
   ====
-  error_id
+  errorId
   ----
   status
   loglevel
@@ -101,17 +101,17 @@ rectangle error [
   app
   service
   ----
-  public_key
-  public_details
+  publicKey
+  publicDetails
   ----
-  private_message
-  private_details
+  privateMessage
+  privateDetails
   stacktrace
 ]
 rectangle query [
   Query
   ====
-  query_id
+  queryId
   connection
   ----
   raw
@@ -120,8 +120,8 @@ rectangle query [
   tables
   columns
   ----
-  reported_start
-  reported_end
+  reportedStart
+  reportedEnd
 ]
 
 ' ******************************************* RELATIONS ********************************************

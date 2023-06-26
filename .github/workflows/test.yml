@@ -11,6 +11,8 @@ jobs:
     outputs:
       all-services: ${{ steps.set-services.outputs.full-json }}
       deploy-services: ${{ steps.set-services.outputs.deploy-json }}
+      all-gates: ${{ steps.set-gates.outputs.full-json }}
+      deploy-gates: ${{ steps.set-gates.outputs.deploy-json }}
       all-environments: ${{ steps.set-environments.outputs.full-json }}
       deploy-environments: ${{ steps.set-environments.outputs.deploy-json }}
     steps:
@@ -21,11 +23,25 @@ jobs:
         uses: "./.github/actions/set-json-output"
         with:
           filename: "data/services.json"
+      - id: "set-gates"
+        name: "Read gates into matrix"
+        uses: "./.github/actions/set-json-output"
+        with:
+          filename: "data/gates.json"
       - id: "set-environments"
         name: "Read environments into matrix"
         uses: "./.github/actions/set-json-output"
         with:
           filename: "data/environments.json"
+
+  # Verify the helm templates.
+  test-helm-cluster:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v3"
+      - name: "Helm lint cluster"
+        run: "helm lint ./kubernetes/khaleesi-ninja-cluster"
 
   # Update the pip cache with new requirements.
   update-pip-cache:
@@ -98,6 +114,55 @@ jobs:
         uses: "./.github/actions/cache-image"
         with:
           image: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+
+  # Verify the helm templates.
+  test-helm-environment:
+    runs-on: "ubuntu-latest"
+    needs: [ "matrix" ]
+    strategy:
+      matrix:
+        environment: ${{ fromJson(needs.matrix.outputs.all-environments) }}
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v3"
+      - name: "Helm lint environment"
+        run: |
+          helm lint ./kubernetes/khaleesi-ninja-environment \
+          --set-file ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
+
+  # Verify the helm templates.
+  test-helm-gate:
+    runs-on: "ubuntu-latest"
+    needs: [ "matrix" ]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.matrix.outputs.deploy-gates) }}
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v3"
+      - name: "Helm lint gate"
+        run: |
+          helm lint ./kubernetes/khaleesi-ninja-gate \
+          --set-file ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml
+          --set-file ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
+
+  # Verify the helm templates.
+  test-helm-service:
+    runs-on: "ubuntu-latest"
+    needs: [ "matrix" ]
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.matrix.outputs.deploy-services) }}
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v3"
+      - name: "Helm lint service"
+        run: |
+          helm lint ./kubernetes/khaleesi-ninja-service \
+          --set-file ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml
+          --set-file ./kubernetes/configuration/type/${{ matrix.service.type }}.yml
+          --set-file ./kubernetes/configuration/service/${{ matrix.service.gate }}/${{ matrix.service.name }}.yml
+          --set-file ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
   
   # Build the images for reuse.
   build:
@@ -162,7 +227,7 @@ jobs:
   # Execute the E2E tests in parallel.
   e2e-test:
     runs-on: "ubuntu-latest"
-    needs: [ "matrix", "build" ]
+    needs: [ "matrix", "build", "test-helm-cluster", "test-helm-environment", "test-helm-gate", "test-helm-service" ]
     strategy:
       matrix:
         environment: ${{ fromJson(needs.matrix.outputs.deploy-environments) }}
