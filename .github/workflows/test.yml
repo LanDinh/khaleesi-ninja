@@ -136,7 +136,7 @@ jobs:
     needs: [ "matrix" ]
     strategy:
       matrix:
-        service: ${{ fromJson(needs.matrix.outputs.deploy-gates) }}
+        gate: ${{ fromJson(needs.matrix.outputs.all-gates) }}
         environment: ${{ fromJson(needs.matrix.outputs.all-environments) }}
     steps:
       - name: "Checkout repository"
@@ -144,7 +144,7 @@ jobs:
       - name: "Helm lint gate"
         run: |
           helm lint ./kubernetes/khaleesi-ninja-gate \
-          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml \
+          --values ./kubernetes/configuration/gate/${{ matrix.gate.name }}.yml \
           --values ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
 
   # Verify the helm templates.
