@@ -1,13 +1,13 @@
-name: Cache an image
-description: Cache an image
+name: "Cache an image"
+description: "Cache an image"
 inputs:
   image:
-    description: Single image to be cached
+    description: "Single image to be cached"
     required: true
   commit:
-    description: Reference for saving the cache.
+    description: "Reference for saving the cache."
     required: true
     default: ${{ github.sha }}
 runs:
-  using: 'node16'
-  main: 'index.js'
+  using: "node16"
+  main: "index.js"

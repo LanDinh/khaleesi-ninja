@@ -1,27 +1,27 @@
-name: Set JSON output
-description: Set output from JSON file for use in dependent jobs
+name: "Set JSON output"
+description: "Set output from JSON file for use in dependent jobs"
 inputs:
   filename:
-    description: The file to read into the output
+    description: "The file to read into the output"
     required: true
 outputs:
   full-json:
-    description: Full parsed content of the JSON file
+    description: "Full parsed content of the JSON file"
     value: ${{ steps.generate-output.outputs.full-json }}
   deploy-json:
-    description: Parsed content of the JSON file for deployments only
+    description: "Parsed content of the JSON file for deployments only"
     value: ${{ steps.generate-output.outputs.deploy-json }}
 runs:
   using: "composite"
   steps:
-    - shell: bash
+    - shell: "bash"
       run: echo Reading JSON from ${{ inputs.filename }}
-    - id: generate-output
-      shell: bash
+    - id: "generate-output"
+      shell: "bash"
       run: |
         FULL_JSON=$(echo $(cat ${{ inputs.filename }}))
         DEPLOY_JSON=$(echo $(sed '/"deploy": "false"/d' ${{ inputs.filename }}))
         echo "full-json=$FULL_JSON" >> ${GITHUB_OUTPUT}
         echo "deploy-json=$DEPLOY_JSON" >> ${GITHUB_OUTPUT}
-    - shell: bash
+    - shell: "bash"
       run: echo Full result is ${{ toJson(steps.generate-output.outputs.full-json) }}

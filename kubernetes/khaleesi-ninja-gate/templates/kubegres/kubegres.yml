@@ -8,7 +8,7 @@ metadata:
     infrastructure: "kubegres"
     gate: "{{ .Values.gate.name }}"
 spec:
-  replicas: "{{ .Values.kubegres.replicas }}"
+  replicas: {{ .Values.kubegres.replicas }}
   image: "{{ .Values.kubegres.image }}"
   database:
     size: "{{ .Values.kubegres.size }}"

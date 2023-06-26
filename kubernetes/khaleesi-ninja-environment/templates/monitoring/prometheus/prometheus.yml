@@ -18,7 +18,7 @@ spec:
   image: "quay.io/prometheus/prometheus:{{ .Values.prometheus.version }}"
   logLevel: "info"
   paused: false
-  replicas: "{{ .Values.prometheus.replicas }}"
+  replicas: {{ .Values.prometheus.replicas }}
   retention: "{{ .Values.prometheus.retention }}"
   {{- if .Values.prometheus.ingress }}
   externalUrl: "https://monitoring.{{ .Values.environment.domain }}/prometheus/"

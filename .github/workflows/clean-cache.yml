@@ -1,21 +1,21 @@
-name: Clean Cache
+name: "Clean Cache"
 on:
   workflow_dispatch:
     inputs:
       prefix:
-        description: the prefix for which to clean the cache
+        description: "the prefix for which to clean the cache"
         required: true
-        type: string
+        type: "string"
 jobs:
   # Delete workflow runs inside the workflow to clean it up.
   clean-cache:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     permissions:
-      actions: write
+      actions: "write"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Clean up cache.
-        uses: ./.github/actions/clean-cache
+      - name: "Checkout repository"
+        uses: "actions/checkout@v3"
+      - name: "Clean up cache."
+        uses: "./.github/actions/clean-cache"
         with:
           prefix: ${{ inputs.prefix }}

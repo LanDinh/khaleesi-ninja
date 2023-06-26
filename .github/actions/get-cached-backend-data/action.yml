@@ -1,34 +1,34 @@
-name: Get cached data
-description: Get dependency cache, built protos, and base images
+name: "Get cached data"
+description: "Get dependency cache, built protos, and base images"
 inputs:
   gate:
-    description: The name of the gate
+    description: "The name of the gate"
     required: true
   service:
-    description: The name of the service
+    description: "The name of the service"
     required: true
   base-image-version:
-    description: The version of the base images to be fetched
+    description: "The version of the base images to be fetched"
     required: false
-    default: 1.0.0
+    default: "1.0.0"
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-python@v4
+    - uses: "actions/setup-python@v4"
       with:
         python-version: '3.10'
         cache: 'pip'
-    - shell: bash
+    - shell: "bash"
       run: pip install -r ./backend/${{ inputs.gate }}/${{ inputs.service }}/requirements-service.txt
-    - uses: actions/download-artifact@v3
+    - uses: "actions/download-artifact@v3"
       with:
-        name: protos-python
-        path: backend/khaleesi/proto/
-    - name: Load construction base
-      uses: ./.github/actions/load-image
+        name: "protos-python"
+        path: "backend/khaleesi/proto/"
+    - name: "Load construction base"
+      uses: "./.github/actions/load-image"
       with:
         image: khaleesi/base/backend-construction:${{ inputs.base-image-version }}
-    - name: Load image base
-      uses: ./.github/actions/load-image
+    - name: "Load image base"
+      uses: "./.github/actions/load-image"
       with:
         image: khaleesi/base/backend-image:${{ inputs.base-image-version }}

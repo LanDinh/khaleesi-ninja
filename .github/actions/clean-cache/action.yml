@@ -1,14 +1,14 @@
-name: Clean cached data
-description: Clean cached data for a specific commit
+name: "Clean cached data"
+description: "Clean cached data for a specific commit"
 inputs:
   prefix:
-    description: The prefix for which to clean up
+    description: "The prefix for which to clean up"
     required: true
     default: khaleesi/${{ github.sha }}/
 runs:
   using: "composite"
   steps:
-    - uses: actions/github-script@v6
+    - uses: "actions/github-script@v6"
       with:
         script: |
           console.log('Start cleaning cache.')
