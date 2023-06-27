@@ -20,6 +20,7 @@ class TestCleanupJob(SimpleTestCase):
     request = JobRequest()
     request.actionConfiguration.batchSize = 1
     request.actionConfiguration.timelimit.FromSeconds(60)
+    request.cleanupConfiguration.isCleanupJob = True
     job: CleanupJob[Metadata] = CleanupJob(model = Metadata, request = request)
     filterRequests.reset_mock()  # Is getting called in the __init__ method.
     # Execute test.

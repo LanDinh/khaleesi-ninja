@@ -295,6 +295,7 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     self.job = CleanupJob(model = JobExecution, request = request)
     self.job.mock = MagicMock()
 
+  # noinspection PyUnusedLocal
   def testMandatoryCleanupConfiguration(self,
       start    : MagicMock,
       singleton: MagicMock,  # pylint: disable=unused-argument
