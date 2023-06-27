@@ -281,8 +281,19 @@ class CleanupJob(BaseJob[M], Generic[M]):
   def __init__(self, *, model: Type[M], request : JobRequest) -> None :
     """Initialize the job."""
     super().__init__(model = model, job = request.job, action = request.actionConfiguration)
-    self.cleanupConfiguration = request.cleanupConfiguration
-    self.cleanupTimestamp     = self.start - request.cleanupConfiguration.cleanupDelay.ToTimedelta()
+
+    cleanup = request.cleanupConfiguration
+
+    if not cleanup.isCleanupJob:
+      # Without the cleanup configuration, the job will not run at all.
+      raise InvalidArgumentException(
+        publicDetails  = f'cleanupConfiguration = {cleanup}',
+        privateMessage = 'cleanupConfiguration is mandatory!',
+        privateDetails = f'cleanupConfiguration = {cleanup}',
+      )
+
+    self.cleanupConfiguration = cleanup
+    self.cleanupTimestamp     = self.start - cleanup.cleanupDelay.ToTimedelta()
 
   def executeBatch(self, *, page: Page[M]) -> int :
     """Execute a batch deletion."""

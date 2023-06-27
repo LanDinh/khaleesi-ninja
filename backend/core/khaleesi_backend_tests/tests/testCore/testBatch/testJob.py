@@ -295,6 +295,22 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     self.job = CleanupJob(model = JobExecution, request = request)
     self.job.mock = MagicMock()
 
+  def testMandatoryCleanupConfiguration(self,
+      start    : MagicMock,
+      singleton: MagicMock,  # pylint: disable=unused-argument
+      paginator: MagicMock,
+      *_       : MagicMock,
+  ) -> None :
+    """Test that the cleanup configuration is specified."""
+    # Execute test.
+    request = self._successfullyStartJob(start = start, paginator = paginator)
+    with self.assertRaises(InvalidArgumentException) as context:
+      self.job = CleanupJob(model = JobExecution, request = request)
+    # Assert result.
+    self.assertIn('cleanupConfiguration', context.exception.publicDetails)
+    self.assertIn('cleanupConfiguration', context.exception.privateMessage)
+    self.assertIn('cleanupConfiguration', context.exception.privateDetails)
+
   def testJobSuccess(
       self,
       start    : MagicMock,
@@ -305,6 +321,7 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     """Test successful job run."""
     # Prepare data.
     request = self._successfullyStartJob(start = start, paginator = paginator)
+    request.cleanupConfiguration.isCleanupJob = True
     self._setJob(request = request)
     self.job.mock.getQueryset.return_value.filter.return_value.delete.return_value = (2, 0)
     # Execute test.
