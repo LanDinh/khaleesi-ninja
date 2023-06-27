@@ -52,7 +52,6 @@ This contains basic resources necessary for the ecosystem to work:
 
 * namespace
 * ingress class
-* default configuration to use for `grpc-web` `envoy` proxies
 * default configuration to use for `kubegres` - this includes:
   * SQL script to install extensions, create users & databases
   * SQL script to apply user permissions

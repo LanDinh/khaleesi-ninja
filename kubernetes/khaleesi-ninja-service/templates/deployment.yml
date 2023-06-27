@@ -134,28 +134,3 @@ spec:
                   name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
                   key: "readPassword"
           {{- end }}
-      {{- if .Values.grpc_web.enabled }}
-        - name: "grpc-web-envoy"
-          image: "envoyproxy/envoy-alpine:{{ .Values.grpc_web.envoy_version }}"
-          imagePullPolicy: "Always"
-          ports:
-            - name: "grpc-web-envoy"
-              containerPort: 8010
-          volumeMounts:
-            - name: "grpc-web-envoy"
-              readOnly: true
-              mountPath: "/config"
-          args: [ "envoy", "--config-path", "/config/envoy.yml" ]
-          readinessProbe:
-            httpGet:
-              path: "{{ .Values.probe.http.readiness }}"
-              port: "grpc-web-envoy"
-          livenessProbe:
-            httpGet:
-              path: "{{ .Values.probe.http.liveness }}"
-              port: "grpc-web-envoy"
-      volumes:
-        - name: "grpc-web-envoy"
-          configMap:
-            name: "grpc-web-envoy"
-      {{- end }}

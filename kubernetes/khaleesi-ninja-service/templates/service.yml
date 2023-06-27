@@ -23,9 +23,3 @@ spec:
       protocol: "TCP"
       port: 8020
       targetPort: "metrics"
-    {{- if .Values.grpc_web.enabled }}
-    - name: "grpc-web-envoy"
-      protocol: "TCP"
-      port: 8010
-      targetPort: "grpc-web-envoy"
-    {{- end }}

@@ -53,15 +53,6 @@ jobs:
         with:
           python-version: "3.10"
           cache: "pip"
-      - name: "Install Protoc"
-        uses: "arduino/setup-protoc@v1"
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: '3.19.4'
-      - name: "Install Protoc for gRPC-Web"
-        run: |
-          curl -L -o /usr/local/bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/1.4.2/protoc-gen-grpc-web-1.4.2-linux-x86_64
-          chmod +x /usr/local/bin/protoc-gen-grpc-web
       - name: "Generate protos"
         run: "./scripts/generate_protos.sh"
       - name: "Upload python protos"

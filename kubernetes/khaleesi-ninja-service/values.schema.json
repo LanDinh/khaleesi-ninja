@@ -202,24 +202,6 @@
         "http"
       ]
     },
-    "grpc_web": {
-      "description": "grpc-web configuration for gRPC services accessed by browser clients",
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "description": "whether or not this service requires a grpc-web proxy",
-          "type": "boolean"
-        },
-        "envoy_version": {
-          "description": "the version to use for the proxy",
-          "type": "string"
-        }
-      },
-      "required": [
-        "enabled",
-        "envoy_version"
-      ]
-    },
     "grpcui": {
       "description": "grpcui configuration for gRPC services",
       "type": "object",

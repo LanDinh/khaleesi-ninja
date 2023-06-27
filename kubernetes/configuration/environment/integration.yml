@@ -9,7 +9,5 @@ service:
   version: "latest-production"
   replicas: 1
   image_pull_policy: "Never"
-grpc_web:
-  envoy_version: "v1.20-latest"
 grpcui:
   version: "latest"

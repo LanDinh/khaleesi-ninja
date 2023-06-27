@@ -42,9 +42,6 @@ probe:
     enabled: false
 
 # gRPC.
-grpc_web:
-  enabled: false
-  envoy_version: "v1.20.1"
 grpcui:
   enabled: false
   version: "v1.2.0"
