@@ -61,7 +61,7 @@ class QueryManager(models.Manager['Query']):
           **self.model.logMetadata(metadata = metadata, errors = errors)
         )
         newQueries.append(query)
-      except ValueError:  # TODO(46) - sql-metadata doesn't support all query types.
+      except ValueError:  # TODO(46) - sql-metadata doesn't support all query types.  # pylint: disable=line-too-long  # pragma: no cover
         LOGGER.error(f'ValueError when parsing SQL: {raw}')
     return self.bulk_create(objs = newQueries, batch_size = 100)
 

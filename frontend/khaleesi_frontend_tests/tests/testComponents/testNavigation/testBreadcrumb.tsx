@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { NavigationElement } from '../../../../app/khaleesi/components/navigation/navigationElement'
-import { breadcrumb, BreadCrumbs } from '../../../../app/khaleesi/components/navigation/breadcrumb'
+import { NavigationElement } from '../../../app/khaleesi/components/navigation/navigationElement'
+import { breadcrumb, BreadCrumbs } from '../../../app/khaleesi/components/navigation/breadcrumb'
 
 
-jest.mock('../../../../app/khaleesi/components/navigation/navigationElement')
+jest.mock('../../../app/khaleesi/components/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),
@@ -14,20 +14,31 @@ jest.mock('@remix-run/react', () => ({
 
 test('BreadCrumbs render without errors.', () => {
   // Prepare data.
-  const match = {
-    id: 'test',
+  const matchA = {
+    id: 'test1',
     pathname: '',
     params  : {},
     data    : null,
     handle  : {
-      breadcrumb: (): JSX.Element => <div>TEST</div>
+      breadcrumb: (): JSX.Element => <div>TEST1</div>
     }
   }
-  jest.spyOn(router, 'useMatches').mockReturnValue([match])
+  const matchB = {
+    id: 'test2',
+    pathname: '',
+    params  : {},
+    data    : null,
+    handle  : {
+      breadcrumb: (): JSX.Element => <div>TEST2</div>
+    }
+  }
+  jest.spyOn(router, 'useMatches').mockReturnValue([ matchA, matchB ])
   // Execute test.
   render(<BreadCrumbs />)
   // Assert result.
-  expect(screen.getByText('TEST')).toBeInTheDocument()
+  expect(screen.getByText('TEST1')).toBeInTheDocument()
+  expect(screen.getByText('TEST2')).toBeInTheDocument()
+  expect(screen.getByText('>')).toBeInTheDocument()
 })
 
 test('Providing breadcrumb data works as expected.', () => {

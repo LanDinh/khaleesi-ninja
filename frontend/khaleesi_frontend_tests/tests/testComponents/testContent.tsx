@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { BreadCrumbs } from '../../../app/khaleesi/components/navigation/breadcrumb'
-import { Content } from '../../../app/khaleesi/components/content'
+import { BreadCrumbs } from '../../app/khaleesi/components/navigation/breadcrumb'
+import { Content } from '../../app/khaleesi/components/content'
 
 
-jest.mock('../../../app/khaleesi/components/navigation/breadcrumb')
+jest.mock('../../app/khaleesi/components/navigation/breadcrumb')
 
 
 test('Content gets rendered without errors.', () => {

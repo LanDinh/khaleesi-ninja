@@ -117,7 +117,7 @@ class RequestsMetric(CounterMetric):
     ]:
       return 'unknown'
 
-    raise ProgrammingException(
+    raise ProgrammingException(  # pragma: no cover
       privateMessage = 'Unknown gRPC status returned',
       privateDetails = str(status),
     )

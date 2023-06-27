@@ -119,7 +119,7 @@ class Service(Servicer):
       result = DbGrpcRequest.objects.logResponse(grpcResponse = request)
       try:
         DbHttpRequest.objects.addChildDuration(request = result)
-      except Exception:  # pylint: disable=broad-except
+      except Exception:  # pylint: disable=broad-except  # pragma: no cover
         # TODO(45) - remove this hack
         pass
       LOGGER.info('Saving the queries to the database.')

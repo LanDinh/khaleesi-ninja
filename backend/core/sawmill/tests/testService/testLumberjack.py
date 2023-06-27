@@ -81,7 +81,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
           loggingGrpcRequest.return_value.save = MagicMock()
           loggingQuery.return_value = [ DbQuery() ]
           loggingQuery.return_value[0].reportedStart = now
-          loggingQuery.return_value[0].reportedEnd = now + timedelta(days = 1)
+          loggingQuery.return_value[0].reportedEnd   = now + timedelta(days = 1)
           # Execute test.
           self.service.LogGrpcResponse(MagicMock(), MagicMock())
           # Assert result.

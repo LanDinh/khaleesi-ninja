@@ -1,25 +1,25 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { Navigation } from '../../../../app/khaleesi/components/navigation/navigation'
-import { MenuIcon } from '../../../../app/khaleesi/components/icon'
+import { Navigation } from '../../../app/khaleesi/components/navigation/navigation'
+import { MenuIcon } from '../../../app/khaleesi/components/icon'
 import type {
   NavigationElementProperties,
-} from '../../../../app/khaleesi/components/navigation/navigationElement'
+} from '../../../app/khaleesi/components/navigation/navigationElement'
 import {
   NavigationMenuElement,
-} from '../../../../app/khaleesi/components/navigation/navigationElement'
-import { createRemixStub } from '../../../util/remixStub'
+} from '../../../app/khaleesi/components/navigation/navigationElement'
+import { createRemixStub } from '../../util/remixStub'
 
 
-jest.mock('../../../../app/khaleesi/components/icon')
-jest.mock('../../../../app/khaleesi/components/navigation/navigationElement')
+jest.mock('../../../app/khaleesi/components/icon')
+jest.mock('../../../app/khaleesi/components/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),
 }))
 jest.mock(
-  '../../../../app/navigationData',
+  '../../../app/navigationData',
   (): { navigationData: NavigationElementProperties[] } => ({
     navigationData: [
       {

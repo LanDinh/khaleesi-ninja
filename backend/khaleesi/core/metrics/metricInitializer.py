@@ -126,7 +126,7 @@ class BaseMetricInitializer(ABC):
     self._buildRequestMetadata(requestMetadata = peer, caller = rawPeer)
     if peer.caller.grpcService == self.ownName and \
         requestMetadata.user.type != User.UserType.SYSTEM:
-      return
+      return  # pragma: no cover
     for status in StatusCode:
       metric.register(status = status, request = requestMetadata, peer = peer)
 

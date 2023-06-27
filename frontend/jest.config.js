@@ -16,4 +16,5 @@ module.exports = {
         '<rootDir>/tests/mocks/fileMock.ts',
     '\\.(css)$': '<rootDir>/tests/mocks/styleMock.ts',
   },
+  testMatch: [ "**/tests/**/test*.ts?(x)" ]
 }

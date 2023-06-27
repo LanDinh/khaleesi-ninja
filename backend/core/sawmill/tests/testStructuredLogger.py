@@ -1,10 +1,11 @@
 """Test the structured logger."""
-
 # Python.
+from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
+from microservice.models.logs.query import Query
 from microservice.structuredLogger import StructuredDbLogger
 
 
@@ -71,6 +72,10 @@ class TestStructuredDbLogger(SimpleTestCase):
     """Test sending a log response."""
     # Prepare data.
     response = MagicMock()
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    dbQuery.return_value = [ Query() ]
+    dbQuery.return_value[0].reportedStart = now
+    dbQuery.return_value[0].reportedEnd   = now + timedelta(days = 1)
     # Perform test.
     self.logger.sendLogGrpcResponse(grpcResponse = response)
     # Assert result.
