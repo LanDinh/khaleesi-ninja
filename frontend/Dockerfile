@@ -74,7 +74,7 @@ ENV KHALEESI_GATE=${gate}
 
 # Data.
 WORKDIR /code/
-COPY ./execute.sh /code/execute.sh
+COPY ./execute_production.sh.sh /code/execute.sh
 RUN chmod +x ./execute.sh
 RUN npm run build
 

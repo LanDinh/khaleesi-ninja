@@ -8,7 +8,7 @@ set -o pipefail # Make pipes fail
 
 # Options.
 proto_in="proto"
-python_in="proto/python"
+python_in="backend/requirements-proto.txt"
 python_out="backend/khaleesi/proto"
 typescript_out="frontend/khaleesi/app/khaleesi/proto"
 
@@ -17,7 +17,7 @@ echo "Generating the python protos..."
 rm -f "${python_out}/"*
 mkdir -p "${python_out}"
 touch "${python_out}/__init__.py"
-python -m pip install -r "${python_in}/requirements.txt"
+python -m pip install -r "${python_in}"
 python -m grpc_tools.protoc -I "${proto_in}" --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${proto_in}"/*.proto
 
 echo "Generating the typescript protos..."

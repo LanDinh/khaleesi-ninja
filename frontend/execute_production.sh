@@ -10,7 +10,7 @@ command=${1}
 
 
 run() {
-  npm run start
+  exec npm run start
 }
 
 

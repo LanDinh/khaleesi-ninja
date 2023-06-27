@@ -39,7 +39,7 @@ test() {
 }
 
 run() {
-  npm run dev
+  exec npm run dev
 }
 
 
