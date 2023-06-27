@@ -230,7 +230,6 @@
     "kubegres",
     "django",
     "probe",
-    "grpc_web",
     "grpcui"
   ],
   "title": "Values",
