@@ -10,7 +10,8 @@ set -o pipefail # Make pipes fail
 proto_in="proto"
 python_in="backend/requirements-proto.txt"
 python_out="backend/khaleesi/proto"
-typescript_out="frontend/khaleesi/app/khaleesi/proto"
+frontend_base="frontend"
+typescript_out="khaleesi/app/khaleesi/proto"
 
 
 echo "Generating the python protos..."
@@ -21,6 +22,11 @@ python -m pip install -r "${python_in}"
 python -m grpc_tools.protoc -I "${proto_in}" --python_out="${python_out}" --grpc_python_out="${python_out}" --mypy_out="${python_out}" "${proto_in}"/*.proto
 
 echo "Generating the typescript protos..."
+cd "${frontend_base}"
 rm -f "${typescript_out}/"*
 mkdir -p "${typescript_out}"
-protoc -I="${proto_in}" --js_out=import_style=commonjs:"${typescript_out}" --grpc-web_out=import_style=commonjs+dts,mode=grpcweb:"${typescript_out}" "${proto_in}"/*.proto
+npx pbjs -t static-module -w commonjs -o "${typescript_out}/proto.js" "../${proto_in}/*.proto"
+npx pbts -o ${typescript_out}/proto.d.ts ${typescript_out}/proto.js
+cd ..
+
+
