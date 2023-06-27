@@ -25,8 +25,7 @@ echo "Generating the typescript protos..."
 cd "${frontend_base}"
 rm -f "${typescript_out}/"*
 mkdir -p "${typescript_out}"
+cat requirements-proto.txt | xargs npm install --no-save
 npx pbjs -t static-module -w commonjs -o "${typescript_out}/proto.js" "../${proto_in}/*.proto"
 npx pbts -o ${typescript_out}/proto.d.ts ${typescript_out}/proto.js
 cd ..
-
-
