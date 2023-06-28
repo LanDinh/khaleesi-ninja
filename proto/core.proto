@@ -43,6 +43,13 @@ message JobExecutionMetadata {
   int64  executionId = 2;
 }
 
+message ObjectMetadata {
+  string id      = 1;
+  int64  version = 2;
+  google.protobuf.Timestamp created  = 3;
+  google.protobuf.Timestamp modified = 4;
+}
+
 message JobActionConfiguration {
   google.protobuf.Duration timelimit = 1;
   int64                    batchSize = 2;

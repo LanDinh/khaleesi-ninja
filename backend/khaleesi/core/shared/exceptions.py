@@ -12,6 +12,7 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.logging.textLogger import LogLevel
+from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
 class KhaleesiException(Exception):
@@ -212,5 +213,20 @@ class DbObjectTwinException(DbException):
       publicDetails  = objectType,
       privateMessage = f'{objectType} found multiple times in the DB.',
       privateDetails = f'objectType: {objectType}, objectId: {objectId}',
+      loglevel       = LogLevel.ERROR,
+    )
+
+
+class DbOutdatedInformationException(DbException):
+  """Django MultipleObjectsReturned."""
+
+  def __init__(self, *, objectType: str, metadata: ObjectMetadata) -> None :
+    """Initialize the exception."""
+    super().__init__(
+      status         = StatusCode.FAILED_PRECONDITION,
+      publicKey      = 'core-db-outdated-information',
+      publicDetails  = '',
+      privateMessage = f'{objectType} has been changed in the meantime.',
+      privateDetails = f'objectType: {objectType}, id: {metadata.id}',
       loglevel       = LogLevel.ERROR,
     )
