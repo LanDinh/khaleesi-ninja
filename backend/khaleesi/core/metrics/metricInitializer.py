@@ -83,10 +83,10 @@ class BaseMetricInitializer(ABC):
     """Fetch the data for request metrics."""
     request = EmptyRequest()
     addGrpcServerSystemRequestMetadata(
-      request         = request,
+      metadata      = request.requestMetadata,
       httpRequestId = self.httpRequestId,
       grpcRequestId = self.grpcRequestId,
-      grpcMethod     = 'INITIALIZE_REQUEST_METRICS',
+      grpcMethod    = 'INITIALIZE_REQUEST_METRICS',
     )
     return self.getServiceCallData(request = request)
 

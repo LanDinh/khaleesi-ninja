@@ -89,7 +89,7 @@ class JobExecution(models.Model):
   def toGrpc(self) -> JobExecutionResponse :
     """Transform into gRPC."""
     response = JobExecutionResponse()
-    addRequestMetadata(request = response)
+    addRequestMetadata(metadata = response.requestMetadata)
     response.executionMetadata.jobId       = self.jobId
     response.executionMetadata.executionId = self.executionId
     response.status         = JobExecutionResponse.Status.Value(self.status)

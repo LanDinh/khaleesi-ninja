@@ -2,7 +2,6 @@
 
 # Python.
 from datetime import datetime, timezone
-from typing import Any, cast
 
 # Django.
 from django.conf import settings
@@ -18,14 +17,14 @@ khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 def addGrpcServerSystemRequestMetadata(
     *,
-    request      : Any,
+    metadata     : RequestMetadata,
     httpRequestId: str,
     grpcRequestId: str,
     grpcMethod   : str,
 ) -> None :
   """Add request metadata to request protobufs."""
   _addRequestMetadata(
-    request       = request,
+    metadata      = metadata,
     httpRequestId = httpRequestId,
     grpcRequestId = grpcRequestId,
     grpcService   = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME'],
@@ -34,10 +33,10 @@ def addGrpcServerSystemRequestMetadata(
     userType      = UserType.SYSTEM,
   )
 
-def addRequestMetadata(*, request : Any) -> None :
+def addRequestMetadata(*, metadata : RequestMetadata) -> None :
   """Add request metadata to request protobufs."""
   _addRequestMetadata(
-    request       = request,
+    metadata      = metadata,
     httpRequestId = STATE.request.httpRequestId,
     grpcRequestId = STATE.request.grpcRequestId,
     grpcService   = STATE.request.grpcService,
@@ -48,7 +47,7 @@ def addRequestMetadata(*, request : Any) -> None :
 
 def _addRequestMetadata(
     *,
-    request      : Any,
+    metadata     : RequestMetadata,
     httpRequestId: str,
     grpcRequestId: str,
     grpcService  : str,
@@ -57,14 +56,13 @@ def _addRequestMetadata(
     userType     : UserType,
 ) -> None :
   """Add request metadata to request protobufs."""
-  requestMetadata = cast(RequestMetadata, request.requestMetadata)
-  requestMetadata.caller.httpRequestId   = httpRequestId
-  requestMetadata.caller.grpcRequestId   = grpcRequestId
-  requestMetadata.caller.khaleesiGate    = khaleesiSettings['METADATA']['GATE']
-  requestMetadata.caller.khaleesiService = khaleesiSettings['METADATA']['SERVICE']
-  requestMetadata.caller.grpcService     = grpcService
-  requestMetadata.caller.grpcMethod      = grpcMethod
-  requestMetadata.caller.podId           = khaleesiSettings['METADATA']['POD_ID']
-  requestMetadata.user.id                = userId
-  requestMetadata.user.type              = userType.value  # type: ignore[assignment]
-  requestMetadata.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
+  metadata.caller.httpRequestId   = httpRequestId
+  metadata.caller.grpcRequestId   = grpcRequestId
+  metadata.caller.khaleesiGate    = khaleesiSettings['METADATA']['GATE']
+  metadata.caller.khaleesiService = khaleesiSettings['METADATA']['SERVICE']
+  metadata.caller.grpcService     = grpcService
+  metadata.caller.grpcMethod      = grpcMethod
+  metadata.caller.podId           = khaleesiSettings['METADATA']['POD_ID']
+  metadata.user.id                = userId
+  metadata.user.type              = userType.value  # type: ignore[assignment]
+  metadata.timestamp.FromDatetime(datetime.now(tz = timezone.utc))

@@ -56,7 +56,7 @@ class Actuator:
   ) -> JobRequest :
     """Build a JobRequest."""
     request = JobRequest()
-    addRequestMetadata(request = request)
+    addRequestMetadata(metadata = request.requestMetadata)
     request.job.jobId       = job.jobId
     request.job.executionId = job.executionId
     request.actionConfiguration.timelimit.FromTimedelta(action.timelimit.ToTimedelta())
