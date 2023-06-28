@@ -47,7 +47,7 @@ class ModelManagerTestCase(SimpleTestCase):
 
   @patch('khaleesi.core.models.baseModel.transaction')
   @patch.object(Model.objects, 'get')
-  def testKhaleesiUpdateVersionMismatch(self, manager: MagicMock, transaction: MagicMock) -> None :
+  def testKhaleesiUpdateVersionMismatch(self, manager: MagicMock, *_: MagicMock) -> None :
     """Test updating an instance."""
     # Prepare data.
     instance = MagicMock()
