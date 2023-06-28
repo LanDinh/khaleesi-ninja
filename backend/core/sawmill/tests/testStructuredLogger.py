@@ -73,9 +73,9 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Prepare data.
     response = MagicMock()
     now = datetime.now().replace(tzinfo = timezone.utc)
-    dbQuery.return_value = [ Query() ]
-    dbQuery.return_value[0].reportedStart = now
-    dbQuery.return_value[0].reportedEnd   = now + timedelta(days = 1)
+    dbQuery.objects.logQueries.return_value = [ Query() ]
+    dbQuery.objects.logQueries.return_value[0].reportedStart = now
+    dbQuery.objects.logQueries.return_value[0].reportedEnd   = now + timedelta(days = 1)
     # Perform test.
     self.logger.sendLogGrpcResponse(grpcResponse = response)
     # Assert result.
