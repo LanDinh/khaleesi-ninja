@@ -9,6 +9,7 @@ from google.protobuf.message import Message
 
 # khaleesi.ninja.
 from khaleesi.core.models.baseModel import Model as BaseModel
+from khaleesi.core.models.eventSystemModel import Model as BaseEventSystemModel
 from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
@@ -40,3 +41,21 @@ class Model(BaseModel[Grpc]):
   def save(self, *args: Any, **kwargs: Any) -> None :
     """Don't talk to the database."""
     self.saved = True
+
+
+class EventSystemModel(BaseEventSystemModel[Grpc]):
+  """Allow instantiation of abstract model."""
+
+  def fromGrpc(self, *, grpc: Grpc) -> None :
+    """Change own values according to the grpc object."""
+
+  def toGrpc(
+      self, *,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : Grpc           = MagicMock(),
+  ) -> Grpc :
+    """Return a grpc object containing own values."""
+    return super().toGrpc(metadata = metadata, grpc = grpc)
+
+  def save(self, *args: Any, **kwargs: Any) -> None :
+    """Don't talk to the database."""
