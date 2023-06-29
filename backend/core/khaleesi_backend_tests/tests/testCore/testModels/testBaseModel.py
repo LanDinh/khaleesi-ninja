@@ -12,6 +12,7 @@ from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.core.shared.exceptions import (
   DbObjectNotFoundException,
   DbOutdatedInformationException,
+  DbObjectTwinException,
 )
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models import Model, Grpc
@@ -20,6 +21,8 @@ from tests.models import Model, Grpc
 class ModelManagerTestCase(SimpleTestCase):
   """Test the khaleesi base model manager."""
 
+  @patch('khaleesi.core.models.baseModel.transaction.atomic')
+  @patch.object(Model.objects, 'filter')
   def testKhaleesiCreate(self) -> None :
     """Test creating an instance."""
     # Execute test.
@@ -28,6 +31,14 @@ class ModelManagerTestCase(SimpleTestCase):
     self.assertEqual(1, result.khaleesiVersion)
     self.assertIsNotNone(result.khaleesiId)
     self.assertTrue(result.saved)  # type: ignore[attr-defined]
+
+  @patch('khaleesi.core.models.baseModel.transaction.atomic')
+  @patch.object(Model.objects, 'filter', return_value = [ 'one', 'two' ])
+  def testKhaleesiCreateNotBecauseDupe(self) -> None :
+    """Test creating an instance."""
+    # Execute test & assert result.
+    with self.assertRaises(DbObjectTwinException):
+      Model.objects.khaleesiCreate(grpc = MagicMock())
 
   @patch('khaleesi.core.models.baseModel.transaction.atomic')
   @patch.object(Model.objects, 'get')

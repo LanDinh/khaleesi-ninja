@@ -18,6 +18,7 @@ from google.protobuf.message import Message
 from khaleesi.core.shared.exceptions import (
   DbOutdatedInformationException,
   DbObjectNotFoundException,
+  DbObjectTwinException,
 )
 from khaleesi.proto.core_pb2 import ObjectMetadata
 
@@ -33,9 +34,14 @@ class ModelManager(models.Manager['Model'], Generic[Grpc]):  # type: ignore[type
 
   def khaleesiCreate(self, *, grpc: Grpc) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
     """Create a new instance."""
-    instance = self.model()
-    instance.khaleesiId = str(uuid4())
-    return self._khaleesiEdit(instance = instance, grpc = grpc, metadata = ObjectMetadata())
+    with transaction.atomic(using = 'write'):
+      khaleesiId = str(uuid4())
+      result = self.filter(khaleesiId = khaleesiId)
+      if len(result) > 0:
+        raise DbObjectTwinException(objectType = self.model.modelType(), objectId = khaleesiId)
+      instance = self.model()
+      instance.khaleesiId = khaleesiId
+      return self._khaleesiEdit(instance = instance, grpc = grpc, metadata = ObjectMetadata())
 
   def khaleesiUpdate(self, *, metadata: ObjectMetadata, grpc: Grpc) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
     """Update an existing instance."""
