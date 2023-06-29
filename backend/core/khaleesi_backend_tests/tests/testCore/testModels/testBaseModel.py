@@ -23,7 +23,7 @@ class ModelManagerTestCase(SimpleTestCase):
 
   @patch('khaleesi.core.models.baseModel.transaction.atomic')
   @patch.object(Model.objects, 'filter')
-  def testKhaleesiCreate(self) -> None :
+  def testKhaleesiCreate(self, *_: MagicMock) -> None :
     """Test creating an instance."""
     # Execute test.
     result = Model.objects.khaleesiCreate(grpc = MagicMock())
@@ -34,7 +34,7 @@ class ModelManagerTestCase(SimpleTestCase):
 
   @patch('khaleesi.core.models.baseModel.transaction.atomic')
   @patch.object(Model.objects, 'filter', return_value = [ 'one', 'two' ])
-  def testKhaleesiCreateNotBecauseDupe(self) -> None :
+  def testKhaleesiCreateNotBecauseDupe(self, *_: MagicMock) -> None :
     """Test creating an instance."""
     # Execute test & assert result.
     with self.assertRaises(DbObjectTwinException):
