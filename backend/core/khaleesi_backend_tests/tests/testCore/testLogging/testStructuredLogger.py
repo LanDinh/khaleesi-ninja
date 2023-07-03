@@ -19,13 +19,12 @@ from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.state import STATE, Query
 from khaleesi.core.testUtil.exceptions import defaultKhaleesiException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import RequestMetadata, User
+from khaleesi.proto.core_pb2 import RequestMetadata, User, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   Error,
   Event,
-  EmptyRequest,
   HttpRequest,
   HttpResponseRequest,
 )
