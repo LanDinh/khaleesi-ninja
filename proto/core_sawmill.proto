@@ -235,6 +235,12 @@ service Sawyer {
   rpc GetErrors           (LogFilter) returns (ErrorList);
   rpc GetHttpRequests     (LogFilter) returns (HttpRequestList);
   rpc GetQueries          (LogFilter) returns (QueryList);
+}
+
+/* MAID *******************************************************************************************/
+
+
+service Maid {
   rpc CleanupEvents       (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
   rpc CleanupGrpcRequests (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
   rpc CleanupErrors       (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
