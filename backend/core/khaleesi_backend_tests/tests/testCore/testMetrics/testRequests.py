@@ -65,8 +65,8 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           superGetValue.reset_mock()
           request = self._getRequestMetadata(user = userType, **requestAttributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
           peer    = self._getRequestMetadata(user = userType, **requestAttributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-          peer.caller.grpcService = calleeGrpcService
-          peer.caller.grpcMethod  = calleeGrpcMethod
+          peer.grpcCaller.grpcService = calleeGrpcService
+          peer.grpcCaller.grpcMethod  = calleeGrpcMethod
           # Execute test.
           self.metric.getValue(
             status  = status,
@@ -77,12 +77,12 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           superGetValue.assert_called_once_with(
             status              = status,
             user                = userType,
-            grpcService         = request.caller.grpcService  or 'UNKNOWN',
-            grpcMethod          = request.caller.grpcMethod   or 'UNKNOWN',
-            peerKhaleesiGate    = peer.caller.khaleesiGate    or 'UNKNOWN',
-            peerKhaleesiService = peer.caller.khaleesiService or 'UNKNOWN',
-            peerGrpcService     = peer.caller.grpcService     or 'UNKNOWN',
-            peerGrpcMethod      = peer.caller.grpcMethod      or 'UNKNOWN',
+            grpcService         = request.grpcCaller.grpcService  or 'UNKNOWN',
+            grpcMethod          = request.grpcCaller.grpcMethod   or 'UNKNOWN',
+            peerKhaleesiGate    = peer.grpcCaller.khaleesiGate    or 'UNKNOWN',
+            peerKhaleesiService = peer.grpcCaller.khaleesiService or 'UNKNOWN',
+            peerGrpcService     = peer.grpcCaller.grpcService     or 'UNKNOWN',
+            peerGrpcMethod      = peer.grpcCaller.grpcMethod      or 'UNKNOWN',
           )
 
 
@@ -96,11 +96,11 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
   ) -> RequestMetadata :
     """Get the request metadata."""
     requestMetadata = RequestMetadata()
-    requestMetadata.caller.khaleesiGate    = khaleesiGate
-    requestMetadata.caller.khaleesiService = khaleesiService
-    requestMetadata.caller.grpcService     = grpcService
-    requestMetadata.caller.grpcMethod      = grpcMethod
-    requestMetadata.user.type              = user
+    requestMetadata.grpcCaller.khaleesiGate    = khaleesiGate
+    requestMetadata.grpcCaller.khaleesiService = khaleesiService
+    requestMetadata.grpcCaller.grpcService     = grpcService
+    requestMetadata.grpcCaller.grpcMethod      = grpcMethod
+    requestMetadata.user.type                  = user
     return requestMetadata
 
 

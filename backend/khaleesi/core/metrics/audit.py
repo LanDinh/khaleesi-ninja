@@ -58,10 +58,10 @@ class AuditEventMetric(CounterMetric):
     """Transform the event into arguments."""
     return {
         'user'            : event.requestMetadata.user.type,
-        'khaleesiGate'    : event.requestMetadata.caller.khaleesiGate,
-        'khaleesiService' : event.requestMetadata.caller.khaleesiService,
-        'grpcService'     : event.requestMetadata.caller.grpcService,
-        'grpcMethod'      : event.requestMetadata.caller.grpcMethod,
+        'khaleesiGate'    : event.requestMetadata.grpcCaller.khaleesiGate,
+        'khaleesiService' : event.requestMetadata.grpcCaller.khaleesiService,
+        'grpcService'     : event.requestMetadata.grpcCaller.grpcService,
+        'grpcMethod'      : event.requestMetadata.grpcCaller.grpcMethod,
         'target'          : event.target.type,
         'actionCrudType'  : event.action.crudType,
         'actionCustomType': event.action.customType,

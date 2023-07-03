@@ -4,80 +4,53 @@
 from datetime import datetime, timezone
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.requestMetadata import (
-  addRequestMetadata,
-  addGrpcServerSystemRequestMetadata,
-)
-from khaleesi.core.shared.state import STATE, UserType
+from khaleesi.core.grpc.requestMetadata import addRequestMetadata, addSystemRequestMetadata
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.proto.core_pb2 import RequestMetadata, User
 
 
 class GrpcTestCase(SimpleTestCase):
   """Test grpc utility."""
 
-  def testAddGrpcServerSystemRequestMetadata(self) -> None :
+  def testAddSystemRequestMetadata(self) -> None :
     """Test adding request metadata for grpc server system actions."""
     # Prepare data.
     metadata = RequestMetadata()
-    expected = RequestMetadata()
-    expected.caller.httpRequestId = 'http-request'
-    expected.caller.grpcRequestId = 'grpc-request'
-    expected.caller.grpcService   = 'grpc-server'
-    expected.caller.grpcMethod    = 'lifecycle'
-    expected.user.id              = 'grpc-server'
+    httpRequestId = 'http-request'
+    grpcRequestId = 'grpc-request'
     # Execute test.
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = metadata,
       grpcMethod    = 'LIFECYCLE',
-      httpRequestId = 'http-request',
-      grpcRequestId = 'grpc-request',
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
     )
-    # Assert result
-    self._assertMetadata(metadata = metadata, expected = expected, userType = UserType.SYSTEM)
+    # Assert result.
+    self.assertEqual(httpRequestId, metadata.httpCaller.requestId)
+    self.assertEqual('core'       , metadata.httpCaller.khaleesiGate)
+    self.assertEqual('/'          , metadata.httpCaller.path)
+    self.assertEqual(''           , metadata.httpCaller.podId)
+    self.assertEqual(grpcRequestId, metadata.grpcCaller.requestId)
+    self.assertEqual('grpc-server', metadata.grpcCaller.grpcService)
+    self.assertEqual('lifecycle'  , metadata.grpcCaller.grpcMethod)
+    self.assertEqual('grpc-server'       , metadata.user.id)
+    self.assertEqual(User.UserType.SYSTEM, metadata.user.type)
+    self._assertMetadata(metadata = metadata)
 
   def testAddRequestMetadata(self) -> None :
     """Test adding request metadata."""
     # Prepare data.
-    expected = RequestMetadata()
-    expected.caller.httpRequestId = 'http-request'
-    expected.caller.grpcRequestId = 'grpc-request-id'
-    expected.caller.grpcService   = 'grpc-service'
-    expected.caller.grpcMethod    = 'grpc-method'
-    expected.user.id              = 'user-id'
-    for userType in UserType:
-      with self.subTest(user = userType.name):
-        metadata = RequestMetadata()
-        STATE.reset()
-        STATE.request.httpRequestId = expected.caller.httpRequestId
-        STATE.request.grpcRequestId = expected.caller.grpcRequestId
-        STATE.request.grpcService   = expected.caller.grpcService
-        STATE.request.grpcMethod    = expected.caller.grpcMethod
-        STATE.user.type   = userType
-        STATE.user.userId = expected.user.id
-        # Execute test.
-        addRequestMetadata(metadata = metadata)
-        # Assert result.
-        self._assertMetadata(metadata = metadata, expected = expected, userType = userType)
-        STATE.reset()
+    metadata = RequestMetadata()
+    # Execute test.
+    addRequestMetadata(metadata = metadata)
+    # Assert result.
+    self._assertMetadata(metadata = metadata)
 
-  def _assertMetadata(
-      self, *,
-      metadata: RequestMetadata,
-      expected: RequestMetadata,
-      userType: UserType,
-  ) -> None :
+  def _assertMetadata(self, *, metadata: RequestMetadata) -> None :
     """Asset that the metadata is as expected."""
-    # Manual values.
-    self.assertEqual(expected.caller.httpRequestId, metadata.caller.httpRequestId)
-    self.assertEqual(expected.caller.grpcRequestId, metadata.caller.grpcRequestId)
-    self.assertEqual(expected.caller.grpcService  , metadata.caller.grpcService)
-    self.assertEqual(expected.caller.grpcMethod   , metadata.caller.grpcMethod)
-    self.assertEqual(expected.user.id             , metadata.user.id)
-    self.assertEqual(userType                     , UserType(metadata.user.type))
     # Automatic values.
-    self.assertEqual('core'                  , metadata.caller.khaleesiGate)
-    self.assertEqual('khaleesi_backend_tests', metadata.caller.khaleesiService)
-    self.assertIsNotNone(metadata.caller.podId)
+    self.assertEqual('core'                  , metadata.grpcCaller.khaleesiGate)
+    self.assertEqual('khaleesi_backend_tests', metadata.grpcCaller.khaleesiService)
+    self.assertIsNotNone(metadata.grpcCaller.podId)
     now = datetime.now(tz = timezone.utc)
     self.assertEqual(now.date(), metadata.timestamp.ToDatetime().date())

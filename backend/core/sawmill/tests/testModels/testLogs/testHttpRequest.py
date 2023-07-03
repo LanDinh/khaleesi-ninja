@@ -124,7 +124,7 @@ class HttpRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         requestMock.reset_mock()
         requestMock.return_value = request
         grpcResponse = GrpcHttpResponseRequest()
-        grpcResponse.requestMetadata.caller.httpRequestId = 'request-id'
+        grpcResponse.requestMetadata.httpCaller.requestId = 'request-id'
         grpcResponse.response.status                      = status.name
         grpcResponse.response.timestamp.FromDatetime(request.metaResponseLoggedTimestamp)
         # Execute test.

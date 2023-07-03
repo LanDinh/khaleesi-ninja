@@ -28,10 +28,10 @@ class PrometheusClientInterceptor(ClientInterceptor):
   ) -> Any :
     """Collect the prometheus metrics."""
     peer = RequestMetadata()
-    peer.caller.khaleesiGate    = khaleesiGate
-    peer.caller.khaleesiService = khaleesiService
-    peer.caller.grpcService     = grpcService
-    peer.caller.grpcMethod      = grpcMethod
+    peer.grpcCaller.khaleesiGate    = khaleesiGate
+    peer.grpcCaller.khaleesiService = khaleesiService
+    peer.grpcCaller.grpcService     = grpcService
+    peer.grpcCaller.grpcMethod      = grpcMethod
     if hasattr(requestOrIterator, 'requestMetadata'):
       requestMetadata: RequestMetadata = requestOrIterator.requestMetadata
     else:

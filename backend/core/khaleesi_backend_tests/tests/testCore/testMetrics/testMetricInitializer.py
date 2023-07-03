@@ -26,7 +26,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
 
   metricInitializer = MetricInitializer(httpRequestId = 'http-request')
 
-  @patch('khaleesi.core.metrics.metricInitializer.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.metrics.metricInitializer.addSystemRequestMetadata')
   def testRequests(self, addMetadata: MagicMock) -> None :
     """Test requests."""
     # Prepare data.
@@ -68,7 +68,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
     results = set()
     for rawArgument in arguments:
       argument: Event = rawArgument.kwargs['event']
-      self.assertCaller(expected = eventData.caller, actual = argument.requestMetadata.caller)
+      self.assertCaller(expected = eventData.caller, actual = argument.requestMetadata.grpcCaller)
       users.add(argument.requestMetadata.user.type)
       crudActions.add(argument.action.crudType)
       if argument.action.customType:

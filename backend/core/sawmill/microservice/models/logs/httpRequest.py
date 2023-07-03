@@ -64,7 +64,7 @@ class HttpRequestManager(models.Manager['HttpRequest']):
   def logResponse(self, *, grpcResponse: GrpcHttpResponseRequest) -> HttpRequest :
     """Log a gRPC HTTP response."""
     request = self.get(
-      metaCallerHttpRequestId = grpcResponse.requestMetadata.caller.httpRequestId,
+      metaCallerHttpRequestId = grpcResponse.requestMetadata.httpCaller.requestId,
       metaResponseStatus      = 'IN_PROGRESS',
     )
     request.logResponse(grpcResponse = grpcResponse.response)

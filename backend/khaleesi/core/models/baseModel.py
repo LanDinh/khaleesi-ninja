@@ -92,3 +92,4 @@ class Model(models.Model, ABC, Generic[Grpc], metaclass = AbstractModelMeta):  #
 
   class Meta:
     abstract = True
+    ordering = [ 'pk' ]

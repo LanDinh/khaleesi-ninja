@@ -44,37 +44,37 @@ class Metadata(models.Model):
     return {
         # Caller.
         'metaCallerHttpRequestId': parseString(
-          raw    = metadata.caller.httpRequestId,
+          raw    = metadata.grpcCaller.requestId,
           name   = 'metaCallerHttpRequestId',
           errors = errors,
         ),
         'metaCallerGrpcRequestId': parseString(
-          raw    = metadata.caller.grpcRequestId,
+          raw    = metadata.grpcCaller.requestId,
           name   = 'metaCallerGrpcRequestId',
           errors = errors,
         ),
         'metaCallerKhaleesiGate': parseString(
-          raw    = metadata.caller.khaleesiGate,
+          raw    = metadata.grpcCaller.khaleesiGate,
           name   = 'metaCallerKhaleesiGate',
           errors = errors,
         ),
         'metaCallerKhaleesiService': parseString(
-          raw    = metadata.caller.khaleesiService,
+          raw    = metadata.grpcCaller.khaleesiService,
           name   = 'metaCallerKhaleesiService',
           errors = errors,
         ),
         'metaCallerGrpcService': parseString(
-          raw    = metadata.caller.grpcService,
+          raw    = metadata.grpcCaller.grpcService,
           name   = 'metaCallerGrpcService',
           errors = errors,
         ),
         'metaCallerGrpcMethod': parseString(
-          raw    = metadata.caller.grpcMethod,
+          raw    = metadata.grpcCaller.grpcMethod,
           name   = 'metaCallerGrpcMethod',
           errors = errors,
         ),
         'metaCallerPodId': parseString(
-          raw    = metadata.caller.podId,
+          raw    = metadata.grpcCaller.podId,
           name   = 'metaCallerPodId',
           errors = errors,
         ),
@@ -94,13 +94,13 @@ class Metadata(models.Model):
   def requestMetadataToGrpc(self, *, requestMetadata: RequestMetadata) -> None :
     """Fill in the request metadata for grpc."""
     # Caller.
-    requestMetadata.caller.httpRequestId   = self.metaCallerHttpRequestId
-    requestMetadata.caller.grpcRequestId   = self.metaCallerGrpcRequestId
-    requestMetadata.caller.khaleesiGate    = self.metaCallerKhaleesiGate
-    requestMetadata.caller.khaleesiService = self.metaCallerKhaleesiService
-    requestMetadata.caller.grpcService     = self.metaCallerGrpcService
-    requestMetadata.caller.grpcMethod      = self.metaCallerGrpcMethod
-    requestMetadata.caller.podId           = self.metaCallerPodId
+    requestMetadata.httpCaller.requestId       = self.metaCallerHttpRequestId
+    requestMetadata.grpcCaller.requestId       = self.metaCallerGrpcRequestId
+    requestMetadata.grpcCaller.khaleesiGate    = self.metaCallerKhaleesiGate
+    requestMetadata.grpcCaller.khaleesiService = self.metaCallerKhaleesiService
+    requestMetadata.grpcCaller.grpcService     = self.metaCallerGrpcService
+    requestMetadata.grpcCaller.grpcMethod      = self.metaCallerGrpcMethod
+    requestMetadata.grpcCaller.podId           = self.metaCallerPodId
     # User.
     requestMetadata.user.id   = self.metaUserId
     requestMetadata.user.type = self.metaUserType  # type: ignore[assignment]

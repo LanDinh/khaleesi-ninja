@@ -100,9 +100,6 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
       STRUCTURED_LOGGER = definition.GrpcServerInterceptor(
         NAME = 'khaleesi.core.logging.structuredLogger.StructuredGrpcLogger',
       ),
-      REQUEST_STATE = definition.GrpcServerInterceptor(
-        NAME = 'khaleesi.core.interceptors.server.requestState.RequestStateServerInterceptor',
-      ),
     ),
     HANDLERS = [ 'khaleesi.core.service.maid' ],
   ),

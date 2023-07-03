@@ -61,7 +61,7 @@ class Logger:
     logger.fatal(message, extra = self._extra())
 
   def _extra(self) -> Dict[str, str] :
-    return { 'grpcRequestId': STATE.request.grpcRequestId }
+    return { 'grpcRequestId': STATE.request.grpcCaller.requestId }
 
 
 class StdoutWriter(Logger):

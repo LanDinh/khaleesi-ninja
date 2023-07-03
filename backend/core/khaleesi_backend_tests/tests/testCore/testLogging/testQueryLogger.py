@@ -23,14 +23,13 @@ class QueryLoggerTestCase(SimpleTestCase):
         def method(*_: Any) -> None :
           pass
         STATE.reset()
-        STATE.queries[alias] = []
-        self.assertEqual(0, len(STATE.queries[alias]))
+        self.assertEqual(0, len(STATE.queries))
         # Execute test.
         logger(execute = method, sql = sql, params = None, many = many, context = {})
         # Assert result.
-        self.assertEqual(1, len(STATE.queries[alias]))
-        self.assertEqual(sql, STATE.queries[alias][0].raw)
-        self.assertIsNotNone(STATE.queries[alias][0].queryId)
+        self.assertEqual(1, len(STATE.queries))
+        self.assertEqual(sql, STATE.queries[0].raw)
+        self.assertIsNotNone(STATE.queries[0].id)
 
 
 class QueryLoggerContextManagerTestCase(SimpleTestCase):

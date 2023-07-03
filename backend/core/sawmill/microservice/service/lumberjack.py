@@ -71,7 +71,7 @@ class Service(Servicer):
     def method() -> Metadata :
       LOGGER.info(
         'Saving the system HTTP request '
-        f'"{request.requestMetadata.caller.httpRequestId}" to the database.',
+        f'"{request.requestMetadata.httpCaller.requestId}" to the database.',
       )
       return DbHttpRequest.objects.logSystemRequest(grpcRequest = request)
     return self._handleResponse(method = method)

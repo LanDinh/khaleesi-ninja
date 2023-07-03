@@ -35,7 +35,7 @@ class GrpcRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         string.return_value   = 'parsed-string'
         grpcRequest = GrpcGrpcRequest()
         self.setRequestMetadata(requestMetadata = grpcRequest.requestMetadata, user = userType)
-        grpcRequest.upstreamRequest.grpcRequestId   = string.return_value
+        grpcRequest.upstreamRequest.requestId       = string.return_value
         grpcRequest.upstreamRequest.khaleesiGate    = string.return_value
         grpcRequest.upstreamRequest.khaleesiService = string.return_value
         grpcRequest.upstreamRequest.grpcService     = string.return_value
@@ -46,10 +46,7 @@ class GrpcRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         metadata.assert_called_once()
         self.assertEqual(grpcRequest.requestMetadata, metadata.call_args.kwargs['metadata'])
         self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
-        self.assertEqual(
-          grpcRequest.upstreamRequest.grpcRequestId,
-          result.upstreamRequestGrpcRequestId,
-        )
+        self.assertEqual(grpcRequest.upstreamRequest.requestId, result.upstreamRequestGrpcRequestId)
         self.assertEqual(
           grpcRequest.upstreamRequest.khaleesiGate,
           result.upstreamRequestKhaleesiGate,
@@ -93,7 +90,7 @@ class GrpcRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
         requestMock.reset_mock()
         requestMock.return_value = request
         grpcResponse = GrpcGrpcResponse()
-        grpcResponse.requestMetadata.caller.grpcRequestId = 'request-id'
+        grpcResponse.requestMetadata.grpcCaller.requestId = 'request-id'
         grpcResponse.response.status                      = status.name
         grpcResponse.response.timestamp.FromDatetime(request.metaResponseLoggedTimestamp)
         # Execute test.
@@ -150,7 +147,7 @@ class GrpcRequestTestCase(ModelResponseMetadataMixin, SimpleTestCase):
           )
           self.assertEqual(
             request.upstreamRequestGrpcRequestId,
-            result.request.upstreamRequest.grpcRequestId,
+            result.request.upstreamRequest.requestId,
           )
           self.assertEqual(
             request.upstreamRequestKhaleesiGate,

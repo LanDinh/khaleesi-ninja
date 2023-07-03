@@ -25,15 +25,15 @@ class MetadataTestCase(SimpleTestCase):
         string.return_value    = 'parsed-string'
         grpcMetadata = GrpcMetadata()
         grpcMetadata.timestamp.FromDatetime(now)
-        grpcMetadata.caller.httpRequestId   = 'http-request-id'
-        grpcMetadata.caller.grpcRequestId   = 'grpc-request-id'
-        grpcMetadata.caller.khaleesiGate    = 'khaleesi-gate'
-        grpcMetadata.caller.khaleesiService = 'khaleesi-service'
-        grpcMetadata.caller.grpcService     = 'grpc-service'
-        grpcMetadata.caller.grpcMethod      = 'grpc-method'
-        grpcMetadata.caller.podId           = 'pod-id'
-        grpcMetadata.user.id                = 'user-id'
-        grpcMetadata.user.type              = userType
+        grpcMetadata.httpCaller.requestId       = 'http-request-id'
+        grpcMetadata.grpcCaller.requestId       = 'grpc-request-id'
+        grpcMetadata.grpcCaller.khaleesiGate    = 'khaleesi-gate'
+        grpcMetadata.grpcCaller.khaleesiService = 'khaleesi-service'
+        grpcMetadata.grpcCaller.grpcService     = 'grpc-service'
+        grpcMetadata.grpcCaller.grpcMethod      = 'grpc-method'
+        grpcMetadata.grpcCaller.podId           = 'pod-id'
+        grpcMetadata.user.id                    = 'user-id'
+        grpcMetadata.user.type                  = userType
         initialError = 'test errors'
         # Execute test.
         result = Metadata.logMetadata(metadata = grpcMetadata, errors = [ initialError])

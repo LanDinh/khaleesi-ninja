@@ -43,9 +43,9 @@ class AuditEventMetricTestCase(CounterMetricTestMixin, SimpleTestCase):
   ) -> Event :
     """Construct event."""
     event = Event()
-    event.requestMetadata.user.type          = user
-    event.requestMetadata.caller.grpcService = 'grpc-service'
-    event.requestMetadata.caller.grpcMethod  = 'grpc-method'
+    event.requestMetadata.user.type              = user
+    event.requestMetadata.grpcCaller.grpcService = 'grpc-service'
+    event.requestMetadata.grpcCaller.grpcMethod  = 'grpc-method'
     event.target.type = 'target'
     event.action.crudType   = actionCrudType
     event.action.customType = 'action-type'

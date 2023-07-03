@@ -17,10 +17,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import CHANNEL_MANAGER
 from khaleesi.core.grpc.importUtil import importSetting
-from khaleesi.core.grpc.requestMetadata import (
-  addRequestMetadata,
-  addGrpcServerSystemRequestMetadata,
-)
+from khaleesi.core.grpc.requestMetadata import addRequestMetadata, addSystemRequestMetadata
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.textLogger import LOGGER
@@ -48,22 +45,22 @@ class StructuredLogger(ABC):
   def logGrpcRequest(self, *, upstreamRequest: RequestMetadata) -> None :
     """Log a microservice request."""
     LOGGER.info(
-      f'User "{STATE.user.userId}" started request '
-      f'{STATE.request.grpcService}.{STATE.request.grpcMethod}.'
+      f'User "{STATE.request.user.id}" started request '
+      f'{STATE.request.grpcCaller.grpcService}.{STATE.request.grpcCaller.grpcMethod}.'
     )
     LOGGER.info(
-      f'Upstream request "{upstreamRequest.caller.grpcRequestId}" caller data: '
-      f'{upstreamRequest.caller.khaleesiGate}-{upstreamRequest.caller.khaleesiService}: '
-      f'{upstreamRequest.caller.grpcService}.{upstreamRequest.caller.grpcMethod}'
+      f'Upstream request "{upstreamRequest.grpcCaller.requestId}" caller data: '
+      f'{upstreamRequest.grpcCaller.khaleesiGate}-{upstreamRequest.grpcCaller.khaleesiService}: '
+      f'{upstreamRequest.grpcCaller.grpcService}.{upstreamRequest.grpcCaller.grpcMethod}'
     )
 
     grpcRequest = GrpcRequest()
     addRequestMetadata(metadata = grpcRequest.requestMetadata)
-    grpcRequest.upstreamRequest.grpcRequestId   = upstreamRequest.caller.grpcRequestId
-    grpcRequest.upstreamRequest.khaleesiGate    = upstreamRequest.caller.khaleesiGate
-    grpcRequest.upstreamRequest.khaleesiService = upstreamRequest.caller.khaleesiService
-    grpcRequest.upstreamRequest.grpcService     = upstreamRequest.caller.grpcService
-    grpcRequest.upstreamRequest.grpcMethod      = upstreamRequest.caller.grpcMethod
+    grpcRequest.upstreamRequest.requestId       = upstreamRequest.grpcCaller.requestId
+    grpcRequest.upstreamRequest.khaleesiGate    = upstreamRequest.grpcCaller.khaleesiGate
+    grpcRequest.upstreamRequest.khaleesiService = upstreamRequest.grpcCaller.khaleesiService
+    grpcRequest.upstreamRequest.grpcService     = upstreamRequest.grpcCaller.grpcService
+    grpcRequest.upstreamRequest.grpcMethod      = upstreamRequest.grpcCaller.grpcMethod
 
     self.sendLogGrpcRequest(grpcRequest = grpcRequest)
 
@@ -76,7 +73,7 @@ class StructuredLogger(ABC):
     """Log a microservice request."""
     LOGGER.info(f'System started request "{grpcRequestId}".')
     grpcRequest = GrpcRequest()
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = grpcRequest.requestMetadata,
       grpcMethod    = grpcMethod,
       httpRequestId = httpRequestId,
@@ -93,7 +90,7 @@ class StructuredLogger(ABC):
   ) -> None :
     """Log a microservice system response."""
     grpcResponse = GrpcResponseRequest()
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = grpcResponse.requestMetadata,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
@@ -134,7 +131,7 @@ class StructuredLogger(ABC):
   ) -> None :
     """Log an exception."""
     error = self._logErrorObject(exception = exception)
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = error.requestMetadata,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
@@ -148,7 +145,7 @@ class StructuredLogger(ABC):
       f'HTTP request "{httpRequestId}" started.'
     )
     httpRequest = EmptyRequest()
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = httpRequest.requestMetadata,
       grpcMethod    = grpcMethod,
       httpRequestId = httpRequestId,
@@ -158,7 +155,7 @@ class StructuredLogger(ABC):
 
   def logHttpRequest(self) -> None :
     """Log a HTTP request for system requests."""
-    LOGGER.info(f'HTTP request "{STATE.request.httpRequestId}" started.')
+    LOGGER.info(f'HTTP request "{STATE.request.httpCaller.requestId}" started.')
     httpRequest = HttpRequest()
     addRequestMetadata(metadata = httpRequest.requestMetadata)
     self.sendLogHttpRequest(httpRequest = httpRequest)
@@ -171,7 +168,7 @@ class StructuredLogger(ABC):
   ) -> None :
     """Log a microservice system HTTP response."""
     httpResponse = HttpResponseRequest()
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = httpResponse.requestMetadata,
       grpcMethod    = grpcMethod,
       httpRequestId = httpRequestId,
@@ -190,7 +187,7 @@ class StructuredLogger(ABC):
     addRequestMetadata(metadata = httpResponse.requestMetadata)
     self._logResponseObject(
       status      = status,
-      requestName = f'HTTP request "{STATE.request.httpRequestId}"',
+      requestName = f'HTTP request "{STATE.request.httpCaller.requestId}"',
       response    = httpResponse.response,
     )
     self.sendLogHttpResponse(httpResponse = httpResponse)
@@ -209,7 +206,7 @@ class StructuredLogger(ABC):
   ) -> None :
     """Log a system event."""
     event = Event()
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = event.requestMetadata,
       grpcMethod    = grpcMethod,
       httpRequestId = httpRequestId,
@@ -297,15 +294,9 @@ class StructuredLogger(ABC):
   def _logQueries(self, *, queries: RepeatedCompositeFieldContainer[Query]) -> None :
     """Attach queries to the gRPC object."""
     count = 0
-    for connection, stateQueries in STATE.queries.items():
-      for query in stateQueries:
-        grpcQuery            = queries.add()
-        grpcQuery.id         = query.queryId
-        grpcQuery.connection = connection
-        grpcQuery.raw        = query.raw
-        grpcQuery.start.FromDatetime(query.start)
-        grpcQuery.end.FromDatetime(query.end)
-        count += 1
+    for query in STATE.queries:
+      queries.append(query)
+      count += 1
     LOGGER.info(f'Reporting {count} queries.')
 
   def _logResponseObject(

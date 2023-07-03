@@ -14,7 +14,7 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import CHANNEL_MANAGER
-from khaleesi.core.grpc.requestMetadata import addGrpcServerSystemRequestMetadata
+from khaleesi.core.grpc.requestMetadata import addSystemRequestMetadata
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS, RequestsMetric
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
@@ -82,7 +82,7 @@ class BaseMetricInitializer(ABC):
   def requests(self) -> ServiceCallData :
     """Fetch the data for request metrics."""
     request = EmptyRequest()
-    addGrpcServerSystemRequestMetadata(
+    addSystemRequestMetadata(
       metadata      = request.requestMetadata,
       httpRequestId = self.httpRequestId,
       grpcRequestId = self.grpcRequestId,
@@ -96,7 +96,7 @@ class BaseMetricInitializer(ABC):
     for request in requests.callList:
       requestMetadata = RequestMetadata()
       self._buildRequestMetadata(requestMetadata = requestMetadata, caller = request.call)
-      if requestMetadata.caller.grpcService == self.ownName:
+      if requestMetadata.grpcCaller.grpcService == self.ownName:
         userList = [ (User.UserType.Name(User.UserType.SYSTEM), User.UserType.SYSTEM) ]
       else:
         userList = User.UserType.items()
@@ -124,7 +124,7 @@ class BaseMetricInitializer(ABC):
     """Register the request to the specified metric."""
     peer = RequestMetadata()
     self._buildRequestMetadata(requestMetadata = peer, caller = rawPeer)
-    if peer.caller.grpcService == self.ownName and \
+    if peer.grpcCaller.grpcService == self.ownName and \
         requestMetadata.user.type != User.UserType.SYSTEM:
       return  # pragma: no cover
     for status in StatusCode:
@@ -137,10 +137,10 @@ class BaseMetricInitializer(ABC):
       caller: GrpcCallerDetails,
   ) -> None :
     """Build the request metadata to register metrics."""
-    requestMetadata.caller.khaleesiGate    = caller.khaleesiGate
-    requestMetadata.caller.khaleesiService = caller.khaleesiService
-    requestMetadata.caller.grpcService     = caller.grpcService
-    requestMetadata.caller.grpcMethod      = caller.grpcMethod
+    requestMetadata.grpcCaller.khaleesiGate    = caller.khaleesiGate
+    requestMetadata.grpcCaller.khaleesiService = caller.khaleesiService
+    requestMetadata.grpcCaller.grpcService     = caller.grpcService
+    requestMetadata.grpcCaller.grpcMethod      = caller.grpcMethod
 
   def _initializeEvents(self, *, events: List[EventData]) -> None :
     """Initialize the event metrics to 0."""
@@ -177,13 +177,13 @@ class BaseMetricInitializer(ABC):
         privateDetails = '',
       )
     event = Event()
-    event.requestMetadata.user.type              = userType
-    event.requestMetadata.caller.khaleesiGate    = eventData.caller.khaleesiGate
-    event.requestMetadata.caller.khaleesiService = eventData.caller.khaleesiService
-    event.requestMetadata.caller.grpcService     = eventData.caller.grpcService
-    event.requestMetadata.caller.grpcMethod      = eventData.caller.grpcMethod
-    event.target.type                            = eventData.targetType
-    event.action.result                          = resultType
+    event.requestMetadata.user.type                  = userType
+    event.requestMetadata.grpcCaller.khaleesiGate    = eventData.caller.khaleesiGate
+    event.requestMetadata.grpcCaller.khaleesiService = eventData.caller.khaleesiService
+    event.requestMetadata.grpcCaller.grpcService     = eventData.caller.grpcService
+    event.requestMetadata.grpcCaller.grpcMethod      = eventData.caller.grpcMethod
+    event.target.type                                = eventData.targetType
+    event.action.result                              = resultType
 
     if actionCrudType:
       event.action.crudType = actionCrudType

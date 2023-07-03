@@ -149,8 +149,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     )
     context.set_code.assert_not_called()
     context.set_details.assert_not_called()
-    self.assertEqual(requestMetadata.caller, upstreamRequest.caller)
-    self.assertEqual(StatusCode.OK         , status)
+    self.assertEqual(requestMetadata.grpcCaller, upstreamRequest.grpcCaller)
+    self.assertEqual(StatusCode.OK             , status)
 
   def _assertExceptionLoggingCall(
       self, *,

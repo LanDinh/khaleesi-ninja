@@ -10,33 +10,22 @@ from grpc import StatusCode
 
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.requestState import (
-  BaseRequestStateServerInterceptor,
   RequestStateServerInterceptor,
   instantiateRequestStateInterceptor
 )
 from khaleesi.core.logging.textLogger import LogLevel
-from khaleesi.core.shared.state import STATE, UserType
+from khaleesi.core.shared.state import STATE
 from khaleesi.core.testUtil.exceptions import khaleesiRaisingMethod
 from khaleesi.core.testUtil.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import User, RequestMetadata
-
-
-class RequestStateServerTestInterceptor(BaseRequestStateServerInterceptor):
-  """Subclass to test base functionality."""
-
-  mock = MagicMock()
-
-  def setHttpRequestId(self, *, upstream: RequestMetadata) -> None :
-    """Set the HTTP request."""
-    self.mock()
+from khaleesi.proto.core_pb2 import User
 
 
 @patch('khaleesi.core.interceptors.server.requestState.LOGGER')
-class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
+class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
   """Test RequestStateServerInterceptor."""
 
-  interceptor = RequestStateServerTestInterceptor()
+  interceptor = RequestStateServerInterceptor()
 
   def testInterceptWithRequestMetadata(self, *_: MagicMock) -> None :
     """Test intercept with metadata present."""
@@ -83,7 +72,6 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
   ) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
-    self.interceptor.mock.reset_mock()
     def _method(*_: Any) -> None :
       self._assertNotCleanState(userType = userType)
     # Execute test.
@@ -93,7 +81,6 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
     )
     # Assert result.
     self._assertCleanState()
-    self.interceptor.mock.assert_called_once()
     queryLogger.assert_called_once()
 
   @patch('khaleesi.core.interceptors.server.requestState.queryLogger')
@@ -110,7 +97,6 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
       for loglevel in LogLevel:
         with self.subTest(status = status.name, loglevel = loglevel.name):
           # Prepare data.
-          self.interceptor.mock.reset_mock()
           queryLogger.reset_mock()
           context.reset_mock()
           # Execute test.
@@ -127,7 +113,6 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
           )
           # Assert result.
           self._assertCleanState()
-          self.interceptor.mock.assert_called_once()
           context.abort.assert_called_once()
           queryLogger.assert_called_once()
 
@@ -142,7 +127,6 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
     """Test the counter gets incremented."""
     # Prepare data.
     context = MagicMock()
-    self.interceptor.mock.reset_mock()
     def _method(*_: Any) -> None :
       self._assertNotCleanState(userType = userType)
       raise Exception('exception')
@@ -154,56 +138,28 @@ class BaseRequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTe
     # Assert result.
     self._assertCleanState()
     context.abort.assert_called_once()
-    self.interceptor.mock.assert_called_once()
     queryLogger.assert_called_once()
 
   def _assertCleanState(self) -> None :
     """Assert a clean state."""
-    self.assertEqual('UNKNOWN'       , STATE.request.grpcService)
-    self.assertEqual('UNKNOWN'       , STATE.request.grpcMethod)
-    self.assertEqual('UNKNOWN'       , STATE.user.userId)
-    self.assertEqual(UserType.UNKNOWN, STATE.user.type)
+    self.assertEqual('UNKNOWN', STATE.request.httpCaller.requestId)
+    self.assertEqual('system' , STATE.request.grpcCaller.requestId)
+    self.assertEqual('UNKNOWN', STATE.request.user.id)
+    self.assertEqual(User.UserType.UNKNOWN, STATE.request.user.type)
 
   # noinspection PyUnusedLocal
   def _assertNotCleanState(self, *args: Any, userType: int, **kwargs: Any) -> None :
     """Assert a clean state."""
-    self.assertNotEqual('UNKNOWN'      , STATE.request.grpcService)
-    self.assertNotEqual('UNKNOWN'      , STATE.request.grpcMethod)
-    self.assertNotEqual('UNKNOWN'      , STATE.user.userId)
-    self.assertEqual(UserType(userType), STATE.user.type)
-
-
-class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase):
-  """Test RequestStateServerInterceptor."""
-
-  interceptor = RequestStateServerInterceptor()
-
-  def testSetHttpRequestIdWithRequestMetadata(self) -> None :
-    """Test setting the HTTP request id."""
-    for name, requestParams in self.metadataRequestParams:
-      for userLabel, userType in User.UserType.items():
-        with self.subTest(case = name, user = userLabel):
-          # Prepare data.
-          requestMetadata, _ = self.getRequest(
-            request = None,
-            user    = userType,
-            **requestParams,
-          )
-          STATE.reset()
-          # Execute test.
-          self.interceptor.setHttpRequestId(upstream = requestMetadata)
-          # Assert result.
-          self.assertEqual(requestMetadata.caller.httpRequestId, STATE.request.httpRequestId)
+    self.assertNotEqual('UNKNOWN', STATE.request.httpCaller.requestId)
+    self.assertNotEqual('system' , STATE.request.grpcCaller.requestId)
+    self.assertNotEqual('UNKNOWN', STATE.request.user.id)
+    self.assertEqual(userType, STATE.request.user.type)
 
 
 class RequestStateServerInterceptorInstantiationTest(SimpleTestCase):
   """Test instantiation."""
 
-  @patch('khaleesi.core.interceptors.server.requestState.LOGGER')
-  @patch('khaleesi.core.interceptors.server.requestState.importSetting')
-  def testInstantiation(self, importSetting: MagicMock, *_: MagicMock) -> None :
+  def testInstantiation(self) -> None :
     """Test instantiation."""
     # Execute test.
     instantiateRequestStateInterceptor()
-    # Assert result.
-    importSetting.assert_called_once()

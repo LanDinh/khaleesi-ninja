@@ -1,8 +1,7 @@
 """Interceptor to handle state of requests."""
 
 # Python.
-from abc import ABC, abstractmethod
-from typing import Callable, Any, cast
+from typing import Callable, Any
 from uuid import uuid4
 
 # Django.
@@ -12,20 +11,18 @@ from django.conf import settings
 from grpc import ServicerContext
 
 # khaleesi.ninja.
-from khaleesi.core.grpc.importUtil import importSetting
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.logging.queryLogger import queryLogger
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
-from khaleesi.core.shared.state import STATE, UserType
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.core.shared.state import STATE
 
 
 khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
-class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
+class RequestStateServerInterceptor(ServerInterceptor):
   """Interceptor to handle state of requests."""
 
   def khaleesiIntercept(  # pylint: disable=inconsistent-return-statements
@@ -39,17 +36,18 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
     STATE.reset()  # Always start with a clean state.
     try:
       with queryLogger():
-        STATE.request.grpcRequestId = str(uuid4())
+        STATE.request.grpcCaller.requestId = str(uuid4())
         # Process request data.
         _, _, serviceName, methodName = self.processMethodName(raw = methodName)
-        STATE.request.grpcService = serviceName
-        STATE.request.grpcMethod  = methodName
+        STATE.request.grpcCaller.grpcService = serviceName
+        STATE.request.grpcCaller.grpcMethod  = methodName
 
         upstream = self.getUpstreamRequest(request = request)
-        self.setHttpRequestId(upstream = upstream)
+        if upstream.httpCaller.requestId:
+          STATE.request.httpCaller.requestId = upstream.httpCaller.requestId
         if upstream.user.id:
-          STATE.user.userId = upstream.user.id
-        STATE.user.type = UserType(upstream.user.type)
+          STATE.request.user.id = upstream.user.id
+        STATE.request.user.type = upstream.user.type
 
         # Continue execution.
         response = method(request, context)
@@ -60,10 +58,6 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
     except Exception as exception:  # pylint: disable=broad-except
       newException = MaskingInternalServerException(exception = exception)
       self._handleException(context = context, exception = newException)
-
-  @abstractmethod
-  def setHttpRequestId(self, *, upstream: RequestMetadata) -> None :
-    """Set the HTTP request id."""
 
   def _handleException(
       self, *,
@@ -77,19 +71,6 @@ class BaseRequestStateServerInterceptor(ServerInterceptor, ABC):
     context.abort(code = exception.status, details = exception.toJson())
 
 
-class RequestStateServerInterceptor(BaseRequestStateServerInterceptor):
-  """RequestStateServerInterceptor that reads the ID from the request metadata."""
-
-  def setHttpRequestId(self, *, upstream: RequestMetadata) -> None :
-    """Set the HTTP request id."""
-    if upstream.caller.httpRequestId:
-      STATE.request.httpRequestId = upstream.caller.httpRequestId
-
-
-def instantiateRequestStateInterceptor() -> BaseRequestStateServerInterceptor :
+def instantiateRequestStateInterceptor() -> RequestStateServerInterceptor :
   """Instantiate the request state interceptor."""
-  LOGGER.info('Importing request state interceptor...')
-  return cast(BaseRequestStateServerInterceptor, importSetting(
-    name               = 'request state interceptor',
-    fullyQualifiedName = khaleesiSettings['GRPC']['INTERCEPTORS']['REQUEST_STATE']['NAME'],
-  ))
+  return RequestStateServerInterceptor()

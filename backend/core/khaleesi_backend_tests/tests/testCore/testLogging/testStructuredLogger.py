@@ -16,7 +16,7 @@ from khaleesi.core.logging.structuredLogger import (
 )
 from khaleesi.core.logging.textLogger import LogLevel
 from khaleesi.core.shared.exceptions import KhaleesiException
-from khaleesi.core.shared.state import STATE, Query
+from khaleesi.core.shared.state import STATE
 from khaleesi.core.testUtil.exceptions import defaultKhaleesiException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import RequestMetadata, User, EmptyRequest
@@ -27,6 +27,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   Event,
   HttpRequest,
   HttpResponseRequest,
+  Query,
 )
 
 
@@ -78,11 +79,11 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     metadata.reset_mock()
     upstreamRequest = RequestMetadata()
-    upstreamRequest.caller.grpcRequestId   = 'request-id'
-    upstreamRequest.caller.khaleesiGate    = 'khaleesi-gate'
-    upstreamRequest.caller.khaleesiService = 'khaleesi-service'
-    upstreamRequest.caller.grpcService     = 'grpc-service'
-    upstreamRequest.caller.grpcMethod      = 'grpc-method'
+    upstreamRequest.grpcCaller.requestId       = 'request-id'
+    upstreamRequest.grpcCaller.khaleesiGate    = 'khaleesi-gate'
+    upstreamRequest.grpcCaller.khaleesiService = 'khaleesi-service'
+    upstreamRequest.grpcCaller.grpcService     = 'grpc-service'
+    upstreamRequest.grpcCaller.grpcMethod      = 'grpc-method'
     # Perform test.
     self.logger.logGrpcRequest(upstreamRequest = upstreamRequest)
     # Assert result.
@@ -90,9 +91,9 @@ class TestStructuredLogger(SimpleTestCase):
     self.assertEqual(2, logger.info.call_count)
     metadata.assert_called_once()
     logGrpcRequest = cast(GrpcRequest, self.logger.sender.send.call_args.kwargs['request'])
-    self.assertEqual(upstreamRequest.caller, logGrpcRequest.upstreamRequest)
+    self.assertEqual(upstreamRequest.grpcCaller, logGrpcRequest.upstreamRequest)
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogSystemRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a system request."""
     # Prepare data.
@@ -113,7 +114,7 @@ class TestStructuredLogger(SimpleTestCase):
     logger.info.assert_called_once()
     metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogSystemHttpRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a request."""
     # Prepare data.
@@ -143,7 +144,7 @@ class TestStructuredLogger(SimpleTestCase):
     logger.info.assert_called_once()
     metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogNotOkSystemHttpResponse(
       self,
       metadata: MagicMock,
@@ -172,7 +173,7 @@ class TestStructuredLogger(SimpleTestCase):
         self.assertEqual(status.name, logResponse.response.status)
         metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogOkSystemHttpResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
@@ -233,7 +234,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogNotOkSystemResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     for status in [s for s in StatusCode if s != StatusCode.OK]:
@@ -261,7 +262,7 @@ class TestStructuredLogger(SimpleTestCase):
         self.assertEqual(0, len(logResponse.queries))
         metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogOkSystemResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
@@ -269,14 +270,13 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     ids = [ 'id0', 'id1', 'id2', ]
     STATE.reset()
-    STATE.queries = {
-        'one' : [ Query(queryId = ids[0], raw = 'raw', start = datetime.now(tz = timezone.utc)) ],
-        'two' : [
-            Query(queryId = ids[1], raw = 'raw', start = datetime.now(tz = timezone.utc)),
-            Query(queryId = ids[2], raw = 'raw', start = datetime.now(tz = timezone.utc)),
-        ],
-        'zero': [],
-    }
+    for queryId in ids:
+      query = Query()
+      query.id = queryId
+      query.raw = 'raw'
+      query.start.FromDatetime(datetime.now(tz = timezone.utc))
+      query.connection = 'connection'
+      STATE.queries.append(query)
     # Perform test.
     self.logger.logSystemGrpcResponse(
       httpRequestId = 'http-request-id',
@@ -290,12 +290,10 @@ class TestStructuredLogger(SimpleTestCase):
     logResponse = cast(GrpcResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     self.assertEqual(3, len(logResponse.queries))
-    for queryId in ids:
-      self.assertIn(queryId, [ query.id for query in logResponse.queries ])
-    connections = [ query.connection for query in logResponse.queries ]
-    self.assertIn('one', connections)
-    self.assertIn('two', connections)
-    self.assertNotIn('three', connections)
+    for query in logResponse.queries:
+      self.assertIn(query.id, ids)
+      self.assertEqual('connection', query.connection)
+      self.assertEqual('raw'       , query.raw)
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
@@ -329,14 +327,13 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     ids = [ 'id0', 'id1', 'id2', ]
     STATE.reset()
-    STATE.queries = {
-        'one' : [ Query(queryId = ids[0], raw = 'raw', start = datetime.now(tz = timezone.utc)) ],
-        'two' : [
-            Query(queryId = ids[1], raw = 'raw', start = datetime.now(tz = timezone.utc)),
-            Query(queryId = ids[2], raw = 'raw', start = datetime.now(tz = timezone.utc)),
-        ],
-        'zero': [],
-    }
+    for queryId in ids:
+      query = Query()
+      query.id = queryId
+      query.raw = 'raw'
+      query.start.FromDatetime(datetime.now(tz = timezone.utc))
+      query.connection = 'connection'
+      STATE.queries.append(query)
     # Perform test.
     self.logger.logGrpcResponse(status = StatusCode.OK)
     # Assert result.
@@ -345,8 +342,10 @@ class TestStructuredLogger(SimpleTestCase):
     logResponse = cast(GrpcResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     self.assertEqual(3, len(logResponse.queries))
-    for queryId in ids:
-      self.assertIn(queryId, [ query.id for query in logResponse.queries ])
+    for query in logResponse.queries:
+      self.assertIn(query.id, ids)
+      self.assertEqual('connection', query.connection)
+      self.assertEqual('raw'       , query.raw)
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
@@ -372,7 +371,7 @@ class TestStructuredLogger(SimpleTestCase):
           self._assertError(exception = exception, logError = logError)
           metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogSystemError(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging an error."""
     httpRequestId = 'http-request'
@@ -403,7 +402,7 @@ class TestStructuredLogger(SimpleTestCase):
           self._assertError(exception = exception, logError = logError)
           metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addGrpcServerSystemRequestMetadata')
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogSystemEvent(self, requestMetadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a system event."""
     method        = 'LIFECYCLE'

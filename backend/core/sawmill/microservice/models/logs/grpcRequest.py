@@ -26,7 +26,7 @@ class GrpcRequestManager(models.Manager['GrpcRequest']):
 
     upstreamRequest = {} if grpcRequest is None else {
         "upstreamRequestGrpcRequestId": parseString(
-          raw    = grpcRequest.upstreamRequest.grpcRequestId,
+          raw    = grpcRequest.upstreamRequest.requestId,
           name   = 'upstreamRequestGrpcRequestId',
           errors = errors,
         ),
@@ -62,7 +62,7 @@ class GrpcRequestManager(models.Manager['GrpcRequest']):
   def logResponse(self, *, grpcResponse: GrpcGrpcResponse) -> GrpcRequest :
     """Log a gRPC response."""
     request = self.get(
-      metaCallerGrpcRequestId = grpcResponse.requestMetadata.caller.grpcRequestId,
+      metaCallerGrpcRequestId = grpcResponse.requestMetadata.grpcCaller.requestId,
       metaResponseStatus      = 'IN_PROGRESS',
     )
     request.logResponse(grpcResponse = grpcResponse.response)
@@ -98,7 +98,7 @@ class GrpcRequest(ResponseMetadata):
     )
 
     # Upstream request.
-    grpcRequestResponse.request.upstreamRequest.grpcRequestId = self.upstreamRequestGrpcRequestId
+    grpcRequestResponse.request.upstreamRequest.requestId = self.upstreamRequestGrpcRequestId
     grpcRequestResponse.request.upstreamRequest.khaleesiGate = self.upstreamRequestKhaleesiGate
     grpcRequestResponse.request.upstreamRequest.khaleesiService = \
       self.upstreamRequestKhaleesiService

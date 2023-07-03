@@ -10,7 +10,8 @@ from uuid import uuid4
 from django.db import connections
 
 # khaleesi.ninja.
-from khaleesi.core.shared.state import Query, STATE
+from khaleesi.core.shared.state import STATE
+from khaleesi.proto.core_sawmill_pb2 import Query
 
 
 class QueryLogger:
@@ -31,13 +32,18 @@ class QueryLogger:
       context: Dict[str, Any],
   ) -> Any :
     """Wrap the database call."""
-    query = Query(queryId = str(uuid4()), raw = sql, start = datetime.now(tz = timezone.utc))
-    STATE.queries[self.alias].append(query)
+    query = Query()
+    query.id         = str(uuid4())
+    query.connection = self.alias
+    query.raw        = sql
+    query.start.FromDatetime(datetime.now(tz = timezone.utc))
+    STATE.queries.append(query)
+
     try:
       result = execute(sql, params, many, context)
       return result  # finally executes before the return statement.
     finally:
-      query.end = datetime.now(tz = timezone.utc)
+      query.end.FromDatetime(datetime.now(tz = timezone.utc))
 
 
 @contextmanager

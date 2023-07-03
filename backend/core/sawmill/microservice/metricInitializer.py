@@ -38,7 +38,7 @@ class MetricInitializer(BaseMetricInitializer):
 
   def getServiceCallData(self, *, request: EmptyRequest) -> ServiceCallData :
     """Fetch the data for request metrics."""
-    return SERVICE_REGISTRY.getCallData(owner = request.requestMetadata.caller)
+    return SERVICE_REGISTRY.getCallData(owner = request.requestMetadata.grpcCaller)
 
   def _serverStateEvents(self) -> List[EventData] :
     events = []

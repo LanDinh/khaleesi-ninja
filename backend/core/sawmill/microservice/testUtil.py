@@ -55,13 +55,13 @@ class ModelRequestMetadataMixin:
       grpcResponse: GrpcResponseMetadata,
   ) -> None :
     """Assert that returned gRPC request metadata matches the original model metadata."""
-    self.assertEqual(model.metaCallerHttpRequestId  , grpc.caller.httpRequestId)
-    self.assertEqual(model.metaCallerGrpcRequestId  , grpc.caller.grpcRequestId)
-    self.assertEqual(model.metaCallerKhaleesiGate   , grpc.caller.khaleesiGate)
-    self.assertEqual(model.metaCallerKhaleesiService, grpc.caller.khaleesiService)
-    self.assertEqual(model.metaCallerGrpcService    , grpc.caller.grpcService)
-    self.assertEqual(model.metaCallerGrpcMethod     , grpc.caller.grpcMethod)
-    self.assertEqual(model.metaCallerPodId          , grpc.caller.podId)
+    self.assertEqual(model.metaCallerHttpRequestId  , grpc.httpCaller.requestId)
+    self.assertEqual(model.metaCallerGrpcRequestId  , grpc.grpcCaller.requestId)
+    self.assertEqual(model.metaCallerKhaleesiGate   , grpc.grpcCaller.khaleesiGate)
+    self.assertEqual(model.metaCallerKhaleesiService, grpc.grpcCaller.khaleesiService)
+    self.assertEqual(model.metaCallerGrpcService    , grpc.grpcCaller.grpcService)
+    self.assertEqual(model.metaCallerGrpcMethod     , grpc.grpcCaller.grpcMethod)
+    self.assertEqual(model.metaCallerPodId          , grpc.grpcCaller.podId)
     self.assertEqual(model.metaUserId  , grpc.user.id)
     self.assertEqual(model.metaUserType, grpc.user.type)
     self.assertEqual(

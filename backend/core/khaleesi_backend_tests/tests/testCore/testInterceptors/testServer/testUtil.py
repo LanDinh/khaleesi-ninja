@@ -51,11 +51,11 @@ class ServerInterceptorTest(SimpleTestCase):
     """Test if we can fetch the upstream request."""
     # Prepare data.
     request = GrpcRequest()
-    request.requestMetadata.caller.grpcRequestId = 'request-id'
+    request.requestMetadata.grpcCaller.requestId = 'request-id'
     # Execute test.
     result = self.interceptor.getUpstreamRequest(request = request)
     # Assert result.
-    self.assertEqual(request.requestMetadata.caller.grpcRequestId, result.caller.grpcRequestId)
+    self.assertEqual(request.requestMetadata.grpcCaller.requestId, result.grpcCaller.requestId)
 
 
 
@@ -64,4 +64,4 @@ class ServerInterceptorTest(SimpleTestCase):
     # Execute test.
     result = self.interceptor.getUpstreamRequest(request = object())
     # Assert result.
-    self.assertEqual('', result.caller.grpcRequestId)
+    self.assertEqual('', result.grpcCaller.requestId)
