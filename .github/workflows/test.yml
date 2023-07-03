@@ -213,10 +213,11 @@ jobs:
         run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m
       - name: "Spin up the environment"
         run:  ./scripts/ci/deploy.sh ${{ matrix.environment.name }}
-      - name: "Check the status"
-        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
       - name: "Wait for successful spinup"
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} wait pod -l job!=true --for condition=ready --timeout 2m
+      - name: "Check the status"
+        if: always()
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
 
   # Clean up cache.
   clean-cache:
