@@ -38,15 +38,15 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up events older than '
-      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbEvent, request = request))
 
-  def CleanupGrpcRequests(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupGrpcRequests(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :  # pylint: disable=line-too-long
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up requests older than '
-      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbGrpcRequest, request = request))
 
@@ -54,15 +54,15 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up errors older than '
-      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbError, request = request))
 
-  def CleanupHttpRequests(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupHttpRequests(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :  # pylint: disable=line-too-long
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up HTTP requests older than '
-      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = request))
 
@@ -70,7 +70,7 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up queries older than '
-      f'{request.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbQuery, request = request))
 
