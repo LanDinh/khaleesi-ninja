@@ -9,10 +9,10 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.shared.parseUtil import parseString
+from khaleesi.proto.core_pb2 import EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   HttpRequest as GrpcHttpRequest,
   HttpRequestResponse as GrpcHttpRequestResponse,
-  EmptyRequest,
   HttpResponseRequest as GrpcHttpResponseRequest,
 )
 from microservice.models.logs.abstractResponse import ResponseMetadata

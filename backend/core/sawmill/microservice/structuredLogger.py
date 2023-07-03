@@ -2,12 +2,12 @@
 
 # khaleesi.ninja.
 from khaleesi.core.logging.structuredLogger import StructuredLogger
+from khaleesi.proto.core_pb2 import EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   Error,
   Event,
-  EmptyRequest,
   HttpRequest,
   HttpResponseRequest,
 )

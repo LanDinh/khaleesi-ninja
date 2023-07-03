@@ -7,6 +7,9 @@ import "google/protobuf/duration.proto";
 import "core.proto";
 
 
+/* SHARED *****************************************************************************************/
+
+
 message ResponseMetadata {
   google.protobuf.Timestamp loggedTimestamp = 1;
   string                    errors          = 2;
@@ -121,6 +124,9 @@ message GrpcResponseRequest {
 }
 
 
+/* LUMBERJACK *************************************************************************************/
+
+
 message LogStandardResponse {}
 
 service Lumberjack {
@@ -129,8 +135,8 @@ service Lumberjack {
   rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
   rpc LogError               (Error)               returns (LogStandardResponse);
   rpc LogHttpRequest         (HttpRequest)         returns (LogStandardResponse);
-  rpc LogSystemHttpRequest   (EmptyRequest)        returns (LogStandardResponse);
   rpc LogHttpRequestResponse (HttpResponseRequest) returns (LogStandardResponse);
+  rpc LogSystemHttpRequest   (khaleesi.core.EmptyRequest) returns (LogStandardResponse);
 }
 
 
@@ -235,6 +241,10 @@ service Sawyer {
   rpc CleanupHttpRequests (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
   rpc CleanupQueries      (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
 }
+
+
+/* FORESTER ***************************************************************************************/
+
 
 message CallData {
   khaleesi.core.GrpcCallerDetails          call     = 1;

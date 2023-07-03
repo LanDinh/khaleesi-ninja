@@ -9,8 +9,8 @@ from django.conf import settings
 # khaleesi.ninja.
 from khaleesi.core.metrics.metricInitializer import BaseMetricInitializer, EventData, GrpcData
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
-from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData, EmptyRequest
+from khaleesi.proto.core_pb2 import User, GrpcCallerDetails, EmptyRequest
+from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
 from microservice.models.serviceRegistry import SERVICE_REGISTRY
 
 

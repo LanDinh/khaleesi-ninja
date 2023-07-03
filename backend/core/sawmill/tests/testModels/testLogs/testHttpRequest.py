@@ -11,10 +11,9 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.testUtil.grpc import GrpcTestMixin
 from khaleesi.core.testUtil.testCase import TransactionTestCase, SimpleTestCase
-from khaleesi.proto.core_pb2 import User
+from khaleesi.proto.core_pb2 import User, EmptyRequest as GrpcEmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   HttpRequest as GrpcHttpRequest,
-  EmptyRequest as GrpcEmptyRequest,
   HttpRequestResponse as GrpcHttpResponse,
   HttpResponseRequest as GrpcHttpResponseRequest,
 )
