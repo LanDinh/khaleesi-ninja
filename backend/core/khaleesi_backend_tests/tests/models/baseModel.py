@@ -1,4 +1,7 @@
 """Test only models."""
+
+from __future__ import annotations
+
 # Python.
 from abc import ABC
 from typing import Any
@@ -8,8 +11,7 @@ from unittest.mock import MagicMock
 from google.protobuf.message import Message
 
 # khaleesi.ninja.
-from khaleesi.core.models.baseModel import Model as BaseModel
-from khaleesi.core.models.eventSystemModel import Model as BaseEventSystemModel
+from khaleesi.core.models.baseModel import Model, ModelManager as BaseModelManager
 from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
@@ -17,9 +19,18 @@ class Grpc(Message, ABC):
   """Helper class."""
 
 
-class Model(BaseModel[Grpc]):
+class ModelManager(BaseModelManager['BaseModel']):
   """Allow instantiation of abstract model."""
 
+  def khaleesiGet(self, *, metadata: ObjectMetadata) -> BaseModel :
+    """Get an existing instance."""
+    return self.model()
+
+
+class BaseModel(Model[Grpc]):
+  """Allow instantiation of abstract model."""
+
+  objects: ModelManager = ModelManager()    # type: ignore[assignment]
   saved: bool
 
   def __init__(self) -> None :
@@ -41,21 +52,3 @@ class Model(BaseModel[Grpc]):
   def save(self, *args: Any, **kwargs: Any) -> None :
     """Don't talk to the database."""
     self.saved = True
-
-
-class EventSystemModel(BaseEventSystemModel[Grpc]):
-  """Allow instantiation of abstract model."""
-
-  def fromGrpc(self, *, grpc: Grpc) -> None :
-    """Change own values according to the grpc object."""
-
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata = ObjectMetadata(),
-      grpc    : Grpc           = MagicMock(),
-  ) -> Grpc :
-    """Return a grpc object containing own values."""
-    return super().toGrpc(metadata = metadata, grpc = grpc)
-
-  def save(self, *args: Any, **kwargs: Any) -> None :
-    """Don't talk to the database."""

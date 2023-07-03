@@ -61,7 +61,7 @@ class BaseMetricInitializer(ABC):
   grpcRequestId: str
 
   # noinspection PyUnusedLocal
-  def __init__(self, *, httpRequestId: str) -> None :  # pylint: disable=unused-argument,line-too-long
+  def __init__(self, *, httpRequestId: str) -> None :
     self.ownName = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES']['SERVICE_NAME']
     self.httpRequestId = httpRequestId
     self.grpcRequestId = str(uuid4())

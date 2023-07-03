@@ -6,8 +6,8 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import IdRequest, IdMessage, EmptyResponse
-from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest
+from khaleesi.proto.core_pb2 import ObjectMetadata
+from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest, JobResponse
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
     add_BellRingerServicer_to_server as addToServer
@@ -19,25 +19,20 @@ from microservice.models import Job
 class Service(Servicer):
   """core_clocktower service."""
 
-  def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> IdMessage :
+  def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> JobResponse :
     """Create a new job."""
     LOGGER.info('Creating the new job.')
-    job = Job.objects.createJob(grpcJob = request.job)
-    response = IdMessage()
-    response.id = job.jobId
+    job = Job.objects.khaleesiCreate(grpc = request.job)
+    response = JobResponse()
+    job.toGrpc(metadata = response.metadata, grpc = response.job)
     return response
 
-  def ExecuteJob(self, request: IdRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def ExecuteJob(self, request: ObjectMetadata, _: grpc.ServicerContext) -> ObjectMetadata :
     """Execute a job by ID."""
-    LOGGER.info(f'Executing job "{request.idMessage.id}".')
-    action, jobRequest = Job.objects.getJobRequest(idMessage = request.idMessage)
-    ACTUATOR.actuate(
-      actionName = action,
-      job        = jobRequest.job,
-      action     = jobRequest.actionConfiguration,
-      cleanup    = jobRequest.cleanupConfiguration,
-    )
-    return EmptyResponse()
+    LOGGER.info(f'Executing job "{request.id}".')
+    job = Job.objects.khaleesiGet(metadata = request)
+    action, jobExecutionRequest = job.toGrpcJobExecutionRequest()
+    return ACTUATOR.actuate(action = action, request = jobExecutionRequest)
 
 
 serviceConfiguration = ServiceConfiguration[Service](

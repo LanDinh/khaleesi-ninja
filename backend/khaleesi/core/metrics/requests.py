@@ -31,7 +31,7 @@ class RequestsMetric(CounterMetric):
       ],
     )
 
-  def inc(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def inc(  # type: ignore[override]  # pylint: disable=arguments-differ
       self, *,
       request: RequestMetadata,
       peer   : RequestMetadata,
@@ -40,7 +40,7 @@ class RequestsMetric(CounterMetric):
     """Increment the metric."""
     super().inc(status = status, **self._getArguments(request = request, peer = peer))
 
-  def register(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def register(  # type: ignore[override]  # pylint: disable=arguments-differ
       self, *,
       request: RequestMetadata,
       peer   : RequestMetadata,
@@ -49,7 +49,7 @@ class RequestsMetric(CounterMetric):
     """Increment the metric."""
     super().register(status = status, **self._getArguments(request = request, peer = peer))  # pragma: no cover  # pylint: disable=line-too-long
 
-  def getValue(  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def getValue(  # type: ignore[override]  # pylint: disable=arguments-differ
       self, *,
       request: RequestMetadata,
       peer   : RequestMetadata,
@@ -58,7 +58,7 @@ class RequestsMetric(CounterMetric):
     """Increment the metric."""
     return super().getValue(status = status, **self._getArguments(request = request, peer = peer))
 
-  def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
+  def labels(  # type: ignore[override] # pylint: disable=arguments-differ,useless-super-delegation
       self, *,
       status            : StatusCode,
       user              : 'User.UserType.V',

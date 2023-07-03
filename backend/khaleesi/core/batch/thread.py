@@ -1,12 +1,12 @@
 """Thread utility."""
 
 # Python.
-from threading import Thread, Event
-from typing import Generic
+from threading import Thread, Event, enumerate as threadingEnumerate
+from typing import Generic, List
 
 # khaleesi.ninja.
 from khaleesi.core.batch.job import BaseJob, M
-from khaleesi.proto.core_pb2 import JobExecutionMetadata
+from khaleesi.proto.core_pb2 import ObjectMetadata, JobExecution
 
 
 class BatchJobThread(Thread, Generic[M]):
@@ -31,6 +31,24 @@ class BatchJobThread(Thread, Generic[M]):
     """Stop the current thread object."""
     self.stopEvent.set()
 
-  def isJob(self, *, job: JobExecutionMetadata) -> bool :
+  def isJob(self, *, job: ObjectMetadata) -> bool :
     """Check if the job is the one asked for."""
-    return self.job.job.jobId == job.jobId and self.job.job.executionId == job.executionId
+    return self.job.request.jobMetadata.id == job.id
+
+def stopAllJobs() -> List[Thread] :
+  """Stop all jobs."""
+  threads: List[Thread] = []
+  for thread in threadingEnumerate():
+    if hasattr(thread, 'isBatchJobThread'):
+      thread.stop()  # type: ignore[attr-defined]
+      threads.append(thread)
+  return threads
+
+def stopJob(jobs: List[JobExecution]) -> None :
+  """Stop the given job."""
+  for thread in threadingEnumerate():
+    if hasattr(thread, 'isBatchJobThread'):
+      # This is expected to have at most 1 element, but stop all executions just in case.
+      for job in jobs:
+        if thread.isJob(job = job):  # type: ignore[attr-defined]
+          thread.stop()  # type: ignore[attr-defined]

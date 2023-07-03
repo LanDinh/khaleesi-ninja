@@ -5,45 +5,37 @@ from __future__ import annotations
 # Python.
 from abc import ABC, ABCMeta, abstractmethod
 from typing import TypeVar, Generic
-from uuid import uuid4
 
 # Django.
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 
 # gRPC.
 from google.protobuf.message import Message
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import (
-  DbOutdatedInformationException,
-  DbObjectNotFoundException,
-  DbObjectTwinException,
-)
+from khaleesi.core.shared.exceptions import DbOutdatedInformationException
 from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
-Grpc = TypeVar('Grpc', bound = Message)
+Grpc      = TypeVar('Grpc', bound = Message)
+ModelType = TypeVar('ModelType', bound = 'Model')  # type: ignore[type-arg]  # pylint: disable=invalid-name
 
 class AbstractModelMeta(ABCMeta, type(models.Model)):  # type: ignore[misc]
   """Need this to circumvent metaclass conflicts."""
 
 
-class ModelManager(models.Manager['Model'], Generic[Grpc]):  # type: ignore[type-arg]
+class ModelManager(models.Manager[ModelType], Generic[ModelType]):
   """Basic model manager for CRUD operations."""
 
-  def khaleesiCreate(self, *, grpc: Grpc) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
+  def khaleesiCreate(self, *, grpc: Grpc) -> ModelType :
     """Create a new instance."""
-    with transaction.atomic(using = 'write'):
-      khaleesiId = str(uuid4())
-      result = self.filter(khaleesiId = khaleesiId)
-      if len(result) > 0:
-        raise DbObjectTwinException(objectType = self.model.modelType(), objectId = khaleesiId)
-      instance = self.model()
-      instance.khaleesiId = khaleesiId
-      return self._khaleesiEdit(instance = instance, grpc = grpc, metadata = ObjectMetadata())
+    return self._khaleesiEdit(
+      instance = self.khaleesiInstantiateNewInstance(),
+      grpc     = grpc,
+      metadata = ObjectMetadata(),
+    )
 
-  def khaleesiUpdate(self, *, metadata: ObjectMetadata, grpc: Grpc) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
+  def khaleesiUpdate(self, *, metadata: ObjectMetadata, grpc: Grpc) -> ModelType :
     """Update an existing instance."""
     with transaction.atomic(using = 'write'):
       return self._khaleesiEdit(
@@ -54,21 +46,22 @@ class ModelManager(models.Manager['Model'], Generic[Grpc]):  # type: ignore[type
 
   def khaleesiDelete(self, *, metadata: ObjectMetadata) -> None :
     """Delete an existing instance."""
-    self.filter(khaleesiId = metadata.id).delete()
+    self.khaleesiGet(metadata = metadata).delete()
 
-  def khaleesiGet(self, *, metadata: ObjectMetadata) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
+  @abstractmethod
+  def khaleesiGet(self, *, metadata: ObjectMetadata) -> ModelType :
     """Get an existing instance."""
-    try:
-      return self.get(khaleesiId = metadata.id)
-    except ObjectDoesNotExist as exception:
-      raise DbObjectNotFoundException(objectType = self.model.modelType()) from exception
+
+  def khaleesiInstantiateNewInstance(self) -> ModelType :
+    """Instantiate a new element."""
+    return self.model()
 
   def _khaleesiEdit(
       self, *,
-      instance: 'Model'[Grpc],  # pylint: disable=invalid-sequence-index
+      instance: ModelType,
       grpc    : Grpc,
       metadata: ObjectMetadata,
-  ) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
+  ) -> ModelType :
     if not instance.khaleesiVersion == metadata.version:
       raise DbOutdatedInformationException(objectType = self.model.modelType(), metadata = metadata)
     instance.fromGrpc(grpc = grpc)
@@ -79,14 +72,9 @@ class ModelManager(models.Manager['Model'], Generic[Grpc]):  # type: ignore[type
 
 class Model(models.Model, ABC, Generic[Grpc], metaclass = AbstractModelMeta):  # type: ignore[misc]
   """Basic model for gRPC conversions."""
-
-  khaleesiId      = models.TextField(unique = True, editable = False)
   khaleesiVersion = models.IntegerField(default = 0)
 
-  khaleesiCreated  = models.DateTimeField(auto_now_add = True)
-  khaleesiModified = models.DateTimeField(auto_now = True)
-
-  objects = ModelManager()
+  objects: ModelManager[Model[Grpc]]
 
   @classmethod
   def modelType(cls) -> str :
@@ -99,10 +87,7 @@ class Model(models.Model, ABC, Generic[Grpc], metaclass = AbstractModelMeta):  #
 
   def toGrpc(self, *, metadata: ObjectMetadata = ObjectMetadata(), grpc: Grpc) -> Grpc :
     """Return a grpc object containing own values."""
-    metadata.id      = self.khaleesiId
     metadata.version = self.khaleesiVersion
-    metadata.created.FromDatetime(self.khaleesiCreated)
-    metadata.modified.FromDatetime(self.khaleesiModified)
     return grpc
 
   class Meta:

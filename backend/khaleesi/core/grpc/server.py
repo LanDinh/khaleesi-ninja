@@ -18,6 +18,7 @@ from grpc_health.v1.health_pb2_grpc import add_HealthServicer_to_server
 from grpc_reflection.v1alpha import reflection
 
 # khaleesi.ninja.
+from khaleesi.core.batch.thread import stopAllJobs
 from khaleesi.core.grpc.channels import CHANNEL_MANAGER
 from khaleesi.core.grpc.importUtil import registerService
 from khaleesi.core.interceptors.server.logging import instantiateLoggingInterceptor
@@ -32,7 +33,6 @@ from khaleesi.core.shared.exceptions import (
   TimeoutException,
 )
 from khaleesi.core.shared.singleton import SINGLETON
-from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences
@@ -96,7 +96,7 @@ class Server:
       self.server.start()
       LOGGER.info('Setting health state...')
       for serviceName in self.serviceNames:
-        self.healthServicer.set(serviceName, HealthCheckResponse.SERVING)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+        self.healthServicer.set(serviceName, HealthCheckResponse.SERVING)  # type: ignore[arg-type]
       self.healthServicer.set('', HealthCheckResponse.SERVING)  # type: ignore[arg-type]
       self._logServerStartEvent(
         grpcRequestId = startGrpcRequestId,
@@ -169,7 +169,7 @@ class Server:
       secondsRemaining = (end - datetime.now(tz = timezone.utc)).seconds
       doneEvent = self.server.stop(secondsRemaining)
 
-      threads = JobExecution.objects.stopAllJobs()
+      threads = stopAllJobs()
       for thread in threads:
         secondsRemaining = (end - datetime.now(tz = timezone.utc)).seconds
         thread.join(secondsRemaining)

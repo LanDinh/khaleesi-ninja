@@ -1,83 +1,73 @@
 """Test the event logs."""
 
 # Python.
-from datetime import timedelta
 from unittest.mock import patch, MagicMock
+from uuid import UUID
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import DbObjectNotFoundException, DbObjectTwinException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import IdMessage
 from khaleesi.proto.core_clocktower_pb2 import Job as GrpcJob
 from microservice.models import Job
 
 
-@patch('microservice.models.job.parseString')
-class JobManagerTestCase(SimpleTestCase):
-  """Test the event logs objects manager."""
+class JobTestCase(SimpleTestCase):
+  """Test the job model."""
 
-  @patch.object(Job.objects, 'create')
-  def testCreateJob(self, create: MagicMock, *_: MagicMock) -> None :
-    """Test creating a new job."""
+  @patch('microservice.models.job.JobConfigurationMixin.jobConfigurationToGrpc')
+  @patch('microservice.models.job.addRequestMetadata')
+  def testToGrpcJobExecutionRequest(
+      self,
+      requestMetadata : MagicMock,
+      jobConfiguration: MagicMock,
+  ) -> None :
+    """Test getting a gRPC job execution request."""
     # Prepare data.
-    grpcJob = GrpcJob()
-    grpcJob.description                   = 'description'
-    grpcJob.cronExpression                = 'cron'
-    grpcJob.actionConfiguration.batchSize = 1337
-    grpcJob.actionConfiguration.timelimit.FromTimedelta(timedelta(minutes = 13))
-    grpcJob.cleanupConfiguration.cleanupDelay.FromTimedelta(timedelta(seconds = 42))
+    job = Job(khaleesiId = 'job-id', action = 'action')
     # Execute test.
-    Job.objects.createJob(grpcJob = grpcJob)
+    action, result = job.toGrpcJobExecutionRequest()
     # Assert result.
-    create.assert_called_once()
-    callArgs = create.call_args.kwargs
-    self.assertEqual(grpcJob.description   , callArgs['description'])
-    self.assertEqual(grpcJob.cronExpression, callArgs['cronExpression'])
-    self.assertEqual(grpcJob.actionConfiguration.batchSize              , callArgs['batchSize'])
-    self.assertEqual(grpcJob.actionConfiguration.timelimit.ToTimedelta(), callArgs['timelimit'])
-    self.assertEqual(
-      grpcJob.cleanupConfiguration.cleanupDelay.ToTimedelta(),
-      callArgs['cleanupDelay'],
+    requestMetadata.assert_called_once()
+    jobConfiguration.assert_called_once()
+    self.assertEqual(job.khaleesiId, result.jobExecution.jobMetadata.id)
+    self.assertTrue(UUID(result.jobExecution.executionMetadata.id))
+    self.assertEqual(job.action, action)
+
+  @patch('microservice.models.job.JobConfigurationMixin.jobConfigurationFromGrpc')
+  def testFromGrpc(self, jobConfiguration: MagicMock) -> None :
+    """Test setting the values from gRPC."""
+    # Prepare data.
+    job = Job()
+    grpc = GrpcJob()
+    grpc.name           = 'name'
+    grpc.description    = 'description'
+    grpc.cronExpression = 'cronExpression'
+    grpc.action         = 'action'
+    # Execute test.
+    job.fromGrpc(grpc = grpc)
+    # Assert result.
+    jobConfiguration.assert_called_once()
+    self.assertEqual(grpc.name          , job.name)
+    self.assertEqual(grpc.description   , job.description)
+    self.assertEqual(grpc.cronExpression, job.cronExpression)
+    self.assertEqual(grpc.action        , job.action)
+
+  @patch('microservice.models.job.JobConfigurationMixin.jobConfigurationToGrpc')
+  @patch('microservice.models.job.Model.toGrpc')
+  def testToGrpc(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
+    """Test returning a gRPC."""
+    # Prepare data.
+    job = Job(
+      name           = 'name',
+      description    = 'description',
+      cronExpression = 'cron',
+      action         = 'action',
     )
-
-  @patch.object(Job.objects, 'create')
-  def testCreateJobEnforceDefaultValues(self, create: MagicMock, *_: MagicMock) -> None :
-    """Test creating a new job."""
-    # Prepare data.
-    grpcJob = GrpcJob()
     # Execute test.
-    Job.objects.createJob(grpcJob = grpcJob)
+    result = job.toGrpc()
     # Assert result.
-    create.assert_called_once()
-    callArgs = create.call_args.kwargs
-    self.assertEqual(1000                , callArgs['batchSize'])
-    self.assertEqual(timedelta(hours = 1), callArgs['timelimit'])
-
-  @patch.object(Job.objects, 'get')
-  def testGetJobRequest(self, get: MagicMock, *_: MagicMock) -> None :
-    """Test getting a job request."""
-    # Prepare data.
-    idMessage = IdMessage()
-    get.return_value = Job()
-    # Execute test.
-    Job.objects.getJobRequest(idMessage = idMessage)
-    # Assert result.
-    get.assert_called_once_with(jobId = idMessage.id)
-
-  @patch.object(Job.objects, 'get')
-  def testGetJobRequestNotFound(self, get: MagicMock, *_: MagicMock) -> None :
-    """Test getting a job request."""
-    # Prepare data.
-    get.side_effect = Job.DoesNotExist()
-    # Execute test & assert result.
-    with self.assertRaises(DbObjectNotFoundException):
-      Job.objects.getJobRequest(idMessage = IdMessage())
-
-  @patch.object(Job.objects, 'get')
-  def testGetJobRequestTwins(self, get: MagicMock, *_: MagicMock) -> None :
-    """Test getting a job request."""
-    # Prepare data.
-    get.side_effect = Job.MultipleObjectsReturned()
-    # Execute test & assert result.
-    with self.assertRaises(DbObjectTwinException):
-      Job.objects.getJobRequest(idMessage = IdMessage())
+    parent.assert_called_once()
+    jobConfiguration.assert_called_once()
+    self.assertEqual(job.name          , result.name)
+    self.assertEqual(job.description   , result.description)
+    self.assertEqual(job.cronExpression, result.cronExpression)
+    self.assertEqual(job.action        , result.action)

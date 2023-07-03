@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import JobRequest
+from khaleesi.proto.core_pb2 import JobExecutionRequest
 from microservice.actuator.core.sawmill import (
   cleanupEvents,
   cleanupGrpcRequests,
@@ -22,7 +22,7 @@ class SawmillJobTestCase(SimpleTestCase):
   def testCleanupEvents(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
-    request = JobRequest()
+    request = JobExecutionRequest()
     # Execute test.
     cleanupEvents(request)
     # Assert result.
@@ -31,7 +31,7 @@ class SawmillJobTestCase(SimpleTestCase):
   def testCleanupGrpcRequests(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
-    request = JobRequest()
+    request = JobExecutionRequest()
     # Execute test.
     cleanupGrpcRequests(request)
     # Assert result.
@@ -40,7 +40,7 @@ class SawmillJobTestCase(SimpleTestCase):
   def testCleanupErrors(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
-    request = JobRequest()
+    request = JobExecutionRequest()
     # Execute test.
     cleanupErrors(request)
     # Assert result.
@@ -49,7 +49,7 @@ class SawmillJobTestCase(SimpleTestCase):
   def testCleanupHttpRequests(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
-    request = JobRequest()
+    request = JobExecutionRequest()
     # Execute test.
     cleanupHttpRequests(request)
     # Assert result.
@@ -58,7 +58,7 @@ class SawmillJobTestCase(SimpleTestCase):
   def testCleanupQueries(self, stub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
-    request = JobRequest()
+    request = JobExecutionRequest()
     # Execute test.
     cleanupQueries(request)
     # Assert result.

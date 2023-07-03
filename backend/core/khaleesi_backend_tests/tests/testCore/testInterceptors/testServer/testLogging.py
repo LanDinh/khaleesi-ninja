@@ -36,14 +36,14 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     """Test intercept with metadata present."""
     for name, requestParams in self.metadataRequestParams:
       with self.subTest(case = name):
-        self._executeInterceptGrpcLoggingTest(  # pylint: disable=no-value-for-parameter
+        self._executeInterceptGrpcLoggingTest(
           requestParams = requestParams,
           singleton     = singleton,
         )
 
   def testInterceptWithoutRequestMetadata(self, singleton: MagicMock) -> None :
     """Test intercept with no metadata present."""
-    self._executeInterceptGrpcLoggingTest(  # pylint: disable=no-value-for-parameter
+    self._executeInterceptGrpcLoggingTest(
       request       = {},
       requestParams = self.emptyInput,
       singleton     = singleton,

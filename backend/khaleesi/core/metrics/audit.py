@@ -27,19 +27,19 @@ class AuditEventMetric(CounterMetric):
       ],
     )
 
-  def inc(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def inc(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Increment the metric."""
     super().inc(**self._getArguments(event = event))
 
-  def register(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def register(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Increment the metric."""
     super().register(**self._getArguments(event = event))  # pragma: no cover
 
-  def getValue(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,unused-argument
+  def getValue(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Increment the metric."""
     return super().getValue(**self._getArguments(event = event))
 
-  def labels(  # type: ignore[override] # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
+  def labels(  # type: ignore[override] # pylint: disable=arguments-differ,useless-super-delegation
       self, *,
       user              : 'User.UserType.V',
       actionCrudType    : 'Event.Action.ActionType.V',

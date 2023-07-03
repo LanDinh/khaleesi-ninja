@@ -6,7 +6,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from tests.models import EventSystemModel as Model
+from tests.models.eventSystemModel import EventSystemModel
 
 
 @patch('khaleesi.core.models.eventSystemModel.SINGLETON')
@@ -22,7 +22,7 @@ class ModelManagerTestCase(SimpleTestCase):
     instance.khaleesiModified = datetime.now(tz = timezone.utc)
     parent.return_value = instance
     # Execute test.
-    Model.objects.khaleesiCreate(grpc = MagicMock())  # type: ignore[has-type]
+    EventSystemModel.objects.khaleesiCreate(grpc = MagicMock())
     # Assert result.
     singleton.structuredLogger.logEvent.assert_called_once()
 
@@ -33,7 +33,7 @@ class ModelManagerTestCase(SimpleTestCase):
     parent.side_effect = Exception()
     # Execute test.
     with self.assertRaises(Exception):
-      Model.objects.khaleesiCreate(grpc = MagicMock())  # type: ignore[has-type]
+      EventSystemModel.objects.khaleesiCreate(grpc = MagicMock())
     # Assert result.
     singleton.structuredLogger.logEvent.assert_called_once()
 
@@ -46,7 +46,7 @@ class ModelManagerTestCase(SimpleTestCase):
     instance.khaleesiModified = datetime.now(tz = timezone.utc)
     parent.return_value = instance
     # Execute test.
-    Model.objects.khaleesiUpdate(metadata = MagicMock(), grpc = MagicMock())  # type: ignore[has-type]  # pylint: disable=line-too-long
+    EventSystemModel.objects.khaleesiUpdate(metadata = MagicMock(), grpc = MagicMock())
     # Assert result.
     singleton.structuredLogger.logEvent.assert_called_once()
 
@@ -57,7 +57,7 @@ class ModelManagerTestCase(SimpleTestCase):
     parent.side_effect = Exception()
     # Execute test.
     with self.assertRaises(Exception):
-      Model.objects.khaleesiUpdate(metadata = MagicMock(), grpc = MagicMock())  # type: ignore[has-type]  # pylint: disable=line-too-long
+      EventSystemModel.objects.khaleesiUpdate(metadata = MagicMock(), grpc = MagicMock())
     # Assert result.
     singleton.structuredLogger.logEvent.assert_called_once()
 
@@ -65,7 +65,7 @@ class ModelManagerTestCase(SimpleTestCase):
   def testKhaleesiDelete(self, _: MagicMock, singleton: MagicMock) -> None :
     """Test creating an instance."""
     # Execute test.
-    Model.objects.khaleesiDelete(metadata = MagicMock())  # type: ignore[has-type]  # pylint: disable=line-too-long
+    EventSystemModel.objects.khaleesiDelete(metadata = MagicMock())
     # Assert result.
     singleton.structuredLogger.logEvent.assert_called_once()
 
@@ -76,6 +76,6 @@ class ModelManagerTestCase(SimpleTestCase):
     parent.side_effect = Exception()
     # Execute test.
     with self.assertRaises(Exception):
-      Model.objects.khaleesiDelete(metadata = MagicMock())  # type: ignore[has-type]  # pylint: disable=line-too-long
+      EventSystemModel.objects.khaleesiDelete(metadata = MagicMock())
     # Assert result.
     singleton.structuredLogger.logEvent.assert_called_once()

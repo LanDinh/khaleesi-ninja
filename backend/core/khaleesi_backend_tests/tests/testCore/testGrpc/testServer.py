@@ -18,7 +18,6 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import TimeoutException, KhaleesiException
 from khaleesi.core.testUtil.exceptions import defaultKhaleesiException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.models.job import JobExecution
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 
@@ -33,7 +32,7 @@ khaleesiNinjaSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 @patch('khaleesi.core.grpc.server.LOGGER')
 @patch('khaleesi.core.grpc.server.HEALTH_METRIC')
 @patch('khaleesi.core.grpc.server.MetricInitializer')
-@patch.object(JobExecution.objects, 'stopAllJobs')
+@patch('khaleesi.core.grpc.server.stopAllJobs')
 @patch('khaleesi.core.grpc.server.CHANNEL_MANAGER')
 @patch('khaleesi.core.grpc.server.SINGLETON')
 @patch('khaleesi.core.grpc.server.server')

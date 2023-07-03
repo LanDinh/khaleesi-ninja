@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Python.
 from abc import ABC
-from typing import Generic
+from typing import Generic, TypeVar
 
 # Django.
 from django.conf import settings
@@ -17,20 +17,24 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.singleton import SINGLETON
 from khaleesi.proto.core_pb2 import ObjectMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import Event
-from .baseModel import Model as BaseModel, ModelManager as BaseModelManager, Grpc, AbstractModelMeta
+from .baseModel import Grpc, AbstractModelMeta
+from .idModel import Model as BaseModel, ModelManager as BaseModelManager
 
 
 khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
-class ModelManager(BaseModelManager[Grpc], Generic[Grpc]):
+
+ModelType = TypeVar('ModelType', bound = 'Model')  # type: ignore[type-arg]  # pylint: disable=invalid-name
+
+class ModelManager(BaseModelManager[ModelType], Generic[ModelType]):
   """khaleesi.ninja base model manager which sends events upon changes."""
 
-  def khaleesiCreate(self, *, grpc: Grpc) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
+  def khaleesiCreate(self, *, grpc: Grpc) -> ModelType :
     """Create a new instance."""
     try:
       instance = super().khaleesiCreate(grpc = grpc)
-      self._logSuccessEvent(instance = instance, action = Event.Action.ActionType.CREATE)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-      return instance  # type: ignore[return-value]
+      self._logSuccessEvent(instance = instance, action = Event.Action.ActionType.CREATE)
+      return instance
     except Exception:
       self._logFailureEvent(
         metadata = ObjectMetadata(),
@@ -39,12 +43,12 @@ class ModelManager(BaseModelManager[Grpc], Generic[Grpc]):
       )
       raise
 
-  def khaleesiUpdate(self, *, metadata: ObjectMetadata, grpc: Grpc) -> 'Model'[Grpc] :  # pylint: disable=invalid-sequence-index
+  def khaleesiUpdate(self, *, metadata: ObjectMetadata, grpc: Grpc) -> ModelType :
     """Update an existing instance."""
     try:
       instance = super().khaleesiUpdate(metadata = metadata, grpc = grpc)
-      self._logSuccessEvent(instance = instance, action = Event.Action.ActionType.UPDATE)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-      return instance  # type: ignore[return-value]
+      self._logSuccessEvent(instance = instance, action = Event.Action.ActionType.UPDATE)
+      return instance
     except Exception:
       self._logFailureEvent(
         metadata = metadata,
@@ -74,7 +78,7 @@ class ModelManager(BaseModelManager[Grpc], Generic[Grpc]):
 
   def _logSuccessEvent(
       self, *,
-      instance: 'Model'[Grpc],   # pylint: disable=invalid-sequence-index
+      instance: Model[Grpc],
       action  : 'Event.Action.ActionType.V',
   ) -> None :
     """Log a CRUD success event."""
@@ -128,7 +132,7 @@ class ModelManager(BaseModelManager[Grpc], Generic[Grpc]):
 class Model(BaseModel[Grpc], ABC, Generic[Grpc], metaclass = AbstractModelMeta):  # type: ignore[misc]  # pylint: disable=line-too-long
   """khaleesi.ninja base model which sends events upon changes."""
 
-  objects = ModelManager()  # type: ignore[assignment]
+  objects: ModelManager[Model[Grpc]] = ModelManager()  # type: ignore[assignment]
 
   class Meta:
     abstract = True

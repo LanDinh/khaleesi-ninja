@@ -1,13 +1,46 @@
 """Test the thread utility."""
 
 # Python.
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
-from khaleesi.core.batch.thread import BatchJobThread
+from khaleesi.core.batch.thread import BatchJobThread, stopJob, stopAllJobs
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import JobExecutionMetadata
+from khaleesi.proto.core_pb2 import ObjectMetadata
 
+
+
+class StopBatchJobsTestCase(SimpleTestCase):
+  """Test if stopping batch jobs works."""
+
+  @patch('khaleesi.core.batch.thread.threadingEnumerate')
+  def testStopBatchJob(self, threads: MagicMock, *_: MagicMock) -> None :
+    """Test aborting a specific job."""
+    # Prepare data.
+    threadToStop = MagicMock()
+    threadToStop.isBatchJobThread  = True
+    threadToStop.isJob.side_effect = [ True, False ]
+    threadToNotStop = MagicMock([ 'stop' ])
+    threads.return_value = [ threadToStop, threadToNotStop ]
+    # Execute test.
+    stopJob(jobs = [ MagicMock(), MagicMock() ])
+    # Assert result.
+    threadToStop.stop.assert_called_once()
+    threadToNotStop.stop.assert_not_called()
+
+  @patch('khaleesi.core.batch.thread.threadingEnumerate')
+  def testStopAllBatchJobs(self, threads: MagicMock, *_: MagicMock) -> None :
+    """Test aborting a specific job."""
+    # Prepare data.
+    threadToStop = MagicMock()
+    threadToStop.isBatchJobThread = True
+    threadToNotStop = MagicMock([ 'stop' ])
+    threads.return_value = [ threadToStop, threadToNotStop ]
+    # Execute test.
+    stopAllJobs()
+    # Assert result.
+    threadToStop.stop.assert_called_once()
+    threadToNotStop.stop.assert_not_called()
 
 class BatchJobThreadTestCase(SimpleTestCase):
   """Test the thread utility."""
@@ -50,13 +83,12 @@ class BatchJobThreadTestCase(SimpleTestCase):
     self.assertTrue(result)
 
   def testIsJob(self) -> None :
-    """Test if stopping the thread works as expected."""
+    """Test if the job can be identified."""
     # Prepare data.
-    metadata             = JobExecutionMetadata()
-    metadata.jobId       = 'job'
-    metadata.executionId = 13
+    metadata    = ObjectMetadata()
+    metadata.id = 'job'
     job = MagicMock()
-    job.job = metadata
+    job.request.jobMetadata = metadata
     thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
     # Execute test.
     result = thread.isJob(job = metadata)
@@ -64,18 +96,14 @@ class BatchJobThreadTestCase(SimpleTestCase):
     self.assertTrue(result)
 
   def testIsNotJob(self) -> None :
-    """Test if stopping the thread works as expected."""
+    """Test if the job can be identified."""
     # Prepare data.
-    job                 = MagicMock()
-    job.job.jobId       = 'job'
-    job.job.executionId = 13
+    job = MagicMock()
+    job.request.jobMetadata.id = 'job'
     thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
-    for jobId, executionId in [ ('not-job', 13), ('job', 1337), ('not-job', 1337) ]:
-      with self.subTest(job = jobId, execution = executionId):
-        metadata             = JobExecutionMetadata()
-        metadata.jobId       = jobId
-        metadata.executionId = executionId
-        # Execute test.
-        result = thread.isJob(job = metadata)
-        # Assert result.
-        self.assertFalse(result)
+    metadata    = ObjectMetadata()
+    metadata.id = 'not-job'
+    # Execute test.
+    result = thread.isJob(job = metadata)
+    # Assert result.
+    self.assertFalse(result)

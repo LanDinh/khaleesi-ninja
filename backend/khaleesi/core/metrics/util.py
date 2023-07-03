@@ -59,7 +59,7 @@ class AbstractMetric:
   def getValue(self, **kwargs: Any) -> int :
     """Return the current value of the metric."""
     # noinspection PyProtectedMember
-    return int(self._metric.labels(**self.labels(**kwargs))._value.get())  # type: ignore[attr-defined]  # pylint: disable=protected-access,line-too-long
+    return int(self._metric.labels(**self.labels(**kwargs))._value.get())  # type: ignore[attr-defined]  # pylint: disable=protected-access
 
   def labels(self, **kwargs: str) -> Dict[str, str] :
     """Shortcut to get all labels."""
@@ -130,16 +130,16 @@ class EnumMetric(Generic[EnumType], GaugeMetric):
     )
 
   # noinspection PyMethodOverriding
-  def set(self, *, value: EnumType) -> None :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ
+  def set(self, *, value: EnumType) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Set the metric to the given value."""
     for enum in type(value):
       super().set(gaugeValue = 0, value = enum)
     super().set(gaugeValue = 1, value = value)
 
-  def getValue(self, *, value: EnumType) -> int :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ,useless-super-delegation
+  def getValue(self, *, value: EnumType) -> int :  # type: ignore[override]  # pylint: disable=arguments-differ,useless-super-delegation
     """Return the current value of the metric."""
     return super().getValue(value = value)
 
-  def labels(self, *, value: EnumType) -> Dict[str, str] :  # type: ignore[override]  # pylint: disable=arguments-renamed,arguments-differ
+  def labels(self, *, value: EnumType) -> Dict[str, str] :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Shortcut to get all labels."""
     return super().labels(**{ self._id.name.lower(): value.name.lower() })

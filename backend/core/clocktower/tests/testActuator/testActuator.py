@@ -6,11 +6,7 @@ from unittest.mock import MagicMock, patch
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import (
-  JobExecutionMetadata,
-  JobActionConfiguration,
-  JobCleanupActionConfiguration,
-)
+from khaleesi.proto.core_pb2 import JobExecutionRequest
 from microservice.actuator.actuator import ACTUATOR
 
 
@@ -21,12 +17,7 @@ class ActuatorTest(SimpleTestCase):
     """Actuating a job should fail if the action name has the wrong format."""
     with self.assertRaises(InvalidArgumentException) as exception:
       # Execute test.
-      ACTUATOR.actuate(
-        actionName = 'invalid-name',
-        job        = MagicMock(),
-        action     = MagicMock(),
-        cleanup    = MagicMock(),
-      )
+      ACTUATOR.actuate(action = 'invalid-name', request = JobExecutionRequest())
       # Assert result.
       self.assertIn('wrong format', exception.exception.privateMessage)
 
@@ -34,12 +25,7 @@ class ActuatorTest(SimpleTestCase):
     """Actuating a job should fail if the action name has the wrong format."""
     with self.assertRaises(InvalidArgumentException) as exception:
       # Execute test.
-      ACTUATOR.actuate(
-        actionName = 'unknown.action.name',
-        job        = MagicMock(),
-        action     = MagicMock(),
-        cleanup    = MagicMock(),
-      )
+      ACTUATOR.actuate(action = 'unknown.action.name', request = JobExecutionRequest())
       # Assert result.
       self.assertIn('exists', exception.exception.privateMessage)
 
@@ -47,13 +33,11 @@ class ActuatorTest(SimpleTestCase):
     """Actuating a job should fail if the action name has the wrong format."""
     # Prepare data.
     mock = MagicMock()
+    request = JobExecutionRequest()
+    request.jobExecution.executionMetadata.id = 'execution-id'
     # Execute test.
     with patch.dict('microservice.actuator.actuator.CORE', { 'some': { 'action': mock } }):
-      ACTUATOR.actuate(
-        actionName = 'core.some.action',
-        job        = JobExecutionMetadata(),
-        action     = JobActionConfiguration(),
-        cleanup    = JobCleanupActionConfiguration(),
-      )
+      result = ACTUATOR.actuate(action = 'core.some.action', request = request)
     # Assert result.
     mock.assert_called_once()
+    self.assertEqual(request.jobExecution.executionMetadata, result)

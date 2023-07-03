@@ -12,7 +12,7 @@ from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.textLogger import LogLevel
 
 
-def _raise(*args: Any, exception: Exception, method: Callable, **kwargs: Any) -> None :  # type: ignore[type-arg] # pylint: disable=line-too-long
+def _raise(*args: Any, exception: Exception, method: Callable, **kwargs: Any) -> None :  # type: ignore[type-arg]  # pylint: disable=line-too-long
   method(*args, **kwargs)
   raise exception
 

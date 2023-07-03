@@ -6,7 +6,7 @@ from functools import partial
 from typing import Callable, Any, Optional, TypeVar, List, Protocol
 
 
-T_co = TypeVar('T_co', covariant = True)  # pylint: disable=invalid-name
+T_co = TypeVar('T_co', covariant = True)
 
 
 def _parseInput(
