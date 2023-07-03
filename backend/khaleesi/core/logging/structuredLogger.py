@@ -25,13 +25,12 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.state import STATE
-from khaleesi.proto.core_pb2 import RequestMetadata, User
+from khaleesi.proto.core_pb2 import RequestMetadata, User, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   Error,
   Event,
-  EmptyRequest,
   HttpRequest,
   HttpResponseRequest,
   Response,

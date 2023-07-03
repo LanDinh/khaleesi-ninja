@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import JobRequest
+from khaleesi.proto.core_pb2 import JobExecutionRequest
 from microservice.models.cleanup import CleanupJob
 from tests.models import Metadata
 
@@ -17,7 +17,7 @@ class TestCleanupJob(SimpleTestCase):
   def testGetQueryset(self, filterRequests: MagicMock) -> None :
     """Test executing a batch."""
     # Prepare data.
-    request = JobRequest()
+    request = JobExecutionRequest()
     request.actionConfiguration.batchSize = 1
     request.actionConfiguration.timelimit.FromSeconds(60)
     request.cleanupConfiguration.isCleanupJob = True

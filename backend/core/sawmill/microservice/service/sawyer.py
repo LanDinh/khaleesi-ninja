@@ -7,7 +7,7 @@ import grpc
 from khaleesi.core.batch.executor import jobExecutor
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import EmptyResponse, JobRequest
+from khaleesi.proto.core_pb2 import EmptyResponse, JobExecutionRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogFilter,
@@ -34,7 +34,7 @@ from microservice.models.cleanup import CleanupJob
 class Service(Servicer):
   """Sawyer service."""
 
-  def CleanupEvents(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupEvents(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up events older than '
@@ -42,7 +42,7 @@ class Service(Servicer):
     )
     return jobExecutor(job = CleanupJob(model = DbEvent, request = request))
 
-  def CleanupGrpcRequests(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupGrpcRequests(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up requests older than '
@@ -50,7 +50,7 @@ class Service(Servicer):
     )
     return jobExecutor(job = CleanupJob(model = DbGrpcRequest, request = request))
 
-  def CleanupErrors(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupErrors(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up errors older than '
@@ -58,7 +58,7 @@ class Service(Servicer):
     )
     return jobExecutor(job = CleanupJob(model = DbError, request = request))
 
-  def CleanupHttpRequests(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupHttpRequests(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up HTTP requests older than '
@@ -66,7 +66,7 @@ class Service(Servicer):
     )
     return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = request))
 
-  def CleanupQueries(self, request: JobRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def CleanupQueries(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up queries older than '

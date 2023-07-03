@@ -19,8 +19,8 @@ from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS, RequestsMetric
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import ProgrammingException
-from khaleesi.proto.core_pb2 import User, RequestMetadata, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData, EmptyRequest
+from khaleesi.proto.core_pb2 import User, RequestMetadata, GrpcCallerDetails, EmptyRequest
+from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
 from khaleesi.proto.core_sawmill_pb2_grpc import ForesterStub
 
 

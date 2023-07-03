@@ -9,7 +9,7 @@ from grpc import ServicerContext
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import JobExecutionResponse, JobRequest
+from khaleesi.proto.core_pb2 import JobExecutionRequest, EmptyResponse
 from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
   EventResponse as GrpcEventResponse,
@@ -129,10 +129,10 @@ class SawyerServiceTestCase(SimpleTestCase):
       executor: MagicMock,
       cleanup : MagicMock,
       *,
-      method: Callable[[JobRequest, ServicerContext], JobExecutionResponse],
+      method: Callable[[JobExecutionRequest, ServicerContext], EmptyResponse],
   ) -> None :
     """All cleanup methods look the same, so we can have a unified test."""
     # Execute test.
-    method(JobRequest(), MagicMock())
+    method(JobExecutionRequest(), MagicMock())
     # Assert result.
     executor.assert_called_once_with(job = cleanup.return_value)

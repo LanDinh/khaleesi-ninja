@@ -19,6 +19,7 @@ class ModelManagerTestCase(SimpleTestCase):
     result = BaseModel.objects.khaleesiCreate(grpc = MagicMock())
     # Assert result.
     self.assertEqual(1, result.khaleesiVersion)
+    # noinspection PyUnresolvedReferences
     self.assertTrue(result.saved)
 
   @patch('khaleesi.core.models.baseModel.transaction.atomic')

@@ -236,10 +236,6 @@ service Sawyer {
   rpc CleanupQueries      (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
 }
 
-message EmptyRequest {
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-}
-
 message CallData {
   khaleesi.core.GrpcCallerDetails          call     = 1;
   repeated khaleesi.core.GrpcCallerDetails calls    = 2;
@@ -251,5 +247,5 @@ message ServiceCallData {
 }
 
 service Forester {
-  rpc GetServiceCallData (EmptyRequest) returns (ServiceCallData);
+  rpc GetServiceCallData (khaleesi.core.EmptyRequest) returns (ServiceCallData);
 }

@@ -21,5 +21,7 @@ class CleanupJob(BaseCleanupJob[L], Generic[L]):
     """Count the total number of items that should be executed."""
     return cast(
       QuerySet[L],
-      self.model.objects.filter(metaLoggedTimestamp__lt = self.cleanupTimestamp),
+      self.model.objects.filter(
+        metaLoggedTimestamp__lt = self.request.cleanupConfiguration.cleanupDelay,
+      ),
     )

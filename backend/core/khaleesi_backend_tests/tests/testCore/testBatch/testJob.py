@@ -102,6 +102,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertIn('actionConfiguration.timelimit', context.exception.privateMessage)
     self.assertIn('actionConfiguration.timelimit', context.exception.privateDetails)
 
+  # noinspection PyUnusedLocal
   @patch('khaleesi.core.batch.job.DbJobExecution')
   def testJobFailsToStart(
       self,
@@ -127,6 +128,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
     singleton.structuredLogger.logError.assert_called_once()
 
+  # noinspection PyUnusedLocal
   def testJobIsSkipped(
       self,
       start    : MagicMock,  # pylint: disable=unused-argument
