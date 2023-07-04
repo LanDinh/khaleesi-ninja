@@ -4,11 +4,7 @@
 from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
-# Django.
-from django.core.exceptions import ObjectDoesNotExist
-
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import DbObjectNotFoundException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.models import JobExecution as DbJobExecution
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution
@@ -39,19 +35,12 @@ class JobExecutionManagerTestCase(SimpleTestCase):
     self.assertEqual(2, len(result))
 
   @patch.object(DbJobExecution.objects, 'get')
-  def testKhaleesiGet(self, manager: MagicMock) -> None :
+  def testBaseKhaleesiGet(self, manager: MagicMock) -> None :
     """Test getting an instance."""
     # Execute test.
-    DbJobExecution.objects.khaleesiGet(metadata = MagicMock())
+    DbJobExecution.objects.baseKhaleesiGet(metadata = MagicMock())
     # Assert result.
     manager.assert_called_once()
-
-  @patch.object(DbJobExecution.objects, 'get', side_effect = ObjectDoesNotExist())
-  def testKhaleesiGetNoResult(self, *_: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test & assert result..
-    with self.assertRaises(DbObjectNotFoundException):
-      DbJobExecution.objects.khaleesiGet(metadata = MagicMock())
 
 
 class JobExecutionTestCase(SimpleTestCase):

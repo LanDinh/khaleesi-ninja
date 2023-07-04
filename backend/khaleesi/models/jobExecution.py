@@ -6,13 +6,11 @@ from __future__ import annotations
 from typing import List
 
 # Django.
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
 from khaleesi.core.models.baseModel import Model, ModelManager
-from khaleesi.core.shared.exceptions import DbObjectNotFoundException
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, ObjectMetadata
 
 
@@ -38,12 +36,9 @@ class JobExecutionManager(ModelManager['JobExecution']):
 
     return jobs
 
-  def khaleesiGet(self, *, metadata: ObjectMetadata) -> JobExecution :
+  def baseKhaleesiGet(self, *, metadata: ObjectMetadata) -> JobExecution :
     """Get a job execution by ID."""
-    try:
-      return self.get(executionId = metadata.id)
-    except ObjectDoesNotExist as exception:
-      raise DbObjectNotFoundException(objectType = self.model.modelType()) from exception
+    return self.get(executionId = metadata.id)
 
 
 class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):

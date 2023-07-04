@@ -57,16 +57,17 @@ class ModelManager(BaseModelManager[ModelType], Generic[ModelType]):
       )
       raise
 
-  def khaleesiDelete(self, *, metadata: ObjectMetadata) -> None :
+  def khaleesiDelete(self, *, metadata: ObjectMetadata) -> ModelType :
     """Delete an existing instance."""
     try:
-      super().khaleesiDelete(metadata = metadata)
+      instance = super().khaleesiDelete(metadata = metadata)
       self._logEvent(
         target = metadata.id,
         action = Event.Action.ActionType.DELETE,
         result = Event.Action.ResultType.SUCCESS,
         details = ''
       )
+      return instance
     except Exception:
       self._logFailureEvent(
         metadata = metadata,
