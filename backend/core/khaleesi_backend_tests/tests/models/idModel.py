@@ -16,8 +16,9 @@ from tests.models.baseModel import Grpc
 class IdModel(BaseModel[Grpc]):
   """Allow instantiation of abstract model."""
 
-  saved: bool
+  saved  : bool
   objects: ModelManager[IdModel]  # type: ignore[assignment]
+  grpc = Grpc
 
   def __init__(self) -> None :
     """Initialize the instance."""

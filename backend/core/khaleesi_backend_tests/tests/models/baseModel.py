@@ -30,8 +30,9 @@ class ModelManager(BaseModelManager['BaseModel']):
 class BaseModel(Model[Grpc]):
   """Allow instantiation of abstract model."""
 
+  saved  : bool
   objects: ModelManager = ModelManager()    # type: ignore[assignment]
-  saved: bool
+  grpc = Grpc
 
   def __init__(self) -> None :
     """Initialize the instance."""

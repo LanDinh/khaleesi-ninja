@@ -25,6 +25,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
   action         = models.TextField(default = 'UNKNOWN')
 
   objects: ModelManager[Job]  # type: ignore[assignment]
+  grpc = GrpcJob
 
   def toGrpcJobExecutionRequest(self) -> Tuple[str, JobExecutionRequest] :
     """Build a job start request based on the data of this job."""
@@ -53,7 +54,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
   def toGrpc(
       self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
-      grpc: GrpcJob = GrpcJob(),
+      grpc    : GrpcJob        = GrpcJob(),
   ) -> GrpcJob :
     """Return a grpc object containing own values."""
     super().toGrpc(metadata = metadata, grpc = grpc)

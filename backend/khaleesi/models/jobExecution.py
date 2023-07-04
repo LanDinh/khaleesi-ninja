@@ -57,6 +57,7 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
   totalItems     = models.IntegerField()
 
   objects: JobExecutionManager = JobExecutionManager()  # type: ignore[assignment]
+  grpc = GrpcJobExecution
 
   @property
   def inProgress(self) -> bool :

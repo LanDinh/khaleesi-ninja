@@ -98,6 +98,7 @@ class Model(models.Model, ABC, Generic[Grpc], metaclass = AbstractModelMeta):  #
   khaleesiVersion = models.IntegerField(default = 0)
 
   objects: ModelManager[Model[Grpc]]
+  grpc   : Type[Grpc]
 
   @classmethod
   def modelType(cls) -> str :
@@ -108,7 +109,7 @@ class Model(models.Model, ABC, Generic[Grpc], metaclass = AbstractModelMeta):  #
   def fromGrpc(self, *, grpc: Grpc) -> None :
     """Change own values according to the grpc object."""
 
-  def toGrpc(self, *, metadata: ObjectMetadata = ObjectMetadata(), grpc: Grpc) -> Grpc :
+  def toGrpc(self, *, metadata: ObjectMetadata, grpc: Grpc) -> Grpc :
     """Return a grpc object containing own values."""
     metadata.version = self.khaleesiVersion
     return grpc

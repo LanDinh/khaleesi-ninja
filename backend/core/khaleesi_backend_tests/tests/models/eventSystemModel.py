@@ -16,6 +16,7 @@ class EventSystemModel(BaseModel[Grpc]):
   """Allow instantiation of abstract model."""
 
   objects: ModelManager[EventSystemModel]  # type: ignore[assignment]
+  grpc = Grpc
 
   def fromGrpc(self, *, grpc: Grpc) -> None :
     """Change own values according to the grpc object."""
