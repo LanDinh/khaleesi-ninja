@@ -48,11 +48,7 @@ class BaseJob(ABC, Generic[M]):
   jobExecution  : DbJobExecution
   paginator     : Paginator  # type: ignore[type-arg]
 
-  def __init__(
-      self, *,
-      model : Type[M],
-      request: JobExecutionRequest,
-  ) -> None :
+  def __init__(self, *, model: Type[M], request: JobExecutionRequest) -> None :
     """Initialize the job."""
 
     action = request.jobExecution.actionConfiguration

@@ -6,7 +6,8 @@ from typing import Generic, List
 
 # khaleesi.ninja.
 from khaleesi.core.batch.job import BaseJob, M
-from khaleesi.proto.core_pb2 import ObjectMetadata, JobExecution
+from khaleesi.proto.core_pb2 import ObjectMetadata, JobExecution, RequestMetadata
+from khaleesi.proto.core_sawmill_pb2 import Query
 
 
 class BatchJobThread(Thread, Generic[M]):
@@ -15,16 +16,32 @@ class BatchJobThread(Thread, Generic[M]):
   stopEvent       : Event
   job             : BaseJob[M]
   isBatchJobThread: bool
+  stateRequest    : RequestMetadata
+  stateQueries         : List[Query]
 
-  def __init__(self, *, job: BaseJob[M]) -> None :
+  def __init__(
+      self, *,
+      job         : BaseJob[M],
+      stateRequest: RequestMetadata,
+      stateQueries: List[Query],
+  ) -> None :
     """Init the thread."""
     super().__init__()
     self.stopEvent        = Event()
     self.job              = job
     self.isBatchJobThread = True
+    self.stateRequest     = RequestMetadata()
+    self.stateQueries     = []
+    self.stateRequest.CopyFrom(stateRequest)
+    for source_query in stateQueries:
+      query = Query()
+      query.CopyFrom(source_query)
+      self.stateQueries.append(query)
 
   def run(self) -> None :
     """Run the job."""
+    from khaleesi.core.shared.state import STATE
+    STATE.copyFrom(request = self.stateRequest, queries = self.stateQueries)
     self.job.execute(stopEvent = self.stopEvent)
 
   def stop(self) -> None :

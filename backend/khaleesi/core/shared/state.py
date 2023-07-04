@@ -1,5 +1,7 @@
 """Per-request state."""
 
+from __future__ import annotations
+
 # Python.
 import threading
 from typing import List
@@ -19,6 +21,14 @@ class State(threading.local):
     """Set the default state."""
     super().__init__()
     self.reset()
+
+  def copyFrom(self, *, request: RequestMetadata, queries: List[Query]) -> None :
+    """Copy the state from somewhere else. Used for sharing state with a thread."""
+    self.request.CopyFrom(request)
+    for source_query in queries:
+      query = Query()
+      query.CopyFrom(source_query)
+      self.queries.append(query)
 
   def reset(self) -> None :
     """Reset to default state."""

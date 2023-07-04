@@ -45,15 +45,17 @@ class StopBatchJobsTestCase(SimpleTestCase):
 class BatchJobThreadTestCase(SimpleTestCase):
   """Test the thread utility."""
 
-  def testRun(self) -> None :
+  @patch('khaleesi.core.shared.state.STATE')
+  def testRun(self, state: MagicMock) -> None :
     """Test if running the thread works as expected."""
     # Prepare data.
     job = MagicMock()
-    thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
+    thread = BatchJobThread(job = job, stateRequest = MagicMock(), stateQueries = [])  # type: ignore[var-annotated]  # pylint: disable=line-too-long
     # Execute test.
     thread.start()
     # Assert result.
     job.execute.assert_called_once_with(stopEvent = thread.stopEvent)
+    state.copyFrom.assert_called_once()
 
   def testStop(self) -> None :
     """Test if stopping the thread works as expected."""

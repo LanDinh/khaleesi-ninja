@@ -43,8 +43,7 @@ class RequestStateServerInterceptor(ServerInterceptor):
         STATE.request.grpcCaller.grpcMethod  = methodName
 
         upstream = self.getUpstreamRequest(request = request)
-        if upstream.httpCaller.requestId:
-          STATE.request.httpCaller.requestId = upstream.httpCaller.requestId
+        STATE.request.httpCaller.requestId = upstream.httpCaller.requestId
         if upstream.user.id:
           STATE.request.user.id = upstream.user.id
         STATE.request.user.type = upstream.user.type
