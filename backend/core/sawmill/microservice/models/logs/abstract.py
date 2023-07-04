@@ -44,7 +44,7 @@ class Metadata(models.Model):
     return {
         # Caller.
         'metaCallerHttpRequestId': parseString(
-          raw    = metadata.grpcCaller.requestId,
+          raw    = metadata.httpCaller.requestId,
           name   = 'metaCallerHttpRequestId',
           errors = errors,
         ),
