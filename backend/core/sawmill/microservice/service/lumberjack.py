@@ -43,9 +43,9 @@ class Service(Servicer):
     """Log events."""
     def method() -> Metadata :
       LOGGER.info('Adding service to service registry.')
-      SERVICE_REGISTRY.addService(callerDetails = request.requestMetadata.caller)
+      SERVICE_REGISTRY.addService(callerDetails = request.requestMetadata.grpcCaller)
       LOGGER.info(
-        f'Saving an event to the request "{request.requestMetadata.caller.grpcRequestId}" '
+        f'Saving an event to the request "{request.requestMetadata.grpcCaller.requestId}" '
         f'to the database.',
       )
       return DbEvent.objects.logEvent(grpcEvent = request)
@@ -56,7 +56,7 @@ class Service(Servicer):
     """Log HTTP request."""
     def method() -> Metadata :
       LOGGER.info(
-        f'Saving the HTTP request "{request.requestMetadata.caller.httpRequestId}" '
+        f'Saving the HTTP request "{request.requestMetadata.httpCaller.requestId}" '
         'to the database.',
       )
       return DbHttpRequest.objects.logRequest(grpcRequest = request)
@@ -85,7 +85,7 @@ class Service(Servicer):
     def method() -> Metadata :
       LOGGER.info(
         'Saving the response to the HTTP request '
-        f'"{request.requestMetadata.caller.httpRequestId}" to the database.',
+        f'"{request.requestMetadata.httpCaller.requestId}" to the database.',
       )
       return DbHttpRequest.objects.logResponse(grpcResponse = request)
     return self._handleResponse(method = method)
@@ -96,10 +96,10 @@ class Service(Servicer):
       LOGGER.info('Adding call to service registry.')
       SERVICE_REGISTRY.addCall(
         callerDetails = request.upstreamRequest,
-        calledDetails = request.requestMetadata.caller,
+        calledDetails = request.requestMetadata.grpcCaller,
       )
       LOGGER.info(
-        f'Saving the request "{request.requestMetadata.caller.grpcRequestId}" to the database.',
+        f'Saving the request "{request.requestMetadata.grpcCaller.requestId}" to the database.',
       )
       return DbGrpcRequest.objects.logRequest(grpcRequest = request)
 
@@ -113,7 +113,7 @@ class Service(Servicer):
     """Log request responses."""
     def method() -> Metadata :
       LOGGER.info(
-        f'Saving the response to the request "{request.requestMetadata.caller.grpcRequestId}" '
+        f'Saving the response to the request "{request.requestMetadata.grpcCaller.requestId}" '
         f'to the database.',
       )
       result = DbGrpcRequest.objects.logResponse(grpcResponse = request)
@@ -141,7 +141,7 @@ class Service(Servicer):
     """Log errors."""
     def method() -> Metadata :
       LOGGER.info(
-        f'Saving an error to the request "{request.requestMetadata.caller.grpcRequestId}" '
+        f'Saving an error to the request "{request.requestMetadata.grpcCaller.requestId}" '
         'to the database.',
       )
       return DbError.objects.logError(grpcError = request)
