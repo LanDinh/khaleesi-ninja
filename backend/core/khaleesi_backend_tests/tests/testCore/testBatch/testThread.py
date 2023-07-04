@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 # khaleesi.ninja.
 from khaleesi.core.batch.thread import BatchJobThread, stopJob, stopAllJobs
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import ObjectMetadata
+from khaleesi.proto.core_pb2 import ObjectMetadata, RequestMetadata
 
 
 
@@ -50,7 +50,11 @@ class BatchJobThreadTestCase(SimpleTestCase):
     """Test if running the thread works as expected."""
     # Prepare data.
     job = MagicMock()
-    thread = BatchJobThread(job = job, stateRequest = MagicMock(), stateQueries = [])  # type: ignore[var-annotated]  # pylint: disable=line-too-long
+    thread: BatchJobThread[MagicMock] = BatchJobThread(
+      job          = MagicMock(),
+      stateRequest = RequestMetadata(),
+      stateQueries = [],
+    )
     # Execute test.
     thread.start()
     # Assert result.
@@ -60,7 +64,11 @@ class BatchJobThreadTestCase(SimpleTestCase):
   def testStop(self) -> None :
     """Test if stopping the thread works as expected."""
     # Prepare data.
-    thread = BatchJobThread(job = MagicMock())  # type: ignore[var-annotated]
+    thread: BatchJobThread[MagicMock] = BatchJobThread(
+      job          = MagicMock(),
+      stateRequest = RequestMetadata(),
+      stateQueries = [],
+    )
     # Execute test.
     thread.stop()
     # Assert result.
@@ -69,7 +77,11 @@ class BatchJobThreadTestCase(SimpleTestCase):
   def testThreadStartsStopped(self) -> None :
     """Test if stopping the thread works as expected."""
     # Prepare data.
-    thread = BatchJobThread(job = MagicMock())  # type: ignore[var-annotated]
+    thread: BatchJobThread[MagicMock] = BatchJobThread(
+      job          = MagicMock(),
+      stateRequest = RequestMetadata(),
+      stateQueries = [],
+    )
     # Execute test.
     result = thread.stopEvent.is_set()
     # Assert result.
@@ -78,7 +90,11 @@ class BatchJobThreadTestCase(SimpleTestCase):
   def testIsBatchJobThread(self) -> None :
     """Test if the thread type can be correctly identified."""
     # Prepare data.
-    thread: BatchJobThread[MagicMock] = BatchJobThread(job = MagicMock())
+    thread: BatchJobThread[MagicMock] = BatchJobThread(
+      job          = MagicMock(),
+      stateRequest = RequestMetadata(),
+      stateQueries = [],
+    )
     # Execute test.
     result = thread.isBatchJobThread
     # Assert result.
@@ -91,7 +107,11 @@ class BatchJobThreadTestCase(SimpleTestCase):
     metadata.id = 'job'
     job = MagicMock()
     job.request.jobMetadata = metadata
-    thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
+    thread: BatchJobThread[MagicMock] = BatchJobThread(
+      job          = MagicMock(),
+      stateRequest = RequestMetadata(),
+      stateQueries = [],
+    )
     # Execute test.
     result = thread.isJob(job = metadata)
     # Assert result.
@@ -102,7 +122,11 @@ class BatchJobThreadTestCase(SimpleTestCase):
     # Prepare data.
     job = MagicMock()
     job.request.jobMetadata.id = 'job'
-    thread = BatchJobThread(job = job)  # type: ignore[var-annotated]
+    thread: BatchJobThread[MagicMock] = BatchJobThread(
+      job          = MagicMock(),
+      stateRequest = RequestMetadata(),
+      stateQueries = [],
+    )
     metadata    = ObjectMetadata()
     metadata.id = 'not-job'
     # Execute test.
