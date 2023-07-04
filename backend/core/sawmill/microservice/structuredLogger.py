@@ -41,7 +41,7 @@ class StructuredDbLogger(StructuredLogger):
     DbGrpcRequest.objects.logRequest(grpcRequest = grpcRequest)
     SERVICE_REGISTRY.addCall(
       callerDetails = grpcRequest.upstreamRequest,
-      calledDetails = grpcRequest.requestMetadata.caller,
+      calledDetails = grpcRequest.requestMetadata.grpcCaller,
     )
 
   def sendLogGrpcResponse(self, *, grpcResponse: GrpcResponseRequest) -> None :
