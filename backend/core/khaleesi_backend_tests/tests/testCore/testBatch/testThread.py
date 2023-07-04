@@ -51,7 +51,7 @@ class BatchJobThreadTestCase(SimpleTestCase):
     # Prepare data.
     job = MagicMock()
     thread: BatchJobThread[MagicMock] = BatchJobThread(
-      job          = MagicMock(),
+      job          = job,
       stateRequest = RequestMetadata(),
       stateQueries = [],
     )
@@ -108,7 +108,7 @@ class BatchJobThreadTestCase(SimpleTestCase):
     job = MagicMock()
     job.request.jobMetadata = metadata
     thread: BatchJobThread[MagicMock] = BatchJobThread(
-      job          = MagicMock(),
+      job          = job,
       stateRequest = RequestMetadata(),
       stateQueries = [],
     )
@@ -123,7 +123,7 @@ class BatchJobThreadTestCase(SimpleTestCase):
     job = MagicMock()
     job.request.jobMetadata.id = 'job'
     thread: BatchJobThread[MagicMock] = BatchJobThread(
-      job          = MagicMock(),
+      job          = job,
       stateRequest = RequestMetadata(),
       stateQueries = [],
     )
