@@ -25,9 +25,9 @@ class State(threading.local):
   def copyFrom(self, *, request: RequestMetadata, queries: List[Query]) -> None :
     """Copy the state from somewhere else. Used for sharing state with a thread."""
     self.request.CopyFrom(request)
-    for source_query in queries:
+    for sourceQuery in queries:
       query = Query()
-      query.CopyFrom(source_query)
+      query.CopyFrom(sourceQuery)
       self.queries.append(query)
 
   def reset(self) -> None :

@@ -33,14 +33,14 @@ class BatchJobThread(Thread, Generic[M]):
     self.stateRequest     = RequestMetadata()
     self.stateQueries     = []
     self.stateRequest.CopyFrom(stateRequest)
-    for source_query in stateQueries:
+    for sourceQuery in stateQueries:
       query = Query()
-      query.CopyFrom(source_query)
+      query.CopyFrom(sourceQuery)
       self.stateQueries.append(query)
 
   def run(self) -> None :
     """Run the job."""
-    from khaleesi.core.shared.state import STATE
+    from khaleesi.core.shared.state import STATE  # pylint: disable=import-outside-toplevel
     STATE.copyFrom(request = self.stateRequest, queries = self.stateQueries)
     self.job.execute(stopEvent = self.stopEvent)
 
