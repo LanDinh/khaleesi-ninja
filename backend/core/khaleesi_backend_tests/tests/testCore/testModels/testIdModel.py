@@ -5,12 +5,8 @@ from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 from uuid import UUID
 
-# Django.
-from django.core.exceptions import ObjectDoesNotExist
-
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.core.shared.exceptions import DbObjectNotFoundException
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models.idModel import IdModel
 
