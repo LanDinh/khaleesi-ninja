@@ -3,9 +3,16 @@
 # Python.
 from unittest.mock import patch, MagicMock
 
+# Django.
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.core.shared.exceptions import DbOutdatedInformationException
+from khaleesi.core.shared.exceptions import (
+  DbObjectNotFoundException,
+  DbOutdatedInformationException,
+  DbObjectTwinException,
+)
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models.baseModel import BaseModel, Grpc
 
@@ -50,13 +57,40 @@ class ModelManagerTestCase(SimpleTestCase):
     with self.assertRaises(DbOutdatedInformationException):
       BaseModel.objects.khaleesiUpdate(metadata = MagicMock(), grpc = Grpc())
 
+  @patch('khaleesi.core.models.baseModel.transaction')
   @patch.object(BaseModel.objects, 'khaleesiGet')
-  def testKhaleesiDelete(self, manager: MagicMock) -> None :
+  def testKhaleesiDelete(self, manager: MagicMock, *_: MagicMock) -> None :
     """Test deleting an instance."""
     # Execute test.
     BaseModel.objects.khaleesiDelete(metadata = MagicMock())
     # Assert result.
     manager.return_value.delete.assert_called_once()
+
+  @patch.object(BaseModel.objects, 'baseKhaleesiGet')
+  def testKhaleesiGet(self, baseGet: MagicMock) -> None :
+    """Test getting an instance."""
+    # Execute test.
+    BaseModel.objects.khaleesiGet(metadata = MagicMock())
+    # Assert result.
+    baseGet.assert_called_once()
+
+  @patch.object(BaseModel.objects, 'baseKhaleesiGet', side_effect = MultipleObjectsReturned())
+  def testKhaleesiGetNotFound(self, baseGet: MagicMock) -> None :
+    """Test getting an instance."""
+    # Execute test.
+    with self.assertRaises(DbObjectTwinException):
+      BaseModel.objects.khaleesiGet(metadata = MagicMock())
+    # Assert result.
+    baseGet.assert_called_once()
+
+  @patch.object(BaseModel.objects, 'baseKhaleesiGet', side_effect = ObjectDoesNotExist())
+  def testKhaleesiGetMultipleFound(self, baseGet: MagicMock) -> None :
+    """Test getting an instance."""
+    # Execute test.
+    with self.assertRaises(DbObjectNotFoundException):
+      BaseModel.objects.khaleesiGet(metadata = MagicMock())
+    # Assert result.
+    baseGet.assert_called_once()
 
 
 class ModelTestCase(SimpleTestCase):

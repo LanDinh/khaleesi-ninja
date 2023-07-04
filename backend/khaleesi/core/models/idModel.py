@@ -4,11 +4,10 @@ from __future__ import annotations
 
 # Python.
 from abc import ABC
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Type
 from uuid import uuid4
 
 # Django.
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 # khaleesi.ninja.
@@ -18,7 +17,6 @@ from khaleesi.core.models.baseModel import (
   ModelManager as BaseModelManager,
   AbstractModelMeta
 )
-from khaleesi.core.shared.exceptions import DbObjectNotFoundException
 from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
@@ -28,12 +26,11 @@ ModelType = TypeVar('ModelType', bound = 'Model')  # type: ignore[type-arg]  # p
 class ModelManager(BaseModelManager[ModelType], Generic[ModelType]):
   """Basic model manager for CRUD operations."""
 
-  def khaleesiGet(self, *, metadata: ObjectMetadata) -> ModelType :
+  model: Type[ModelType]
+
+  def baseKhaleesiGet(self, *, metadata: ObjectMetadata) -> ModelType :
     """Get an existing instance."""
-    try:
-      return self.get(khaleesiId = metadata.id)
-    except ObjectDoesNotExist as exception:
-      raise DbObjectNotFoundException(objectType = self.model.modelType()) from exception
+    return self.get(khaleesiId = metadata.id)
 
   def khaleesiInstantiateNewInstance(self) -> ModelType :
     """Instantiate a new element."""

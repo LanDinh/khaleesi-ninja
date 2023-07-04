@@ -19,19 +19,12 @@ class ModelManagerTestCase(SimpleTestCase):
   """Test the khaleesi base model manager."""
 
   @patch.object(IdModel.objects, 'get')
-  def testKhaleesiGet(self, manager: MagicMock) -> None :
+  def testBaseKhaleesiGet(self, manager: MagicMock) -> None :
     """Test getting an instance."""
     # Execute test.
     IdModel.objects.khaleesiGet(metadata = MagicMock())
     # Assert result.
     manager.assert_called_once()
-
-  @patch.object(IdModel.objects, 'get', side_effect = ObjectDoesNotExist())
-  def testKhaleesiGetNoResult(self, *_: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test & assert result..
-    with self.assertRaises(DbObjectNotFoundException):
-      IdModel.objects.khaleesiGet(metadata = MagicMock())
 
   @patch('khaleesi.core.models.idModel.BaseModelManager.khaleesiInstantiateNewInstance')
   def testKhaleesiInstantiateNewInstance(self, parent: MagicMock) -> None :

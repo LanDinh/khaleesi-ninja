@@ -22,7 +22,7 @@ class Grpc(Message, ABC):
 class ModelManager(BaseModelManager['BaseModel']):
   """Allow instantiation of abstract model."""
 
-  def khaleesiGet(self, *, metadata: ObjectMetadata) -> BaseModel :
+  def baseKhaleesiGet(self, *, metadata: ObjectMetadata) -> BaseModel :
     """Get an existing instance."""
     return self.model()
 
