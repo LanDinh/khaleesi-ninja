@@ -109,6 +109,7 @@ class Model(models.Model, ABC, Generic[Grpc], metaclass = AbstractModelMeta):  #
   def fromGrpc(self, *, grpc: Grpc) -> None :
     """Change own values according to the grpc object."""
 
+  @abstractmethod
   def toGrpc(self, *, metadata: ObjectMetadata, grpc: Grpc) -> Grpc :
     """Return a grpc object containing own values."""
     metadata.version = self.khaleesiVersion

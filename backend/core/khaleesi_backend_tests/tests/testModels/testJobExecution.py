@@ -104,7 +104,8 @@ class JobExecutionTestCase(SimpleTestCase):
         jobExecution.save.assert_called_once_with()
 
   @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
-  def testFromGrpcForCreation(self, jobConfiguration: MagicMock) -> None :
+  @patch('khaleesi.models.jobExecution.Model.fromGrpc')
+  def testFromGrpcForCreation(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
     """Test creating an instance from gRPC."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
@@ -112,6 +113,7 @@ class JobExecutionTestCase(SimpleTestCase):
         instance = DbJobExecution()
         grpc     = GrpcJobExecution()
         jobConfiguration.reset_mock()
+        parent.reset_mock()
         # Relevant attributes.
         grpc.jobMetadata.id       = 'job-id'
         grpc.executionMetadata.id = 'execution-id'
@@ -124,6 +126,7 @@ class JobExecutionTestCase(SimpleTestCase):
         # Execute test.
         instance.fromGrpc(grpc = grpc)
         # Assert result.
+        parent.assert_called_once()
         jobConfiguration.assert_called_once()
         self.assertEqual(grpc.jobMetadata.id      , instance.jobId)
         self.assertEqual(grpc.executionMetadata.id, instance.executionId)
@@ -134,11 +137,13 @@ class JobExecutionTestCase(SimpleTestCase):
         self.assertFalse(instance.itemsProcessed)
 
   @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
-  def testFromGrpcForUpdate(self, jobConfiguration: MagicMock) -> None :
+  @patch('khaleesi.models.jobExecution.Model.fromGrpc')
+  def testFromGrpcForUpdate(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
     """Test updating an instance from gRPC."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
         # Prepare data.
+        parent.reset_mock()
         instance = DbJobExecution(pk = 1)
         grpc = GrpcJobExecution()
         # Relevant attributes.
@@ -153,6 +158,7 @@ class JobExecutionTestCase(SimpleTestCase):
         # Execute test.
         instance.fromGrpc(grpc = grpc)
         # Assert result.
+        parent.assert_called_once()
         jobConfiguration.assert_not_called()
         self.assertFalse(instance.jobId)
         self.assertFalse(instance.executionId)

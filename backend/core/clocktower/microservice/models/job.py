@@ -41,6 +41,8 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
 
   def fromGrpc(self, *, grpc: GrpcJob) -> None :
     """Change own values according to the grpc object."""
+    super().fromGrpc(grpc = grpc)
+
     self.name           = grpc.name
     self.description    = grpc.description
     self.cronExpression = grpc.cronExpression
@@ -57,7 +59,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
       grpc    : GrpcJob        = GrpcJob(),
   ) -> GrpcJob :
     """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
 
     grpc.name           = self.name
     grpc.description    = self.description

@@ -82,6 +82,8 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
 
   def fromGrpc(self, *, grpc: GrpcJobExecution) -> None :
     """Change own values according to the grpc object."""
+    super().fromGrpc(grpc = grpc)
+
     if not self.pk:
       # Metadata.
       self.jobId       = grpc.jobMetadata.id
