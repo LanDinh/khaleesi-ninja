@@ -27,7 +27,7 @@ class IdModel(BaseModel[Grpc]):
 
   def fromGrpc(self, *, grpc: Grpc) -> None :
     """Change own values according to the grpc object."""
-    super().fromGrpc(grpc = grpc)
+    super().fromGrpc(grpc = grpc)  # pylint: disable=useless-super-delegation
 
   def toGrpc(
       self, *,

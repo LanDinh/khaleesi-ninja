@@ -6,8 +6,9 @@ from unittest.mock import patch, MagicMock
 from uuid import UUID
 
 # khaleesi.ninja.
+from khaleesi.core.shared.state import STATE
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import ObjectMetadata, User
+from khaleesi.proto.core_pb2 import ObjectMetadata, User, RequestMetadata
 from tests.models.idModel import IdModel
 
 
@@ -35,16 +36,17 @@ class ModelManagerTestCase(SimpleTestCase):
 class ModelTestCase(SimpleTestCase):
   """Test the khaleesi base model."""
 
-  @patch('khaleesi.core.models.idModel.STATE')
-  def testFromGrpcForCreation(self, state: MagicMock) -> None :
+  def testFromGrpcForCreation(self) -> None :
     """Test setting from gRPC data."""
     for userLabel, userType in User.UserType.items():
       with self.subTest(user = userLabel):
         # Prepare data.
         userId = 'id'
-        state.reset_mock()
-        state.request.user.id   = userId
-        state.request.user.type = userType
+        request = RequestMetadata()
+        request.user.id   = userId
+        request.user.type = userType
+        STATE.reset()
+        STATE.copyFrom(request = request, queries = [])
         instance = IdModel()
         # Execute test.
         instance.fromGrpc(grpc = MagicMock())
@@ -54,18 +56,20 @@ class ModelTestCase(SimpleTestCase):
         self.assertEqual(userId   , instance.khaleesiModifiedById)
         self.assertEqual(userLabel, instance.khaleesiModifiedByType)
 
-  @patch('khaleesi.core.models.idModel.STATE')
-  def testFromGrpcForUpdate(self, state: MagicMock) -> None :
+  def testFromGrpcForUpdate(self) -> None :
     """Test setting from gRPC data."""
-    for creatorLabel, creatorType in User.UserType.items():
+    for creatorLabel, _ in User.UserType.items():
       for modifierLabel, modifierType in User.UserType.items():
         with self.subTest(creator = creatorLabel, modifier = modifierLabel):
           # Prepare data.
           userId = 'id'
-          state.reset_mock()
-          state.request.user.id   = userId
-          state.request.user.type = modifierType
+          request = RequestMetadata()
+          request.user.id   = userId
+          request.user.type = modifierType
+          STATE.reset()
+          STATE.copyFrom(request = request, queries = [])
           instance = IdModel()
+          instance.pk = 1337
           instance.khaleesiCreatedById = 'creator'
           instance.khaleesiModifiedByType = creatorLabel
           # Execute test.
