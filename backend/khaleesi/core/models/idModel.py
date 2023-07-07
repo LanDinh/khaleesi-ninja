@@ -61,8 +61,8 @@ class Model(BaseModel[Grpc], ABC, Generic[Grpc], metaclass = AbstractModelMeta):
 
     # Creation.
     if not self.pk:
-      self.khaleesiCreatedById    = STATE.request.user.id
-      self.khaleesiModifiedByType = User.UserType.Name(STATE.request.user.type)
+      self.khaleesiCreatedById   = STATE.request.user.id
+      self.khaleesiCreatedByType = User.UserType.Name(STATE.request.user.type)
 
     # Modification.
     self.khaleesiModifiedById   = STATE.request.user.id

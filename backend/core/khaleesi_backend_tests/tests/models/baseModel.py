@@ -39,9 +39,9 @@ class BaseModel(Model[Grpc]):
     super().__init__()
     self.saved = False
 
-  def fromGrpc(self, *, grpc: Grpc) -> None :
+  def fromGrpc(self, *, grpc: Grpc) -> None :  # pylint: disable=useless-super-delegation
     """Change own values according to the grpc object."""
-    super().fromGrpc(grpc = grpc)  # pylint: disable=useless-super-delegation
+    super().fromGrpc(grpc = grpc)
 
   def toGrpc(
       self, *,

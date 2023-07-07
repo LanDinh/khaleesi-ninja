@@ -18,9 +18,9 @@ class EventSystemModel(BaseModel[Grpc]):
   objects: ModelManager[EventSystemModel]  # type: ignore[assignment]
   grpc = Grpc
 
-  def fromGrpc(self, *, grpc: Grpc) -> None :
+  def fromGrpc(self, *, grpc: Grpc) -> None :  # pylint: disable=useless-super-delegation
     """Change own values according to the grpc object."""
-    super().fromGrpc(grpc = grpc)  # pylint: disable=useless-super-delegation
+    super().fromGrpc(grpc = grpc)
 
   def toGrpc(
       self, *,
