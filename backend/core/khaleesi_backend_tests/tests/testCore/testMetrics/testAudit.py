@@ -7,7 +7,7 @@ from functools import partial
 from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import Event
+from khaleesi.proto.core_sawmill_pb2 import Event, EventRequest
 from tests.testCore.testMetrics.testUtil import CounterMetricTestMixin
 
 
@@ -40,14 +40,14 @@ class AuditEventMetricTestCase(CounterMetricTestMixin, SimpleTestCase):
       user          : 'User.UserType.V',
       actionCrudType: 'Event.Action.ActionType.V',
       result        : 'Event.Action.ResultType.V',
-  ) -> Event :
+  ) -> EventRequest :
     """Construct event."""
-    event = Event()
+    event = EventRequest()
     event.requestMetadata.user.type              = user
     event.requestMetadata.grpcCaller.grpcService = 'grpc-service'
     event.requestMetadata.grpcCaller.grpcMethod  = 'grpc-method'
-    event.target.type = 'target'
-    event.action.crudType   = actionCrudType
-    event.action.customType = 'action-type'
-    event.action.result     = result
+    event.event.target.type = 'target'
+    event.event.action.crudType   = actionCrudType
+    event.event.action.customType = 'action-type'
+    event.event.action.result     = result
     return event

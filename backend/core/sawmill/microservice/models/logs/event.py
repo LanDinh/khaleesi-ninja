@@ -1,7 +1,8 @@
 """Event logs."""
 
-# Python.
 from __future__ import annotations
+
+# Python.
 from typing import List
 
 # Django.
@@ -9,52 +10,19 @@ from django.db import models
 from django.conf import settings
 
 # khaleesi.ninja.
-from khaleesi.core.metrics.audit import AUDIT_EVENT
+from khaleesi.core.models.idModel import Model, ModelManager
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.parseUtil import parseString
-from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventResponse as GrpcEventResponse
-from microservice.models.logs.abstract import Metadata
+from khaleesi.proto.core_pb2 import User, ObjectMetadata
+from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventRequest as GrpcEventRequest
+from microservice.models.logs.metadataMixin import GrpcMetadataMixin
 
 
 khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 
-class EventManager(models.Manager['Event']):
-  """Custom model manager."""
-
-  def logEvent(self, *, grpcEvent: GrpcEvent) -> Event :
-    """Log a gRPC event."""
-    if grpcEvent.loggerSendMetric:
-      AUDIT_EVENT.inc(event = grpcEvent)
-
-    errors: List[str] = []
-
-    return self.create(
-      eventId = parseString(raw = grpcEvent.id, name = 'eventId', errors = errors),
-      # Target.
-      targetType = parseString(raw = grpcEvent.target.type, name = 'targetType', errors = errors),
-      targetId   = parseString(raw = grpcEvent.target.id, name = 'targetId', errors = errors),
-      targetOwnerId = parseString(
-        raw    = grpcEvent.target.owner.id,
-        name   = 'targetOwner',
-        errors = errors,
-      ),
-      targetOwnerType = User.UserType.Name(grpcEvent.target.owner.type),
-      # Action.
-      actionCrudType   = GrpcEvent.Action.ActionType.Name(grpcEvent.action.crudType),
-      actionCustomType = grpcEvent.action.customType,
-      actionResult     = GrpcEvent.Action.ResultType.Name(grpcEvent.action.result),
-      actionDetails    = grpcEvent.action.details,
-      # Metadata.
-      **self.model.logMetadata(metadata = grpcEvent.requestMetadata, errors = errors),
-    )
-
-
-class Event(Metadata):
+class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
   """Event logs."""
-  eventId = models.TextField(default = 'UNKNOWN')
-
   # Target.
   targetType      = models.TextField(default = 'UNKNOWN')
   targetId        = models.TextField(default = 'UNKNOWN')
@@ -67,24 +35,56 @@ class Event(Metadata):
   actionResult     = models.TextField(default = 'UNKNOWN_RESULT')
   actionDetails    = models.TextField(default = 'UNKNOWN')
 
-  objects = EventManager()
+  objects: ModelManager[Event]  # type: ignore[assignment]
 
-  def toGrpc(self) -> GrpcEventResponse :
-    """Map to gRPC event message."""
+  def fromGrpc(self, *, grpc: GrpcEventRequest) -> None :
+    """Change own values according to the grpc object."""
+    super().fromGrpc(grpc = grpc)
+    errors: List[str] = []
 
-    grpcEventResponse = GrpcEventResponse()
-    self.requestMetadataToGrpc(requestMetadata = grpcEventResponse.event.requestMetadata)
-    self.responseMetadataToGrpc(responseMetadata = grpcEventResponse.eventMetadata)
-    grpcEventResponse.event.id = self.eventId
+    if not self.pk:
+      # Target.
+      self.targetType = parseString(
+        raw    = grpc.event.target.type,
+        name   = 'targetType',
+        errors = errors,
+      )
+      self.targetId = parseString(raw = grpc.event.target.id, name = 'targetId', errors = errors)
+      self.targetOwnerId = parseString(
+        raw    = grpc.event.target.owner.id,
+        name   = 'targetOwner',
+        errors = errors,
+      )
+      self.targetOwnerType = User.UserType.Name(grpc.event.target.owner.type)
+
+      # Action.
+      self.actionCrudType   = GrpcEvent.Action.ActionType.Name(grpc.event.action.crudType)
+      self.actionCustomType = grpc.event.action.customType
+      self.actionResult     = GrpcEvent.Action.ResultType.Name(grpc.event.action.result)
+      self.actionDetails    = grpc.event.action.details
+
+    # Needs to be at the end because it saves errors to the model.
+    self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
+
+  def toGrpc(
+      self, *,
+      metadata: ObjectMetadata   = ObjectMetadata(),
+      grpc    : GrpcEventRequest = GrpcEventRequest(),
+  ) -> GrpcEventRequest :
+    """Return a grpc object containing own values."""
+    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
+    self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+
     # Target.
-    grpcEventResponse.event.target.type       = self.targetType
-    grpcEventResponse.event.target.id         = self.targetId
-    grpcEventResponse.event.target.owner.id   = self.targetOwnerId
-    grpcEventResponse.event.target.owner.type = User.UserType.Value(self.targetOwnerType)
-    # Action.
-    grpcEventResponse.event.action.crudType = GrpcEvent.Action.ActionType.Value(self.actionCrudType)
-    grpcEventResponse.event.action.customType = self.actionCustomType
-    grpcEventResponse.event.action.result     = GrpcEvent.Action.ResultType.Value(self.actionResult)
-    grpcEventResponse.event.action.details    = self.actionDetails
+    grpc.event.target.type       = self.targetType
+    grpc.event.target.id         = self.targetId
+    grpc.event.target.owner.id   = self.targetOwnerId
+    grpc.event.target.owner.type = User.UserType.Value(self.targetOwnerType)
 
-    return grpcEventResponse
+    # Action.
+    grpc.event.action.crudType   = GrpcEvent.Action.ActionType.Value(self.actionCrudType)
+    grpc.event.action.customType = self.actionCustomType
+    grpc.event.action.result     = GrpcEvent.Action.ResultType.Value(self.actionResult)
+    grpc.event.action.details    = self.actionDetails
+
+    return grpc

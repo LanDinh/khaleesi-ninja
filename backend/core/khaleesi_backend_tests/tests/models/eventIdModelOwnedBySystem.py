@@ -7,7 +7,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.models.eventSystemModel import Model as BaseModel, ModelManager
+from khaleesi.core.models.eventIdModelOwnedBySystem import Model as BaseModel, ModelManager
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models.baseModel import Grpc
 

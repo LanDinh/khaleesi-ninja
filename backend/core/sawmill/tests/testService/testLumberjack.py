@@ -16,7 +16,7 @@ from microservice.service.lumberjack import (  # type: ignore[attr-defined]
   DbHttpRequest,
   DbQuery,
 )
-from tests.models import Metadata
+from tests.models import OldMetadata, Metadata
 
 
 @patch('microservice.service.lumberjack.LOGGER')
@@ -31,41 +31,44 @@ class LumberjackServiceTestCase(SimpleTestCase):
     self._executeLoggingTests(
       method        = lambda : self.service.LogEvent(MagicMock(), MagicMock()),
       loggingObject = DbEvent.objects,
-      loggingMethod = 'logEvent',
     )
     serviceRegistry.addService.assert_called()
 
   def testLogHttpRequest(self, *_: MagicMock) -> None :
     """Test logging requests."""
     self._executeLoggingTests(
-      method        = lambda : self.service.LogHttpRequest(MagicMock(), MagicMock()),
-      loggingObject = DbHttpRequest.objects,
-      loggingMethod = 'logRequest',
+      method         = lambda : self.service.LogHttpRequest(MagicMock(), MagicMock()),
+      loggingObject  = DbHttpRequest.objects,
+      loggingMethod  = 'logRequest',
+      expectedResult = OldMetadata(),
     )
 
   def testLogSystemHttpRequest(self, *_: MagicMock) -> None :
     """Test logging system HTTP requests."""
     self._executeLoggingTests(
-      method        = lambda : self.service.LogSystemHttpRequest(MagicMock(), MagicMock()),
-      loggingObject = DbHttpRequest.objects,
-      loggingMethod = 'logSystemRequest',
+      method         = lambda : self.service.LogSystemHttpRequest(MagicMock(), MagicMock()),
+      loggingObject  = DbHttpRequest.objects,
+      loggingMethod  = 'logSystemRequest',
+      expectedResult = OldMetadata(),
     )
 
   def testLogHttpResponse(self, *_: MagicMock) -> None :
     """Test logging responses."""
     self._executeLoggingTests(
-      method        = lambda : self.service.LogHttpRequestResponse(MagicMock(), MagicMock()),
-      loggingObject = DbHttpRequest.objects,
-      loggingMethod = 'logResponse',
+      method         = lambda : self.service.LogHttpRequestResponse(MagicMock(), MagicMock()),
+      loggingObject  = DbHttpRequest.objects,
+      loggingMethod  = 'logResponse',
+      expectedResult = OldMetadata(),
     )
 
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def testLogGrpcRequest(self, serviceRegistry: MagicMock, *_: MagicMock) -> None :
     """Test logging requests."""
     self._executeLoggingTests(
-      method        = lambda : self.service.LogGrpcRequest(MagicMock(), MagicMock()),
-      loggingObject = DbGrpcRequest.objects,
-      loggingMethod = 'logRequest',
+      method         = lambda : self.service.LogGrpcRequest(MagicMock(), MagicMock()),
+      loggingObject  = DbGrpcRequest.objects,
+      loggingMethod  = 'logRequest',
+      expectedResult = OldMetadata(),
     )
     serviceRegistry.addCall.assert_called()
 
@@ -93,31 +96,34 @@ class LumberjackServiceTestCase(SimpleTestCase):
   def testLogError(self, *_: MagicMock) -> None :
     """Test logging events."""
     self._executeLoggingTests(
-      method        = lambda : self.service.LogError(MagicMock(), MagicMock()),
-      loggingObject = DbError.objects,
-      loggingMethod = 'logError',
+      method         = lambda : self.service.LogError(MagicMock(), MagicMock()),
+      loggingObject  = DbError.objects,
+      loggingMethod  = 'logError',
+      expectedResult = OldMetadata(),
     )
 
   def _executeLoggingTests(
       self, *,
-      method       : Callable[[], Any],
-      loggingObject: Any,
-      loggingMethod: str,
+      method        : Callable[[], Any],
+      loggingObject : Any,
+      loggingMethod : str = 'khaleesiCreate',
+      expectedResult: Any = Metadata(),
   ) -> None :
     """Execute all typical logging tests."""
     for test in [ self._executeSuccessfulLoggingTest, self._executeLoggingTestWithParsingError ]:
       with self.subTest(test = test.__name__):
         with patch.object(loggingObject, loggingMethod) as logging:
-          test(method = method, logging = logging)  # type: ignore[operator]  # pylint: disable=no-value-for-parameter
+          test(method = method, logging = logging, expectedResult = expectedResult)  # type: ignore[operator]  # pylint: disable=no-value-for-parameter,line-too-long
 
   def _executeSuccessfulLoggingTest(
       self, *,
-      method : Callable[[], Any],
-      logging: MagicMock,
+      method        : Callable[[], Any],
+      logging       : MagicMock,
+      expectedResult: Any,
   ) -> None :
     """Successful call to logging method."""
     # Prepare data.
-    logging.return_value = Metadata()
+    logging.return_value = expectedResult
     # Execute test.
     method()
     # Assert result.
@@ -129,12 +135,12 @@ class LumberjackServiceTestCase(SimpleTestCase):
       self,
       _: MagicMock,
       *,
-      method : Callable[[], Any],
-      logging: MagicMock,
+      method        : Callable[[], Any],
+      logging       : MagicMock,
+      expectedResult: Any,
   ) -> None :
     """Call to logging method that results in parsing errors."""
     # Prepare data.
-    expectedResult = Metadata()
     expectedResult.metaLoggingErrors = 'some parsing errors'
     logging.return_value = expectedResult
     # Execute test & assert result.

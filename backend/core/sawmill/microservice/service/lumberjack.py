@@ -15,7 +15,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogStandardResponse,
   Error,
-  Event,
+  EventRequest,
   GrpcResponseRequest,
   GrpcRequest,
   HttpRequest,
@@ -33,23 +33,23 @@ from microservice.models import (
   Query as DbQuery,
 )
 from microservice.models.logs.abstract import Metadata
+from microservice.models.logs.metadataMixin import MetadataMixin
 from microservice.models.serviceRegistry import SERVICE_REGISTRY
 
 
 class Service(Servicer):
   """Lumberjack service."""
 
-  def LogEvent(self, request: Event, _: grpc.ServicerContext) -> LogStandardResponse :
+  def LogEvent(self, request: EventRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
-    def method() -> Metadata :
+    def method() -> MetadataMixin :
       LOGGER.info('Adding service to service registry.')
       SERVICE_REGISTRY.addService(callerDetails = request.requestMetadata.grpcCaller)
       LOGGER.info(
         f'Saving an event to the request "{request.requestMetadata.grpcCaller.requestId}" '
         f'to the database.',
       )
-      return DbEvent.objects.logEvent(grpcEvent = request)
-
+      return DbEvent.objects.khaleesiCreate(grpc = request)
     return self._handleResponse(method = method)
 
   def LogHttpRequest(self, request: HttpRequest, _: grpc.ServicerContext) -> LogStandardResponse :
@@ -60,7 +60,7 @@ class Service(Servicer):
         'to the database.',
       )
       return DbHttpRequest.objects.logRequest(grpcRequest = request)
-    return self._handleResponse(method = method)
+    return self._handleResponseOld(method = method)
 
   def LogSystemHttpRequest(
       self,
@@ -74,7 +74,7 @@ class Service(Servicer):
         f'"{request.requestMetadata.httpCaller.requestId}" to the database.',
       )
       return DbHttpRequest.objects.logSystemRequest(grpcRequest = request)
-    return self._handleResponse(method = method)
+    return self._handleResponseOld(method = method)
 
   def LogHttpRequestResponse(
       self,
@@ -88,7 +88,7 @@ class Service(Servicer):
         f'"{request.requestMetadata.httpCaller.requestId}" to the database.',
       )
       return DbHttpRequest.objects.logResponse(grpcResponse = request)
-    return self._handleResponse(method = method)
+    return self._handleResponseOld(method = method)
 
   def LogGrpcRequest(self, request: GrpcRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log requests."""
@@ -103,7 +103,7 @@ class Service(Servicer):
       )
       return DbGrpcRequest.objects.logRequest(grpcRequest = request)
 
-    return self._handleResponse(method = method)
+    return self._handleResponseOld(method = method)
 
   def LogGrpcResponse(
       self,
@@ -135,7 +135,7 @@ class Service(Servicer):
       result.save()
       result.metaLoggingErrors = errors
       return result
-    return self._handleResponse(method = method)
+    return self._handleResponseOld(method = method)
 
   def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log errors."""
@@ -145,10 +145,21 @@ class Service(Servicer):
         'to the database.',
       )
       return DbError.objects.logError(grpcError = request)
-    return self._handleResponse(method = method)
+    return self._handleResponseOld(method = method)
 
 
-  def _handleResponse(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :
+  def _handleResponseOld(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :
+    """Wrap responses for logging."""
+    metadata = method()
+    if metadata.metaLoggingErrors:
+      raise InvalidArgumentException(
+        privateMessage = 'Error when parsing the metadata fields.',
+        privateDetails = metadata.metaLoggingErrors,
+      )
+    return LogStandardResponse()
+
+
+  def _handleResponse(self, *, method: Callable[[], MetadataMixin]) -> LogStandardResponse :
     """Wrap responses for logging."""
     metadata = method()
     if metadata.metaLoggingErrors:

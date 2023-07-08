@@ -20,7 +20,8 @@ from microservice.models import (
   HttpRequest as DbHttpRequest,
   Query as DbQuery,
 )
-from microservice.models.cleanup import CleanupJob
+from microservice.models.cleanup import CleanupJob as OldCleanupJob
+from microservice.models.cleanupJob import CleanupJob
 
 
 class Service(Servicer):
@@ -43,7 +44,7 @@ class Service(Servicer):
       'Cleaning up requests older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = CleanupJob(model = DbGrpcRequest, request = request))
+    return jobExecutor(job = OldCleanupJob(model = DbGrpcRequest, request = request))
 
   def CleanupErrors(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
@@ -51,7 +52,7 @@ class Service(Servicer):
       'Cleaning up errors older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = CleanupJob(model = DbError, request = request))
+    return jobExecutor(job = OldCleanupJob(model = DbError, request = request))
 
   def CleanupHttpRequests(
       self,
@@ -63,7 +64,7 @@ class Service(Servicer):
       'Cleaning up HTTP requests older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = request))
+    return jobExecutor(job = OldCleanupJob(model = DbHttpRequest, request = request))
 
   def CleanupQueries(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
@@ -71,7 +72,7 @@ class Service(Servicer):
       'Cleaning up queries older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = CleanupJob(model = DbQuery, request = request))
+    return jobExecutor(job = OldCleanupJob(model = DbQuery, request = request))
 
 
 serviceConfiguration = ServiceConfiguration[Service](

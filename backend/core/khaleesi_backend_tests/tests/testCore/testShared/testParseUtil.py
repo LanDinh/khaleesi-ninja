@@ -21,7 +21,7 @@ class ParseUtilTestCase(SimpleTestCase):
         # Execute test.
         result = parseTimestamp(raw = raw, name = 'valid-timestamp', errors = errors)
         # Assert result.
-        self.assertEqual(raw.replace(tzinfo = None), result.replace(tzinfo = None))  # type: ignore[union-attr]  # pylint: disable=line-too-long
+        self.assertEqual(raw.replace(tzinfo = None), result.replace(tzinfo = None))
         self.assertEqual(0                         , len(errors))
 
   def testParseTimestampEmpty(self) -> None :

@@ -1,145 +1,184 @@
 """Test the event logs."""
 
 # Python.
-from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.testUtil.grpc import GrpcTestMixin
-from khaleesi.core.testUtil.testCase import TransactionTestCase, SimpleTestCase
+from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent
+from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventRequest as GrpcEventRequest
 from microservice.models import Event
-from microservice.testUtil import ModelRequestMetadataMixin
 
 
-@patch('microservice.models.logs.event.AUDIT_EVENT')
-@patch('microservice.models.logs.event.parseString')
-@patch.object(Event.objects.model, 'logMetadata')
-class EventManagerTestCase(GrpcTestMixin, TransactionTestCase):
-  """Test the event logs objects manager."""
-
-  def testLogEvent(self, metadata: MagicMock, string: MagicMock, auditMetric: MagicMock) -> None :
-    """Test logging a gRPC event."""
-    for actionLabel, actionType in GrpcEvent.Action.ActionType.items():
-      for resultLabel, resultType in GrpcEvent.Action.ResultType.items():
-        for userLabel, userType in User.UserType.items():
-          for ownerLabel, ownerType in User.UserType.items():
-            for logEventMetric in [True, False]:
-              with self.subTest(
-                  action         = actionLabel,
-                  result         = resultLabel,
-                  user           = userLabel,
-                  logEventMetric = logEventMetric,
-                  owner          = ownerLabel,
-              ):
-                # Prepare data.
-                auditMetric.reset_mock()
-                metadata.reset_mock()
-                metadata.return_value = {}
-                string.return_value = 'parsed-string'
-                now = datetime.now(tz = timezone.utc)
-                grpcEvent = GrpcEvent()
-                self.setRequestMetadata(
-                  requestMetadata = grpcEvent.requestMetadata,
-                  now             = now,
-                  user            = userType,
-                )
-                grpcEvent.id                = 'event-id'
-                grpcEvent.target.type       = 'target-type'
-                grpcEvent.target.id         = 'target-id'
-                grpcEvent.target.owner.id   = 'target-owner'
-                grpcEvent.target.owner.type = ownerType
-                grpcEvent.action.crudType   = actionType
-                grpcEvent.action.customType = 'action-type'
-                grpcEvent.action.result     = resultType
-                grpcEvent.action.details    = 'action-description'
-                grpcEvent.loggerSendMetric  = logEventMetric
-                # Execute test.
-                result = Event.objects.logEvent(grpcEvent = grpcEvent)
-                # Assert result.
-                metadata.assert_called_once()
-                self.assertEqual(grpcEvent.requestMetadata  , metadata.call_args.kwargs['metadata'])
-                self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
-                self.assertEqual(ownerLabel                 , result.targetOwnerType)
-                self.assertEqual(actionLabel                , result.actionCrudType)
-                self.assertEqual(grpcEvent.action.customType, result.actionCustomType)
-                self.assertEqual(resultLabel                , result.actionResult)
-                self.assertEqual(grpcEvent.action.details   , result.actionDetails)
-                if logEventMetric:
-                  auditMetric.inc.assert_called_once()
-                else:
-                  auditMetric.inc.assert_not_called()
-
-  def testLogEventEmpty(
-      self,
-      metadata   : MagicMock,
-      string     : MagicMock,
-      auditMetric: MagicMock,
-  ) -> None :
-    """Test logging an empty gRPC event."""
-    # Prepare data.
-    string.return_value = 'parsed-string'
-    metadata.return_value = {}
-    grpcEvent = GrpcEvent()
-    # Execute test.
-    result = Event.objects.logEvent(grpcEvent = grpcEvent)
-    # Assert result.
-    auditMetric.inc.assert_not_called()
-    metadata.assert_called_once()
-    self.assertEqual([], metadata.call_args.kwargs['errors'])
-    self.assertEqual('', result.metaLoggingErrors)
-
-
-class EventTestCase(ModelRequestMetadataMixin, SimpleTestCase):
+class EventTestCase(SimpleTestCase):
   """Test the event logs models."""
 
-  def testToGrpcEvent(self) -> None :
-    """Test that general mapping to gRPC works."""
+  @patch('microservice.models.logs.event.parseString')
+  @patch('microservice.models.logs.event.Model.fromGrpc')
+  @patch('microservice.models.logs.event.Event.metadataFromGrpc')
+  def testFromGrpcForCreation(
+      self,
+      metadata: MagicMock,
+      parent  : MagicMock,
+      string  : MagicMock,
+  ) -> None :
+    """Test reading from gRPC."""
+    string.return_value = 'parsed-string'
     for actionLabel, actionType in GrpcEvent.Action.ActionType.items():
       for resultLabel, resultType in GrpcEvent.Action.ResultType.items():
-        for userLabel, userType in User.UserType.items():
-          for ownerLabel, ownerType in User.UserType.items():
-            with self.subTest(
-                action = actionLabel,
-                result = resultLabel,
-                user   = userLabel,
-                owner  = ownerLabel,
-            ):
-              # Prepare data.
-              event = Event(
-                eventId          = 'event-id',
-                targetType       = 'target-type',
-                targetId         = 'target-id',
-                targetOwnerId    = 'owner-id',
-                targetOwnerType  = ownerLabel,
-                actionCrudType   = actionLabel,
-                actionCustomType = 'action-type',
-                actionResult     = resultLabel,
-                actionDetails    = 'action-details',
-                **self.modelFullRequestMetadata(user = userType),
-              )
-              # Execute test.
-              result = event.toGrpc()
-              # Assert result.
-              self.assertGrpcRequestMetadata(
-                model        = event,
-                grpc         = result.event.requestMetadata,
-                grpcResponse = result.eventMetadata,
-              )
-              self.assertEqual(event.eventId         , result.event.id)
-              self.assertEqual(event.targetType      , result.event.target.type)
-              self.assertEqual(ownerType             , result.event.target.owner.type)
-              self.assertEqual(actionType            , result.event.action.crudType)
-              self.assertEqual(event.actionCustomType, result.event.action.customType)
-              self.assertEqual(resultType            , result.event.action.result)
-              self.assertEqual(event.actionDetails   , result.event.action.details)
+        for ownerLabel, ownerType in User.UserType.items():
+          with self.subTest(action = actionLabel, result = resultLabel, owner = ownerLabel):
+            # Prepare data.
+            metadata.reset_mock()
+            parent.reset_mock()
+            instance = Event()
+            grpc     = self._createGrpcEvent(
+              owner  = ownerType,
+              action = actionType,
+              result = resultType,
+            )
+            # Execute test.
+            instance.fromGrpc(grpc = grpc)
+            # Assert result.
+            metadata.assert_called_once()
+            parent.assert_called_once()
+            self.assertEqual(ownerLabel                  , instance.targetOwnerType)
+            self.assertEqual(actionLabel                 , instance.actionCrudType)
+            self.assertEqual(grpc.event.action.customType, instance.actionCustomType)
+            self.assertEqual(resultLabel                 , instance.actionResult)
+            self.assertEqual(grpc.event.action.details   , instance.actionDetails)
 
-  def testEmptyToGrpcEvent(self) -> None :
+  @patch('microservice.models.logs.event.parseString')
+  @patch('microservice.models.logs.event.Model.fromGrpc')
+  @patch('microservice.models.logs.event.Event.metadataFromGrpc')
+  def testFromGrpcForUpdate(
+      self,
+      metadata: MagicMock,
+      parent  : MagicMock,
+      string  : MagicMock,
+  ) -> None :
+    """Test reading from gRPC."""
+    string.return_value = 'parsed-string'
+    for actionLabel, actionType in [
+        (actionLabel, actionType) for actionLabel, actionType in GrpcEvent.Action.ActionType.items()
+        if actionType != GrpcEvent.Action.ActionType.UNKNOWN_ACTION
+    ]:
+      for resultLabel, resultType in [
+          (resultLabel, resultType)
+          for resultLabel, resultType in GrpcEvent.Action.ResultType.items()
+          if resultType != GrpcEvent.Action.ResultType.UNKNOWN_RESULT
+      ]:
+        for ownerLabel, ownerType in [
+            (ownerLabel, ownerType) for ownerLabel, ownerType in User.UserType.items()
+            if ownerType != User.UserType.UNKNOWN
+        ]:
+          with self.subTest(action = actionLabel, result = resultLabel, owner = ownerLabel):
+            # Prepare data.
+            metadata.reset_mock()
+            parent.reset_mock()
+            instance    = Event()
+            instance.pk = 1337
+            grpc     = self._createGrpcEvent(
+              owner  = ownerType,
+              action = actionType,
+              result = resultType,
+            )
+            # Execute test.
+            instance.fromGrpc(grpc = grpc)
+            # Assert result.
+            metadata.assert_called_once()
+            parent.assert_called_once()
+            self.assertNotEqual(ownerLabel                  , instance.targetOwnerType)
+            self.assertNotEqual(actionLabel                 , instance.actionCrudType)
+            self.assertNotEqual(grpc.event.action.customType, instance.actionCustomType)
+            self.assertNotEqual(resultLabel                 , instance.actionResult)
+            self.assertNotEqual(grpc.event.action.details   , instance.actionDetails)
+
+  @patch('microservice.models.logs.event.parseString')
+  @patch('microservice.models.logs.event.Model.fromGrpc')
+  @patch('microservice.models.logs.event.Event.metadataFromGrpc')
+  def testFromGrpcForCreationEmpty(
+      self,
+      metadata: MagicMock,
+      parent  : MagicMock,
+      string  : MagicMock,
+  ) -> None :
+    """Test reading from gRPC."""
+    # Prepare data.
+    string.return_value = 'parsed-string'
+    instance = Event()
+    grpc     = GrpcEventRequest()
+    # Execute test.
+    instance.fromGrpc(grpc = grpc)
+    # Assert result.
+    metadata.assert_called_once()
+    parent.assert_called_once()
+
+  @patch('microservice.models.logs.event.Model.toGrpc')
+  @patch('microservice.models.logs.event.Event.metadataToGrpc')
+  def testToGrpc(self, metadata: MagicMock, parent: MagicMock) -> None :
+    """Test returning a gRPC object."""
+    for actionLabel, actionType in GrpcEvent.Action.ActionType.items():
+      for resultLabel, resultType in GrpcEvent.Action.ResultType.items():
+        for ownerLabel, ownerType in User.UserType.items():
+          with self.subTest(action = actionLabel, result = resultLabel, owner = ownerLabel):
+            # Prepare data.
+            metadata.reset_mock()
+            parent.reset_mock()
+            instance = Event(
+              targetType       = 'target-type',
+              targetId         = 'target-id',
+              targetOwnerId    = 'owner-id',
+              targetOwnerType  = ownerLabel,
+              actionCrudType   = actionLabel,
+              actionCustomType = 'action-type',
+              actionResult     = resultLabel,
+              actionDetails    = 'action-details',
+            )
+            grpc = GrpcEventRequest()
+            # Execute test.
+            result = instance.toGrpc(grpc = grpc)
+            # Assert result.
+            metadata.assert_called_once()
+            parent.assert_called_once()
+            self.assertEqual(instance.targetType      , result.event.target.type)
+            self.assertEqual(instance.targetId        , result.event.target.id)
+            self.assertEqual(instance.targetOwnerId   , result.event.target.owner.id)
+            self.assertEqual(ownerType                , result.event.target.owner.type)
+            self.assertEqual(actionType               , result.event.action.crudType)
+            self.assertEqual(instance.actionCustomType, result.event.action.customType)
+            self.assertEqual(resultType               , result.event.action.result)
+            self.assertEqual(instance.actionDetails   , result.event.action.details)
+
+  @patch('microservice.models.logs.event.Model.toGrpc')
+  @patch('microservice.models.logs.event.Event.metadataToGrpc')
+  def testToGrpcEmpty(self, metadata: MagicMock, parent: MagicMock) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
-    event = Event(**self.modelEmptyRequestMetadata())
+    event = Event()
     # Execute test.
-    result = event.toGrpc()
+    event.toGrpc()
     # Assert result.
-    self.assertIsNotNone(result)
+    metadata.assert_called_once()
+    parent.assert_called_once()
+
+  def _createGrpcEvent(
+      self, *,
+      owner : 'User.UserType.V',
+      action: 'GrpcEvent.Action.ActionType.V',
+      result: 'GrpcEvent.Action.ResultType.V'
+  ) -> GrpcEventRequest :
+    """Utility method for creating gRPC Events."""
+    grpc     = GrpcEventRequest()
+
+    grpc.event.target.type       = 'target-type'
+    grpc.event.target.id         = 'target-id'
+    grpc.event.target.owner.type = owner
+    grpc.event.target.owner.id   = 'owner-id'
+
+    grpc.event.action.crudType   = action
+    grpc.event.action.customType = 'custom-action'
+    grpc.event.action.result     = result
+    grpc.event.action.details    = 'details'
+
+    return grpc

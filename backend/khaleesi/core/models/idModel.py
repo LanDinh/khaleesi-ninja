@@ -72,12 +72,12 @@ class Model(BaseModel[Grpc], ABC, Generic[Grpc], metaclass = AbstractModelMeta):
   def toGrpc(self, *, metadata: ObjectMetadata, grpc: Grpc) -> Grpc :
     """Return a grpc object containing own values."""
     grpc = super().toGrpc(metadata = metadata, grpc = grpc)
-    metadata.id      = self.khaleesiId
+    metadata.id = self.khaleesiId
     metadata.created.FromDatetime(self.khaleesiCreated)
-    metadata.createdBy.id = self.khaleesiCreatedById
+    metadata.createdBy.id   = self.khaleesiCreatedById
     metadata.createdBy.type = User.UserType.Value(self.khaleesiCreatedByType)
     metadata.modified.FromDatetime(self.khaleesiModified)
-    metadata.modifiedBy.id = self.khaleesiModifiedById
+    metadata.modifiedBy.id   = self.khaleesiModifiedById
     metadata.modifiedBy.type = User.UserType.Value(self.khaleesiModifiedByType)
     return grpc
 

@@ -41,8 +41,8 @@ message GrpcCallerDetails {
 }
 
 message RequestMetadata {
-  GrpcCallerDetails         grpcCaller = 1;
-  HttpCallerDetails         httpCaller = 2;
+  HttpCallerDetails         httpCaller = 1;
+  GrpcCallerDetails         grpcCaller = 2;
   User                      user       = 3;
   google.protobuf.Timestamp timestamp  = 4;
 }

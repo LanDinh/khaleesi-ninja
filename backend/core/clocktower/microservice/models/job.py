@@ -12,7 +12,7 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
 from khaleesi.core.grpc.requestMetadata import addRequestMetadata
-from khaleesi.core.models.eventSystemModel import Model, ModelManager
+from khaleesi.core.models.eventIdModelOwnedBySystem import Model, ModelManager
 from khaleesi.proto.core_pb2 import JobExecutionRequest, ObjectMetadata
 from khaleesi.proto.core_clocktower_pb2 import Job as GrpcJob
 

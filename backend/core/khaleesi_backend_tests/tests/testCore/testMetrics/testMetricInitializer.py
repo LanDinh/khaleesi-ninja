@@ -11,7 +11,7 @@ from khaleesi.core.metrics.metricInitializer import (
 )
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
+from khaleesi.proto.core_sawmill_pb2 import EventRequest, Event, ServiceCallData
 
 
 class MetricInitializer(BaseMetricInitializer):
@@ -67,13 +67,16 @@ class BaseMetricInitializerTest(SimpleTestCase):
     customActions = set()
     results = set()
     for rawArgument in arguments:
-      argument: Event = rawArgument.kwargs['event']
-      self.assertCaller(expected = eventData.caller, actual = argument.requestMetadata.grpcCaller)
+      argument: EventRequest = rawArgument.kwargs['event']
+      self.assertCaller(
+        expected = eventData.caller,
+        actual = argument.requestMetadata.grpcCaller,
+      )
       users.add(argument.requestMetadata.user.type)
-      crudActions.add(argument.action.crudType)
-      if argument.action.customType:
-        customActions.add(argument.action.customType)
-      results.add(argument.action.result)
+      crudActions.add(argument.event.action.crudType)
+      if argument.event.action.customType:
+        customActions.add(argument.event.action.customType)
+      results.add(argument.event.action.result)
     self.assertEqual(usersCount  , len(users))
     self.assertEqual(actionsCount, len(crudActions) + len(customActions))
     self.assertEqual(resultsCount, len(results))

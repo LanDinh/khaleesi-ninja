@@ -13,10 +13,10 @@ def _parseInput(
     *,
     parser : Callable[[Any], T_co],
     raw    : Optional[Any],
-    default: Optional[T_co],
+    default: T_co,  # type: ignore[misc]
     name   : str,
     errors : List[str],
-) -> Optional[T_co] :
+) -> T_co :
   """Attempt to parse the input."""
   try:
     if raw:
@@ -28,7 +28,7 @@ def _parseInput(
 
 class Parser(Protocol[T_co]):
   """Signature for parsers."""
-  def __call__(self, *, raw: Optional[Any], name: str, errors: List[str]) -> Optional[T_co] : ...
+  def __call__(self, *, raw: Optional[Any], name: str, errors: List[str]) -> T_co : ...
 
 
 parseTimestamp: Parser[datetime] = partial(

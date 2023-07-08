@@ -309,19 +309,21 @@ class Server:
       details      : str,
   ) -> None :
     """Log the server state."""
-    user = User()
-    user.type = User.UserType.SYSTEM
-    user.id   = f'{khaleesiSettings["METADATA"]["GATE"]}-{khaleesiSettings["METADATA"]["SERVICE"]}'
+    grpcMethod = 'LIFECYCLE'
+    metadataSettings = khaleesiSettings["METADATA"]
+    event = Event()
+    event.target.owner.type = User.UserType.SYSTEM
+    event.target.owner.id   = f'{metadataSettings["GATE"]}-{metadataSettings["SERVICE"]}'
+    event.target.id         = metadataSettings['POD_ID']
+    event.target.type = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES'][grpcMethod]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
+    event.action.crudType = action
+    event.action.result   = result
+    event.action.details  = details
     SINGLETON.structuredLogger.logSystemEvent(
-      httpRequestId    = httpRequestId,
-      grpcRequestId    = grpcRequestId,
-      grpcMethod       = 'LIFECYCLE',
-      target           = khaleesiSettings['METADATA']['POD_ID'],
-      owner            = user,
-      action           = action,
-      result           = result,
-      details          = details,
-      loggerSendMetric = True,
+      event         = event,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = grpcMethod,
     )
 
   def _logShutdown(

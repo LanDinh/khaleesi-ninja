@@ -24,7 +24,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   Error,
-  Event,
+  Event, EventRequest,
   HttpRequest,
   HttpResponseRequest,
   Query,
@@ -60,7 +60,7 @@ class StructuredTestLogger(StructuredLogger):
     """Send the log error to the logging facility."""
     self.sender.send(error = error)
 
-  def sendLogEvent(self, *, event: Event) -> None :
+  def sendLogEvent(self, *, event: EventRequest) -> None :
     """Send the log event to the logging facility."""
     self.sender.send(event = event)
 
@@ -413,51 +413,42 @@ class TestStructuredLogger(SimpleTestCase):
     for actionLabel, actionType in Event.Action.ActionType.items():
       for resultLabel, resultType in Event.Action.ResultType.items():
         for userLabel, userType in User.UserType.items():
-          for loggerSendMetric in [True, False]:
-            with self.subTest(
-                action           = actionLabel,
-                result           = resultLabel,
-                user             = userLabel,
-                loggerSendMetric = loggerSendMetric,
-            ):
-              # Prepare data.
-              requestMetadata.reset_mock()
-              self.logger.sender.reset_mock()
-              logger.reset_mock()
-              owner      = User()
-              owner.type = userType
-              owner.id   = 'user'
-              # Perform test.
-              self.logger.logSystemEvent(
-                grpcMethod       = method,
-                httpRequestId    = httpRequestId,
-                grpcRequestId    = grpcRequestId,
-                target           = target,
-                owner            = owner,
-                action           = actionType,
-                result           = resultType,
-                details          = details,
-                loggerSendMetric = loggerSendMetric,
-              )
-              # Assert result.
-              requestMetadata.assert_called_once()
-              self.logger.sender.send.assert_called_once()
-              self.assertEqual(
-                1,
-                logger.info.call_count + logger.warning.call_count + logger.error.call_count
-                + logger.fatal.call_count,
-              )
-              logEvent = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
-              self.assertIsNotNone(logEvent.id)
-              self.assertIsNotNone(logEvent.target.type)
-              self.assertEqual(target          , logEvent.target.id)
-              self.assertEqual(owner.id        , logEvent.target.owner.id)
-              self.assertEqual(owner.type      , logEvent.target.owner.type)
-              self.assertEqual(''              , logEvent.action.customType)
-              self.assertEqual(actionType      , logEvent.action.crudType)
-              self.assertEqual(resultType      , logEvent.action.result)
-              self.assertEqual(details         , logEvent.action.details)
-              self.assertEqual(loggerSendMetric, logEvent.loggerSendMetric)
+          with self.subTest(action = actionLabel, result = resultLabel, user = userLabel):
+            # Prepare data.
+            requestMetadata.reset_mock()
+            self.logger.sender.reset_mock()
+            logger.reset_mock()
+            event = Event()
+            event.target.id         = target
+            event.target.owner.type = userType
+            event.target.owner.id   = 'user'
+            event.action.crudType   = actionType
+            event.action.result     = resultType
+            event.action.details    = details
+            # Perform test.
+            self.logger.logSystemEvent(
+              grpcMethod    = method,
+              httpRequestId = httpRequestId,
+              grpcRequestId = grpcRequestId,
+              event         = event,
+            )
+            # Assert result.
+            requestMetadata.assert_called_once()
+            self.logger.sender.send.assert_called_once()
+            self.assertEqual(
+              1,
+              logger.info.call_count + logger.warning.call_count + logger.error.call_count
+              + logger.fatal.call_count,
+            )
+            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
+            self.assertIsNotNone(logEvent.event.target.type)
+            self.assertEqual(target                 , logEvent.event.target.id)
+            self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
+            self.assertEqual(event.target.owner.type, logEvent.event.target.owner.type)
+            self.assertEqual(''                     , logEvent.event.action.customType)
+            self.assertEqual(actionType             , logEvent.event.action.crudType)
+            self.assertEqual(resultType             , logEvent.event.action.result)
+            self.assertEqual(details                , logEvent.event.action.details)
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
   def testLogEvent(self, requestMetadata: MagicMock, logger: MagicMock) -> None :
@@ -474,19 +465,17 @@ class TestStructuredLogger(SimpleTestCase):
             requestMetadata.reset_mock()
             self.logger.sender.reset_mock()
             logger.reset_mock()
-            owner      = User()
-            owner.type = userType
-            owner.id   = 'user'
+            event = Event()
+            event.target.id         = target
+            event.target.type       = targetType
+            event.target.owner.type = userType
+            event.target.owner.id   = 'user'
+            event.action.crudType   = actionType
+            event.action.customType = action
+            event.action.result     = resultType
+            event.action.details    = details
             # Perform test.
-            self.logger.logEvent(
-              target     = target,
-              targetType = targetType,
-              owner      = owner,
-              action     = action,
-              actionCrud = actionType,
-              result     = resultType,
-              details    = details,
-            )
+            self.logger.logEvent(event = event)
             # Assert result.
             requestMetadata.assert_called_once()
             self.logger.sender.send.assert_called_once()
@@ -495,17 +484,15 @@ class TestStructuredLogger(SimpleTestCase):
               logger.info.call_count + logger.warning.call_count + logger.error.call_count
               + logger.fatal.call_count,
             )
-            logEvent = cast(Event, self.logger.sender.send.call_args.kwargs['event'])
-            self.assertIsNotNone(logEvent.id)
-            self.assertEqual(target    , logEvent.target.id)
-            self.assertEqual(targetType, logEvent.target.type)
-            self.assertEqual(owner.id  , logEvent.target.owner.id)
-            self.assertEqual(owner.type, logEvent.target.owner.type)
-            self.assertEqual(action    , logEvent.action.customType)
-            self.assertEqual(actionType, logEvent.action.crudType)
-            self.assertEqual(resultType, logEvent.action.result)
-            self.assertEqual(details   , logEvent.action.details)
-            self.assertEqual(False     , logEvent.loggerSendMetric)
+            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
+            self.assertEqual(target                 , logEvent.event.target.id)
+            self.assertEqual(targetType             , logEvent.event.target.type)
+            self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
+            self.assertEqual(event.target.owner.type, logEvent.event.target.owner.type)
+            self.assertEqual(action                 , logEvent.event.action.customType)
+            self.assertEqual(actionType             , logEvent.event.action.crudType)
+            self.assertEqual(resultType             , logEvent.event.action.result)
+            self.assertEqual(details                , logEvent.event.action.details)
 
   def _assertError(self, exception: KhaleesiException, logError: Error) -> None :
     self.assertEqual(exception.gate          , logError.gate)

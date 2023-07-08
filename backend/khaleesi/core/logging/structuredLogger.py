@@ -17,17 +17,18 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.grpc.channels import CHANNEL_MANAGER
 from khaleesi.core.grpc.importUtil import importSetting
+from khaleesi.core.metrics.audit import AUDIT_EVENT
 from khaleesi.core.grpc.requestMetadata import addRequestMetadata, addSystemRequestMetadata
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.state import STATE
-from khaleesi.proto.core_pb2 import RequestMetadata, User, EmptyRequest
+from khaleesi.proto.core_pb2 import RequestMetadata, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   Error,
-  Event,
+  Event, EventRequest,
   HttpRequest,
   HttpResponseRequest,
   Response,
@@ -194,100 +195,50 @@ class StructuredLogger(ABC):
 
   def logSystemEvent(
       self, *,
+      event: Event,
       httpRequestId   : str,
       grpcRequestId   : str,
       grpcMethod      : str,
-      target          : str,
-      owner           : User,
-      action          : 'Event.Action.ActionType.V',
-      result          : 'Event.Action.ResultType.V',
-      details         : str,
-      loggerSendMetric: bool,
   ) -> None :
     """Log a system event."""
-    event = Event()
+    request = EventRequest()
     addSystemRequestMetadata(
-      metadata      = event.requestMetadata,
+      metadata      = request.requestMetadata,
       grpcMethod    = grpcMethod,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
     )
-    self._logEvent(
-      event            = event,
-      target           = target,
-      targetType       = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES'][grpcMethod]['TARGET'],  # type: ignore[literal-required]  # pylint: disable=line-too-long
-      owner            = owner,
-      action           = '',
-      actionCrud       = action,
-      result           = result,
-      details          = details,
-      loggerSendMetric = loggerSendMetric,
-    )
+    request.event.CopyFrom(event)
+    self._logEvent(event = request)
 
-  def logEvent(
-      self, *,
-      target    : str,
-      targetType: str,
-      owner     : User,
-      action    : str,
-      actionCrud: 'Event.Action.ActionType.V',
-      result    : 'Event.Action.ResultType.V',
-      details   : str,
-  ) -> None :
-    """Log a system event."""
-    event = Event()
-    addRequestMetadata(metadata = event.requestMetadata)
-    self._logEvent(
-      event            = event,
-      target           = target,
-      targetType       = targetType,
-      owner            = owner,
-      action           = action,
-      actionCrud       = actionCrud,
-      result           = result,
-      details          = details,
-      loggerSendMetric = False,
-    )
+  def logEvent(self, *, event: Event) -> None :
+    """Log a user event."""
+    request = EventRequest()
+    addRequestMetadata(metadata = request.requestMetadata)
+    request.event.CopyFrom(event)
+    self._logEvent(event = request)
 
-  def _logEvent(
-      self, *,
-      event           : Event,
-      target          : str,
-      targetType      : str,
-      owner           : User,
-      action          : str,
-      actionCrud      : 'Event.Action.ActionType.V',
-      result          : 'Event.Action.ResultType.V',
-      details         : str,
-      loggerSendMetric: bool,
-  ) -> None :
+  def _logEvent(self, *, event: EventRequest) -> None :
     """Log an event."""
-    actionString = Event.Action.ActionType.Name(actionCrud) if actionCrud else action
-    logString = \
-      f'Event targeting "{targetType}": "{target}" owned by "{owner.id}". ' \
-      f'{actionString} with result {Event.Action.ResultType.Name(result)}.'
+    AUDIT_EVENT.inc(event = event)
 
-    if result == Event.Action.ResultType.SUCCESS:
+    actionString = Event.Action.ActionType.Name(event.event.action.crudType) \
+      if event.event.action.crudType else event.event.action.customType
+    logString = \
+      f'Event targeting "{event.event.target.type}": "{event.event.target.id}" owned by ' \
+      f'"{event.event.target.owner.id}". ' \
+      f'{actionString} with result {Event.Action.ResultType.Name(event.event.action.result)}.'
+
+    if event.event.action.result == Event.Action.ResultType.SUCCESS:
       LOGGER.info(logString)
-    elif result == Event.Action.ResultType.WARNING:
+    elif event.event.action.result == Event.Action.ResultType.WARNING:
       LOGGER.warning(logString)
-    elif result == Event.Action.ResultType.ERROR:
+    elif event.event.action.result == Event.Action.ResultType.ERROR:
       LOGGER.error(logString)
-    elif result == Event.Action.ResultType.FATAL:
+    elif event.event.action.result == Event.Action.ResultType.FATAL:
       LOGGER.fatal(logString)
     else:
       LOGGER.fatal(logString)
-
-    event.id                = str(uuid4())
-    event.target.type       = targetType
-    event.target.id         = target
-    event.target.owner.id   = owner.id
-    event.target.owner.type = owner.type
-    event.action.customType = action
-    event.action.crudType   = actionCrud
-    event.action.result     = result
-    event.action.details    = details
-    event.loggerSendMetric  = loggerSendMetric
 
     self.sendLogEvent(event = event)
 
@@ -356,7 +307,7 @@ class StructuredLogger(ABC):
     """Send the log error to the logging facility."""
 
   @abstractmethod
-  def sendLogEvent(self, *, event: Event) -> None :
+  def sendLogEvent(self, *, event: EventRequest) -> None :
     """Send the log event to the logging facility."""
 
 
@@ -393,7 +344,7 @@ class StructuredGrpcLogger(StructuredLogger):
     """Send the log error to the logging facility."""
     self.stub.LogError(error)
 
-  def sendLogEvent(self, *, event: Event) -> None :
+  def sendLogEvent(self, *, event: EventRequest) -> None :
     """Send the log event to the logging facility."""
     self.stub.LogEvent(event)
 

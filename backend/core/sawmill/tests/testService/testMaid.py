@@ -26,26 +26,41 @@ class MaidServiceTestCase(SimpleTestCase):
   def testCleanupGrpcRequests(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._executeCleanupTest(method = self.service.CleanupGrpcRequests)  # pylint: disable=no-value-for-parameter
+    self._executeOldCleanupTest(method = self.service.CleanupGrpcRequests)  # pylint: disable=no-value-for-parameter
 
   def testCleanupErrors(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._executeCleanupTest(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
+    self._executeOldCleanupTest(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
 
   def testCleanupHttpRequests(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._executeCleanupTest(method = self.service.CleanupHttpRequests)  # pylint: disable=no-value-for-parameter
+    self._executeOldCleanupTest(method = self.service.CleanupHttpRequests)  # pylint: disable=no-value-for-parameter
 
   def testCleanupQueries(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._executeCleanupTest(method = self.service.CleanupQueries)  # pylint: disable=no-value-for-parameter
+    self._executeOldCleanupTest(method = self.service.CleanupQueries)  # pylint: disable=no-value-for-parameter
 
   @patch('microservice.service.maid.CleanupJob')
   @patch('microservice.service.maid.jobExecutor')
   def _executeCleanupTest(
+      self,
+      executor: MagicMock,
+      cleanup : MagicMock,
+      *,
+      method: Callable[[JobExecutionRequest, ServicerContext], EmptyResponse],
+  ) -> None :
+    """All cleanup methods look the same, so we can have a unified test."""
+    # Execute test.
+    method(JobExecutionRequest(), MagicMock())
+    # Assert result.
+    executor.assert_called_once_with(job = cleanup.return_value)
+
+  @patch('microservice.service.maid.OldCleanupJob')
+  @patch('microservice.service.maid.jobExecutor')
+  def _executeOldCleanupTest(
       self,
       executor: MagicMock,
       cleanup : MagicMock,

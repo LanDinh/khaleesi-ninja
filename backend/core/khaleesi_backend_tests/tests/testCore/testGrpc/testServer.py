@@ -331,8 +331,7 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Assert the result."""
     kwargs = singleton.structuredLogger.logSystemEvent.call_args.kwargs
-    self.assertEqual(kwargs['grpcMethod']      , 'LIFECYCLE')
-    self.assertEqual(kwargs['owner'].type      , User.UserType.SYSTEM)
-    self.assertEqual(kwargs['action']          , action)
-    self.assertEqual(kwargs['result']          , result)
-    self.assertEqual(kwargs['loggerSendMetric'], True)
+    self.assertEqual(kwargs['grpcMethod']             , 'LIFECYCLE')
+    self.assertEqual(kwargs['event'].target.owner.type, User.UserType.SYSTEM)
+    self.assertEqual(kwargs['event'].action.crudType  , action)
+    self.assertEqual(kwargs['event'].action.result    , result)

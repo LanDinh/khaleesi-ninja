@@ -7,13 +7,13 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
-  EventResponse as GrpcEventResponse,
+  EventRequest as GrpcEventRequest,
   GrpcRequestResponse as GrpcGrpcRequestResponse,
   ErrorResponse as GrpcErrorResponse,
   HttpRequestResponse as GrpcHttpResponse,
   QueryResponse as GrpcQueryResponse,
 )
-from microservice.models import Event, GrpcRequest, Error, HttpRequest, Query
+from microservice.models import Event as DbEvent, GrpcRequest, Error, HttpRequest, Query
 from microservice.service.sawyer import Service
 
 @patch('microservice.service.sawyer.LOGGER')
@@ -22,12 +22,12 @@ class SawyerServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch.object(Event.objects, 'filter')
+  @patch.object(DbEvent.objects, 'filter')
   def testGetEvents(self, dbEvents: MagicMock, *_: MagicMock) -> None :
     """Test getting logged events."""
     # Prepare data.
     dbEvent = MagicMock()
-    dbEvent.toGrpc.return_value = GrpcEventResponse()
+    dbEvent.toGrpc.return_value = GrpcEventRequest()
     dbEvents.return_value       = [ dbEvent]
     # Execute test.
     result = self.service.GetEvents(LogFilter(), MagicMock())

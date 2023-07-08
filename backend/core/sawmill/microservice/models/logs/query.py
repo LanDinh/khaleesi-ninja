@@ -37,7 +37,7 @@ class QueryManager(models.Manager['Query']):
       raw    = parseString(raw = grpcQuery.raw, name = 'raw', errors = errors)
       parser = Parser(sql = raw)
       try:
-        query = Query(  # type: ignore[misc]
+        query = Query(
           queryId    = parseString(raw = grpcQuery.id, name = 'queryId', errors = errors),
           connection = parseString(
             raw    = grpcQuery.connection,

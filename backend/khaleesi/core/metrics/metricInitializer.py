@@ -20,7 +20,7 @@ from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS,
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import ProgrammingException
 from khaleesi.proto.core_pb2 import User, RequestMetadata, GrpcCallerDetails, EmptyRequest
-from khaleesi.proto.core_sawmill_pb2 import Event, ServiceCallData
+from khaleesi.proto.core_sawmill_pb2 import Event, EventRequest, ServiceCallData
 from khaleesi.proto.core_sawmill_pb2_grpc import ForesterStub
 
 
@@ -176,19 +176,19 @@ class BaseMetricInitializer(ABC):
         privateMessage = 'Only one of actionCrudType and actionCustomType are allowed',
         privateDetails = '',
       )
-    event = Event()
+    event = EventRequest()
     event.requestMetadata.user.type                  = userType
     event.requestMetadata.grpcCaller.khaleesiGate    = eventData.caller.khaleesiGate
     event.requestMetadata.grpcCaller.khaleesiService = eventData.caller.khaleesiService
     event.requestMetadata.grpcCaller.grpcService     = eventData.caller.grpcService
     event.requestMetadata.grpcCaller.grpcMethod      = eventData.caller.grpcMethod
-    event.target.type                                = eventData.targetType
-    event.action.result                              = resultType
+    event.event.target.type                          = eventData.targetType
+    event.event.action.result                        = resultType
 
     if actionCrudType:
-      event.action.crudType = actionCrudType
+      event.event.action.crudType = actionCrudType
     if actionCustomType:
-      event.action.customType = actionCustomType
+      event.event.action.customType = actionCustomType
 
     AUDIT_EVENT.register(event = event)
 

@@ -7,7 +7,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   Error,
-  Event,
+  EventRequest,
   HttpRequest,
   HttpResponseRequest,
 )
@@ -66,6 +66,6 @@ class StructuredDbLogger(StructuredLogger):
     """Send the log error to the logging facility."""
     DbError.objects.logError(grpcError = error)
 
-  def sendLogEvent(self, *, event: Event) -> None :
+  def sendLogEvent(self, *, event: EventRequest) -> None :
     """Send the log event to the logging facility."""
-    DbEvent.objects.logEvent(grpcEvent = event)
+    DbEvent.objects.khaleesiCreate(grpc = event)

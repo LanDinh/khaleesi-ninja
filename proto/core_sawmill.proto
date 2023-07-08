@@ -7,7 +7,13 @@ import "google/protobuf/duration.proto";
 import "core.proto";
 
 
-/* SHARED *****************************************************************************************/
+/* BASIC ******************************************************************************************/
+
+
+message LogRequestMetadata {
+  google.protobuf.Timestamp loggedTimestamp = 1;
+  string                    errors          = 2;
+}
 
 
 message ResponseMetadata {
@@ -55,12 +61,8 @@ message Event {
     string     details    = 4;
   }
 
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-  string                        id              = 2;
-  Target                        target          = 3;
-  Action                        action          = 4;
-
-  bool loggerSendMetric = 10;
+  Target target = 1;
+  Action action = 2;
 }
 
 
@@ -126,11 +128,18 @@ message GrpcResponseRequest {
 
 /* LUMBERJACK *************************************************************************************/
 
-
 message LogStandardResponse {}
 
+message EventRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  khaleesi.core.ObjectMetadata  objectMetadata  = 2;
+  LogRequestMetadata            logMetadata     = 3;
+
+  Event event = 10;
+}
+
 service Lumberjack {
-  rpc LogEvent               (Event)               returns (LogStandardResponse);
+  rpc LogEvent               (EventRequest)        returns (khaleesi.core.ObjectMetadata);
   rpc LogGrpcRequest         (GrpcRequest)         returns (LogStandardResponse);
   rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
   rpc LogError               (Error)               returns (LogStandardResponse);
@@ -140,13 +149,11 @@ service Lumberjack {
 }
 
 
-message EventResponse {
-  ResponseMetadata eventMetadata = 1;
-  Event            event         = 2;
-}
+/* SAWYER *****************************************************************************************/
+
 
 message EventsList {
-  repeated EventResponse events = 1;
+  repeated EventRequest events = 1;
 }
 
 message QueryResponse {

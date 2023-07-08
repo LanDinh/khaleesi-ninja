@@ -195,16 +195,15 @@ class BaseJob(ABC, Generic[M]):
       details: str,
   ) -> None :
     """Log start and end events."""
-    SINGLETON.structuredLogger.logEvent(
-      target     = self.target(),
-      targetType = self.targetType(),
-      owner      = self.owner(),
-      action     = '',  # Batch jobs use START and END crud types.
-      actionCrud = action,
-      result     = result,
-      details    = f'{self._loggingPrefix()} '
-                   f'{details} {self.itemsProcessed} items processed so far.',
-    )
+    event = Event()
+    event.target.id   = self.target()
+    event.target.type = self.targetType()
+    event.target.owner.CopyFrom(self.owner())
+    event.action.crudType = action
+    event.action.result   = result
+    event.action.details  = f'{self._loggingPrefix()} '\
+                            f'{details} {self.itemsProcessed} items processed so far.'
+    SINGLETON.structuredLogger.logEvent(event = event)
 
   def _loggingPrefix(self) -> str :
     """Return uniform logging prefix."""

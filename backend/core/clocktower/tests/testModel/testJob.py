@@ -1,4 +1,4 @@
-"""Test the event logs."""
+"""Test the job."""
 
 # Python.
 from unittest.mock import patch, MagicMock

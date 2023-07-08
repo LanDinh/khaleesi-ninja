@@ -4,5 +4,5 @@
 
 from .baseModel import BaseModel as BaseModel
 from .idModel import IdModel as IdModel
-from .eventSystemModel import EventSystemModel as EventSystemModel
+from .eventIdModelOwnedBySystem import EventSystemModel as EventSystemModel
 from .jobConfiguration import JobConfiguration as JobConfiguration

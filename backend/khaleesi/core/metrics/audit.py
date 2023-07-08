@@ -6,7 +6,7 @@ from typing import Dict, Any
 # khaleesi.ninja.
 from khaleesi.core.metrics.util import CounterMetric, Metric
 from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import Event
+from khaleesi.proto.core_sawmill_pb2 import EventRequest, Event
 
 
 class AuditEventMetric(CounterMetric):
@@ -27,15 +27,15 @@ class AuditEventMetric(CounterMetric):
       ],
     )
 
-  def inc(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
+  def inc(self, *, event: EventRequest) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Increment the metric."""
     super().inc(**self._getArguments(event = event))
 
-  def register(self, *, event: Event) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
+  def register(self, *, event: EventRequest) -> None :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Increment the metric."""
     super().register(**self._getArguments(event = event))  # pragma: no cover
 
-  def getValue(self, *, event: Event) -> int :  # type: ignore[override]  # pylint: disable=arguments-differ
+  def getValue(self, *, event: EventRequest) -> int :  # type: ignore[override]  # pylint: disable=arguments-differ
     """Increment the metric."""
     return super().getValue(**self._getArguments(event = event))
 
@@ -54,7 +54,7 @@ class AuditEventMetric(CounterMetric):
       **additionalLabels,
     )
 
-  def _getArguments(self, *, event: Event) -> Dict[str, Any] :
+  def _getArguments(self, *, event: EventRequest) -> Dict[str, Any] :
     """Transform the event into arguments."""
     return {
         'user'            : event.requestMetadata.user.type,
@@ -62,10 +62,10 @@ class AuditEventMetric(CounterMetric):
         'khaleesiService' : event.requestMetadata.grpcCaller.khaleesiService,
         'grpcService'     : event.requestMetadata.grpcCaller.grpcService,
         'grpcMethod'      : event.requestMetadata.grpcCaller.grpcMethod,
-        'target'          : event.target.type,
-        'actionCrudType'  : event.action.crudType,
-        'actionCustomType': event.action.customType,
-        'result'          : event.action.result,
+        'target'          : event.event.target.type,
+        'actionCrudType'  : event.event.action.crudType,
+        'actionCustomType': event.event.action.customType,
+        'result'          : event.event.action.result,
     }
 
 
