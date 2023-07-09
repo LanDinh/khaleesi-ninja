@@ -37,7 +37,7 @@ class ModelManager(models.Manager[ModelType], Generic[ModelType]):
   def khaleesiCreate(self, *, grpc: Grpc) -> ModelType :
     """Create a new instance."""
     return self._khaleesiEdit(
-      instance = self.khaleesiInstantiateNewInstance(),
+      instance = self.model(),
       grpc     = grpc,
       metadata = ObjectMetadata(),
     )
@@ -74,10 +74,6 @@ class ModelManager(models.Manager[ModelType], Generic[ModelType]):
   @abstractmethod
   def baseKhaleesiGet(self, *, metadata: ObjectMetadata) -> ModelType :
     """Define the basic get by metadata."""
-
-  def khaleesiInstantiateNewInstance(self) -> ModelType :
-    """Instantiate a new element."""
-    return self.model()
 
   def _khaleesiEdit(
       self, *,

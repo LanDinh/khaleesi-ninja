@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 # Python.
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Generic, Type, TypeVar
 
 # Django.
 from django.conf import settings
+from django.db import models
 
 # gRPC.
 from google.protobuf.json_format import MessageToJson
@@ -15,6 +16,7 @@ from google.protobuf.json_format import MessageToJson
 # khaleesi.ninja.
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import ObjectMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import Event
 from .baseModel import Grpc, AbstractModelMeta
@@ -142,6 +144,13 @@ class ModelManager(BaseModelManager[ModelType], Generic[ModelType]):
 class Model(BaseModel[Grpc], ABC, Generic[Grpc], metaclass = AbstractModelMeta):  # type: ignore[misc]  # pylint: disable=line-too-long
   """khaleesi.ninja base model which sends events upon changes."""
 
+  khaleesiCreated        = models.DateTimeField(auto_now_add = True)
+  khaleesiCreatedById    = models.TextField()
+  khaleesiCreatedByType  = models.TextField()
+  khaleesiModified       = models.DateTimeField(auto_now = True)
+  khaleesiModifiedById   = models.TextField()
+  khaleesiModifiedByType = models.TextField()
+
   objects: ModelManager[Model[Grpc]] = ModelManager()  # type: ignore[assignment]
 
   @staticmethod
@@ -159,6 +168,32 @@ class Model(BaseModel[Grpc], ABC, Generic[Grpc], metaclass = AbstractModelMeta):
     user.type = User.UserType.SYSTEM
     user.id   = f'{khaleesiSettings["METADATA"]["GATE"]}-{khaleesiSettings["METADATA"]["SERVICE"]}'
     return user
+
+  @abstractmethod
+  def fromGrpc(self, *, grpc: Grpc) -> None :
+    """Set modification metadata from gRPC."""
+    super().fromGrpc(grpc = grpc)
+
+    # Creation.
+    if not self.pk:
+      self.khaleesiCreatedById   = STATE.request.user.id
+      self.khaleesiCreatedByType = User.UserType.Name(STATE.request.user.type)
+
+    # Modification.
+    self.khaleesiModifiedById   = STATE.request.user.id
+    self.khaleesiModifiedByType = User.UserType.Name(STATE.request.user.type)
+
+  @abstractmethod
+  def toGrpc(self, *, metadata: ObjectMetadata, grpc: Grpc) -> Grpc :
+    """Return a grpc object containing own values."""
+    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
+    metadata.created.FromDatetime(self.khaleesiCreated)
+    metadata.createdBy.id   = self.khaleesiCreatedById
+    metadata.createdBy.type = User.UserType.Value(self.khaleesiCreatedByType)
+    metadata.modified.FromDatetime(self.khaleesiModified)
+    metadata.modifiedBy.id   = self.khaleesiModifiedById
+    metadata.modifiedBy.type = User.UserType.Value(self.khaleesiModifiedByType)
+    return grpc
 
   class Meta(BaseModel.Meta):
     abstract = True
