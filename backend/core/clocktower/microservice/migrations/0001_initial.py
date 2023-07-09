@@ -39,6 +39,5 @@ class Migration(migrations.Migration):
                 'ordering': ['pk'],
                 'abstract': False,
             },
-            bases=(models.Model, abc.ABC, typing.Generic),
         ),
     ]

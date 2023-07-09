@@ -47,6 +47,9 @@ make_migrations_container() {
   echo -e "${yellow}Making the migrations...${clear_color}"
   docker run --rm --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}:latest-development" make_migrations "${app}"
 
+  echo -e "${yellow}Fixing metaclass issues in migrations...${clear_color}"
+  sed -i '/bases=/d' temp/*.py
+
   echo -e "${yellow}Copying the migrations...${clear_color}"
   cp -r temp/* "backend/${gate}/${service}/${app}/migrations"
   rm -r "backend/${gate}/${service}/${app}/migrations/__pycache__"
