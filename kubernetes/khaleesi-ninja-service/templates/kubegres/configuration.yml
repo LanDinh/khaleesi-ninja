@@ -11,6 +11,5 @@ metadata:
     type: "kubegres"
 data:
   database: "{{ .Values.service.name }}"
-  writeUser: "{{ .Values.service.name }}-writer"
-  readUser: "{{ .Values.service.name }}-reader"
+  user: "{{ .Values.service.name }}-writer"
 {{- end }}

@@ -179,44 +179,6 @@ class DbException(KhaleesiCoreException):
   """DB-related exceptions."""
 
 
-class DbObjectNotFoundException(DbException):
-  """Django ObjectDoesNotExist."""
-
-  def __init__(
-      self, *,
-      objectType: str,
-      loglevel   : LogLevel = LogLevel.WARNING,
-  ) -> None :
-    """Initialize the exception."""
-    super().__init__(
-      status         = StatusCode.NOT_FOUND,
-      publicKey      = 'core-db-object-not-found',
-      publicDetails  = objectType,
-      privateMessage = f'{objectType} not found in the DB.',
-      privateDetails = objectType,
-      loglevel       = loglevel,
-    )
-
-
-class DbObjectTwinException(DbException):
-  """Django MultipleObjectsReturned."""
-
-  def __init__(
-      self, *,
-      objectType: str,
-      objectId  : str,
-  ) -> None :
-    """Initialize the exception."""
-    super().__init__(
-      status         = StatusCode.FAILED_PRECONDITION,
-      publicKey      = 'core-db-object-twin',
-      publicDetails  = objectType,
-      privateMessage = f'{objectType} found multiple times in the DB.',
-      privateDetails = f'objectType: {objectType}, objectId: {objectId}',
-      loglevel       = LogLevel.ERROR,
-    )
-
-
 class DbOutdatedInformationException(DbException):
   """Django MultipleObjectsReturned."""
 

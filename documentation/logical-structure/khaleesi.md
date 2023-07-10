@@ -5,7 +5,6 @@ It is structured as follows:
 
 * `core` contains shared code.
   * `batch` contains code for batch job execution.
-  * `database_router` contains logic determining which database connection to use in a given query.
   * `grpc` defines the gRPC server, including startup and graceful turn-down.
   * `interceptors` contains both client and server interceptors:
     * logging

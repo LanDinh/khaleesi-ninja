@@ -24,16 +24,10 @@ DATABASE = {
   },
 }
 DATABASES = {
-  'default': {},
-  'read': {
-    **DATABASE,  # type: ignore[arg-type]
-    'USER'    : environ['KHALEESI_DATABASE_READ_USER'],
-    'PASSWORD': environ['KHALEESI_DATABASE_READ_PASSWORD'],
-  },
-  'write': {
-    **DATABASE,  # type: ignore[arg-type]
-    'USER'    : environ['KHALEESI_DATABASE_WRITE_USER'],
-    'PASSWORD': environ['KHALEESI_DATABASE_WRITE_PASSWORD'],
+  'default': {
+      **DATABASE,  # type: ignore[arg-type]
+      'USER'    : environ['KHALEESI_DATABASE_USER'],
+      'PASSWORD': environ['KHALEESI_DATABASE_PASSWORD'],
   },
   'migrate': {
     **DATABASE,  # type: ignore[arg-type]
@@ -41,4 +35,3 @@ DATABASES = {
     'PASSWORD': environ['KHALEESI_DATABASE_SUPERUSER_PASSWORD'],
   },
 }
-DATABASE_ROUTERS = [ 'khaleesi.core.database_router.production.DatabaseRouter' ]

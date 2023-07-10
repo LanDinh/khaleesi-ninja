@@ -14,4 +14,4 @@ class SimpleTestCase(DjangoSimpleTestCase):
 class TransactionTestCase(DjangoTransactionTestCase):
   """Override the TransactionTestCase."""
 
-  databases = {'read', 'write'}
+  databases = { 'default' }
