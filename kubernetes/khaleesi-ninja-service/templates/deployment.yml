@@ -122,5 +122,5 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: "{{ .Values.gate.name }}-{{ .Values.service.name }}-kubegres"
-                  key: "Password"
+                  key: "password"
           {{- end }}
