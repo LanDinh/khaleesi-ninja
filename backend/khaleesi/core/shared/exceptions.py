@@ -229,5 +229,3 @@ class DbObjectTwinException(DbException):
       privateDetails = f'objectType: {objectType}, objectId: {objectId}',
       loglevel       = LogLevel.ERROR,
     )
-
-
