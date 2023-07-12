@@ -2,7 +2,6 @@
 
 # Python.
 from typing import Any
-from unittest.mock import MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.logging.queryLogger import QueryLogger, queryLogger
@@ -39,4 +38,4 @@ class QueryLoggerContextManagerTestCase(SimpleTestCase):
     # Execute test.
     with queryLogger():
       # Assert result.
-      self.assertTrue(True)
+      self.assertTrue(True)  # pylint: disable=redundant-unittest-assert
