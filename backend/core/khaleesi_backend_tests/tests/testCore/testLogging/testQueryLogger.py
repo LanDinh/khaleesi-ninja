@@ -34,7 +34,7 @@ class QueryLoggerTestCase(SimpleTestCase):
 class QueryLoggerContextManagerTestCase(SimpleTestCase):
   """Test the query logger context manager."""
 
-  def testContextManager(self, _: MagicMock) -> None :
+  def testContextManager(self) -> None :
     """Test the context manager."""
     # Execute test.
     with queryLogger():

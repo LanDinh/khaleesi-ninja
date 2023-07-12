@@ -24,16 +24,16 @@ fi
 
 echo -e "${magenta}Creating users and database...${clear_color}"
 psql -a -f /config/initialize-postgres.sql \
-    -d postgres\
-    -v superUser="${KHALEESI_DATABASE_SUPERUSER}" -v superUserPassword="${KHALEESI_DATABASE_SUPERUSER_PASSWORD}"\
-    -v user="${KHALEESI_DATABASE_USER}" -v password="${KHALEESI_DATABASE_PASSWORD}"\\
+    -d postgres \
+    -v superUser="${KHALEESI_DATABASE_SUPERUSER}" -v superUserPassword="${KHALEESI_DATABASE_SUPERUSER_PASSWORD}" \
+    -v serviceUser="${KHALEESI_DATABASE_USER}" -v serviceUserPassword="${KHALEESI_DATABASE_PASSWORD}" \
     -v database="${KHALEESI_DATABASE_NAME}"
 
 
 echo -e "${magenta}Asserting permissions...${clear_color}"
 psql -a -f /config/initialize-database.sql \
-    -d "${KHALEESI_DATABASE_NAME}"\
-    -v user="${KHALEESI_DATABASE_USER}"
+    -d "${KHALEESI_DATABASE_NAME}" \
+    -v serviceUser="${KHALEESI_DATABASE_USER}" \
     -v database="${KHALEESI_DATABASE_NAME}"
 
 echo -e "${green}DONE! :D${clear_color}"

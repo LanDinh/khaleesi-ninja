@@ -23,6 +23,4 @@ $$ LANGUAGE plpgsql;
 -- noinspection SyntaxError,SqlSignature
 SELECT pg_temp.create_database(:'superUser', :'superUserPassword', :'database');
 -- noinspection SyntaxError,SqlSignature
-SELECT pg_temp.create_user(:'writeUser', :'writePassword');
--- noinspection SyntaxError,SqlSignature
-SELECT pg_temp.create_user(:'readUser', :'readPassword');
+SELECT pg_temp.create_user(:'serviceUser', :'serviceUserPassword');

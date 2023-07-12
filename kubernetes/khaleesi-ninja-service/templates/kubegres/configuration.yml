@@ -11,5 +11,5 @@ metadata:
     type: "kubegres"
 data:
   database: "{{ .Values.service.name }}"
-  user: "{{ .Values.service.name }}-writer"
+  user: "{{ .Values.service.name }}"
 {{- end }}
