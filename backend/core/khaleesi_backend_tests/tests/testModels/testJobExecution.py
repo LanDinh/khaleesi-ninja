@@ -14,12 +14,13 @@ class JobExecutionManagerTestCase(SimpleTestCase):
   """Test the job execution manager."""
 
   @patch.object(DbJobExecution.objects, 'filter')
-  def testCountJobsInProgress(self, filterCount: MagicMock) -> None :
+  def testCountJobExecutionsInProgress(self, filterCount: MagicMock) -> None :
     """Test counting how many executions are in progress for the job in question."""
     # Execute test.
-    DbJobExecution.objects.countJobsInProgress(job = MagicMock())
+    DbJobExecution.objects.countJobExecutionsInProgress(job = MagicMock())
     # Assert result.
     filterCount.assert_called_once()
+    filterCount.return_value.count.assert_called_once()
 
   @patch.object(DbJobExecution.objects, 'filter')
   def testGetJobExecutionsInProgress(self, filterData: MagicMock) -> None :
@@ -33,14 +34,6 @@ class JobExecutionManagerTestCase(SimpleTestCase):
     result = DbJobExecution.objects.getJobExecutionsInProgress(job = MagicMock())
     # Assert result.
     self.assertEqual(2, len(result))
-
-  @patch.object(DbJobExecution.objects, 'get')
-  def testBaseKhaleesiGet(self, manager: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test.
-    DbJobExecution.objects.baseKhaleesiGet(metadata = MagicMock())
-    # Assert result.
-    manager.assert_called_once()
 
 
 class JobExecutionTestCase(SimpleTestCase):
@@ -70,48 +63,48 @@ class JobExecutionTestCase(SimpleTestCase):
         # Assert result.
         self.assertFalse(result)
 
-  def testSetTotal(self) -> None :
+  @patch('khaleesi.models.jobExecution.JobExecution.toGrpc')
+  @patch('khaleesi.models.jobExecution.JobExecution.khaleesiSave')
+  def testSetTotal(self, save: MagicMock, toGrpc: MagicMock) -> None :
     """Test if a job execution is in progress."""
     # Prepare data.
     jobExecution = DbJobExecution()
-    jobExecution.save = MagicMock()  # type: ignore[assignment]
-    total = 13
     # Execute test.
     jobExecution.setTotal(total = 13)
     # Assert result.
-    self.assertEqual(total, jobExecution.totalItems)
-    jobExecution.save.assert_called_once_with()
+    toGrpc.assert_called_once()
+    save.assert_called_once()
 
-  def testFinish(self) -> None :
+  @patch('khaleesi.models.jobExecution.JobExecution.toGrpc')
+  @patch('khaleesi.models.jobExecution.JobExecution.khaleesiSave')
+  def testFinish(self, save: MagicMock, toGrpc: MagicMock) -> None :
     """Test finishing a job."""
-    itemsProcessed = 13
-    details        = 'details'
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
         # Prepare data.
+        save.reset_mock()
+        toGrpc.reset_mock()
         jobExecution = DbJobExecution()
-        jobExecution.save = MagicMock()  # type: ignore[assignment]
         # Execute test.
         jobExecution.finish(
           status         = statusType,
-          itemsProcessed = itemsProcessed,
-          statusDetails  = details,
+          itemsProcessed = 13,
+          statusDetails  = 'details',
         )
         # Assert result.
-        self.assertEqual(statusLabel   , jobExecution.status)
-        self.assertEqual(itemsProcessed, jobExecution.itemsProcessed)
-        self.assertEqual(details       , jobExecution.statusDetails)
-        jobExecution.save.assert_called_once_with()
+        toGrpc.assert_called_once()
+        save.assert_called_once()
 
   @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
-  @patch('khaleesi.models.jobExecution.Model.fromGrpc')
-  def testFromGrpcForCreation(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
+  @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
+  def testSaveNew(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
     """Test creating an instance from gRPC."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
         # Prepare data.
         instance = DbJobExecution()
-        grpc     = GrpcJobExecution()
+        instance._state.adding = True  # pylint: disable=protected-access
+        grpc = GrpcJobExecution()
         jobConfiguration.reset_mock()
         parent.reset_mock()
         # Relevant attributes.
@@ -122,9 +115,8 @@ class JobExecutionTestCase(SimpleTestCase):
         grpc.end.FromDatetime(datetime.now(tz = timezone.utc))
         grpc.statusDetails  = 'details'
         grpc.itemsProcessed = 42
-        grpc.totalItems = 1337
         # Execute test.
-        instance.fromGrpc(grpc = grpc)
+        instance.khaleesiSave(grpc = grpc)
         # Assert result.
         parent.assert_called_once()
         jobConfiguration.assert_called_once()
@@ -137,36 +129,66 @@ class JobExecutionTestCase(SimpleTestCase):
         self.assertFalse(instance.itemsProcessed)
 
   @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
-  @patch('khaleesi.models.jobExecution.Model.fromGrpc')
-  def testFromGrpcForUpdate(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
+  @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
+  def testSaveInProgress(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
     """Test updating an instance from gRPC."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
         # Prepare data.
         parent.reset_mock()
-        instance = DbJobExecution(pk = 1)
+        instance = DbJobExecution()
+        instance._state.adding = False  # pylint: disable=protected-access
+        instance.status = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS)
         grpc = GrpcJobExecution()
-        # Relevant attributes.
+        # Ignored attributes.
         grpc.jobMetadata.id       = 'job-id'
         grpc.executionMetadata.id = 'execution-id'
-        grpc.status               = statusType
-        # Ignored attributes.
         grpc.end.FromDatetime(datetime.now(tz = timezone.utc))
+        # Relevant attributes.
         grpc.statusDetails  = 'details'
         grpc.itemsProcessed = 42
-        grpc.totalItems = 1337
+        grpc.status         = statusType
         # Execute test.
-        instance.fromGrpc(grpc = grpc)
+        instance.khaleesiSave(grpc = grpc)
         # Assert result.
         parent.assert_called_once()
         jobConfiguration.assert_not_called()
         self.assertFalse(instance.jobId)
         self.assertFalse(instance.executionId)
-        self.assertEqual('UNKNOWN', instance.status)
         self.assertFalse(instance.end)
-        self.assertFalse(instance.statusDetails)
+        self.assertEqual(statusLabel        , instance.status)
+        self.assertEqual(grpc.statusDetails , instance.statusDetails)
+        self.assertEqual(grpc.itemsProcessed, instance.itemsProcessed)
         self.assertFalse(instance.totalItems)
-        self.assertFalse(instance.itemsProcessed)
+
+  @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
+  @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
+  def testSaveTotalItems(self, parent: MagicMock, *_: MagicMock) -> None :
+    """Test updating an instance from gRPC."""
+    # Prepare data.
+    instance = DbJobExecution()
+    grpc = GrpcJobExecution()
+    grpc.totalItems = 1337
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parent.assert_called_once()
+    self.assertEqual(grpc.totalItems, instance.totalItems)
+
+  @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
+  @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
+  def testSaveDontOverwriteTotalItems(self, parent: MagicMock, *_: MagicMock) -> None :
+    """Test updating an instance from gRPC."""
+    # Prepare data.
+    instance = DbJobExecution()
+    instance.totalItems = 1337
+    grpc = GrpcJobExecution()
+    grpc.totalItems = 9000
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parent.assert_called_once()
+    self.assertNotEqual(grpc.totalItems, instance.totalItems)
 
   @patch.object(DbJobExecution, 'jobConfigurationToGrpc')
   @patch('khaleesi.models.jobExecution.Model.toGrpc')

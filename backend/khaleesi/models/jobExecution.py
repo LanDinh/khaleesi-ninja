@@ -3,24 +3,24 @@
 from __future__ import annotations
 
 # Python.
-from typing import List
+from typing import List, Any
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
-from khaleesi.core.models.baseModel import Model, ModelManager
+from khaleesi.core.models.baseModel import Model
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, ObjectMetadata
 
 
 IN_PROGRESS = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS)
 
 
-class JobExecutionManager(ModelManager['JobExecution']):
+class JobExecutionManager(models.Manager['JobExecution']):
   """Basic job manager."""
 
-  def countJobsInProgress(self, *, job: ObjectMetadata) -> int :
+  def countJobExecutionsInProgress(self, *, job: ObjectMetadata) -> int :
     """Count how many jobs are in progress."""
     return self.filter(jobId = job.id, status = IN_PROGRESS).count()
 
@@ -36,10 +36,6 @@ class JobExecutionManager(ModelManager['JobExecution']):
 
     return jobs
 
-  def baseKhaleesiGet(self, *, metadata: ObjectMetadata) -> JobExecution :
-    """Get a job execution by ID."""
-    return self.get(executionId = metadata.id)
-
 
 class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
   """Basic job."""
@@ -48,16 +44,15 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
   executionId = models.TextField()
 
   # Result.
-  status         = models.TextField(default = 'UNKNOWN')
-  end            = models.DateTimeField()
+  status        = models.TextField(default = 'UNKNOWN')
+  end           = models.DateTimeField()
   statusDetails = models.TextField()
 
   # Statistics.
-  itemsProcessed = models.IntegerField()
-  totalItems     = models.IntegerField()
+  itemsProcessed = models.IntegerField(default = 0)
+  totalItems     = models.IntegerField(default = 0)
 
-  objects: JobExecutionManager = JobExecutionManager()  # type: ignore[assignment]
-  grpc = GrpcJobExecution
+  objects: JobExecutionManager = JobExecutionManager()
 
   @property
   def inProgress(self) -> bool :
@@ -66,25 +61,32 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
 
   def setTotal(self, *, total: int) -> None :
     """Set the total amount of items for the job."""
-    self.totalItems = total
-    self.save()
+    grpc = self.toGrpc()
+    grpc.totalItems = total
+    self.khaleesiSave(metadata = ObjectMetadata(), grpc = grpc)
 
-  def finish(self, *,
+  def finish(
+      self, *,
       status        : 'GrpcJobExecution.Status.V',
       itemsProcessed: int,
       statusDetails : str,
   ) -> None :
     """Register job finish."""
-    self.status         = GrpcJobExecution.Status.Name(status)
-    self.itemsProcessed = itemsProcessed
-    self.statusDetails  = statusDetails
-    self.save()
+    grpc = self.toGrpc()
+    grpc.status         = status
+    grpc.itemsProcessed = itemsProcessed
+    grpc.statusDetails  = statusDetails
+    self.khaleesiSave(metadata = ObjectMetadata(), grpc = grpc)
 
-  def fromGrpc(self, *, grpc: GrpcJobExecution) -> None :
+  def khaleesiSave(
+      self,
+      *args   : Any,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : GrpcJobExecution,
+      **kwargs: Any,
+  ) -> None :
     """Change own values according to the grpc object."""
-    super().fromGrpc(grpc = grpc)
-
-    if not self.pk:
+    if self._state.adding:
       # Metadata.
       self.jobId       = grpc.jobMetadata.id
       self.executionId = grpc.executionMetadata.id
@@ -95,8 +97,20 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
         cleanup = grpc.cleanupConfiguration,
       )
 
-      # Misc. Necessary because IN_PROGRESS and SKIPPED are also a status.
+      # Necessary because IN_PROGRESS and SKIPPED are also a status.
       self.status = GrpcJobExecution.Status.Name(grpc.status)
+
+    # Setting the finishing information can only be done for in-progress job executions.
+    elif self.inProgress:
+      self.itemsProcessed = grpc.itemsProcessed
+      self.statusDetails  = grpc.statusDetails
+      self.status         = GrpcJobExecution.Status.Name(grpc.status)
+
+    # This can be set only once.
+    if not self.totalItems:
+      self.totalItems = grpc.totalItems
+
+    super().khaleesiSave(metadata = metadata, grpc = grpc)
 
   def toGrpc(
       self, *,

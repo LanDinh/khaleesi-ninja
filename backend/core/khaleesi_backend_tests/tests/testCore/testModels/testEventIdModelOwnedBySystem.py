@@ -11,107 +11,26 @@ from khaleesi.proto.core_pb2 import User, ObjectMetadata, RequestMetadata
 from tests.models.eventIdModelOwnedBySystem import EventSystemModel
 
 
-@patch('khaleesi.core.models.eventIdModelOwnedBySystem.SINGLETON')
-class ModelManagerTestCase(SimpleTestCase):
-  """Test the khaleesi base model event sending."""
-
-  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModelManager.khaleesiCreate')
-  def testKhaleesiCreate(self, parent: MagicMock, singleton: MagicMock) -> None :
-    """Test creating an instance."""
-    # Prepare data.
-    self._mockInstance(parent = parent)
-    # Execute test.
-    EventSystemModel.objects.khaleesiCreate(grpc = ObjectMetadata())
-    # Assert result.
-    singleton.structuredLogger.logEvent.assert_called_once()
-
-  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModelManager.khaleesiCreate')
-  def testKhaleesiCreateError(self, parent: MagicMock, singleton: MagicMock) -> None :
-    """Test creating an instance."""
-    # Prepare data.
-    parent.side_effect = Exception()
-    # Execute test.
-    with self.assertRaises(Exception):
-      EventSystemModel.objects.khaleesiCreate(grpc = ObjectMetadata())
-    # Assert result.
-    singleton.structuredLogger.logEvent.assert_called_once()
-
-  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModelManager.khaleesiUpdate')
-  def testKhaleesiUpdate(self, parent: MagicMock, singleton: MagicMock) -> None :
-    """Test creating an instance."""
-    # Prepare data.
-    self._mockInstance(parent = parent)
-    # Execute test.
-    EventSystemModel.objects.khaleesiUpdate(metadata = ObjectMetadata(), grpc = ObjectMetadata())
-    # Assert result.
-    singleton.structuredLogger.logEvent.assert_called_once()
-
-  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModelManager.khaleesiUpdate')
-  def testKhaleesiUpdateError(self, parent: MagicMock, singleton: MagicMock) -> None :
-    """Test creating an instance."""
-    # Prepare data.
-    parent.side_effect = Exception()
-    # Execute test.
-    with self.assertRaises(Exception):
-      EventSystemModel.objects.khaleesiUpdate(metadata = ObjectMetadata(), grpc = ObjectMetadata())
-    # Assert result.
-    singleton.structuredLogger.logEvent.assert_called_once()
-
-  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModelManager.khaleesiDelete')
-  def testKhaleesiDelete(self, parent: MagicMock, singleton: MagicMock) -> None :
-    """Test creating an instance."""
-    # Prepare data.
-    self._mockInstance(parent = parent)
-    # Execute test.
-    EventSystemModel.objects.khaleesiDelete(metadata = ObjectMetadata())
-    # Assert result.
-    singleton.structuredLogger.logEvent.assert_called_once()
-
-  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModelManager.khaleesiDelete')
-  def testKhaleesiDeleteError(self, parent: MagicMock, singleton: MagicMock) -> None :
-    """Test creating an instance."""
-    # Prepare data.
-    parent.side_effect = Exception()
-    # Execute test.
-    with self.assertRaises(Exception):
-      EventSystemModel.objects.khaleesiDelete(metadata = ObjectMetadata())
-    # Assert result.
-    singleton.structuredLogger.logEvent.assert_called_once()
-
-  def _mockInstance(self, *, parent: MagicMock) -> None :
-    """Mock an instance."""
-    instance = MagicMock()
-    instance.khaleesiId       = 'khaleesi-id'
-    instance.khaleesiCreated  = datetime.now(tz = timezone.utc)
-    instance.khaleesiModified = datetime.now(tz = timezone.utc)
-    instance.getKhaleesiOwner.return_value = User()
-    parent.return_value = instance
-
-
 class ModelTestCase(SimpleTestCase):
   """Test the khaleesi base model event sending."""
-
-  def testGetDefaultKhaleesiOwner(self) -> None :
-    """Test getting the default owner."""
-    # Execute test.
-    owner = EventSystemModel.getDefaultKhaleesiOwner(metadata = MagicMock(), grpc = MagicMock())
-    # Assert result.
-    self.assertEqual(User.UserType.SYSTEM         , owner.type)
-    self.assertEqual('core-khaleesi_backend_tests', owner.id)
 
   def testKhaleesiOwner(self) -> None :
     """Test getting the instance owner."""
     # Execute test.
-    owner = EventSystemModel().getKhaleesiOwner()
+    owner = EventSystemModel().khaleesiOwner
     # Assert result.
     self.assertEqual(User.UserType.SYSTEM         , owner.type)
     self.assertEqual('core-khaleesi_backend_tests', owner.id)
 
-  def testFromGrpcForCreation(self) -> None :
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.SINGLETON')
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModel.khaleesiSave')
+  def testKhaleesiSaveNew(self, parent: MagicMock, singleton: MagicMock) -> None :
     """Test setting from gRPC data."""
     for userLabel, userType in User.UserType.items():
       with self.subTest(user = userLabel):
         # Prepare data.
+        parent.reset_mock()
+        singleton.reset_mock()
         userId = 'id'
         request = RequestMetadata()
         request.user.id   = userId
@@ -119,20 +38,30 @@ class ModelTestCase(SimpleTestCase):
         STATE.reset()
         STATE.copyFrom(request = request, queries = [])
         instance = EventSystemModel()
+        instance._state.adding = True  # pylint: disable=protected-access
         # Execute test.
-        instance.fromGrpc(grpc = MagicMock())
+        instance.khaleesiSave(grpc = MagicMock())
         # Assert result.
+        parent.assert_called_once()
+        singleton.structuredLogger.logEvent.assert_called_once()
         self.assertEqual(userId   , instance.khaleesiCreatedById)
         self.assertEqual(userLabel, instance.khaleesiCreatedByType)
         self.assertEqual(userId   , instance.khaleesiModifiedById)
         self.assertEqual(userLabel, instance.khaleesiModifiedByType)
 
-  def testFromGrpcForUpdate(self) -> None :
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.SINGLETON')
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModel.khaleesiSave')
+  def testKhaleesiSaveOld(self, parent: MagicMock, singleton: MagicMock) -> None :
     """Test setting from gRPC data."""
-    for creatorLabel, _ in User.UserType.items():
-      for modifierLabel, modifierType in User.UserType.items():
+    singleton.reset_mock()
+    for creatorLabel, creatorType in User.UserType.items():
+      for modifierLabel, modifierType in [
+          (modifierLabel, modifierType) for modifierLabel, modifierType
+          in User.UserType.items() if creatorType != modifierType ]:
         with self.subTest(creator = creatorLabel, modifier = modifierLabel):
           # Prepare data.
+          parent.reset_mock()
+          singleton.reset_mock()
           userId = 'id'
           request = RequestMetadata()
           request.user.id   = userId
@@ -140,16 +69,69 @@ class ModelTestCase(SimpleTestCase):
           STATE.reset()
           STATE.copyFrom(request = request, queries = [])
           instance = EventSystemModel()
-          instance.pk = 1337
-          instance.khaleesiCreatedById = 'creator'
-          instance.khaleesiModifiedByType = creatorLabel
+          instance.khaleesiCreatedById   = 'creator'
+          instance.khaleesiCreatedByType = creatorLabel
+          instance._state.adding         = False  # pylint: disable=protected-access
           # Execute test.
-          instance.fromGrpc(grpc = MagicMock())
+          instance.khaleesiSave(grpc = MagicMock())
           # Assert result.
+          parent.assert_called_once()
+          singleton.structuredLogger.logEvent.assert_called_once()
           self.assertNotEqual(userId       , instance.khaleesiCreatedById)
           self.assertNotEqual(modifierLabel, instance.khaleesiCreatedByType)
           self.assertEqual(userId       , instance.khaleesiModifiedById)
           self.assertEqual(modifierLabel, instance.khaleesiModifiedByType)
+
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.SINGLETON')
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModel.khaleesiSave')
+  def testKhaleesiSaveError(self, parent: MagicMock, singleton: MagicMock) -> None :
+    """Test setting from gRPC data."""
+    for userLabel, userType in User.UserType.items():
+      with self.subTest(user = userLabel):
+        # Prepare data.
+        parent.reset_mock()
+        parent.side_effect = Exception()
+        singleton.reset_mock()
+        userId = 'id'
+        request = RequestMetadata()
+        request.user.id   = userId
+        request.user.type = userType
+        STATE.reset()
+        STATE.copyFrom(request = request, queries = [])
+        instance = EventSystemModel()
+        instance._state.adding = True  # pylint: disable=protected-access
+        # Execute test.
+        with self.assertRaises(Exception):
+          instance.khaleesiSave(grpc = MagicMock())
+        # Assert result.
+        parent.assert_called_once()
+        singleton.structuredLogger.logEvent.assert_called_once()
+
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.SINGLETON')
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModel.delete')
+  def testDelete(self, parent: MagicMock, singleton: MagicMock) -> None :
+    """Test deletion."""
+    # Prepare data.
+    instance = EventSystemModel()
+    # Execute test.
+    instance.delete()
+    # Assert result.
+    parent.assert_called_once()
+    singleton.structuredLogger.logEvent.assert_called_once()
+
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.SINGLETON')
+  @patch('khaleesi.core.models.eventIdModelOwnedBySystem.BaseModel.delete')
+  def testDeleteError(self, parent: MagicMock, singleton: MagicMock) -> None :
+    """Test deletion."""
+    # Prepare data.
+    instance = EventSystemModel()
+    parent.side_effect = Exception()
+    # Execute test.
+    with self.assertRaises(Exception):
+      instance.delete()
+    # Assert result.
+    parent.assert_called_once()
+    singleton.structuredLogger.logEvent.assert_called_once()
 
   def testToGrpc(self) -> None :
     """Test getting gRPC data."""

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Python.
-from typing import Tuple
+from typing import Tuple, Any
 from uuid import uuid4
 
 # Django.
@@ -12,7 +12,7 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
 from khaleesi.core.grpc.requestMetadata import addRequestMetadata
-from khaleesi.core.models.eventIdModelOwnedBySystem import Model, ModelManager
+from khaleesi.core.models.eventIdModelOwnedBySystem import Model
 from khaleesi.proto.core_pb2 import JobExecutionRequest, ObjectMetadata
 from khaleesi.proto.core_clocktower_pb2 import Job as GrpcJob
 
@@ -24,8 +24,6 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
   cronExpression = models.TextField()
   action         = models.TextField(default = 'UNKNOWN')
 
-  objects: ModelManager[Job]  # type: ignore[assignment]
-  grpc = GrpcJob
 
   def toGrpcJobExecutionRequest(self) -> Tuple[str, JobExecutionRequest] :
     """Build a job start request based on the data of this job."""
@@ -39,10 +37,14 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
     )
     return self.action, result
 
-  def fromGrpc(self, *, grpc: GrpcJob) -> None :
+  def khaleesiSave(
+      self,
+      *args   : Any,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : GrpcJob,
+      **kwargs: Any,
+  ) -> None :
     """Change own values according to the grpc object."""
-    super().fromGrpc(grpc = grpc)
-
     self.name           = grpc.name
     self.description    = grpc.description
     self.cronExpression = grpc.cronExpression
@@ -52,6 +54,8 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
       action  = grpc.actionConfiguration,
       cleanup = grpc.cleanupConfiguration,
     )
+
+    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
   def toGrpc(
       self, *,

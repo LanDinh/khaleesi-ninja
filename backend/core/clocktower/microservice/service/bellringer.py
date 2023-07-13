@@ -22,7 +22,8 @@ class Service(Servicer):
   def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> JobResponse :
     """Create a new job."""
     LOGGER.info('Creating the new job.')
-    job = Job.objects.khaleesiCreate(grpc = request.job)
+    job = Job()
+    job.khaleesiSave(grpc = request.job)
     response = JobResponse()
     job.toGrpc(metadata = response.metadata, grpc = response.job)
     return response
@@ -30,7 +31,7 @@ class Service(Servicer):
   def ExecuteJob(self, request: ObjectMetadata, _: grpc.ServicerContext) -> ObjectMetadata :
     """Execute a job by ID."""
     LOGGER.info(f'Executing job "{request.id}".')
-    job = Job.objects.khaleesiGet(metadata = request)
+    job = Job.objects.get(khaleesiId = request.id)
     action, jobExecutionRequest = job.toGrpcJobExecutionRequest()
     return ACTUATOR.actuate(action = action, request = jobExecutionRequest)
 

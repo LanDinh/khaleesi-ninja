@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 # Python.
-from typing import List
+from typing import List, Any
 
 # Django.
 from django.db import models
 from django.conf import settings
 
 # khaleesi.ninja.
-from khaleesi.core.models.idModel import Model, ModelManager
+from khaleesi.core.models.idModel import Model
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.parseUtil import parseString
 from khaleesi.proto.core_pb2 import User, ObjectMetadata
@@ -35,14 +35,18 @@ class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
   actionResult     = models.TextField(default = 'UNKNOWN_RESULT')
   actionDetails    = models.TextField(default = 'UNKNOWN')
 
-  objects: ModelManager[Event]  # type: ignore[assignment]
 
-  def fromGrpc(self, *, grpc: GrpcEventRequest) -> None :
+  def khaleesiSave(
+      self,
+      *args   : Any,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : GrpcEventRequest,
+      **kwargs: Any,
+  ) -> None :
     """Change own values according to the grpc object."""
-    super().fromGrpc(grpc = grpc)
     errors: List[str] = []
 
-    if not self.pk:
+    if self._state.adding:
       # Target.
       self.targetType = parseString(
         raw    = grpc.event.target.type,
@@ -65,6 +69,7 @@ class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
 
     # Needs to be at the end because it saves errors to the model.
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
+    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
   def toGrpc(
       self, *,

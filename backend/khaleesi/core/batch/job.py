@@ -213,15 +213,16 @@ class BaseJob(ABC, Generic[M]):
   def _startJobExecution(self) -> None :
     """Start job execution. Returns false when job is getting skipped."""
     try:
-      with transaction.atomic(using = 'write'):
+      with transaction.atomic():  # Avoid race conditions with count.
         self.request.status = GrpcJobExecution.Status.IN_PROGRESS
-        if DbJobExecution.objects.countJobsInProgress(job = self.request.jobMetadata) > 0:
+        if DbJobExecution.objects.countJobExecutionsInProgress(job = self.request.jobMetadata) > 0:
           self.request.status = GrpcJobExecution.Status.SKIPPED
-        self.jobExecution = DbJobExecution.objects.khaleesiCreate(grpc = self.request)
+        self.jobExecution = DbJobExecution()
+        self.jobExecution.khaleesiSave(grpc = self.request)
     except Exception as exception:
       LOGGER.fatal(f'{self._loggingPrefix()} Failed to start.')
       self.jobExecution = DbJobExecution()
-      self.jobExecution.fromGrpc(grpc = self.request)
+      self.jobExecution.khaleesiSave(grpc = self.request)
       self._logEvent(
         action  = Event.Action.ActionType.START,
         result  = Event.Action.ResultType.FATAL,
@@ -258,7 +259,6 @@ class BaseJob(ABC, Generic[M]):
         details   = 'Could not determine total amount of affected items.',
       )
       return True
-    self.jobExecution.setTotal(total = total)
     return False
 
   def _checkIfAborted(self, *, stopEvent: ThreadingEvent) -> bool :

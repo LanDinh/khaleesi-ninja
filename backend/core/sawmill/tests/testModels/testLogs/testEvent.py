@@ -14,9 +14,9 @@ class EventTestCase(SimpleTestCase):
   """Test the event logs models."""
 
   @patch('microservice.models.logs.event.parseString')
-  @patch('microservice.models.logs.event.Model.fromGrpc')
+  @patch('microservice.models.logs.event.Model.khaleesiSave')
   @patch('microservice.models.logs.event.Event.metadataFromGrpc')
-  def testFromGrpcForCreation(
+  def testKhaleesiSaveNew(
       self,
       metadata: MagicMock,
       parent  : MagicMock,
@@ -31,14 +31,15 @@ class EventTestCase(SimpleTestCase):
             # Prepare data.
             metadata.reset_mock()
             parent.reset_mock()
-            instance = Event()
-            grpc     = self._createGrpcEvent(
+            instance               = Event()
+            instance._state.adding = True  # pylint: disable=protected-access
+            grpc = self._createGrpcEvent(
               owner  = ownerType,
               action = actionType,
               result = resultType,
             )
             # Execute test.
-            instance.fromGrpc(grpc = grpc)
+            instance.khaleesiSave(grpc = grpc)
             # Assert result.
             metadata.assert_called_once()
             parent.assert_called_once()
@@ -49,9 +50,9 @@ class EventTestCase(SimpleTestCase):
             self.assertEqual(grpc.event.action.details   , instance.actionDetails)
 
   @patch('microservice.models.logs.event.parseString')
-  @patch('microservice.models.logs.event.Model.fromGrpc')
+  @patch('microservice.models.logs.event.Model.khaleesiSave')
   @patch('microservice.models.logs.event.Event.metadataFromGrpc')
-  def testFromGrpcForUpdate(
+  def testKhaleesiSaveOld(
       self,
       metadata: MagicMock,
       parent  : MagicMock,
@@ -76,15 +77,15 @@ class EventTestCase(SimpleTestCase):
             # Prepare data.
             metadata.reset_mock()
             parent.reset_mock()
-            instance    = Event()
-            instance.pk = 1337
-            grpc     = self._createGrpcEvent(
+            instance               = Event()
+            instance._state.adding = False  # pylint: disable=protected-access
+            grpc = self._createGrpcEvent(
               owner  = ownerType,
               action = actionType,
               result = resultType,
             )
             # Execute test.
-            instance.fromGrpc(grpc = grpc)
+            instance.khaleesiSave(grpc = grpc)
             # Assert result.
             metadata.assert_called_once()
             parent.assert_called_once()
@@ -95,9 +96,9 @@ class EventTestCase(SimpleTestCase):
             self.assertNotEqual(grpc.event.action.details   , instance.actionDetails)
 
   @patch('microservice.models.logs.event.parseString')
-  @patch('microservice.models.logs.event.Model.fromGrpc')
+  @patch('microservice.models.logs.event.Model.khaleesiSave')
   @patch('microservice.models.logs.event.Event.metadataFromGrpc')
-  def testFromGrpcForCreationEmpty(
+  def testKhaleesiSaveNewEmpty(
       self,
       metadata: MagicMock,
       parent  : MagicMock,
@@ -106,10 +107,11 @@ class EventTestCase(SimpleTestCase):
     """Test reading from gRPC."""
     # Prepare data.
     string.return_value = 'parsed-string'
-    instance = Event()
-    grpc     = GrpcEventRequest()
+    instance               = Event()
+    instance._state.adding = True  # pylint: disable=protected-access
+    grpc = GrpcEventRequest()
     # Execute test.
-    instance.fromGrpc(grpc = grpc)
+    instance.khaleesiSave(grpc = grpc)
     # Assert result.
     metadata.assert_called_once()
     parent.assert_called_once()

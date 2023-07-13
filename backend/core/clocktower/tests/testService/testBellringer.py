@@ -15,16 +15,16 @@ class BellRingerServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch('microservice.service.bellringer.Job.objects.khaleesiCreate')
+  @patch('microservice.service.bellringer.Job')
   def testCreateJob(self, create: MagicMock, *_: MagicMock) -> None :
     """Test creating a new job."""
     # Execute test.
     self.service.CreateJob(JobRequest(), MagicMock())
     # Assert result.
     create.assert_called_once()
-    create.return_value.toGrpc.assert_called_once()
+    create.return_value.khaleesiSave.assert_called_once()
 
-  @patch('microservice.service.bellringer.Job.objects.khaleesiGet')
+  @patch('microservice.service.bellringer.Job.objects.get')
   @patch('microservice.service.bellringer.ACTUATOR')
   def testExecuteJob(self, actuator: MagicMock, job: MagicMock, *_: MagicMock) -> None :
     """Test creating a new job."""

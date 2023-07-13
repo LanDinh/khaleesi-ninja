@@ -68,4 +68,5 @@ class StructuredDbLogger(StructuredLogger):
 
   def sendLogEvent(self, *, event: EventRequest) -> None :
     """Send the log event to the logging facility."""
-    DbEvent.objects.khaleesiCreate(grpc = event)
+    dbEvent = DbEvent()
+    dbEvent.khaleesiSave(grpc = event)

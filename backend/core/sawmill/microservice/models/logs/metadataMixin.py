@@ -35,7 +35,7 @@ class MetadataMixin(models.Model):
 
   def metadataFromGrpc(self, *, grpc: RequestMetadata, errors: List[str]) -> None :
     """Change own values according to the grpc object."""
-    if not self.pk:
+    if self._state.adding:
       # HTTP caller.
       self.metaCallerHttpRequestId = parseString(
         raw    = grpc.httpCaller.requestId,
@@ -112,9 +112,10 @@ class GrpcMetadataMixin(MetadataMixin):
   metaCallerGrpcGrpcMethod      = models.TextField(default = 'UNKNOWN')
   metaCallerGrpcPodId           = models.TextField(default = 'UNKNOWN')
 
+
   def metadataFromGrpc(self, *, grpc: RequestMetadata, errors: List[str]) -> None :
     """Change own values according to the grpc object."""
-    if not self.pk:
+    if not self._state.adding:
       self.metaCallerGrpcRequestId = parseString(
         raw    = grpc.grpcCaller.requestId,
         name   = 'metaCallerGrpcRequestId',

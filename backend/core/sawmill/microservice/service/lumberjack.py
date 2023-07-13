@@ -49,7 +49,9 @@ class Service(Servicer):
         f'Saving an event to the request "{request.requestMetadata.grpcCaller.requestId}" '
         f'to the database.',
       )
-      return DbEvent.objects.khaleesiCreate(grpc = request)
+      dbEvent = DbEvent()
+      dbEvent.khaleesiSave(grpc = request)
+      return dbEvent
     return self._handleResponse(method = method)
 
   def LogHttpRequest(self, request: HttpRequest, _: grpc.ServicerContext) -> LogStandardResponse :

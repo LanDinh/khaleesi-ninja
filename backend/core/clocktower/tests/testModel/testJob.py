@@ -33,8 +33,8 @@ class JobTestCase(SimpleTestCase):
     self.assertEqual(job.action, action)
 
   @patch('microservice.models.job.JobConfigurationMixin.jobConfigurationFromGrpc')
-  @patch('microservice.models.job.Model.fromGrpc')
-  def testFromGrpc(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
+  @patch('microservice.models.job.Model.khaleesiSave')
+  def testKhaleesiSave(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
     """Test setting the values from gRPC."""
     # Prepare data.
     job = Job()
@@ -44,7 +44,7 @@ class JobTestCase(SimpleTestCase):
     grpc.cronExpression = 'cronExpression'
     grpc.action         = 'action'
     # Execute test.
-    job.fromGrpc(grpc = grpc)
+    job.khaleesiSave(grpc = grpc)
     # Assert result.
     parent.assert_called_once()
     jobConfiguration.assert_called_once()

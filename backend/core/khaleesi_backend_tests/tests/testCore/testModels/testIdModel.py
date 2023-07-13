@@ -10,42 +10,40 @@ from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models.idModel import IdModel
 
 
-class ModelManagerTestCase(SimpleTestCase):
-  """Test the khaleesi base model manager."""
-
-  @patch.object(IdModel.objects, 'get')
-  def testBaseKhaleesiGet(self, manager: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test.
-    IdModel.objects.khaleesiGet(metadata = MagicMock())
-    # Assert result.
-    manager.assert_called_once()
-
-
 class ModelTestCase(SimpleTestCase):
   """Test the khaleesi base model."""
 
-  def testFromGrpcForCreation(self) -> None :
+  @patch('khaleesi.core.models.idModel.BaseModel.khaleesiSave')
+  def testKhaleesiSaveNew(self, parent: MagicMock) -> None :
     """Test setting from gRPC data."""
     # Prepare data.
-    instance = IdModel()
+    oldId = 'old-id'
+    instance               = IdModel()
+    instance._state.adding = True  # pylint: disable=protected-access
+    instance.khaleesiId    = oldId
     # Execute test.
-    instance.fromGrpc(grpc = MagicMock())
+    instance.khaleesiSave(grpc = MagicMock())
     # Assert result.
+    parent.assert_called_once()
+    self.assertNotEqual(oldId, instance.khaleesiId)
     self.assertTrue(UUID(instance.khaleesiId))
 
-  def testFromGrpcForUpdate(self) -> None :
+  @patch('khaleesi.core.models.idModel.BaseModel.khaleesiSave')
+  def testKhaleesiSaveOld(self, parent: MagicMock) -> None :
     """Test setting from gRPC data."""
     # Prepare data.
-    instance = IdModel()
-    instance.pk = 1337
+    oldId = 'old-id'
+    instance               = IdModel()
+    instance._state.adding = False  # pylint: disable=protected-access
+    instance.khaleesiId    = oldId
     # Execute test.
-    instance.fromGrpc(grpc = MagicMock())
+    instance.khaleesiSave(grpc = MagicMock())
     # Assert result.
-    with self.assertRaises(ValueError):
-      UUID(instance.khaleesiId)
+    parent.assert_called_once()
+    self.assertEqual(oldId, instance.khaleesiId)
 
-  def testToGrpc(self) -> None :
+  @patch('khaleesi.core.models.idModel.BaseModel.toGrpc')
+  def testToGrpc(self, parent: MagicMock) -> None :
     """Test getting gRPC data."""
     # Prepare data.
     instance = IdModel()
@@ -54,4 +52,5 @@ class ModelTestCase(SimpleTestCase):
     # Execute test.
     instance.toGrpc(metadata = result)
     # Assert result.
+    parent.assert_called_once()
     self.assertEqual(instance.khaleesiId, result.id)

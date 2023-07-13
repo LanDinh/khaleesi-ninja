@@ -102,4 +102,4 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Perform test.
     self.logger.sendLogEvent(event = event)
     # Assert result.
-    dbEvent.objects.khaleesiCreate.assert_called_once_with(grpc = event)
+    dbEvent.return_value.khaleesiSave.assert_called_once_with(grpc = event)

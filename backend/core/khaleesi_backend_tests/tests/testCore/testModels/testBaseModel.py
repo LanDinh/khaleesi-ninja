@@ -3,94 +3,12 @@
 # Python.
 from unittest.mock import patch, MagicMock
 
-# Django.
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.core.shared.exceptions import (
-  DbObjectNotFoundException,
-  DbOutdatedInformationException,
-  DbObjectTwinException,
-)
+from khaleesi.core.shared.exceptions import DbOutdatedInformationException
 from khaleesi.proto.core_pb2 import ObjectMetadata
-from tests.models.baseModel import BaseModel, Grpc
+from tests.models.baseModel import BaseModel
 
-
-class ModelManagerTestCase(SimpleTestCase):
-  """Test the khaleesi base model manager."""
-
-  def testKhaleesiCreate(self) -> None :
-    """Test creating an instance."""
-    # Execute test.
-    result = BaseModel.objects.khaleesiCreate(grpc = MagicMock())
-    # Assert result.
-    self.assertEqual(1, result.khaleesiVersion)
-    # noinspection PyUnresolvedReferences
-    self.assertTrue(result.saved)
-
-  @patch('khaleesi.core.models.baseModel.transaction.atomic')
-  @patch.object(BaseModel.objects, 'khaleesiGet')
-  def testKhaleesiUpdate(self, manager: MagicMock, *_: MagicMock) -> None :
-    """Test updating an instance."""
-    # Prepare data.
-    metadata = ObjectMetadata()
-    metadata.version = 1337
-    instance = MagicMock()
-    instance.khaleesiVersion = 1337
-    manager.return_value = instance
-    # Execute test.
-    result = BaseModel.objects.khaleesiUpdate(metadata = metadata, grpc = Grpc())
-    # Assert result.
-    result.save.assert_called_once()  # type: ignore[attr-defined]
-    self.assertEqual(metadata.version + 1, result.khaleesiVersion)
-
-  @patch('khaleesi.core.models.baseModel.transaction')
-  @patch.object(BaseModel.objects, 'khaleesiGet')
-  def testKhaleesiUpdateVersionMismatch(self, manager: MagicMock, *_: MagicMock) -> None :
-    """Test updating an instance."""
-    # Prepare data.
-    instance = MagicMock()
-    instance.khaleesiVersion = 1337
-    manager.return_value = instance
-    # Execute test & assert result.
-    with self.assertRaises(DbOutdatedInformationException):
-      BaseModel.objects.khaleesiUpdate(metadata = MagicMock(), grpc = Grpc())
-
-  @patch('khaleesi.core.models.baseModel.transaction')
-  @patch.object(BaseModel.objects, 'khaleesiGet')
-  def testKhaleesiDelete(self, manager: MagicMock, *_: MagicMock) -> None :
-    """Test deleting an instance."""
-    # Execute test.
-    BaseModel.objects.khaleesiDelete(metadata = MagicMock())
-    # Assert result.
-    manager.return_value.delete.assert_called_once()
-
-  @patch.object(BaseModel.objects, 'baseKhaleesiGet')
-  def testKhaleesiGet(self, baseGet: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test.
-    BaseModel.objects.khaleesiGet(metadata = MagicMock())
-    # Assert result.
-    baseGet.assert_called_once()
-
-  @patch.object(BaseModel.objects, 'baseKhaleesiGet', side_effect = MultipleObjectsReturned())
-  def testKhaleesiGetNotFound(self, baseGet: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test.
-    with self.assertRaises(DbObjectTwinException):
-      BaseModel.objects.khaleesiGet(metadata = MagicMock())
-    # Assert result.
-    baseGet.assert_called_once()
-
-  @patch.object(BaseModel.objects, 'baseKhaleesiGet', side_effect = ObjectDoesNotExist())
-  def testKhaleesiGetMultipleFound(self, baseGet: MagicMock) -> None :
-    """Test getting an instance."""
-    # Execute test.
-    with self.assertRaises(DbObjectNotFoundException):
-      BaseModel.objects.khaleesiGet(metadata = MagicMock())
-    # Assert result.
-    baseGet.assert_called_once()
 
 
 class ModelTestCase(SimpleTestCase):
@@ -103,8 +21,73 @@ class ModelTestCase(SimpleTestCase):
     # Assert result.
     self.assertEqual('tests.models.baseModel.BaseModel', result)
 
+  @patch('khaleesi.core.models.baseModel.transaction')
+  @patch('khaleesi.core.models.baseModel.Model.refresh_from_db')
+  @patch('khaleesi.core.models.baseModel.Model.save')
+  def testKhaleesiSave(self, parent: MagicMock, *_: MagicMock) -> None :
+    """Test saving the instance."""
+    for adding in [ True, False ]:
+      with self.subTest(adding = adding):
+        # Prepare data.
+        parent.reset_mock()
+        version = 1337
+        instance                 = BaseModel()
+        instance.khaleesiVersion = version
+        instance._state.adding   = adding  # pylint: disable=protected-access
+        metadata         = ObjectMetadata()
+        metadata.version = version
+        # Execute test.
+        instance.khaleesiSave(metadata = metadata, grpc = MagicMock())
+        # Assert result.
+        self.assertEqual(version + 1, instance.khaleesiVersion)
+        parent.assert_called_once()
+
+  @patch('khaleesi.core.models.baseModel.transaction.atomic')
+  @patch('khaleesi.core.models.baseModel.models.Model.refresh_from_db')
+  @patch('khaleesi.core.models.baseModel.models.Model.save')
+  def testKhaleesiSaveVersionMismatchDbRefresh(
+      self,
+      parent : MagicMock,
+      refresh: MagicMock,
+      *_     : MagicMock,
+  ) -> None :
+    """Test saving the instance."""
+    # Prepare data.
+    version = 1337
+    instance                 = BaseModel()
+    instance.khaleesiVersion = version
+    instance._state.adding   = False  # pylint: disable=protected-access
+    metadata         = ObjectMetadata()
+    metadata.version = version
+    def refreshFromDb() -> None :
+      instance.khaleesiVersion = 9000
+    refresh.side_effect = refreshFromDb
+    # Execute test.
+    with self.assertRaises(DbOutdatedInformationException):
+      instance.khaleesiSave(metadata = metadata, grpc = MagicMock())
+    # Assert result.
+    parent.assert_not_called()
+
+  @patch('khaleesi.core.models.baseModel.transaction')
+  @patch('khaleesi.core.models.baseModel.models.Model.refresh_from_db')
+  @patch('khaleesi.core.models.baseModel.models.Model.save')
+  def testKhaleesiSaveVersionMismatchMetadata(self, parent: MagicMock, *_: MagicMock) -> None :
+    """Test saving the instance."""
+    # Prepare data.
+    version = 1337
+    instance                 = BaseModel()
+    instance.khaleesiVersion = version
+    instance._state.adding   = True  # pylint: disable=protected-access
+    metadata         = ObjectMetadata()
+    metadata.version = version - 1
+    # Execute test.
+    with self.assertRaises(DbOutdatedInformationException):
+      instance.khaleesiSave(metadata = metadata, grpc = MagicMock())
+    # Assert result.
+    parent.assert_not_called()
+
   def testToGrpc(self) -> None :
-    """Test setting the object metadata."""
+    """Test mapping the instance to gRPC."""
     # Prepare data.
     instance = BaseModel()
     instance.khaleesiVersion  = 1337

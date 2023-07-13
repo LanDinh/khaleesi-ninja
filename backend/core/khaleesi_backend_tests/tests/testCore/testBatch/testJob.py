@@ -47,16 +47,25 @@ class JobTestMixin:
   def _successfullyStartJob(
       self, *,
       start    : MagicMock,
-      count    : MagicMock,
       paginator: MagicMock,
   ) -> JobExecutionRequest :
     """Prepare successful job start"""
-    jobExecution = DbJobExecution()
-    jobExecution.status = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS)
-    jobExecution.save   = MagicMock()  # type: ignore[assignment]
-    jobExecution.toGrpc = MagicMock()  # type: ignore[assignment]
+    jobExecution = MagicMock()
+    def setTotal(total: int) -> None :
+      jobExecution.totalItems = total
+    def finish(
+        status        : 'GrpcJobExecution.Status.V',
+        itemsProcessed: int,
+        statusDetails : str,
+    ) -> None :
+      jobExecution.status         = GrpcJobExecution.Status.Name(status)
+      jobExecution.itemsProcessed = itemsProcessed
+      jobExecution.statusDetails  = statusDetails
+    jobExecution.inProcess = True
+    jobExecution.setTotal  = setTotal
+    jobExecution.finish    = finish
     start.return_value = jobExecution
-    count.return_value = 0
+    start.objects.countJobExecutionsInProgress.return_value = 0
     paginator.return_value.count = 6
     paginator.return_value.page_range = [ 1, 2, 3 ]
     request = JobExecutionRequest()
@@ -65,12 +74,12 @@ class JobTestMixin:
     return request
 
 
+@patch('khaleesi.core.models.baseModel.transaction')
 @patch('khaleesi.core.batch.job.LOGGER')
 @patch('khaleesi.core.batch.job.transaction')
 @patch('khaleesi.core.batch.job.Paginator')
 @patch('khaleesi.core.batch.job.SINGLETON')
-@patch.object(DbJobExecution.objects, 'countJobsInProgress')
-@patch.object(DbJobExecution.objects, 'khaleesiCreate')
+@patch('khaleesi.core.batch.job.DbJobExecution')
 class JobTestCase(SimpleTestCase, JobTestMixin):
   """Test job execution."""
 
@@ -102,21 +111,11 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertIn('actionConfiguration.timelimit', context.exception.privateMessage)
     self.assertIn('actionConfiguration.timelimit', context.exception.privateDetails)
 
-  # noinspection PyUnusedLocal
-  @patch('khaleesi.core.batch.job.DbJobExecution')
-  def testJobFailsToStart(
-      self,
-      jobExecution: MagicMock,
-      start       : MagicMock,
-      count       : MagicMock,  # pylint: disable=unused-argument
-      singleton   : MagicMock,
-      *_: MagicMock,
-  ) -> None :
+  def testJobFailsToStart(self, start: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :
     """Test failure for the job to start."""
     # Prepare data.
-    start.side_effect = Exception('start failure')
-    jobExecution.return_value = DbJobExecution()
-    jobExecution.return_value.save = MagicMock()  # type: ignore[assignment]
+    start.objects.countJobExecutionsInProgress.side_effect = Exception('start failure')
+    start.return_value = MagicMock()
     request = JobExecutionRequest()
     request.jobExecution.actionConfiguration.batchSize = 2
     request.jobExecution.actionConfiguration.timelimit.FromSeconds(60)
@@ -129,16 +128,10 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     singleton.structuredLogger.logError.assert_called_once()
 
   # noinspection PyUnusedLocal
-  def testJobIsSkipped(
-      self,
-      start    : MagicMock,  # pylint: disable=unused-argument
-      count    : MagicMock,
-      singleton: MagicMock,
-      *_       : MagicMock,
-  ) -> None :
+  def testJobIsSkipped(self, start: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :
     """Test job getting skipped."""
     # Prepare data.
-    count.return_value = 1337
+    start.objects.countJobExecutionsInProgress.return_value = 1337
     request = JobExecutionRequest()
     request.jobExecution.actionConfiguration.batchSize = 2
     request.jobExecution.actionConfiguration.timelimit.FromSeconds(60)
@@ -149,17 +142,15 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertEqual(GrpcJobExecution.Status.SKIPPED, self.job.request.status)
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
 
-  def testJobFailedToGetCount(
-      self,
+  def testJobFailedToGetCount(self,
       start    : MagicMock,
-      count       : MagicMock,
       singleton: MagicMock,
       paginator: MagicMock,
       *_: MagicMock,
   ) -> None :
     """Test failure for the job to get the total count."""
     # Prepare data.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     type(paginator.return_value).count = PropertyMock(side_effect = Exception('no total count'))
     self._setJob(request = request)
     # Execute test.
@@ -177,14 +168,13 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
   def testJobAbort(
       self,
       start    : MagicMock,
-      count       : MagicMock,
       singleton: MagicMock,
       paginator: MagicMock,
       *_: MagicMock,
   ) -> None :
     """Test job timeout."""
     # Prepare data.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     self._setJob(request = request)
     stopEvent = Event()
     stopEvent.set()
@@ -203,14 +193,13 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
   def testJobTimeout(
       self,
       start    : MagicMock,
-      count       : MagicMock,
       singleton: MagicMock,
       paginator: MagicMock,
       *_: MagicMock,
   ) -> None :
     """Test job timeout."""
     # Prepare data.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     request.jobExecution.actionConfiguration.timelimit.FromNanoseconds(1)
     self._setJob(request = request)
     # Execute test.
@@ -228,14 +217,13 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
   def testJobError(
       self,
       start    : MagicMock,
-      count       : MagicMock,
       singleton: MagicMock,
       paginator: MagicMock,
       *_: MagicMock,
   ) -> None :
     """Test job error during batch processing."""
     # Prepare data.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     self._setJob(request = request)
     self.job.mock.executeBatch.side_effect = Exception('error in batch')
     # Execute test.
@@ -255,14 +243,13 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
   def testJobSuccess(
       self,
       start    : MagicMock,
-      count       : MagicMock,
       singleton: MagicMock,
       paginator: MagicMock,
       *_: MagicMock,
   ) -> None :
     """Test successful job run."""
     # Prepare data.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     self._setJob(request = request)
     # Execute test.
     self.job.execute(stopEvent = Event())
@@ -279,12 +266,12 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertNotEqual(1       , paginator.return_value.get_page.call_args.args[0])
 
 
+@patch('khaleesi.core.models.baseModel.transaction')
 @patch('khaleesi.core.batch.job.LOGGER')
 @patch('khaleesi.core.batch.job.transaction')
 @patch('khaleesi.core.batch.job.Paginator')
 @patch('khaleesi.core.batch.job.SINGLETON')
-@patch.object(DbJobExecution.objects, 'countJobsInProgress')
-@patch.object(DbJobExecution.objects, 'khaleesiCreate')
+@patch('khaleesi.core.batch.job.DbJobExecution')
 class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
   """Test job execution."""
 
@@ -297,14 +284,13 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
   # noinspection PyUnusedLocal
   def testMandatoryCleanupConfiguration(self,
       start    : MagicMock,
-      count    : MagicMock,
       singleton: MagicMock,  # pylint: disable=unused-argument
       paginator: MagicMock,
       *_       : MagicMock,
   ) -> None :
     """Test that the cleanup configuration is specified."""
     # Execute test.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     with self.assertRaises(InvalidArgumentException) as context:
       self.job = CleanupJob(model = DbJobExecution, request = request)
     # Assert result.
@@ -315,14 +301,13 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
   def testJobSuccess(
       self,
       start    : MagicMock,
-      count    : MagicMock,
       singleton: MagicMock,
       paginator: MagicMock,
       *_       : MagicMock,
   ) -> None :
     """Test successful job run."""
     # Prepare data.
-    request = self._successfullyStartJob(start = start, count = count, paginator = paginator)
+    request = self._successfullyStartJob(start = start, paginator = paginator)
     request.jobExecution.cleanupConfiguration.isCleanupJob = True
     self._setJob(request = request)
     self.job.mock.getQueryset.return_value.filter.return_value.delete.return_value = (2, 0)

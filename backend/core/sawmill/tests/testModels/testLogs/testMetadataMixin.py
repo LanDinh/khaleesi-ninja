@@ -29,7 +29,8 @@ class MetadataMixinTestCase(SimpleTestCase):
           userType  = userType,
         )
         initialError = 'test errors'
-        instance     = Metadata()
+        instance               = Metadata()
+        instance._state.adding = True  # pylint: disable=protected-access
         # Execute test.
         instance.metadataFromGrpc(grpc = grpc, errors = [ initialError ])
         # Assert result.
@@ -55,8 +56,8 @@ class MetadataMixinTestCase(SimpleTestCase):
           userType  = userType,
         )
         initialError = 'test errors'
-        instance     = Metadata()
-        instance.pk  = 1337
+        instance               = Metadata()
+        instance._state.adding = False   # pylint: disable=protected-access
         # Execute test.
         instance.metadataFromGrpc(grpc = grpc, errors = [ initialError ])
         # Assert result.
@@ -74,7 +75,8 @@ class MetadataMixinTestCase(SimpleTestCase):
     timestamp.return_value = None
     string.return_value    = 'parsed-string'
     grpc                   = RequestMetadata()
-    instance = Metadata()
+    instance               = Metadata()
+    instance._state.adding = True  # pylint: disable=protected-access
     # Execute test.
     instance.metadataFromGrpc(grpc = grpc, errors = [])
     # Assert result.
