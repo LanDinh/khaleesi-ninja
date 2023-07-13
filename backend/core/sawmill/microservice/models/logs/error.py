@@ -1,49 +1,21 @@
 """Error logs."""
 
 # Python.
-from __future__ import annotations
-from typing import List
+from typing import Any, List
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.models.idModel import Model
 from khaleesi.core.shared.parseUtil import parseString
-from khaleesi.proto.core_sawmill_pb2 import Error as GrpcError, ErrorResponse as GrpcErrorResponse
-from microservice.models.logs.abstract import Metadata
+from khaleesi.proto.core_pb2 import ObjectMetadata
+from khaleesi.proto.core_sawmill_pb2 import ErrorRequest as GrpcErrorRequest
+from microservice.models.logs.metadataMixin import GrpcMetadataMixin
 
 
-class ErrorManager(models.Manager['Error']):
-  """Custom model manager."""
-
-  def logError(self, *, grpcError: GrpcError) -> Error :
-    """Log an error."""
-
-    errors: List[str] = []
-
-    error = {
-        'errorId'  : parseString(raw = grpcError.id       , name = 'errorId'  , errors = errors),
-        'status'   : parseString(raw = grpcError.status   , name = 'status'   , errors = errors),
-        'loglevel' : parseString(raw = grpcError.loglevel , name = 'loglevel' , errors = errors),
-        'gate'     : parseString(raw = grpcError.gate     , name = 'gate'     , errors = errors),
-        'service'  : parseString(raw = grpcError.service  , name = 'service'  , errors = errors),
-        'publicKey': parseString(raw = grpcError.publicKey, name = 'publicKey', errors = errors),
-    }
-
-    return self.create(
-      **self.model.logMetadata(metadata = grpcError.requestMetadata, errors = errors),
-      **error,
-      publicDetails  = grpcError.publicDetails,
-      privateMessage = grpcError.privateMessage,
-      privateDetails = grpcError.privateDetails,
-      stacktrace     = grpcError.stacktrace,
-    )
-
-
-class Error(Metadata):
+class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
   """Error logs."""
-  errorId = models.TextField(default = 'UNKNOWN')
-
   status   = models.TextField(default = 'UNKNOWN')
   loglevel = models.TextField(default = 'FATAL')
 
@@ -57,25 +29,50 @@ class Error(Metadata):
   privateDetails = models.TextField(default = '')
   stacktrace     = models.TextField(default = '')
 
-  objects = ErrorManager()
 
-  def toGrpc(self) -> GrpcErrorResponse :
-    """Map to gRPC event message."""
+  def khaleesiSave(
+      self,
+      *args   : Any,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : GrpcErrorRequest,
+      **kwargs: Any,
+  ) -> None :
+    """Change own values according to the grpc object."""
+    errors: List[str] = []
 
-    grpcErrorResponse = GrpcErrorResponse()
-    # Request metadata.
-    self.requestMetadataToGrpc(requestMetadata = grpcErrorResponse.error.requestMetadata)
-    self.responseMetadataToGrpc(responseMetadata = grpcErrorResponse.errorMetadata)
-    grpcErrorResponse.error.id = self.errorId
+    if self._state.adding:
+      self.status    = parseString(raw = grpc.error.status   , name = 'status'   , errors = errors)
+      self.loglevel  = parseString(raw = grpc.error.loglevel , name = 'loglevel' , errors = errors)
+      self.gate      = parseString(raw = grpc.error.gate     , name = 'gate'     , errors = errors)
+      self.service   = parseString(raw = grpc.error.service  , name = 'service'  , errors = errors)
+      self.publicKey = parseString(raw = grpc.error.publicKey, name = 'publicKey', errors = errors)
+      self.publicDetails  = grpc.error.publicDetails
+      self.privateMessage = grpc.error.privateMessage
+      self.privateDetails = grpc.error.privateDetails
+      self.stacktrace     = grpc.error.stacktrace
+
+    # Needs to be at the end because it saves errors to the model.
+    self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
+    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+
+  def toGrpc(
+      self, *,
+      metadata: ObjectMetadata   = ObjectMetadata(),
+      grpc    : GrpcErrorRequest = GrpcErrorRequest(),
+  ) -> GrpcErrorRequest :
+    """Return a grpc object containing own values."""
+    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
+    self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+
     # Error.
-    grpcErrorResponse.error.status         = self.status
-    grpcErrorResponse.error.loglevel       = self.loglevel
-    grpcErrorResponse.error.gate           = self.gate
-    grpcErrorResponse.error.service        = self.service
-    grpcErrorResponse.error.publicKey      = self.publicKey
-    grpcErrorResponse.error.publicDetails  = self.publicDetails
-    grpcErrorResponse.error.privateMessage = self.privateMessage
-    grpcErrorResponse.error.privateDetails = self.privateDetails
-    grpcErrorResponse.error.stacktrace     = self.stacktrace
+    grpc.error.status         = self.status
+    grpc.error.loglevel       = self.loglevel
+    grpc.error.gate           = self.gate
+    grpc.error.service        = self.service
+    grpc.error.publicKey      = self.publicKey
+    grpc.error.publicDetails  = self.publicDetails
+    grpc.error.privateMessage = self.privateMessage
+    grpc.error.privateDetails = self.privateDetails
+    grpc.error.stacktrace     = self.stacktrace
 
-    return grpcErrorResponse
+    return grpc

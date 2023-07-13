@@ -6,7 +6,7 @@ from khaleesi.proto.core_pb2 import EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
-  Error,
+  ErrorRequest,
   EventRequest,
   HttpRequest,
   HttpResponseRequest,
@@ -62,9 +62,10 @@ class StructuredDbLogger(StructuredLogger):
       result.metaChildDuration += query.reportedDuration
     result.save()
 
-  def sendLogError(self, *, error: Error) -> None :
+  def sendLogError(self, *, error: ErrorRequest) -> None :
     """Send the log error to the logging facility."""
-    DbError.objects.logError(grpcError = error)
+    dbError = DbError()
+    dbError.khaleesiSave(grpc = error)
 
   def sendLogEvent(self, *, event: EventRequest) -> None :
     """Send the log event to the logging facility."""

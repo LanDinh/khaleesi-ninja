@@ -137,9 +137,8 @@ class EventTestCase(SimpleTestCase):
               actionResult     = resultLabel,
               actionDetails    = 'action-details',
             )
-            grpc = GrpcEventRequest()
             # Execute test.
-            result = instance.toGrpc(grpc = grpc)
+            result = instance.toGrpc()
             # Assert result.
             metadata.assert_called_once()
             parent.assert_called_once()
@@ -171,7 +170,7 @@ class EventTestCase(SimpleTestCase):
       result: 'GrpcEvent.Action.ResultType.V'
   ) -> GrpcEventRequest :
     """Utility method for creating gRPC Events."""
-    grpc     = GrpcEventRequest()
+    grpc = GrpcEventRequest()
 
     grpc.event.target.type       = 'target-type'
     grpc.event.target.id         = 'target-id'

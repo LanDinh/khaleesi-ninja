@@ -23,7 +23,7 @@ from khaleesi.proto.core_pb2 import RequestMetadata, User, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
-  Error,
+  ErrorRequest,
   Event, EventRequest,
   HttpRequest,
   HttpResponseRequest,
@@ -56,7 +56,7 @@ class StructuredTestLogger(StructuredLogger):
     """Send the log response to the logging facility."""
     self.sender.send(response = grpcResponse)
 
-  def sendLogError(self, *, error: Error) -> None :
+  def sendLogError(self, *, error: ErrorRequest) -> None :
     """Send the log error to the logging facility."""
     self.sender.send(error = error)
 
@@ -364,10 +364,9 @@ class TestStructuredLogger(SimpleTestCase):
           # Assert result.
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
-          logError = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
-          self.assertIsNotNone(logError.id)
-          self.assertEqual(status.name  , logError.status)
-          self.assertEqual(loglevel.name, logError.loglevel)
+          logError = cast(ErrorRequest, self.logger.sender.send.call_args.kwargs['error'])
+          self.assertEqual(status.name  , logError.error.status)
+          self.assertEqual(loglevel.name, logError.error.loglevel)
           self._assertError(exception = exception, logError = logError)
           metadata.assert_called_once()
 
@@ -395,10 +394,9 @@ class TestStructuredLogger(SimpleTestCase):
           # Assert result.
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
-          logError = cast(Error, self.logger.sender.send.call_args.kwargs['error'])
-          self.assertIsNotNone(logError.id)
-          self.assertEqual(status.name  , logError.status)
-          self.assertEqual(loglevel.name, logError.loglevel)
+          logError = cast(ErrorRequest, self.logger.sender.send.call_args.kwargs['error'])
+          self.assertEqual(status.name  , logError.error.status)
+          self.assertEqual(loglevel.name, logError.error.loglevel)
           self._assertError(exception = exception, logError = logError)
           metadata.assert_called_once()
 
@@ -494,14 +492,14 @@ class TestStructuredLogger(SimpleTestCase):
             self.assertEqual(resultType             , logEvent.event.action.result)
             self.assertEqual(details                , logEvent.event.action.details)
 
-  def _assertError(self, exception: KhaleesiException, logError: Error) -> None :
-    self.assertEqual(exception.gate          , logError.gate)
-    self.assertEqual(exception.service       , logError.service)
-    self.assertEqual(exception.publicKey     , logError.publicKey)
-    self.assertEqual(exception.publicDetails , logError.publicDetails)
-    self.assertEqual(exception.privateMessage, logError.privateMessage)
-    self.assertEqual(exception.privateDetails, logError.privateDetails)
-    self.assertEqual(exception.stacktrace    , logError.stacktrace)
+  def _assertError(self, exception: KhaleesiException, logError: ErrorRequest) -> None :
+    self.assertEqual(exception.gate          , logError.error.gate)
+    self.assertEqual(exception.service       , logError.error.service)
+    self.assertEqual(exception.publicKey     , logError.error.publicKey)
+    self.assertEqual(exception.publicDetails , logError.error.publicDetails)
+    self.assertEqual(exception.privateMessage, logError.error.privateMessage)
+    self.assertEqual(exception.privateDetails, logError.error.privateDetails)
+    self.assertEqual(exception.stacktrace    , logError.error.stacktrace)
 
 
 class TestStructuredGrpcLogger(SimpleTestCase):

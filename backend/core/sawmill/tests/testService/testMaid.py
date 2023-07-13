@@ -31,7 +31,7 @@ class MaidServiceTestCase(SimpleTestCase):
   def testCleanupErrors(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
-    self._executeOldCleanupTest(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
+    self._executeCleanupTest(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
 
   def testCleanupHttpRequests(self, *_: MagicMock) -> None :
     """Test cleaning up."""

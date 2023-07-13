@@ -14,7 +14,7 @@ from khaleesi.proto.core_pb2 import EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogStandardResponse,
-  Error,
+  ErrorRequest,
   EventRequest,
   GrpcResponseRequest,
   GrpcRequest,
@@ -139,15 +139,17 @@ class Service(Servicer):
       return result
     return self._handleResponseOld(method = method)
 
-  def LogError(self, request: Error, _: grpc.ServicerContext) -> LogStandardResponse :
+  def LogError(self, request: ErrorRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log errors."""
-    def method() -> Metadata :
+    def method() -> MetadataMixin :
       LOGGER.info(
         f'Saving an error to the request "{request.requestMetadata.grpcCaller.requestId}" '
         'to the database.',
       )
-      return DbError.objects.logError(grpcError = request)
-    return self._handleResponseOld(method = method)
+      dbError = DbError()
+      dbError.khaleesiSave(grpc = request)
+      return dbError
+    return self._handleResponse(method = method)
 
 
   def _handleResponseOld(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :

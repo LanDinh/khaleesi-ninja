@@ -6,8 +6,6 @@ from datetime import timezone, datetime
 from typing import cast
 
 # Django.
-from uuid import uuid4
-
 from django.conf import settings
 
 # gRPC.
@@ -25,9 +23,8 @@ from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import RequestMetadata, EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
-  GrpcRequest,
+  ErrorRequest, GrpcRequest,
   GrpcResponseRequest,
-  Error,
   Event, EventRequest,
   HttpRequest,
   HttpResponseRequest,
@@ -265,21 +262,20 @@ class StructuredLogger(ABC):
     response.status = status.name
     response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 
-  def _logErrorObject(self, *, exception: KhaleesiException) -> Error :
+  def _logErrorObject(self, *, exception: KhaleesiException) -> ErrorRequest :
     """Text log an exception and return the error object."""
     LOGGER.log(exception.toJson(), loglevel = exception.loglevel)
     LOGGER.log(exception.stacktrace, loglevel = exception.loglevel)
-    error = Error()
-    error.id             = str(uuid4())
-    error.status         = exception.status.name
-    error.loglevel       = exception.loglevel.name
-    error.gate           = exception.gate
-    error.service        = exception.service
-    error.publicKey      = exception.publicKey
-    error.publicDetails  = exception.publicDetails
-    error.privateMessage = exception.privateMessage
-    error.privateDetails = exception.privateDetails
-    error.stacktrace     = exception.stacktrace
+    error = ErrorRequest()
+    error.error.status         = exception.status.name
+    error.error.loglevel       = exception.loglevel.name
+    error.error.gate           = exception.gate
+    error.error.service        = exception.service
+    error.error.publicKey      = exception.publicKey
+    error.error.publicDetails  = exception.publicDetails
+    error.error.privateMessage = exception.privateMessage
+    error.error.privateDetails = exception.privateDetails
+    error.error.stacktrace     = exception.stacktrace
     return error
 
   @abstractmethod
@@ -303,7 +299,7 @@ class StructuredLogger(ABC):
     """Send the gRPC log response to the logging facility."""
 
   @abstractmethod
-  def sendLogError(self, *, error: Error) -> None :
+  def sendLogError(self, *, error: ErrorRequest) -> None :
     """Send the log error to the logging facility."""
 
   @abstractmethod
@@ -340,7 +336,7 @@ class StructuredGrpcLogger(StructuredLogger):
     """Send the gRPC log response to the logging facility."""
     self.stub.LogGrpcResponse(grpcResponse)
 
-  def sendLogError(self, *, error: Error) -> None :
+  def sendLogError(self, *, error: ErrorRequest) -> None :
     """Send the log error to the logging facility."""
     self.stub.LogError(error)
 

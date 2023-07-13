@@ -52,7 +52,7 @@ class Service(Servicer):
       'Cleaning up errors older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = OldCleanupJob(model = DbError, request = request))
+    return jobExecutor(job = CleanupJob(model = DbError, request = request))
 
   def CleanupHttpRequests(
       self,

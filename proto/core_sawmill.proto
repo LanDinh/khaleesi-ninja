@@ -95,17 +95,15 @@ message Query {
 }
 
 message Error {
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-  string                        id              = 2;
-  string                        status          = 3;
-  string                        loglevel        = 4;
-  string                        gate            = 5;
-  string                        service         = 6;
-  string                        publicKey       = 7;
-  string                        publicDetails   = 8;
-  string                        privateMessage  = 9;
-  string                        privateDetails  = 10;
-  string                        stacktrace      = 11;
+  string status          = 1;
+  string loglevel        = 2;
+  string gate            = 3;
+  string service         = 4;
+  string publicKey       = 5;
+  string publicDetails   = 6;
+  string privateMessage  = 7;
+  string privateDetails  = 8;
+  string stacktrace      = 9;
 }
 
 
@@ -138,11 +136,19 @@ message EventRequest {
   Event event = 10;
 }
 
+message ErrorRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  khaleesi.core.ObjectMetadata  objectMetadata  = 2;
+  LogRequestMetadata            logMetadata     = 3;
+
+  Error error = 10;
+}
+
 service Lumberjack {
   rpc LogEvent               (EventRequest)        returns (khaleesi.core.ObjectMetadata);
   rpc LogGrpcRequest         (GrpcRequest)         returns (LogStandardResponse);
   rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
-  rpc LogError               (Error)               returns (LogStandardResponse);
+  rpc LogError               (ErrorRequest)        returns (LogStandardResponse);
   rpc LogHttpRequest         (HttpRequest)         returns (LogStandardResponse);
   rpc LogHttpRequestResponse (HttpResponseRequest) returns (LogStandardResponse);
   rpc LogSystemHttpRequest   (khaleesi.core.EmptyRequest) returns (LogStandardResponse);
@@ -221,13 +227,8 @@ message GrpcRequestList {
   repeated GrpcRequestResponse requests = 1;
 }
 
-message ErrorResponse {
-  ResponseMetadata errorMetadata = 1;
-  Error            error         = 2;
-}
-
 message ErrorList {
-  repeated ErrorResponse errors = 1;
+  repeated ErrorRequest errors = 1;
 }
 
 

@@ -92,7 +92,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Perform test.
     self.logger.sendLogError(error = error)
     # Assert result.
-    dbError.objects.logError.assert_called_once_with(grpcError = error)
+    dbError.return_value.khaleesiSave.assert_called_once_with(grpc = error)
 
   @patch('microservice.structuredLogger.DbEvent')
   def testSendLogEvent(self, dbEvent: MagicMock) -> None :

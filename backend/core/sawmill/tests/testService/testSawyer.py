@@ -9,7 +9,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
   EventRequest as GrpcEventRequest,
   GrpcRequestResponse as GrpcGrpcRequestResponse,
-  ErrorResponse as GrpcErrorResponse,
+  ErrorRequest as GrpcErrorRequest,
   HttpRequestResponse as GrpcHttpResponse,
   QueryResponse as GrpcQueryResponse,
 )
@@ -83,7 +83,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test getting logged events."""
     # Prepare data.
     dbError = MagicMock()
-    dbError.toGrpc.return_value = GrpcErrorResponse()
+    dbError.toGrpc.return_value = GrpcErrorRequest()
     dbErrors.return_value       = [ dbError ]
     # Execute test.
     result = self.service.GetErrors(LogFilter(), MagicMock())

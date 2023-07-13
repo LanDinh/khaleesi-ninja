@@ -11,7 +11,6 @@ from khaleesi.core.testUtil.testCase import SimpleTestCase
 from microservice.service.lumberjack import (  # type: ignore[attr-defined]
   Service,
   DbGrpcRequest,
-  DbError,
   DbHttpRequest,
   DbQuery,
 )
@@ -89,10 +88,9 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def testLogError(self, *_: MagicMock) -> None :
     """Test logging events."""
-    self._executeOldLoggingTests(
-      method         = lambda : self.service.LogError(MagicMock(), MagicMock()),
-      loggingObject  = DbError.objects,
-      loggingMethod  = 'logError',
+    self._executeLoggingTests(
+      method        = lambda : self.service.LogError(MagicMock(), MagicMock()),
+      loggingObject = 'DbError',
     )
 
   def _executeLoggingTests(
