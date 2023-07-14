@@ -175,6 +175,16 @@ class HttpRequestTestCase(SimpleTestCase):
     responseMetadata.assert_called_once()
     self.assertIsNotNone(grpc)
 
+  def testToObjectMetadata(self) -> None :
+    """Test getting the object metadata."""
+    # Prepare data.
+    instance = HttpRequest()
+    instance.metaCallerHttpRequestId = 'request-id'
+    # Execute test.
+    result = instance.toObjectMetadata()
+    # Assert result.
+    self.assertEqual(instance.metaCallerHttpRequestId, result.id)
+
   def _createGrpcHttpRequest(self) -> GrpcHttpRequest :
     """Helper to create gRPC objects."""
     grpc = GrpcHttpRequest()

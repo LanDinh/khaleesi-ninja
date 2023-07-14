@@ -54,3 +54,15 @@ class ModelTestCase(SimpleTestCase):
     # Assert result.
     parent.assert_called_once()
     self.assertEqual(instance.khaleesiId, result.id)
+
+  @patch('khaleesi.core.models.idModel.BaseModel.toGrpc')
+  def testToObjectMetadata(self, parent: MagicMock) -> None :
+    """Test getting gRPC data."""
+    # Prepare data.
+    instance = IdModel()
+    instance.khaleesiId = 'id'
+    # Execute test.
+    result = instance.toObjectMetadata()
+    # Assert result.
+    parent.assert_called_once()
+    self.assertEqual(instance.khaleesiId, result.id)

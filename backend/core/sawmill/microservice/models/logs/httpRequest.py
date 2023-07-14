@@ -118,3 +118,9 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
     grpc.request.deviceType     = self.deviceType
 
     return grpc
+
+  def toObjectMetadata(self) -> ObjectMetadata :
+    """Return the object metadata representing this object."""
+    metadata = ObjectMetadata()
+    metadata.id = self.metaCallerHttpRequestId
+    return metadata

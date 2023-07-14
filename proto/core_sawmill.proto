@@ -169,12 +169,12 @@ message ErrorRequest {
 }
 
 service Lumberjack {
-  rpc LogHttpRequest         (HttpRequestRequest)  returns (khaleesi.core.ObjectMetadata);
-  rpc LogHttpRequestResponse (ResponseRequest)     returns (LogStandardResponse);
-  rpc LogEvent               (EventRequest)        returns (khaleesi.core.ObjectMetadata);
-  rpc LogError               (ErrorRequest)        returns (khaleesi.core.ObjectMetadata);
   rpc LogGrpcRequest         (GrpcRequest)         returns (LogStandardResponse);
   rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
+  rpc LogHttpRequest         (HttpRequestRequest) returns (khaleesi.core.ObjectMetadata);
+  rpc LogHttpRequestResponse (ResponseRequest)    returns (khaleesi.core.ObjectMetadata);
+  rpc LogEvent               (EventRequest)       returns (khaleesi.core.ObjectMetadata);
+  rpc LogError               (ErrorRequest)       returns (khaleesi.core.ObjectMetadata);
 }
 
 

@@ -9,7 +9,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.shared.parseUtil import parseTimestamp, parseString
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.proto.core_pb2 import ObjectMetadata, RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import (
   LogRequestMetadata,
   ProcessedResponse,
@@ -106,6 +106,9 @@ class ResponseMetadataMixin(models.Model):
     if self.metaResponseLoggedTimestamp:
       logMetadata.loggedTimestamp.FromDatetime(self.metaResponseLoggedTimestamp)
     logMetadata.errors = self.metaResponseLoggingErrors
+
+  def toObjectMetadata(self) -> ObjectMetadata :
+    """Return the object metadata representing this object."""
 
 
   class Meta:

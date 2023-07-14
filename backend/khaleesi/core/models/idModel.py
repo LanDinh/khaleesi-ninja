@@ -37,5 +37,11 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
     metadata.id = self.khaleesiId
     return grpc
 
+  def toObjectMetadata(self) -> ObjectMetadata :
+    """Return the object metadata representing this object."""
+    metadata = ObjectMetadata()
+    self.toGrpc(metadata = metadata)
+    return metadata
+
   class Meta(BaseModel.Meta):
     abstract = True

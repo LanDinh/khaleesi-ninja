@@ -10,6 +10,7 @@ import grpc
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
+from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogStandardResponse,
@@ -44,7 +45,7 @@ class Service(Servicer):
       self,
       request: HttpRequestRequest,
       _      : grpc.ServicerContext,
-  ) -> LogStandardResponse :
+  ) -> ObjectMetadata :
     """Log HTTP request."""
     def method() -> MetadataMixin :
       LOGGER.info(
@@ -60,7 +61,7 @@ class Service(Servicer):
       self,
       request: ResponseRequest,
       _      : grpc.ServicerContext,
-  ) -> LogStandardResponse :
+  ) -> ObjectMetadata :
     """Log HTTP request responses."""
     requestId = request.requestMetadata.httpCaller.requestId
     def method() -> ResponseMetadataMixin :
@@ -72,7 +73,7 @@ class Service(Servicer):
       return dbHttpRequest
     return self._handleResponse(method = method)
 
-  def LogEvent(self, request: EventRequest, _: grpc.ServicerContext) -> LogStandardResponse :
+  def LogEvent(self, request: EventRequest, _: grpc.ServicerContext) -> ObjectMetadata :
     """Log events."""
     def method() -> MetadataMixin :
       LOGGER.info('Adding service to service registry.')
@@ -86,7 +87,7 @@ class Service(Servicer):
       return dbEvent
     return self._handleLogging(method = method)
 
-  def LogError(self, request: ErrorRequest, _: grpc.ServicerContext) -> LogStandardResponse :
+  def LogError(self, request: ErrorRequest, _: grpc.ServicerContext) -> ObjectMetadata :
     """Log errors."""
     def method() -> MetadataMixin :
       LOGGER.info(
@@ -160,7 +161,7 @@ class Service(Servicer):
     return LogStandardResponse()
 
 
-  def _handleLogging(self, *, method: Callable[[], MetadataMixin]) -> LogStandardResponse :
+  def _handleLogging(self, *, method: Callable[[], MetadataMixin]) -> ObjectMetadata :
     """Wrap responses for logging."""
     metadata = method()
     if metadata.metaLoggingErrors:
@@ -168,10 +169,10 @@ class Service(Servicer):
         privateMessage = 'Error when parsing the metadata fields.',
         privateDetails = metadata.metaLoggingErrors,
       )
-    return LogStandardResponse()
+    return metadata.toObjectMetadata()
 
 
-  def _handleResponse(self, *, method: Callable[[], ResponseMetadataMixin]) -> LogStandardResponse :
+  def _handleResponse(self, *, method: Callable[[], ResponseMetadataMixin]) -> ObjectMetadata :
     """Wrap responses for logging."""
     metadata = method()
     if metadata.metaResponseLoggingErrors:
@@ -179,7 +180,7 @@ class Service(Servicer):
         privateMessage = 'Error when parsing the metadata fields.',
         privateDetails = metadata.metaResponseLoggingErrors,
       )
-    return LogStandardResponse()
+    return metadata.toObjectMetadata()
 
 
 serviceConfiguration = ServiceConfiguration[Service](

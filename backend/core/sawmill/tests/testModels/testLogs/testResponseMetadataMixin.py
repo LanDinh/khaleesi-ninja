@@ -267,6 +267,13 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
       processed   = processed,
     )
 
+  def testToObjectMetadata(self) -> None :
+    """Test the signature is there."""
+    # Prepare data.
+    instance = ResponseMetadata()
+    # Execute test & assert result.
+    instance.toObjectMetadata()
+
   def _createResponseRequest(
       self, *,
       now      : datetime,
