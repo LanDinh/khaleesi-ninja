@@ -37,16 +37,18 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
 
   def addChildDuration(self, *, request: GrpcRequest) -> None :
     """Log request duration."""
-    grpc = self.toGrpc()
+    metadata = ObjectMetadata()
+    grpc = self.toGrpc(metadata = metadata)
     self.metaChildDuration += request.reportedDuration
-    self.khaleesiSave(grpc = grpc)
+    self.khaleesiSave(metadata = metadata, grpc = grpc)
 
   def finish(self, *, request: ResponseRequest) -> None :
     """Finish an in-progress HTTP request."""
-    grpc = self.toGrpc()
+    metadata = ObjectMetadata()
+    grpc = self.toGrpc(metadata = metadata)
     grpc.response.CopyFrom(request.response)
     grpc.responseMetadata.CopyFrom(request.requestMetadata)
-    self.khaleesiSave(grpc = grpc)
+    self.khaleesiSave(metadata = metadata, grpc = grpc)
 
   def khaleesiSave(
       self,
