@@ -169,7 +169,7 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
 
   @patch('microservice.models.logs.responseMetadataMixin.parseString')
   @patch('microservice.models.logs.responseMetadataMixin.parseTimestamp')
-  def testResponseMetadataFromGrpcForCreationEmpty(
+  def testResponseMetadataFromGrpcForUpdateEmpty(
       self,
       timestamp: MagicMock,
       string   : MagicMock,
@@ -181,6 +181,7 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     grpc = ResponseRequest()
     instance                    = ResponseMetadata()
     instance.metaResponseStatus = 'IN_PROGRESS'
+    instance._state.adding      = False  # pylint: disable=protected-access
     # Execute test.
     instance.responseMetadataFromGrpc(
       metadata = grpc.requestMetadata,
@@ -200,6 +201,7 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     initialError = 'test errors'
     instance                    = ResponseMetadata()
     instance.metaResponseStatus = 'IN_PROGRESS'
+    instance._state.adding      = False  # pylint: disable=protected-access
     # Execute test.
     instance.responseMetadataFromGrpc(
       metadata = grpc.requestMetadata,

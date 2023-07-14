@@ -70,7 +70,7 @@ class ResponseMetadataMixin(models.Model):
       errors  : List[str],
   ) -> None :
     """Change own values according to the grpc object."""
-    if self.inProgress:
+    if self.inProgress and not self._state.adding:
       self.metaResponseStatus = parseString(
         raw    = grpc.status,
         name   = 'metaResponseStatus',
