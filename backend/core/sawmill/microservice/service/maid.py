@@ -39,6 +39,18 @@ class Service(Servicer):
     )
     return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = request))
 
+  def CleanupGrpcRequests(
+      self,
+      request: JobExecutionRequest,
+      _      : grpc.ServicerContext,
+  ) -> EmptyResponse :
+    """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up requests older than '
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+    )
+    return jobExecutor(job = CleanupJob(model = DbGrpcRequest, request = request))
+
   def CleanupEvents(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
@@ -54,18 +66,6 @@ class Service(Servicer):
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbError, request = request))
-
-  def CleanupGrpcRequests(
-      self,
-      request: JobExecutionRequest,
-      _      : grpc.ServicerContext,
-  ) -> EmptyResponse :
-    """Clean up old data."""
-    LOGGER.info(
-      'Cleaning up requests older than '
-      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
-    )
-    return jobExecutor(job = OldCleanupJob(model = DbGrpcRequest, request = request))
 
   def CleanupQueries(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""

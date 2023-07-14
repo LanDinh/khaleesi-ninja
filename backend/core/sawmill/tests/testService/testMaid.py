@@ -23,6 +23,11 @@ class MaidServiceTestCase(SimpleTestCase):
     # Execute test.
     self._executeCleanupTest(method = self.service.CleanupHttpRequests)  # pylint: disable=no-value-for-parameter
 
+  def testCleanupGrpcRequests(self, *_: MagicMock) -> None :
+    """Test cleaning up."""
+    # Execute test.
+    self._executeCleanupTest(method = self.service.CleanupGrpcRequests)  # pylint: disable=no-value-for-parameter
+
   def testCleanupEvents(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     # Execute test.
@@ -32,11 +37,6 @@ class MaidServiceTestCase(SimpleTestCase):
     """Test cleaning up."""
     # Execute test.
     self._executeCleanupTest(method = self.service.CleanupErrors)  # pylint: disable=no-value-for-parameter
-
-  def testCleanupGrpcRequests(self, *_: MagicMock) -> None :
-    """Test cleaning up."""
-    # Execute test.
-    self._executeOldCleanupTest(method = self.service.CleanupGrpcRequests)  # pylint: disable=no-value-for-parameter
 
   def testCleanupQueries(self, *_: MagicMock) -> None :
     """Test cleaning up."""
