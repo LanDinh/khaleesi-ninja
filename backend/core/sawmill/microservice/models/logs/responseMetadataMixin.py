@@ -77,7 +77,7 @@ class ResponseMetadataMixin(models.Model):
         errors = errors,
       )
       self.metaResponseReportedTimestamp = parseTimestamp(
-        raw    = metadata.timestamp,
+        raw    = metadata.timestamp.ToDatetime(),
         name   = 'metaResponseReportedTimestamp',
         errors = errors,
       )
