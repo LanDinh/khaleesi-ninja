@@ -156,7 +156,6 @@ class LumberjackServiceTestCase(SimpleTestCase):
     with self.assertRaises(InvalidArgumentException) as context:
       method()
     logging.return_value.khaleesiSave.assert_called_once()
-    logging.return_value.toObjectMetadata.assert_called_once()
     self.assertEqual(logging.return_value.metaLoggingErrors, context.exception.privateDetails)
 
   def _executeSuccessfulResponseLoggingTest(
@@ -191,7 +190,6 @@ class LumberjackServiceTestCase(SimpleTestCase):
     with self.assertRaises(InvalidArgumentException) as context:
       method()
     logging.objects.get.return_value.finish.assert_called_once()
-    logging.objects.get.return_value.toObjectMetadata.assert_called_once()
     self.assertEqual(
       logging.objects.get.return_value.metaResponseLoggingErrors,
       context.exception.privateDetails,

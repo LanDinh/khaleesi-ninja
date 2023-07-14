@@ -40,7 +40,7 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
   def toObjectMetadata(self) -> ObjectMetadata :
     """Return the object metadata representing this object."""
     metadata = ObjectMetadata()
-    self.toGrpc(metadata = metadata)
+    self.toGrpc(metadata = metadata)  # type: ignore[call-arg]  # pylint: disable=missing-kwoa
     return metadata
 
   class Meta(BaseModel.Meta):
