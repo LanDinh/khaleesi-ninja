@@ -63,7 +63,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
       grpc    : GrpcJob        = GrpcJob(),
   ) -> GrpcJob :
     """Return a grpc object containing own values."""
-    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
+    super().toGrpc(metadata = metadata, grpc = grpc)
 
     grpc.name           = self.name
     grpc.description    = self.description

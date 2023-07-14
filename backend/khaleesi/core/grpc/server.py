@@ -154,7 +154,7 @@ class Server:
     grpcRequestId     = str(uuid4())
 
     try:
-      SINGLETON.structuredLogger.logSystemHttpRequest(
+      SINGLETON.structuredLogger.logHttpRequest(
         httpRequestId = stopHttpRequestId,
         grpcMethod    = 'LIFECYCLE',
       )
@@ -339,7 +339,7 @@ class Server:
       grpcMethod    = 'LIFECYCLE',
       status        = status,
     )
-    SINGLETON.structuredLogger.logSystemHttpResponse(
+    SINGLETON.structuredLogger.logHttpResponse(
       httpRequestId = httpRequestId,
       grpcMethod    = 'LIFECYCLE',
       status        = status,

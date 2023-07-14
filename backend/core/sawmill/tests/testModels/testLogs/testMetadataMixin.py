@@ -129,6 +129,15 @@ class MetadataMixinTestCase(SimpleTestCase):
         )
         self.assertEqual(instance.metaLoggingErrors  , logMetadata.errors)
 
+  def testMetadataToGrpcEmpty(self) -> None :
+    """Test transformation to gRPC."""
+    # Prepare data.
+    instance = Metadata()
+    requestMetadata = RequestMetadata()
+    logMetadata     = LogRequestMetadata()
+    # Execute test & assert result.
+    instance.metadataToGrpc(requestMetadata = requestMetadata, logMetadata = logMetadata)
+
   def _createRequestMetadata(
       self, *,
       now      : datetime,
@@ -218,9 +227,22 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
       instance.metaCallerGrpcKhaleesiService,
       requestMetadata.grpcCaller.khaleesiService,
     )
-    self.assertEqual(instance.metaCallerGrpcGrpcService    , requestMetadata.grpcCaller.grpcService)
-    self.assertEqual(instance.metaCallerGrpcGrpcMethod     , requestMetadata.grpcCaller.grpcMethod)
-    self.assertEqual(instance.metaCallerGrpcPodId          , requestMetadata.grpcCaller.podId)
+    self.assertEqual(instance.metaCallerGrpcGrpcService, requestMetadata.grpcCaller.grpcService)
+    self.assertEqual(instance.metaCallerGrpcGrpcMethod , requestMetadata.grpcCaller.grpcMethod)
+    self.assertEqual(instance.metaCallerGrpcPodId      , requestMetadata.grpcCaller.podId)
+
+  @patch('microservice.models.logs.metadataMixin.MetadataMixin.metadataToGrpc')
+  def testMetadataToGrpcEmpty(self, parent: MagicMock) -> None :
+    """Test transformation to gRPC."""
+    # Prepare data.
+    instance = GrpcMetadata()
+    requestMetadata = RequestMetadata()
+    logMetadata     = LogRequestMetadata()
+
+    # Execute test.
+    instance.metadataToGrpc(requestMetadata = requestMetadata, logMetadata = logMetadata)
+    # Assert result.
+    parent.assert_called_once()
 
   def _createRequestMetadata(self, *, string: MagicMock) -> RequestMetadata :
     """Utility for creating fully populated request metadata objects."""

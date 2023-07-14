@@ -122,10 +122,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.SUCCESS,
       singleton = singleton,
     )
-    singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
+    singleton.structuredLogger.logHttpRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcResponse.assert_called_once()
-    singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+    singleton.structuredLogger.logHttpResponse.assert_called_once()
     channelManager.closeAllChannels.assert_called_once_with()
 
   def testSigtermFailureServerTimeout(
@@ -153,10 +153,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.FATAL,
       singleton = singleton,
     )
-    singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
+    singleton.structuredLogger.logHttpRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcResponse.assert_called_once()
-    singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+    singleton.structuredLogger.logHttpResponse.assert_called_once()
     channelManager.closeAllChannels.assert_called_once_with()
 
   def testSigtermFailureThreadTimeout(
@@ -188,10 +188,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.FATAL,
       singleton = singleton,
     )
-    singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
+    singleton.structuredLogger.logHttpRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcResponse.assert_called_once()
-    singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+    singleton.structuredLogger.logHttpResponse.assert_called_once()
     channelManager.closeAllChannels.assert_called_once_with()
 
   def testSigtermTimeout(
@@ -218,10 +218,10 @@ class ServerTestCase(SimpleTestCase):
       result    = Event.Action.ResultType.FATAL,
       singleton = singleton,
     )
-    singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
+    singleton.structuredLogger.logHttpRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcRequest.assert_called_once()
     singleton.structuredLogger.logSystemGrpcResponse.assert_called_once()
-    singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+    singleton.structuredLogger.logHttpResponse.assert_called_once()
     channelManager.closeAllChannels.assert_called_once_with()
 
   def testStart(self, grpcServer: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :

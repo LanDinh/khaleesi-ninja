@@ -15,24 +15,14 @@ class TestStructuredDbLogger(SimpleTestCase):
   logger = StructuredDbLogger()
 
   @patch('microservice.structuredLogger.DbHttpRequest')
-  def testSendLogSystemHttpRequest(self, dbHttpRequest: MagicMock) -> None :
-    """Test sending a log request."""
-    # Prepare data.
-    request = MagicMock()
-    # Perform test.
-    self.logger.sendLogSystemHttpRequest(httpRequest = request)
-    # Assert result.
-    dbHttpRequest.objects.logSystemRequest.assert_called_once_with(grpcRequest = request)
-
-  @patch('microservice.structuredLogger.DbHttpRequest')
   def testSendLogHttpRequest(self, dbHttpRequest: MagicMock) -> None :
     """Test sending a log request."""
     # Prepare data.
     request = MagicMock()
     # Perform test.
-    self.logger.sendLogHttpRequest(httpRequest = request)
+    self.logger.sendLogHttpRequest(grpc = request)
     # Assert result.
-    dbHttpRequest.objects.logRequest.assert_called_once_with(grpcRequest = request)
+    dbHttpRequest.return_value.khaleesiSave.assert_called_once()
 
   @patch('microservice.structuredLogger.DbHttpRequest')
   def testSendLogHttpResponse(self, dbHttpRequest: MagicMock) -> None :
@@ -40,9 +30,9 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Prepare data.
     response = MagicMock()
     # Perform test.
-    self.logger.sendLogHttpResponse(httpResponse = response)
+    self.logger.sendLogHttpResponse(grpc = response)
     # Assert result.
-    dbHttpRequest.objects.logResponse.assert_called_once_with(grpcResponse = response)
+    dbHttpRequest.objects.get.return_value.finish.assert_called_once()
 
   @patch('microservice.structuredLogger.SERVICE_REGISTRY')
   @patch('microservice.structuredLogger.DbGrpcRequest')
@@ -79,20 +69,10 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Perform test.
     self.logger.sendLogGrpcResponse(grpcResponse = response)
     # Assert result.
-    dbHttpRequest.objects.addChildDuration.assert_called_once()
+    dbHttpRequest.objects.get.return_value.addChildDuration.assert_called_once()
     dbGrpcRequest.objects.logResponse.assert_called_once_with(grpcResponse = response)
     dbGrpcRequest.objects.logResponse.return_value.save.assert_called_once_with()
     dbQuery.objects.logQueries.assert_called_once()
-
-  @patch('microservice.structuredLogger.DbError')
-  def testSendLogError(self, dbError: MagicMock) -> None :
-    """Test sending a log error."""
-    # Prepare data.
-    error = MagicMock()
-    # Perform test.
-    self.logger.sendLogError(error = error)
-    # Assert result.
-    dbError.return_value.khaleesiSave.assert_called_once_with(grpc = error)
 
   @patch('microservice.structuredLogger.DbEvent')
   def testSendLogEvent(self, dbEvent: MagicMock) -> None :
@@ -100,6 +80,16 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Prepare data.
     event = MagicMock()
     # Perform test.
-    self.logger.sendLogEvent(event = event)
+    self.logger.sendLogEvent(grpc = event)
     # Assert result.
-    dbEvent.return_value.khaleesiSave.assert_called_once_with(grpc = event)
+    dbEvent.return_value.khaleesiSave.assert_called_once()
+
+  @patch('microservice.structuredLogger.DbError')
+  def testSendLogError(self, dbError: MagicMock) -> None :
+    """Test sending a log error."""
+    # Prepare data.
+    error = MagicMock()
+    # Perform test.
+    self.logger.sendLogError(grpc = error)
+    # Assert result.
+    dbError.return_value.khaleesiSave.assert_called_once()

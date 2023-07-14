@@ -15,10 +15,47 @@ message LogRequestMetadata {
   string                    errors          = 2;
 }
 
+message Response {
+  string                    status    = 1;
+  google.protobuf.Timestamp timestamp = 2;
+}
+
+message ResponseRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  Response                      response        = 2;
+  repeated Query                queries         = 3;
+}
+
 
 message ResponseMetadata {
   google.protobuf.Timestamp loggedTimestamp = 1;
   string                    errors          = 2;
+}
+
+message ProcessedResponse {
+  google.protobuf.Duration reportedDuration = 1;
+  google.protobuf.Duration loggedDuration   = 2;
+  google.protobuf.Duration childDurationAbsolute = 10;
+  double                   childDurationRelative = 11;
+}
+
+
+message HttpRequest {
+  // khaleesi.ninja.
+  string language = 1;
+  string deviceId = 2;
+
+  // HTTP.
+  string languageHeader = 10;
+  string ip             = 11;
+  string useragent      = 12;
+
+  // Computed.
+  string geolocation    = 20;
+  string browser        = 21;
+  string renderingAgent = 22;
+  string os             = 23;
+  string deviceType     = 24;
 }
 
 
@@ -65,21 +102,6 @@ message Event {
   Action action = 2;
 }
 
-
-message HttpRequest {
-  // Metadata.
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-
-  // khaleesi.ninja.
-  string language = 10;
-  string deviceId = 11;
-
-  // HTTP.
-  string languageHeader = 20;
-  string ip             = 21;
-  string useragent      = 22;
-}
-
 message GrpcRequest {
   khaleesi.core.RequestMetadata   requestMetadata = 1;
   khaleesi.core.GrpcCallerDetails upstreamRequest = 2;
@@ -106,17 +128,6 @@ message Error {
   string stacktrace      = 9;
 }
 
-
-message Response {
-  string                    status    = 1;
-  google.protobuf.Timestamp timestamp = 2;
-}
-
-message HttpResponseRequest {
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-  Response                      response         = 2;
-}
-
 message GrpcResponseRequest {
   khaleesi.core.RequestMetadata requestMetadata = 1;
   Response                      response        = 2;
@@ -127,6 +138,19 @@ message GrpcResponseRequest {
 /* LUMBERJACK *************************************************************************************/
 
 message LogStandardResponse {}
+
+message HttpRequestRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  khaleesi.core.ObjectMetadata  objectMetadata  = 2;
+  LogRequestMetadata            logMetadata     = 3;
+
+  khaleesi.core.RequestMetadata responseMetadata    = 4;
+  LogRequestMetadata            responseLogMetadata = 5;
+  ProcessedResponse             processedResponse   = 6;
+
+  HttpRequest request  = 10;
+  Response    response = 11;
+}
 
 message EventRequest {
   khaleesi.core.RequestMetadata requestMetadata = 1;
@@ -145,21 +169,28 @@ message ErrorRequest {
 }
 
 service Lumberjack {
+  rpc LogHttpRequest         (HttpRequestRequest)  returns (khaleesi.core.ObjectMetadata);
+  rpc LogHttpRequestResponse (ResponseRequest)     returns (LogStandardResponse);
   rpc LogEvent               (EventRequest)        returns (khaleesi.core.ObjectMetadata);
+  rpc LogError               (ErrorRequest)        returns (khaleesi.core.ObjectMetadata);
   rpc LogGrpcRequest         (GrpcRequest)         returns (LogStandardResponse);
   rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
-  rpc LogError               (ErrorRequest)        returns (LogStandardResponse);
-  rpc LogHttpRequest         (HttpRequest)         returns (LogStandardResponse);
-  rpc LogHttpRequestResponse (HttpResponseRequest) returns (LogStandardResponse);
-  rpc LogSystemHttpRequest   (khaleesi.core.EmptyRequest) returns (LogStandardResponse);
 }
 
 
 /* SAWYER *****************************************************************************************/
 
 
+message HttpRequestList {
+  repeated HttpRequestRequest requests = 1;
+}
+
 message EventsList {
   repeated EventRequest events = 1;
+}
+
+message ErrorList {
+  repeated ErrorRequest errors = 1;
 }
 
 message QueryResponse {
@@ -179,42 +210,6 @@ message QueryList{
 }
 
 
-message ProcessedResponse {
-  google.protobuf.Duration reportedDuration = 1;
-  google.protobuf.Duration loggedDuration   = 2;
-  google.protobuf.Duration childDurationAbsolute = 10;
-  double                   childDurationRelative = 11;
-}
-
-
-message HttpRequestResponse {
-  ResponseMetadata requestMetadata  = 1;
-  HttpRequest      request          = 2;
-  ResponseMetadata responseMetadata = 3;
-  Response         response         = 4;
-
-  enum RequestType {
-    UNKNOWN = 0;
-    USER    = 1;
-    SYSTEM  = 2;
-  }
-
-  // Processed data.
-  RequestType       type              = 10;
-  ProcessedResponse processedResponse = 11;
-
-  string geolocation    = 20;
-  string browser        = 21;
-  string renderingAgent = 22;
-  string os             = 23;
-  string deviceType     = 24;
-}
-
-message HttpRequestList {
-  repeated HttpRequestResponse requests = 1;
-}
-
-
 message GrpcRequestResponse {
   ResponseMetadata  requestMetadata   = 1;
   GrpcRequest       request           = 2;
@@ -225,10 +220,6 @@ message GrpcRequestResponse {
 
 message GrpcRequestList {
   repeated GrpcRequestResponse requests = 1;
-}
-
-message ErrorList {
-  repeated ErrorRequest errors = 1;
 }
 
 

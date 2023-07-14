@@ -13,6 +13,9 @@ from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import LogRequestMetadata
 
 
+MIN_TIMESTAMP = datetime.min.replace(tzinfo = timezone.utc)
+
+
 class MetadataMixin(models.Model):
   """Common metadata."""
 
@@ -27,9 +30,7 @@ class MetadataMixin(models.Model):
   metaUserType = models.TextField(default = 'UNKNOWN')
 
   # Misc.
-  metaReportedTimestamp  = models.DateTimeField(
-    default = datetime.min.replace(tzinfo = timezone.utc),
-  )
+  metaReportedTimestamp  = models.DateTimeField(default = MIN_TIMESTAMP)
   metaLoggedTimestamp = models.DateTimeField(auto_now_add = True)
   metaLoggingErrors   = models.TextField(blank = True)
 
@@ -92,8 +93,10 @@ class MetadataMixin(models.Model):
     requestMetadata.user.type = User.UserType.Value(self.metaUserType)
 
     # Misc.
-    requestMetadata.timestamp.FromDatetime(self.metaReportedTimestamp)
-    logMetadata.loggedTimestamp.FromDatetime(self.metaLoggedTimestamp)
+    if self.metaReportedTimestamp:
+      requestMetadata.timestamp.FromDatetime(self.metaReportedTimestamp)
+    if self.metaLoggedTimestamp:
+      logMetadata.loggedTimestamp.FromDatetime(self.metaLoggedTimestamp)
     logMetadata.errors = self.metaLoggingErrors
 
 

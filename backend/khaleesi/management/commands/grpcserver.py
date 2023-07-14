@@ -45,7 +45,7 @@ class Command(BaseCommand, DjangoMigrateCommand):
           khaleesiSettings['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['MIGRATION']
         DjangoMigrateCommand.handle(self, *args, **optionsCopy)
 
-      SINGLETON.structuredLogger.logSystemHttpRequest(
+      SINGLETON.structuredLogger.logHttpRequest(
         httpRequestId = self.serverStartHttpRequestId,
         grpcMethod    = 'LIFECYCLE',
       )
@@ -54,7 +54,7 @@ class Command(BaseCommand, DjangoMigrateCommand):
       self._logSystemRequest(**options, method = self._initialize, grpcMethod = 'INITIALIZE')
       self._logSystemRequest(**options, method = self._start     , grpcMethod = 'LIFECYCLE')
 
-      SINGLETON.structuredLogger.logSystemHttpResponse(
+      SINGLETON.structuredLogger.logHttpResponse(
         httpRequestId = self.serverStartHttpRequestId,
         grpcMethod    = 'LIFECYCLE',
         status        = StatusCode.OK,
@@ -62,14 +62,14 @@ class Command(BaseCommand, DjangoMigrateCommand):
 
       self.server.waitForTermination()
     except KhaleesiException as exception:
-      SINGLETON.structuredLogger.logSystemHttpResponse(
+      SINGLETON.structuredLogger.logHttpResponse(
         httpRequestId = self.serverStartHttpRequestId,
         grpcMethod    = 'LIFECYCLE',
         status        = exception.status,
       )
       raise
     except Exception:
-      SINGLETON.structuredLogger.logSystemHttpResponse(
+      SINGLETON.structuredLogger.logHttpResponse(
         httpRequestId = self.serverStartHttpRequestId,
         grpcMethod    = 'LIFECYCLE',
         status        = StatusCode.INTERNAL,

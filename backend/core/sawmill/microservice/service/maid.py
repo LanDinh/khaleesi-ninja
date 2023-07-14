@@ -27,6 +27,18 @@ from microservice.models.cleanupJob import CleanupJob
 class Service(Servicer):
   """Maid service."""
 
+  def CleanupHttpRequests(
+      self,
+      request: JobExecutionRequest,
+      _      : grpc.ServicerContext,
+  ) -> EmptyResponse :
+    """Clean up old data."""
+    LOGGER.info(
+      'Cleaning up HTTP requests older than '
+      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
+    )
+    return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = request))
+
   def CleanupEvents(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
@@ -34,17 +46,6 @@ class Service(Servicer):
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbEvent, request = request))
-
-  def CleanupGrpcRequests(
-      self,
-      request: JobExecutionRequest, _: grpc.ServicerContext,
-  ) -> EmptyResponse :
-    """Clean up old data."""
-    LOGGER.info(
-      'Cleaning up requests older than '
-      f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
-    )
-    return jobExecutor(job = OldCleanupJob(model = DbGrpcRequest, request = request))
 
   def CleanupErrors(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""
@@ -54,17 +55,17 @@ class Service(Servicer):
     )
     return jobExecutor(job = CleanupJob(model = DbError, request = request))
 
-  def CleanupHttpRequests(
+  def CleanupGrpcRequests(
       self,
       request: JobExecutionRequest,
-      _: grpc.ServicerContext,
+      _      : grpc.ServicerContext,
   ) -> EmptyResponse :
     """Clean up old data."""
     LOGGER.info(
-      'Cleaning up HTTP requests older than '
+      'Cleaning up requests older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = OldCleanupJob(model = DbHttpRequest, request = request))
+    return jobExecutor(job = OldCleanupJob(model = DbGrpcRequest, request = request))
 
   def CleanupQueries(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Clean up old data."""

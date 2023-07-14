@@ -15,7 +15,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequestResponse as GrpcGrpcRequestResponse,
 )
 from microservice.testUtil import ModelResponseMetadataMixin
-from tests.models import ResponseMetadata
+from tests.models import OldResponseMetadata
 
 
 class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
@@ -24,7 +24,7 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
   def testInitialValues(self) -> None :
     """Test initial values."""
     # Execute result.
-    response = ResponseMetadata()
+    response = OldResponseMetadata()
     # Assert result.
     self.assertTrue(response.isInProgress)
     self.assertEqual('IN_PROGRESS', response.metaResponseStatus)
@@ -37,7 +37,7 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
     """Test child duration."""
     # Prepare data.
     now = datetime.now().replace(tzinfo = timezone.utc)
-    response = ResponseMetadata()
+    response = OldResponseMetadata()
     response.metaLoggedTimestamp         = now
     response.metaResponseLoggedTimestamp = now + timedelta(minutes = 10)
     response.metaChildDuration           = timedelta(minutes = 1)
@@ -53,7 +53,7 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
     for status in StatusCode:
       with self.subTest(status = status.name):
         # Prepare data.
-        request = self.getModelForResponseSaving(modelType = ResponseMetadata)
+        request = self.getModelForResponseSaving(modelType = OldResponseMetadata)
         timestamp.return_value = request.metaResponseLoggedTimestamp
         response = GrpcResponse()
         response.status = status.name
@@ -74,7 +74,7 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
   def testLogEmptyResponse(self, timestamp: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
-    request = self.getModelForResponseSaving(modelType = ResponseMetadata)
+    request = self.getModelForResponseSaving(modelType = OldResponseMetadata)
     timestamp.return_value = datetime.min.replace(tzinfo = timezone.utc)
     response = GrpcResponse()
     # Execute test.
@@ -91,7 +91,7 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
       for status in StatusCode:
         with self.subTest(user = userLabel, status = status.name):
           # Prepare data.
-          request = ResponseMetadata(
+          request = OldResponseMetadata(
             **self.modelFullRequestMetadata(user = userType, status = status),
           )
           result = GrpcGrpcRequestResponse()
@@ -113,7 +113,7 @@ class ResponseMetadataTestCase(ModelResponseMetadataMixin, SimpleTestCase):
   def testEmptyToGrpc(self) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
-    request = ResponseMetadata(**self.modelEmptyRequestMetadata())
+    request = OldResponseMetadata(**self.modelEmptyRequestMetadata())
     result  = GrpcGrpcRequestResponse()
     # Execute test.
     request.responseToGrpc(

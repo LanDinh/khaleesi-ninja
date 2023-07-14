@@ -204,7 +204,9 @@ good-names=i,
            k,
            ex,
            Run,
-           _
+           _,
+           ip,
+           os,
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
@@ -483,7 +485,7 @@ ignored-parents=
 max-args=6
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=9
+max-attributes=11
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5

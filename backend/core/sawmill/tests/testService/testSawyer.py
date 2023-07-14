@@ -10,7 +10,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   EventRequest as GrpcEventRequest,
   GrpcRequestResponse as GrpcGrpcRequestResponse,
   ErrorRequest as GrpcErrorRequest,
-  HttpRequestResponse as GrpcHttpResponse,
+  HttpRequestRequest as GrpcHttpRequest,
   QueryResponse as GrpcQueryResponse,
 )
 from microservice.models import Event as DbEvent, GrpcRequest, Error, HttpRequest, Query
@@ -41,7 +41,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test getting logged HTTP requests."""
     # Prepare data.
     dbRequest = MagicMock()
-    dbRequest.toGrpc.return_value = GrpcHttpResponse()
+    dbRequest.toGrpc.return_value = GrpcHttpRequest()
     dbRequests.return_value       = [ dbRequest ]
     # Execute test.
     result = self.service.GetHttpRequests(LogFilter(), MagicMock())

@@ -19,14 +19,14 @@ from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.state import STATE
 from khaleesi.core.testUtil.exceptions import defaultKhaleesiException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import RequestMetadata, User, EmptyRequest
+from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequest,
   GrpcResponseRequest,
   ErrorRequest,
   Event, EventRequest,
-  HttpRequest,
-  HttpResponseRequest,
+  HttpRequestRequest,
+  ResponseRequest,
   Query,
 )
 
@@ -36,17 +36,13 @@ class StructuredTestLogger(StructuredLogger):
 
   sender = MagicMock()
 
-  def sendLogSystemHttpRequest(self, *, httpRequest: EmptyRequest) -> None :
+  def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = httpRequest)
+    self.sender.send(request = grpc)
 
-  def sendLogHttpRequest(self, *, httpRequest: HttpRequest) -> None :
+  def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = httpRequest)
-
-  def sendLogHttpResponse(self, *, httpResponse: HttpResponseRequest) -> None :
-    """Send the log request to the logging facility."""
-    self.sender.send(response = httpResponse)
+    self.sender.send(response = grpc)
 
   def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
     """Send the log request to the logging facility."""
@@ -56,13 +52,13 @@ class StructuredTestLogger(StructuredLogger):
     """Send the log response to the logging facility."""
     self.sender.send(response = grpcResponse)
 
-  def sendLogError(self, *, error: ErrorRequest) -> None :
-    """Send the log error to the logging facility."""
-    self.sender.send(error = error)
-
-  def sendLogEvent(self, *, event: EventRequest) -> None :
+  def sendLogEvent(self, *, grpc: EventRequest) -> None :
     """Send the log event to the logging facility."""
-    self.sender.send(event = event)
+    self.sender.send(event = grpc)
+
+  def sendLogError(self, *, grpc: ErrorRequest) -> None :
+    """Send the log error to the logging facility."""
+    self.sender.send(error = grpc)
 
 
 @patch('khaleesi.core.logging.structuredLogger.LOGGER')
@@ -70,6 +66,65 @@ class TestStructuredLogger(SimpleTestCase):
   """Test the structured logger."""
 
   logger = StructuredTestLogger()
+
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
+  def testLogHttpRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a request."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    httpRequestId = 'http-request'
+    # Perform test.
+    self.logger.logHttpRequest(httpRequestId = httpRequestId, grpcMethod = 'LIFECYCLE')
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called_once()
+    metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
+  def testLogNotOkSystemHttpResponse(
+      self,
+      metadata: MagicMock,
+      logger  : MagicMock,
+  ) -> None :
+    """Test logging a response."""
+    for status in [s for s in StatusCode if s != StatusCode.OK]:
+      with self.subTest(status = status.name):
+        # Prepare data.
+        self.logger.sender.reset_mock()
+        logger.reset_mock()
+        metadata.reset_mock()
+        # Perform test.
+        self.logger.logHttpResponse(
+          httpRequestId = 'http-request',
+          status        = status,
+          grpcMethod    = 'grpc-method',
+        )
+        # Assert result.
+        self.logger.sender.send.assert_called_once()
+        logger.warning.assert_called_once()
+        logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        self.assertEqual(status.name, logResponse.response.status)
+        metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
+  def testLogOkSystemHttpResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    # Perform test.
+    self.logger.logHttpResponse(
+      httpRequestId = 'http-request',
+      grpcMethod    = 'grpc-method',
+      status        = StatusCode.OK,
+    )
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called_once()
+    logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    self.assertEqual(StatusCode.OK.name, logResponse.response.status)
+    metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
   def testLogGrpcRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
@@ -94,7 +149,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.assertEqual(upstreamRequest.grpcCaller, logGrpcRequest.upstreamRequest)
 
   @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogSystemRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def testLogSystemGrpcRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a system request."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -115,127 +170,7 @@ class TestStructuredLogger(SimpleTestCase):
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogSystemHttpRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a request."""
-    # Prepare data.
-    self.logger.sender.reset_mock()
-    logger.reset_mock()
-    httpRequestId = 'http-request'
-    # Perform test.
-    self.logger.logSystemHttpRequest(
-      httpRequestId = httpRequestId,
-      grpcMethod    = 'LIFECYCLE',
-    )
-    # Assert result.
-    self.logger.sender.send.assert_called_once()
-    logger.info.assert_called_once()
-    metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogHttpRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a request."""
-    # Prepare data.
-    self.logger.sender.reset_mock()
-    logger.reset_mock()
-    # Perform test.
-    self.logger.logHttpRequest()
-    # Assert result.
-    self.logger.sender.send.assert_called_once()
-    logger.info.assert_called_once()
-    metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogNotOkSystemHttpResponse(
-      self,
-      metadata: MagicMock,
-      logger  : MagicMock,
-  ) -> None :
-    """Test logging a response."""
-    for status in [s for s in StatusCode if s != StatusCode.OK]:
-      with self.subTest(status = status.name):
-        # Prepare data.
-        self.logger.sender.reset_mock()
-        logger.reset_mock()
-        metadata.reset_mock()
-        # Perform test.
-        self.logger.logSystemHttpResponse(
-          httpRequestId = 'http-request',
-          status        = status,
-          grpcMethod    = 'grpc-method',
-        )
-        # Assert result.
-        self.logger.sender.send.assert_called_once()
-        logger.warning.assert_called_once()
-        logResponse = cast(
-          HttpResponseRequest,
-          self.logger.sender.send.call_args.kwargs['response'],
-        )
-        self.assertEqual(status.name, logResponse.response.status)
-        metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogOkSystemHttpResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a response."""
-    # Prepare data.
-    self.logger.sender.reset_mock()
-    logger.reset_mock()
-    # Perform test.
-    self.logger.logSystemHttpResponse(
-      httpRequestId = 'http-request',
-      grpcMethod    = 'grpc-method',
-      status        = StatusCode.OK,
-    )
-    # Assert result.
-    self.logger.sender.send.assert_called_once()
-    logger.info.assert_called_once()
-    logResponse = cast(
-      HttpResponseRequest,
-      self.logger.sender.send.call_args.kwargs['response'],
-    )
-    self.assertEqual(StatusCode.OK.name, logResponse.response.status)
-    metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogNotOkHttpResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a response."""
-    for status in [s for s in StatusCode if s != StatusCode.OK]:
-      with self.subTest(status = status.name):
-        # Prepare data.
-        self.logger.sender.reset_mock()
-        logger.reset_mock()
-        metadata.reset_mock()
-        # Perform test.
-        self.logger.logHttpResponse(status = status)
-        # Assert result.
-        self.logger.sender.send.assert_called_once()
-        logger.warning.assert_called_once()
-        logResponse = cast(
-          HttpResponseRequest,
-          self.logger.sender.send.call_args.kwargs['response'],
-        )
-        self.assertEqual(status.name, logResponse.response.status)
-        metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogOkHttpResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a response."""
-    # Prepare data.
-    self.logger.sender.reset_mock()
-    logger.reset_mock()
-    # Perform test.
-    self.logger.logHttpResponse(status = StatusCode.OK)
-    # Assert result.
-    self.logger.sender.send.assert_called_once()
-    logger.info.assert_called_once()
-    logResponse = cast(
-      HttpResponseRequest,
-      self.logger.sender.send.call_args.kwargs['response'],
-    )
-    self.assertEqual(StatusCode.OK.name, logResponse.response.status)
-    metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogNotOkSystemResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def testLogNotOkSystemGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     for status in [s for s in StatusCode if s != StatusCode.OK]:
       with self.subTest(status = status.name):
@@ -263,7 +198,7 @@ class TestStructuredLogger(SimpleTestCase):
         metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogOkSystemResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def testLogOkSystemGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -297,7 +232,7 @@ class TestStructuredLogger(SimpleTestCase):
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogNotOkResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def testLogNotOkGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     for status in [s for s in StatusCode if s != StatusCode.OK]:
       with self.subTest(status = status.name):
@@ -320,7 +255,7 @@ class TestStructuredLogger(SimpleTestCase):
         metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogOkResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+  def testLogOkGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
     # Prepare data.
     self.logger.sender.reset_mock()
@@ -347,6 +282,98 @@ class TestStructuredLogger(SimpleTestCase):
       self.assertEqual('connection', query.connection)
       self.assertEqual('raw'       , query.raw)
     metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
+  def testLogEvent(self, requestMetadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging an event."""
+    details    = 'details'
+    target     = 'target'
+    targetType = 'target-type'
+    action     = 'action'
+    for actionLabel, actionType in Event.Action.ActionType.items():
+      for resultLabel, resultType in Event.Action.ResultType.items():
+        for userLabel, userType in User.UserType.items():
+          with self.subTest(action = actionLabel, result = resultLabel, user = userLabel):
+            # Prepare data.
+            requestMetadata.reset_mock()
+            self.logger.sender.reset_mock()
+            logger.reset_mock()
+            event = Event()
+            event.target.id         = target
+            event.target.type       = targetType
+            event.target.owner.type = userType
+            event.target.owner.id   = 'user'
+            event.action.crudType   = actionType
+            event.action.customType = action
+            event.action.result     = resultType
+            event.action.details    = details
+            # Perform test.
+            self.logger.logEvent(event = event)
+            # Assert result.
+            requestMetadata.assert_called_once()
+            self.logger.sender.send.assert_called_once()
+            self.assertEqual(
+              1,
+              logger.info.call_count + logger.warning.call_count + logger.error.call_count
+              + logger.fatal.call_count,
+            )
+            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
+            self.assertEqual(target                 , logEvent.event.target.id)
+            self.assertEqual(targetType             , logEvent.event.target.type)
+            self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
+            self.assertEqual(event.target.owner.type, logEvent.event.target.owner.type)
+            self.assertEqual(action                 , logEvent.event.action.customType)
+            self.assertEqual(actionType             , logEvent.event.action.crudType)
+            self.assertEqual(resultType             , logEvent.event.action.result)
+            self.assertEqual(details                , logEvent.event.action.details)
+
+  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
+  def testLogSystemEvent(self, requestMetadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a system event."""
+    method        = 'LIFECYCLE'
+    details       = 'details'
+    httpRequestId = 'http-request'
+    grpcRequestId = 'grpc-request'
+    target        = 'target'
+    for actionLabel, actionType in Event.Action.ActionType.items():
+      for resultLabel, resultType in Event.Action.ResultType.items():
+        for userLabel, userType in User.UserType.items():
+          with self.subTest(action = actionLabel, result = resultLabel, user = userLabel):
+            # Prepare data.
+            requestMetadata.reset_mock()
+            self.logger.sender.reset_mock()
+            logger.reset_mock()
+            event = Event()
+            event.target.id         = target
+            event.target.owner.type = userType
+            event.target.owner.id   = 'user'
+            event.action.crudType   = actionType
+            event.action.result     = resultType
+            event.action.details    = details
+            # Perform test.
+            self.logger.logSystemEvent(
+              grpcMethod    = method,
+              httpRequestId = httpRequestId,
+              grpcRequestId = grpcRequestId,
+              event         = event,
+            )
+            # Assert result.
+            requestMetadata.assert_called_once()
+            self.logger.sender.send.assert_called_once()
+            self.assertEqual(
+              1,
+              logger.info.call_count + logger.warning.call_count + logger.error.call_count
+              + logger.fatal.call_count,
+            )
+            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
+            self.assertIsNotNone(logEvent.event.target.type)
+            self.assertEqual(target                 , logEvent.event.target.id)
+            self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
+            self.assertEqual(event.target.owner.type, logEvent.event.target.owner.type)
+            self.assertEqual(''                     , logEvent.event.action.customType)
+            self.assertEqual(actionType             , logEvent.event.action.crudType)
+            self.assertEqual(resultType             , logEvent.event.action.result)
+            self.assertEqual(details                , logEvent.event.action.details)
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
   def testLogError(self, metadata: MagicMock, logger: MagicMock) -> None :
@@ -400,98 +427,6 @@ class TestStructuredLogger(SimpleTestCase):
           self._assertError(exception = exception, logError = logError)
           metadata.assert_called_once()
 
-  @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
-  def testLogSystemEvent(self, requestMetadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a system event."""
-    method        = 'LIFECYCLE'
-    details       = 'details'
-    httpRequestId = 'http-request'
-    grpcRequestId = 'grpc-request'
-    target        = 'target'
-    for actionLabel, actionType in Event.Action.ActionType.items():
-      for resultLabel, resultType in Event.Action.ResultType.items():
-        for userLabel, userType in User.UserType.items():
-          with self.subTest(action = actionLabel, result = resultLabel, user = userLabel):
-            # Prepare data.
-            requestMetadata.reset_mock()
-            self.logger.sender.reset_mock()
-            logger.reset_mock()
-            event = Event()
-            event.target.id         = target
-            event.target.owner.type = userType
-            event.target.owner.id   = 'user'
-            event.action.crudType   = actionType
-            event.action.result     = resultType
-            event.action.details    = details
-            # Perform test.
-            self.logger.logSystemEvent(
-              grpcMethod    = method,
-              httpRequestId = httpRequestId,
-              grpcRequestId = grpcRequestId,
-              event         = event,
-            )
-            # Assert result.
-            requestMetadata.assert_called_once()
-            self.logger.sender.send.assert_called_once()
-            self.assertEqual(
-              1,
-              logger.info.call_count + logger.warning.call_count + logger.error.call_count
-              + logger.fatal.call_count,
-            )
-            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
-            self.assertIsNotNone(logEvent.event.target.type)
-            self.assertEqual(target                 , logEvent.event.target.id)
-            self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
-            self.assertEqual(event.target.owner.type, logEvent.event.target.owner.type)
-            self.assertEqual(''                     , logEvent.event.action.customType)
-            self.assertEqual(actionType             , logEvent.event.action.crudType)
-            self.assertEqual(resultType             , logEvent.event.action.result)
-            self.assertEqual(details                , logEvent.event.action.details)
-
-  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogEvent(self, requestMetadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging an event."""
-    details    = 'details'
-    target     = 'target'
-    targetType = 'target-type'
-    action     = 'action'
-    for actionLabel, actionType in Event.Action.ActionType.items():
-      for resultLabel, resultType in Event.Action.ResultType.items():
-        for userLabel, userType in User.UserType.items():
-          with self.subTest(action = actionLabel, result = resultLabel, user = userLabel):
-            # Prepare data.
-            requestMetadata.reset_mock()
-            self.logger.sender.reset_mock()
-            logger.reset_mock()
-            event = Event()
-            event.target.id         = target
-            event.target.type       = targetType
-            event.target.owner.type = userType
-            event.target.owner.id   = 'user'
-            event.action.crudType   = actionType
-            event.action.customType = action
-            event.action.result     = resultType
-            event.action.details    = details
-            # Perform test.
-            self.logger.logEvent(event = event)
-            # Assert result.
-            requestMetadata.assert_called_once()
-            self.logger.sender.send.assert_called_once()
-            self.assertEqual(
-              1,
-              logger.info.call_count + logger.warning.call_count + logger.error.call_count
-              + logger.fatal.call_count,
-            )
-            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
-            self.assertEqual(target                 , logEvent.event.target.id)
-            self.assertEqual(targetType             , logEvent.event.target.type)
-            self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
-            self.assertEqual(event.target.owner.type, logEvent.event.target.owner.type)
-            self.assertEqual(action                 , logEvent.event.action.customType)
-            self.assertEqual(actionType             , logEvent.event.action.crudType)
-            self.assertEqual(resultType             , logEvent.event.action.result)
-            self.assertEqual(details                , logEvent.event.action.details)
-
   def _assertError(self, exception: KhaleesiException, logError: ErrorRequest) -> None :
     self.assertEqual(exception.gate          , logError.error.gate)
     self.assertEqual(exception.service       , logError.error.service)
@@ -507,21 +442,12 @@ class TestStructuredGrpcLogger(SimpleTestCase):
 
   logger = StructuredGrpcLogger()
 
-  def testSendLogSystemHttpRequest(self) -> None :
-    """Test sending a log request."""
-    # Prepare data.
-    self.logger.stub.LogSystemHttpRequest = MagicMock()
-    # Perform test.
-    self.logger.sendLogSystemHttpRequest(httpRequest = MagicMock())
-    # Assert result.
-    self.logger.stub.LogSystemHttpRequest.assert_called_once()
-
   def testSendLogHttpRequest(self) -> None :
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogHttpRequest = MagicMock()
     # Perform test.
-    self.logger.sendLogHttpRequest(httpRequest = MagicMock())
+    self.logger.sendLogHttpRequest(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogHttpRequest.assert_called_once()
 
@@ -530,7 +456,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     # Prepare data.
     self.logger.stub.LogHttpRequestResponse = MagicMock()
     # Perform test.
-    self.logger.sendLogHttpResponse(httpResponse = MagicMock())
+    self.logger.sendLogHttpResponse(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogHttpRequestResponse.assert_called_once()
 
@@ -552,23 +478,23 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     # Assert result.
     self.logger.stub.LogGrpcResponse.assert_called_once()
 
-  def testSendLogError(self) -> None :
-    """Test sending a log request."""
-    # Prepare data.
-    self.logger.stub.LogError = MagicMock()
-    # Perform test.
-    self.logger.sendLogError(error = MagicMock())
-    # Assert result.
-    self.logger.stub.LogError.assert_called_once()
-
   def testSendLogEvent(self) -> None :
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogEvent = MagicMock()
     # Perform test.
-    self.logger.sendLogEvent(event = MagicMock())
+    self.logger.sendLogEvent(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogEvent.assert_called_once()
+
+  def testSendLogError(self) -> None :
+    """Test sending a log request."""
+    # Prepare data.
+    self.logger.stub.LogError = MagicMock()
+    # Perform test.
+    self.logger.sendLogError(grpc = MagicMock())
+    # Assert result.
+    self.logger.stub.LogError.assert_called_once()
 
 
 class StructuredLoggerInstantiationTest(SimpleTestCase):

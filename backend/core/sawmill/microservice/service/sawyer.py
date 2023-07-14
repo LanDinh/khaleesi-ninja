@@ -31,6 +31,14 @@ from microservice.models import (
 class Service(Servicer):
   """Sawyer service."""
 
+  def GetHttpRequests(self, request: LogFilter, _: grpc.ServicerContext) -> HttpRequestList:
+    """Get logged requests."""
+    result = HttpRequestList()
+    LOGGER.info('Getting all HTTP requests.')
+    for dbHttpRequest in DbHttpRequest.objects.filter():
+      result.requests.append(dbHttpRequest.toGrpc())
+    return result
+
   def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
     result = EventsList()
@@ -39,12 +47,12 @@ class Service(Servicer):
       result.events.append(event.toGrpc())
     return result
 
-  def GetHttpRequests(self, request: LogFilter, _: grpc.ServicerContext) -> HttpRequestList:
-    """Get logged requests."""
-    result = HttpRequestList()
-    LOGGER.info('Getting all HTTP requests.')
-    for dbHttpRequest in DbHttpRequest.objects.filter():
-      result.requests.append(dbHttpRequest.toGrpc())
+  def GetErrors(self, request: LogFilter, _: grpc.ServicerContext) -> ErrorList :
+    """Get logged errors."""
+    result = ErrorList()
+    LOGGER.info('Getting all errors.')
+    for dbError in DbError.objects.filter():
+      result.errors.append(dbError.toGrpc())
     return result
 
   def GetGrpcRequests(self, request: LogFilter, _: grpc.ServicerContext) -> GrpcRequestList :
@@ -61,14 +69,6 @@ class Service(Servicer):
     LOGGER.info('Getting all queries.')
     for dbQuery in DbQuery.objects.filter():
       result.queries.append(dbQuery.toGrpc())
-    return result
-
-  def GetErrors(self, request: LogFilter, _: grpc.ServicerContext) -> ErrorList :
-    """Get logged errors."""
-    result = ErrorList()
-    LOGGER.info('Getting all errors.')
-    for dbError in DbError.objects.filter():
-      result.errors.append(dbError.toGrpc())
     return result
 
 

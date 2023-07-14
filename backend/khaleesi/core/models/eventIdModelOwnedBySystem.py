@@ -88,7 +88,7 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
 
   def toGrpc(self, *, metadata: ObjectMetadata = ObjectMetadata(), grpc: Grpc) -> Grpc :
     """Return a grpc object containing own values."""
-    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
+    super().toGrpc(metadata = metadata, grpc = grpc)
     metadata.created.FromDatetime(self.khaleesiCreated)
     metadata.createdBy.id   = self.khaleesiCreatedById
     metadata.createdBy.type = User.UserType.Value(self.khaleesiCreatedByType)

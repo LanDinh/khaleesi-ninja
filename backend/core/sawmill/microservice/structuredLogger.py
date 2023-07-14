@@ -2,14 +2,13 @@
 
 # khaleesi.ninja.
 from khaleesi.core.logging.structuredLogger import StructuredLogger
-from khaleesi.proto.core_pb2 import EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
+  HttpRequestRequest,
   GrpcRequest,
   GrpcResponseRequest,
   ErrorRequest,
   EventRequest,
-  HttpRequest,
-  HttpResponseRequest,
+  ResponseRequest,
 )
 from microservice.models.serviceRegistry import SERVICE_REGISTRY
 from microservice.models import (
@@ -24,17 +23,17 @@ from microservice.models import (
 class StructuredDbLogger(StructuredLogger):
   """Structured logger using gRPC."""
 
-  def sendLogSystemHttpRequest(self, *, httpRequest: EmptyRequest) -> None:
+  def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> None:
     """Send the log request to the logging facility."""
-    DbHttpRequest.objects.logSystemRequest(grpcRequest = httpRequest)
+    dbRequest = DbHttpRequest()
+    dbRequest.khaleesiSave(grpc = grpc)
 
-  def sendLogHttpRequest(self, *, httpRequest: HttpRequest) -> None:
-    """Send the log request to the logging facility."""
-    DbHttpRequest.objects.logRequest(grpcRequest = httpRequest)
-
-  def sendLogHttpResponse(self, *, httpResponse: HttpResponseRequest) -> None :
+  def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
-    DbHttpRequest.objects.logResponse(grpcResponse = httpResponse)
+    dbRequest = DbHttpRequest.objects.get(
+      metaCallerHttpRequestId = grpc.requestMetadata.httpCaller.requestId,
+    )
+    dbRequest.finish(request = grpc)
 
   def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
     """Send the log request to the logging facility."""
@@ -49,7 +48,10 @@ class StructuredDbLogger(StructuredLogger):
     result = DbGrpcRequest.objects.logResponse(grpcResponse = grpcResponse)
     # noinspection PyBroadException
     try:
-      DbHttpRequest.objects.addChildDuration(request = result)
+      dbHttpRequest = DbHttpRequest.objects.get(
+        metaCallerHttpRequestId = grpcResponse.requestMetadata.httpCaller.requestId,
+      )
+      dbHttpRequest.addChildDuration(request = result)
     except Exception:  # pylint: disable=broad-except  # pragma: no cover
       # TODO(45) - remove this hack
       pass
@@ -62,12 +64,12 @@ class StructuredDbLogger(StructuredLogger):
       result.metaChildDuration += query.reportedDuration
     result.save()
 
-  def sendLogError(self, *, error: ErrorRequest) -> None :
-    """Send the log error to the logging facility."""
-    dbError = DbError()
-    dbError.khaleesiSave(grpc = error)
-
-  def sendLogEvent(self, *, event: EventRequest) -> None :
+  def sendLogEvent(self, *, grpc: EventRequest) -> None :
     """Send the log event to the logging facility."""
     dbEvent = DbEvent()
-    dbEvent.khaleesiSave(grpc = event)
+    dbEvent.khaleesiSave(grpc = grpc)
+
+  def sendLogError(self, *, grpc: ErrorRequest) -> None :
+    """Send the log error to the logging facility."""
+    dbError = DbError()
+    dbError.khaleesiSave(grpc = grpc)

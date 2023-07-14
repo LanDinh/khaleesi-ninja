@@ -68,8 +68,8 @@ class GrpcServerTestCase(SimpleTestCase):
     # Execute test.
     self.command.khaleesiHandle()
     # Assert result.
-    singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
-    singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+    singleton.structuredLogger.logHttpRequest.assert_called_once()
+    singleton.structuredLogger.logHttpResponse.assert_called_once()
     self.assertEqual(3, singleton.structuredLogger.logSystemGrpcRequest.call_count)
     self.assertEqual(3, singleton.structuredLogger.logSystemGrpcResponse.call_count)
     self.assertEqual(migrationCalls, migrate.handle.call_count)
@@ -104,8 +104,8 @@ class GrpcServerTestCase(SimpleTestCase):
             # Execute test.
             self.command.khaleesiHandle()
             # Assert result.
-            singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
-            singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+            singleton.structuredLogger.logHttpRequest.assert_called_once()
+            singleton.structuredLogger.logHttpResponse.assert_called_once()
             self.assertEqual(3, singleton.structuredLogger.logSystemGrpcRequest.call_count)
             self.assertEqual(3, singleton.structuredLogger.logSystemGrpcResponse.call_count)
             self.assertEqual(migrationCalls, migrate.handle.call_count)
@@ -136,8 +136,8 @@ class GrpcServerTestCase(SimpleTestCase):
       # Execute test.
       self.command.khaleesiHandle()
       # Assert result.
-      singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
-      singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+      singleton.structuredLogger.logHttpRequest.assert_called_once()
+      singleton.structuredLogger.logHttpResponse.assert_called_once()
       self.assertEqual(3, singleton.structuredLogger.logSystemGrpcRequest.call_count)
       self.assertEqual(3, singleton.structuredLogger.logSystemGrpcResponse.call_count)
       self.assertEqual(migrationCalls, migrate.handle.call_count)
@@ -165,8 +165,8 @@ class GrpcServerTestCase(SimpleTestCase):
       # Execute test.
       self.command.khaleesiHandle()
       # Assert result.
-      singleton.structuredLogger.logSystemHttpRequest.assert_called_once()
-      singleton.structuredLogger.logSystemHttpResponse.assert_called_once()
+      singleton.structuredLogger.logHttpRequest.assert_called_once()
+      singleton.structuredLogger.logHttpResponse.assert_called_once()
       self.assertEqual(3, singleton.structuredLogger.logSystemGrpcRequest.call_count)
       self.assertEqual(3, singleton.structuredLogger.logSystemGrpcResponse.call_count)
       self.assertEqual(migrationCalls, migrate.handle.call_count)

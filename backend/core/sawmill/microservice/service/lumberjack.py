@@ -10,7 +10,6 @@ import grpc
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import EmptyRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
   LogStandardResponse,
@@ -18,8 +17,8 @@ from khaleesi.proto.core_sawmill_pb2 import (
   EventRequest,
   GrpcResponseRequest,
   GrpcRequest,
-  HttpRequest,
-  HttpResponseRequest,
+  HttpRequestRequest,
+  ResponseRequest,
 )
 from khaleesi.proto.core_sawmill_pb2_grpc import (
     LumberjackServicer as Servicer,
@@ -34,11 +33,44 @@ from microservice.models import (
 )
 from microservice.models.logs.abstract import Metadata
 from microservice.models.logs.metadataMixin import MetadataMixin
+from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
 from microservice.models.serviceRegistry import SERVICE_REGISTRY
 
 
 class Service(Servicer):
   """Lumberjack service."""
+
+  def LogHttpRequest(
+      self,
+      request: HttpRequestRequest,
+      _      : grpc.ServicerContext,
+  ) -> LogStandardResponse :
+    """Log HTTP request."""
+    def method() -> MetadataMixin :
+      LOGGER.info(
+        f'Saving the HTTP request "{request.requestMetadata.httpCaller.requestId}" '
+        'to the database.',
+      )
+      dbHttpRequest = DbHttpRequest()
+      dbHttpRequest.khaleesiSave(grpc = request)
+      return dbHttpRequest
+    return self._handleLogging(method = method)
+
+  def LogHttpRequestResponse(
+      self,
+      request: ResponseRequest,
+      _      : grpc.ServicerContext,
+  ) -> LogStandardResponse :
+    """Log HTTP request responses."""
+    requestId = request.requestMetadata.httpCaller.requestId
+    def method() -> ResponseMetadataMixin :
+      LOGGER.info(
+        f'Saving the response to the HTTP request "{requestId}" to the database.',
+      )
+      dbHttpRequest = DbHttpRequest.objects.get(metaCallerHttpRequestId = requestId)
+      dbHttpRequest.finish(request = request)
+      return dbHttpRequest
+    return self._handleResponse(method = method)
 
   def LogEvent(self, request: EventRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log events."""
@@ -52,45 +84,19 @@ class Service(Servicer):
       dbEvent = DbEvent()
       dbEvent.khaleesiSave(grpc = request)
       return dbEvent
-    return self._handleResponse(method = method)
+    return self._handleLogging(method = method)
 
-  def LogHttpRequest(self, request: HttpRequest, _: grpc.ServicerContext) -> LogStandardResponse :
-    """Log HTTP request."""
-    def method() -> Metadata :
+  def LogError(self, request: ErrorRequest, _: grpc.ServicerContext) -> LogStandardResponse :
+    """Log errors."""
+    def method() -> MetadataMixin :
       LOGGER.info(
-        f'Saving the HTTP request "{request.requestMetadata.httpCaller.requestId}" '
+        f'Saving an error to the request "{request.requestMetadata.grpcCaller.requestId}" '
         'to the database.',
       )
-      return DbHttpRequest.objects.logRequest(grpcRequest = request)
-    return self._handleResponseOld(method = method)
-
-  def LogSystemHttpRequest(
-      self,
-      request: EmptyRequest,
-      _      : grpc.ServicerContext,
-  ) -> LogStandardResponse :
-    """Log HTTP request."""
-    def method() -> Metadata :
-      LOGGER.info(
-        'Saving the system HTTP request '
-        f'"{request.requestMetadata.httpCaller.requestId}" to the database.',
-      )
-      return DbHttpRequest.objects.logSystemRequest(grpcRequest = request)
-    return self._handleResponseOld(method = method)
-
-  def LogHttpRequestResponse(
-      self,
-      request: HttpResponseRequest,
-      _      : grpc.ServicerContext,
-  ) -> LogStandardResponse :
-    """Log HTTP request responses."""
-    def method() -> Metadata :
-      LOGGER.info(
-        'Saving the response to the HTTP request '
-        f'"{request.requestMetadata.httpCaller.requestId}" to the database.',
-      )
-      return DbHttpRequest.objects.logResponse(grpcResponse = request)
-    return self._handleResponseOld(method = method)
+      dbError = DbError()
+      dbError.khaleesiSave(grpc = request)
+      return dbError
+    return self._handleLogging(method = method)
 
   def LogGrpcRequest(self, request: GrpcRequest, _: grpc.ServicerContext) -> LogStandardResponse :
     """Log requests."""
@@ -120,7 +126,10 @@ class Service(Servicer):
       )
       result = DbGrpcRequest.objects.logResponse(grpcResponse = request)
       try:
-        DbHttpRequest.objects.addChildDuration(request = result)
+        dbHttpRequest = DbHttpRequest.objects.get(
+          metaCallerHttpRequestId = request.requestMetadata.httpCaller.requestId,
+        )
+        dbHttpRequest.addChildDuration(request = result)
       except Exception:  # pylint: disable=broad-except  # pragma: no cover
         # TODO(45) - remove this hack
         pass
@@ -139,18 +148,6 @@ class Service(Servicer):
       return result
     return self._handleResponseOld(method = method)
 
-  def LogError(self, request: ErrorRequest, _: grpc.ServicerContext) -> LogStandardResponse :
-    """Log errors."""
-    def method() -> MetadataMixin :
-      LOGGER.info(
-        f'Saving an error to the request "{request.requestMetadata.grpcCaller.requestId}" '
-        'to the database.',
-      )
-      dbError = DbError()
-      dbError.khaleesiSave(grpc = request)
-      return dbError
-    return self._handleResponse(method = method)
-
 
   def _handleResponseOld(self, *, method: Callable[[], Metadata]) -> LogStandardResponse :
     """Wrap responses for logging."""
@@ -163,13 +160,24 @@ class Service(Servicer):
     return LogStandardResponse()
 
 
-  def _handleResponse(self, *, method: Callable[[], MetadataMixin]) -> LogStandardResponse :
+  def _handleLogging(self, *, method: Callable[[], MetadataMixin]) -> LogStandardResponse :
     """Wrap responses for logging."""
     metadata = method()
     if metadata.metaLoggingErrors:
       raise InvalidArgumentException(
         privateMessage = 'Error when parsing the metadata fields.',
         privateDetails = metadata.metaLoggingErrors,
+      )
+    return LogStandardResponse()
+
+
+  def _handleResponse(self, *, method: Callable[[], ResponseMetadataMixin]) -> LogStandardResponse :
+    """Wrap responses for logging."""
+    metadata = method()
+    if metadata.metaResponseLoggingErrors:
+      raise InvalidArgumentException(
+        privateMessage = 'Error when parsing the metadata fields.',
+        privateDetails = metadata.metaResponseLoggingErrors,
       )
     return LogStandardResponse()
 

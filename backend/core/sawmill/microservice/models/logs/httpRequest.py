@@ -2,90 +2,24 @@
 
 # Python.
 from __future__ import annotations
-from typing import List
+from typing import List, Any
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.shared.parseUtil import parseString
-from khaleesi.proto.core_pb2 import EmptyRequest
-from khaleesi.proto.core_sawmill_pb2 import (
-  HttpRequest as GrpcHttpRequest,
-  HttpRequestResponse as GrpcHttpRequestResponse,
-  HttpResponseRequest as GrpcHttpResponseRequest,
-)
-from microservice.models.logs.abstractResponse import ResponseMetadata
+from khaleesi.core.models.baseModel import Model
+from khaleesi.proto.core_pb2 import ObjectMetadata
+from khaleesi.proto.core_sawmill_pb2 import HttpRequestRequest as GrpcHttpRequest, ResponseRequest
+from microservice.models.logs.metadataMixin import MetadataMixin
+from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
 from microservice.models.logs.grpcRequest import GrpcRequest
 
 
-class HttpRequestManager(models.Manager['HttpRequest']):
-  """Custom model manager."""
-
-  def logRequest(self, *, grpcRequest: GrpcHttpRequest) -> HttpRequest :
-    """Log a gRPC HTTP request."""
-
-    errors: List[str] = []
-
-    return self.create(
-      # khaleesi.ninja.
-      type     = GrpcHttpRequestResponse.RequestType.Name(GrpcHttpRequestResponse.RequestType.USER),
-      language = parseString(raw = grpcRequest.language, name = 'language', errors = errors),
-      deviceId = parseString(raw = grpcRequest.deviceId, name = 'deviceId', errors = errors),
-      # Http.
-      languageHeader = parseString(
-        raw    = grpcRequest.languageHeader,
-        name   = 'languageHeader',
-        errors = errors,
-      ),
-      ip = parseString(raw = grpcRequest.ip, name = 'ip', errors = errors),
-      useragent = parseString(
-        raw    = grpcRequest.useragent,
-        name   = 'useragent',
-        errors = errors,
-      ),
-      # Processed.
-      # Metadata.
-      **self.model.logMetadata(metadata = grpcRequest.requestMetadata, errors = errors),
-    )
-
-  def logSystemRequest(self, *, grpcRequest: EmptyRequest) -> HttpRequest :
-    """Log a gRPC HTTP request."""
-
-    errors: List[str] = []
-
-    return self.create(
-      # khaleesi.ninja.
-      type = GrpcHttpRequestResponse.RequestType.Name(GrpcHttpRequestResponse.RequestType.SYSTEM),
-      # Metadata.
-      **self.model.logMetadata(metadata = grpcRequest.requestMetadata, errors = errors),
-    )
-
-  def logResponse(self, *, grpcResponse: GrpcHttpResponseRequest) -> HttpRequest :
-    """Log a gRPC HTTP response."""
-    request = self.get(
-      metaCallerHttpRequestId = grpcResponse.requestMetadata.httpCaller.requestId,
-      metaResponseStatus      = 'IN_PROGRESS',
-    )
-    request.logResponse(grpcResponse = grpcResponse.response)
-    request.save()
-    return request
-
-  def addChildDuration(self, *, request: GrpcRequest) -> None :
-    """Log request duration."""
-    httpRequest = self.get(
-      metaCallerHttpRequestId = request.metaCallerHttpRequestId,
-      metaResponseStatus      = 'IN_PROGRESS',
-    )
-    httpRequest.metaChildDuration += request.reportedDuration
-    httpRequest.save()
-
-
-class HttpRequest(ResponseMetadata):
+class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):  # type: ignore[misc]  # pylint: disable=line-too-long
   """HTTP request logs."""
 
   # khaleesi.ninja.
-  type     = models.TextField(default = 'UNKNOWN')
   language = models.TextField(default = 'UNKNOWN')
   deviceId = models.TextField(default = 'UNKNOWN')
 
@@ -101,22 +35,68 @@ class HttpRequest(ResponseMetadata):
   os             = models.TextField(default = 'UNKNOWN')
   deviceType     = models.TextField(default = 'UNKNOWN')
 
-  objects = HttpRequestManager()
+  def addChildDuration(self, *, request: GrpcRequest) -> None :
+    """Log request duration."""
+    grpc = self.toGrpc()
+    self.metaChildDuration += request.reportedDuration
+    self.khaleesiSave(grpc = grpc)
 
-  def toGrpc(self) -> GrpcHttpRequestResponse :
-    """Map to gRPC HTTP request message."""
+  def finish(self, *, request: ResponseRequest) -> None :
+    """Finish an in-progress HTTP request."""
+    grpc = self.toGrpc()
+    grpc.response.CopyFrom(request.response)
+    grpc.responseMetadata.CopyFrom(request.requestMetadata)
+    self.khaleesiSave(grpc = grpc)
 
-    grpc = GrpcHttpRequestResponse()
+  def khaleesiSave(
+      self,
+      *args   : Any,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : GrpcHttpRequest,
+      **kwargs: Any,
+  ) -> None :
+    """Change own values according to the grpc object."""
+    errors: List[str] = []
 
-    # Request metadata.
-    self.requestMetadataToGrpc(requestMetadata = grpc.request.requestMetadata)
-    self.responseMetadataToGrpc(responseMetadata = grpc.requestMetadata)
+    if self._state.adding:
+      # khaleesi.ninja.
+      self.language = grpc.request.language
+      self.deviceId = grpc.request.deviceId
 
-    # Response.
-    self.responseToGrpc(
-      metadata  = grpc.responseMetadata,
-      response  = grpc.response,
-      processed = grpc.processedResponse,
+      # HTTP.
+      self.languageHeader = grpc.request.languageHeader
+      self.ip             = grpc.request.ip
+      self.useragent      = grpc.request.useragent
+
+      # Processed.
+      # TODO(49): Digest useragent.
+      self.geolocation    = ''
+      self.browser        = ''
+      self.renderingAgent = ''
+      self.os             = ''
+      self.deviceType     = ''
+
+    # Needs to be at the end because it saves errors to the model.
+    self.responseMetadataFromGrpc(
+      metadata = grpc.responseMetadata,
+      grpc = grpc.response,
+      errors = errors,
+    )
+    self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
+    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+
+  def toGrpc(
+      self, *,
+      metadata: ObjectMetadata   = ObjectMetadata(),
+      grpc    : GrpcHttpRequest = GrpcHttpRequest(),
+  ) -> GrpcHttpRequest :
+    """Return a grpc object containing own values."""
+    super().toGrpc(metadata = metadata, grpc = grpc)
+    self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+    self.responseMetadataToGrpc(
+      logMetadata = grpc.responseLogMetadata,
+      processed   = grpc.processedResponse,
+      response    = grpc.response,
     )
 
     # khaleesi.ninja.
@@ -129,11 +109,10 @@ class HttpRequest(ResponseMetadata):
     grpc.request.useragent      = self.useragent
 
     # Processed.
-    grpc.type = GrpcHttpRequestResponse.RequestType.Value(self.type)
-    grpc.geolocation    = self.geolocation
-    grpc.browser        = self.browser
-    grpc.renderingAgent = self.renderingAgent
-    grpc.os             = self.os
-    grpc.deviceType     = self.deviceType
+    grpc.request.geolocation    = self.geolocation
+    grpc.request.browser        = self.browser
+    grpc.request.renderingAgent = self.renderingAgent
+    grpc.request.os             = self.os
+    grpc.request.deviceType     = self.deviceType
 
     return grpc

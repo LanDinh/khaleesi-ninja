@@ -1,214 +1,188 @@
 """Test the HTTP request logs."""
 
-# pylint:disable=duplicate-code
-
 # Python.
+from datetime import timedelta
 from unittest.mock import patch, MagicMock
 
-# gRPC.
-from grpc import StatusCode
-
 # khaleesi.ninja.
-from khaleesi.core.testUtil.grpc import GrpcTestMixin
-from khaleesi.core.testUtil.testCase import TransactionTestCase, SimpleTestCase
-from khaleesi.proto.core_pb2 import User, EmptyRequest as GrpcEmptyRequest
-from khaleesi.proto.core_sawmill_pb2 import (
-  HttpRequest as GrpcHttpRequest,
-  HttpRequestResponse as GrpcHttpResponse,
-  HttpResponseRequest as GrpcHttpResponseRequest,
-)
+from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_sawmill_pb2 import HttpRequestRequest as GrpcHttpRequest
 from microservice.models import HttpRequest
-from microservice.testUtil import ModelResponseMetadataMixin
 
 
-class HttpRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
-  """Test the HTTP request logs objects manager."""
-
-  @patch('microservice.models.logs.httpRequest.parseString', return_value = 'parsed-string')
-  @patch.object(HttpRequest.objects.model, 'logMetadata', return_value = {})
-  def testLogRequest(self, metadata: MagicMock, string: MagicMock) -> None :
-    """Test logging of a gRPC HTTP request."""
-    for userLabel, userType in User.UserType.items():
-      with self.subTest(user = userLabel):
-        # Prepare data.
-        metadata.reset_mock()
-        grpcRequest = GrpcHttpRequest()
-        self.setRequestMetadata(requestMetadata = grpcRequest.requestMetadata, user = userType)
-        grpcRequest.language       = string.return_value
-        grpcRequest.deviceId       = string.return_value
-        grpcRequest.languageHeader = string.return_value
-        grpcRequest.ip             = string.return_value
-        grpcRequest.useragent      = string.return_value
-        # Execute test.
-        result = HttpRequest.objects.logRequest(grpcRequest = grpcRequest)
-        # Assert result.
-        metadata.assert_called_once()
-        self.assertEqual(grpcRequest.requestMetadata, metadata.call_args.kwargs['metadata'])
-        self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
-        self.assertEqual(grpcRequest.language       , result.language)
-        self.assertEqual(grpcRequest.deviceId       , result.deviceId)
-        self.assertEqual(grpcRequest.languageHeader , result.languageHeader)
-        self.assertEqual(grpcRequest.ip             , result.ip)
-        self.assertEqual(grpcRequest.useragent      , result.useragent)
-        self.assertEqual(
-          GrpcHttpResponse.RequestType.Name(GrpcHttpResponse.RequestType.USER),
-          result.type,
-        )
-
-  @patch('microservice.models.logs.httpRequest.parseString', return_value = 'parsed-string')
-  @patch.object(HttpRequest.objects.model, 'logMetadata', return_value = {})
-  def testLogRequestEmpty(self, metadata: MagicMock, _: MagicMock) -> None :
-    """Test logging an empty gRPC HTTP request."""
-    # Prepare data.
-    grpcRequest = GrpcHttpRequest()
-    # Execute test.
-    result = HttpRequest.objects.logRequest(grpcRequest = grpcRequest)
-    # Assert result.
-    metadata.assert_called_once()
-    self.assertEqual([], metadata.call_args.kwargs['errors'])
-    self.assertEqual('', result.metaLoggingErrors)
-    self.assertEqual(
-      GrpcHttpResponse.RequestType.Name(GrpcHttpResponse.RequestType.USER),
-      result.type,
-    )
-
-  @patch.object(HttpRequest.objects.model, 'logMetadata', return_value = {})
-  def testLogSystemRequest(self, metadata: MagicMock) -> None :
-    """Test logging of a gRPC system HTTP request."""
-    for userLabel, userType in User.UserType.items():
-      with self.subTest(user = userLabel):
-        # Prepare data.
-        metadata.reset_mock()
-        grpcRequest = GrpcEmptyRequest()
-        self.setRequestMetadata(requestMetadata = grpcRequest.requestMetadata, user = userType)
-        # Execute test.
-        result = HttpRequest.objects.logSystemRequest(grpcRequest = grpcRequest)
-        # Assert result.
-        metadata.assert_called_once()
-        self.assertEqual(grpcRequest.requestMetadata, metadata.call_args.kwargs['metadata'])
-        self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
-        self.assertEqual('UNKNOWN'                  , result.language)
-        self.assertEqual('UNKNOWN'                  , result.deviceId)
-        self.assertEqual('UNKNOWN'                  , result.languageHeader)
-        self.assertEqual('UNKNOWN'                  , result.ip)
-        self.assertEqual('UNKNOWN'                  , result.useragent)
-        self.assertEqual(
-          GrpcHttpResponse.RequestType.Name(GrpcHttpResponse.RequestType.SYSTEM),
-          result.type,
-        )
-
-  @patch.object(HttpRequest.objects.model, 'logMetadata', return_value = {})
-  def testLogSystemRequestEmpty(self, metadata: MagicMock) -> None :
-    """Test logging an empty gRPC system HTTP request."""
-    # Prepare data.
-    grpcRequest = GrpcEmptyRequest()
-    # Execute test.
-    result = HttpRequest.objects.logSystemRequest(grpcRequest = grpcRequest)
-    # Assert result.
-    metadata.assert_called_once()
-    self.assertEqual([], metadata.call_args.kwargs['errors'])
-    self.assertEqual('', result.metaLoggingErrors)
-    self.assertEqual(
-      GrpcHttpResponse.RequestType.Name(GrpcHttpResponse.RequestType.SYSTEM),
-      result.type,
-    )
-
-  @patch.object(HttpRequest.objects, 'get')
-  def testLogResponse(self, requestMock: MagicMock) -> None :
-    """Test logging a gRPC HTTP request response."""
-    for status in StatusCode:
-      with self.subTest(status = status):
-        # Prepare data.
-        request = ModelResponseMetadataMixin.getModelForResponseSaving(modelType = HttpRequest)
-        request.logResponse = MagicMock()  # type: ignore[assignment]
-        requestMock.reset_mock()
-        requestMock.return_value = request
-        grpcResponse = GrpcHttpResponseRequest()
-        grpcResponse.requestMetadata.httpCaller.requestId = 'request-id'
-        grpcResponse.response.status                      = status.name
-        grpcResponse.response.timestamp.FromDatetime(request.metaResponseLoggedTimestamp)
-        # Execute test.
-        result = HttpRequest.objects.logResponse(grpcResponse = grpcResponse)
-        # Assert result.
-        result.save.assert_called_once_with()  # type: ignore[attr-defined]
-        result.logResponse.assert_called_once()  # type: ignore[attr-defined]
-
-  @patch.object(HttpRequest.objects, 'get')
-  def testLogEmptyResponse(self, requestMock: MagicMock) -> None :
-    """Test logging an empty gRPC HTTP request response."""
-    # Prepare data.
-    request = ModelResponseMetadataMixin.getModelForResponseSaving(modelType = HttpRequest)
-    request.logResponse = MagicMock()  # type: ignore[assignment]
-    requestMock.reset_mock()
-    requestMock.return_value = request
-    grpcResponse = GrpcHttpResponseRequest()
-    # Execute test.
-    result = HttpRequest.objects.logResponse(grpcResponse = grpcResponse)
-    # Assert result.
-    result.save.assert_called_once_with()  # type: ignore[attr-defined]
-    result.logResponse.assert_called_once()  # type: ignore[attr-defined]
-
-  @patch.object(HttpRequest.objects, 'get')
-  def testAddChildDuration(self, requestMock: MagicMock) -> None :
-    """Test adding child durations."""
-    # Prepare data.
-    request = ModelResponseMetadataMixin.getModelForResponseSaving(modelType = HttpRequest)
-    request.save = MagicMock()  # type: ignore[assignment]
-    requestMock.reset_mock()
-    requestMock.return_value = request
-    # Execute test.
-    HttpRequest.objects.addChildDuration(request = MagicMock())
-    # Assert result.
-    request.save.assert_called_once_with()
-
-
-class HttpRequestTestCase(ModelResponseMetadataMixin, SimpleTestCase):
+class HttpRequestTestCase(SimpleTestCase):
   """Test the HTTP request logs models."""
 
-  def testToGrpc(self) -> None :
+  @patch('microservice.models.logs.httpRequest.HttpRequest.toGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.khaleesiSave')
+  def testAddChildDuration(self, parent: MagicMock, toGrpc: MagicMock) -> None :
+    """Test adding child durations."""
+    # Prepare data.
+    instance = HttpRequest()
+    instance.metaChildDuration = timedelta(hours = 1)
+    request = MagicMock()
+    request.reportedDuration = timedelta(hours = 13)
+    # Execute test.
+    instance.addChildDuration(request = request)
+    # Assert result.
+    parent.assert_called_once()
+    toGrpc.assert_called_once()
+    self.assertEqual(request.reportedDuration + timedelta(hours = 1), instance.metaChildDuration)
+
+  @patch('microservice.models.logs.httpRequest.HttpRequest.toGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.khaleesiSave')
+  def testFinish(self, parent: MagicMock, toGrpc: MagicMock) -> None :
+    """Test logging a gRPC HTTP request response."""
+    # Prepare data.
+    instance = HttpRequest()
+    # Execute test.
+    instance.finish(request = MagicMock())
+    # Assert result.
+    parent.assert_called_once()
+    toGrpc.assert_called_once()
+
+  @patch('microservice.models.logs.httpRequest.Model.khaleesiSave')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.metadataFromGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataFromGrpc')
+  def testKhaleesiSaveNew(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test saving a new instance."""
+    # Prepare data.
+    instance = HttpRequest()
+    instance._state.adding = True  # pylint: disable=protected-access
+    grpc = self._createGrpcHttpRequest()
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parent.assert_called_once()
+    metadata.assert_called_once()
+    responseMetadata.assert_called_once()
+    self.assertEqual(grpc.request.language      , instance.language)
+    self.assertEqual(grpc.request.deviceId      , instance.deviceId)
+    self.assertEqual(grpc.request.languageHeader, instance.languageHeader)
+    self.assertEqual(grpc.request.ip            , instance.ip)
+    self.assertEqual(grpc.request.useragent     , instance.useragent)
+
+  @patch('microservice.models.logs.httpRequest.Model.khaleesiSave')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.metadataFromGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataFromGrpc')
+  def testKhaleesiSaveOld(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test saving an old instance."""
+    # Prepare data.
+    instance = HttpRequest()
+    instance._state.adding = False  # pylint: disable=protected-access
+    grpc = self._createGrpcHttpRequest()
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parent.assert_called_once()
+    metadata.assert_called_once()
+    responseMetadata.assert_called_once()
+    self.assertNotEqual(grpc.request.language      , instance.language)
+    self.assertNotEqual(grpc.request.deviceId      , instance.deviceId)
+    self.assertNotEqual(grpc.request.languageHeader, instance.languageHeader)
+    self.assertNotEqual(grpc.request.ip            , instance.ip)
+    self.assertNotEqual(grpc.request.useragent     , instance.useragent)
+
+  @patch('microservice.models.logs.httpRequest.Model.khaleesiSave')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.metadataFromGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataFromGrpc')
+  def testKhaleesiSaveNewEmpty(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test saving a new instance."""
+    # Prepare data.
+    instance = HttpRequest()
+    instance._state.adding = True  # pylint: disable=protected-access
+    grpc = GrpcHttpRequest()
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parent.assert_called_once()
+    metadata.assert_called_once()
+    responseMetadata.assert_called_once()
+
+  @patch('microservice.models.logs.httpRequest.Model.toGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.metadataToGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataToGrpc')
+  def testToGrpc(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
     """Test that general mapping to gRPC works."""
-    for userLabel, userType in User.UserType.items():
-      for typeLabel, typeType in GrpcHttpResponse.RequestType.items():
-        for status in StatusCode:
-          with self.subTest(user = userLabel, type = typeLabel, status = status):
-            # Prepare data.
-            request = HttpRequest(
-              language       = 'language',
-              deviceId       = 'device-id',
-              languageHeader = 'language-header',
-              ip             = 'ip',
-              useragent      = 'useragent',
-              type           = typeLabel,
-              **self.modelFullRequestMetadata(user = userType, status = status),
-            )
-            # Execute test.
-            result = request.toGrpc()
-            # Assert result.
-            self.assertGrpcRequestMetadata(
-              model        = request,
-              grpc         = result.request.requestMetadata,
-              grpcResponse = result.requestMetadata,
-            )
-            self.assertGrpcResponseMetadata(
-              model                 = request,
-              grpcResponse          = result.response,
-              grpcResponseResponse  = result.responseMetadata,
-              grpcResponseProcessed = result.processedResponse,
-            )
-            self.assertEqual(request.language      , result.request.language)
-            self.assertEqual(request.deviceId      , result.request.deviceId)
-            self.assertEqual(request.languageHeader, result.request.languageHeader)
-            self.assertEqual(request.ip            , result.request.ip)
-            self.assertEqual(request.useragent     , result.request.useragent)
-            self.assertEqual(typeType              , result.type)
+    # Prepare data.
+    instance = HttpRequest(
+      language       = 'language',
+      deviceId       = 'device-id',
+      languageHeader = 'language-header',
+      ip             = 'ip',
+      useragent      = 'useragent',
+      geolocation    = 'geolocation',
+      browser        = 'browser',
+      renderingAgent = 'rendering-agent',
+      os             = 'os',
+      deviceType     = 'device-type',
+    )
+    # Execute test.
+    grpc = instance.toGrpc()
+    # Assert result.
+    metadata.assert_called_once()
+    parent.assert_called_once()
+    responseMetadata.assert_called_once()
+    self.assertEqual(instance.language      , grpc.request.language)
+    self.assertEqual(instance.deviceId      , grpc.request.deviceId)
+    self.assertEqual(instance.languageHeader, grpc.request.languageHeader)
+    self.assertEqual(instance.ip            , grpc.request.ip)
+    self.assertEqual(instance.useragent     , grpc.request.useragent)
+    self.assertEqual(instance.geolocation   , grpc.request.geolocation)
+    self.assertEqual(instance.browser       , grpc.request.browser)
+    self.assertEqual(instance.renderingAgent, grpc.request.renderingAgent)
+    self.assertEqual(instance.os            , grpc.request.os)
+    self.assertEqual(instance.deviceType    , grpc.request.deviceType)
 
 
-  def testEmptyToGrpc(self) -> None :
+  @patch('microservice.models.logs.httpRequest.Model.toGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.metadataToGrpc')
+  @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataToGrpc')
+  def testEmptyToGrpc(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
-    request = HttpRequest(**self.modelEmptyRequestMetadata())
+    instance = HttpRequest()
     # Execute test.
-    result = request.toGrpc()
+    grpc = instance.toGrpc()
     # Assert result.
-    self.assertIsNotNone(result)
-    self.assertEqual(GrpcHttpResponse.RequestType.UNKNOWN, result.type)
+    metadata.assert_called_once()
+    parent.assert_called_once()
+    responseMetadata.assert_called_once()
+    self.assertIsNotNone(grpc)
+
+  def _createGrpcHttpRequest(self) -> GrpcHttpRequest :
+    """Helper to create gRPC objects."""
+    grpc = GrpcHttpRequest()
+
+    grpc.request.language       = 'language'
+    grpc.request.deviceId       = 'device-id'
+    grpc.request.languageHeader = 'language-header'
+    grpc.request.ip             = 'ip'
+    grpc.request.useragent      = 'useragent'
+
+    return grpc

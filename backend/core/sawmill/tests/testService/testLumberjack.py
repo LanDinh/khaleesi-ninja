@@ -22,6 +22,20 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   service = Service()
 
+  def testLogHttpRequest(self, *_: MagicMock) -> None :
+    """Test logging requests."""
+    self._executeLoggingTests(
+      method        = lambda : self.service.LogHttpRequest(MagicMock(), MagicMock()),
+      loggingObject = 'DbHttpRequest',
+    )
+
+  def testLogHttpResponse(self, *_: MagicMock) -> None :
+    """Test logging responses."""
+    self._executeResponseLoggingTests(
+      method        = lambda : self.service.LogHttpRequestResponse(MagicMock(), MagicMock()),
+      loggingObject = 'DbHttpRequest',
+    )
+
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
   def testLogEvent(self, serviceRegistry: MagicMock, *_: MagicMock) -> None :
     """Test logging events."""
@@ -31,28 +45,11 @@ class LumberjackServiceTestCase(SimpleTestCase):
     )
     serviceRegistry.addService.assert_called()
 
-  def testLogHttpRequest(self, *_: MagicMock) -> None :
-    """Test logging requests."""
-    self._executeOldLoggingTests(
-      method         = lambda : self.service.LogHttpRequest(MagicMock(), MagicMock()),
-      loggingObject  = DbHttpRequest.objects,
-      loggingMethod  = 'logRequest',
-    )
-
-  def testLogSystemHttpRequest(self, *_: MagicMock) -> None :
-    """Test logging system HTTP requests."""
-    self._executeOldLoggingTests(
-      method         = lambda : self.service.LogSystemHttpRequest(MagicMock(), MagicMock()),
-      loggingObject  = DbHttpRequest.objects,
-      loggingMethod  = 'logSystemRequest',
-    )
-
-  def testLogHttpResponse(self, *_: MagicMock) -> None :
-    """Test logging responses."""
-    self._executeOldLoggingTests(
-      method         = lambda : self.service.LogHttpRequestResponse(MagicMock(), MagicMock()),
-      loggingObject  = DbHttpRequest.objects,
-      loggingMethod  = 'logResponse',
+  def testLogError(self, *_: MagicMock) -> None :
+    """Test logging events."""
+    self._executeLoggingTests(
+      method        = lambda : self.service.LogError(MagicMock(), MagicMock()),
+      loggingObject = 'DbError',
     )
 
   @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
@@ -68,7 +65,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
   def testLogGrpcResponse(self, *_: MagicMock) -> None :
     """Test logging responses."""
     with patch.object(DbGrpcRequest.objects, 'logResponse') as loggingGrpcRequest:
-      with patch.object(DbHttpRequest.objects, 'addChildDuration') as loggingHttpRequest:
+      with patch.object(DbHttpRequest.objects, 'get') as loggingHttpRequest:
         with patch.object(DbQuery.objects, 'logQueries') as loggingQuery:
           # Prepare data.
           now = datetime.now().replace(tzinfo = timezone.utc)
@@ -81,17 +78,10 @@ class LumberjackServiceTestCase(SimpleTestCase):
           # Execute test.
           self.service.LogGrpcResponse(MagicMock(), MagicMock())
           # Assert result.
-          loggingHttpRequest.assert_called_once()
+          loggingHttpRequest.return_value.addChildDuration.assert_called_once()
           loggingGrpcRequest.assert_called_once()
           loggingQuery.assert_called_once()
           loggingGrpcRequest.return_value.save.assert_called_once_with()
-
-  def testLogError(self, *_: MagicMock) -> None :
-    """Test logging events."""
-    self._executeLoggingTests(
-      method        = lambda : self.service.LogError(MagicMock(), MagicMock()),
-      loggingObject = 'DbError',
-    )
 
   def _executeLoggingTests(
       self, *,
@@ -102,7 +92,21 @@ class LumberjackServiceTestCase(SimpleTestCase):
     for test in [ self._executeSuccessfulLoggingTest, self._executeLoggingTestWithParsingError ]:
       with self.subTest(test = test.__name__):
         with patch(f'microservice.service.lumberjack.{loggingObject}') as logging:
-          test(method = method, logging = logging)  # type: ignore[operator]  # pylint: disable=no-value-for-parameter,line-too-long
+          test(method = method, logging = logging)  # type: ignore[operator]  # pylint: disable=line-too-long
+
+  def _executeResponseLoggingTests(
+      self, *,
+      method        : Callable[[], Any],
+      loggingObject : str,
+  ) -> None :
+    """Execute all typical logging tests."""
+    for test in [
+        self._executeSuccessfulResponseLoggingTest,
+        self._executeResponseLoggingTestWithParsingError,
+    ]:
+      with self.subTest(test = test.__name__):
+        with patch(f'microservice.service.lumberjack.{loggingObject}') as logging:
+          test(method = method, logging = logging)  # type: ignore[operator]  # pylint: disable=line-too-long
 
 
   def _executeOldLoggingTests(
@@ -122,8 +126,8 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _executeSuccessfulLoggingTest(
       self, *,
-      method        : Callable[[], Any],
-      logging       : MagicMock,
+      method      : Callable[[], Any],
+      logging     : MagicMock,
   ) -> None :
     """Successful call to logging method."""
     # Prepare data.
@@ -140,18 +144,54 @@ class LumberjackServiceTestCase(SimpleTestCase):
       self,
       _: MagicMock,
       *,
-      method        : Callable[[], Any],
-      logging       : MagicMock,
+      method      : Callable[[], Any],
+      logging     : MagicMock,
   ) -> None :
     """Call to logging method that results in parsing errors."""
     # Prepare data.
     logging.return_value = MagicMock()
-    logging.return_value.metaLoggingErrors = 'some parsing errors'
+    logging.return_value.metaResponseLoggingErrors = 'some parsing errors'
     # Execute test & assert result.
     with self.assertRaises(InvalidArgumentException) as context:
       method()
     logging.return_value.khaleesiSave.assert_called_once()
     self.assertEqual(logging.return_value.metaLoggingErrors, context.exception.privateDetails)
+
+  def _executeSuccessfulResponseLoggingTest(
+      self, *,
+      method      : Callable[[], Any],
+      logging     : MagicMock,
+  ) -> None :
+    """Successful call to logging method."""
+    # Prepare data.
+    logging.objects.get.return_value = MagicMock()
+    logging.objects.get.return_value.metaResponseLoggingErrors = ''
+    # Execute test.
+    method()
+    # Assert result.
+    logging.objects.get.return_value.finish.assert_called_once()
+
+  # noinspection PyUnusedLocal
+  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
+  def _executeResponseLoggingTestWithParsingError(
+      self,
+      _: MagicMock,
+      *,
+      method      : Callable[[], Any],
+      logging     : MagicMock,
+  ) -> None :
+    """Call to logging method that results in parsing errors."""
+    # Prepare data.
+    logging.objects.get.return_value = MagicMock()
+    logging.objects.get.return_value.metaResponseLoggingErrors = 'some parsing errors'
+    # Execute test & assert result.
+    with self.assertRaises(InvalidArgumentException) as context:
+      method()
+    logging.objects.get.return_value.finish.assert_called_once()
+    self.assertEqual(
+      logging.objects.get.return_value.metaResponseLoggingErrors,
+      context.exception.privateDetails,
+    )
 
   def _executeOldSuccessfulLoggingTest(
       self, *,

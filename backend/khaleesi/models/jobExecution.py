@@ -119,7 +119,7 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
   ) -> GrpcJobExecution :
     """Return a grpc object containing own values."""
     # Metadata.
-    grpc = super().toGrpc(metadata = metadata, grpc = grpc)
+    super().toGrpc(metadata = metadata, grpc = grpc)
     grpc.jobMetadata.id       = self.jobId
     grpc.executionMetadata.id = self.executionId
 

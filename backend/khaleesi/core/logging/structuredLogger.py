@@ -21,13 +21,13 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.state import STATE
-from khaleesi.proto.core_pb2 import RequestMetadata, EmptyRequest
+from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import (
+  HttpRequestRequest,
   ErrorRequest, GrpcRequest,
   GrpcResponseRequest,
   Event, EventRequest,
-  HttpRequest,
-  HttpResponseRequest,
+  ResponseRequest,
   Response,
   Query,
 )
@@ -40,10 +40,93 @@ khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class StructuredLogger(ABC):
   """Basic structured logger."""
 
+  def logHttpRequest(self, *, httpRequestId: str, grpcMethod: str) -> None :
+    """Log a HTTP request for system requests."""
+    LOGGER.info(
+      f'System HTTP request "{httpRequestId}" started.'
+    )
+    httpRequest = HttpRequestRequest()
+    addSystemRequestMetadata(
+      metadata      = httpRequest.requestMetadata,
+      grpcMethod    = grpcMethod,
+      httpRequestId = httpRequestId,
+      grpcRequestId = 'system',
+    )
+    self.sendLogHttpRequest(grpc = httpRequest)
+
+  def logHttpResponse(
+      self, *,
+      httpRequestId: str,
+      grpcMethod   : str,
+      status       : StatusCode,
+  ) -> None :
+    """Log a microservice system HTTP response."""
+    httpResponse = ResponseRequest()
+    addSystemRequestMetadata(
+      metadata      = httpResponse.requestMetadata,
+      grpcMethod    = grpcMethod,
+      httpRequestId = httpRequestId,
+      grpcRequestId = 'system',
+    )
+    self._logResponseObject(
+      status      = status,
+      requestName = f'HTTP request "{httpRequestId}"',
+      response    = httpResponse.response,
+    )
+    self.sendLogHttpResponse(grpc = httpResponse)
+
+  def logEvent(self, *, event: Event) -> None :
+    """Log a user event."""
+    request = EventRequest()
+    addRequestMetadata(metadata = request.requestMetadata)
+    request.event.CopyFrom(event)
+    self._logEvent(event = request)
+
+  def logSystemEvent(
+      self, *,
+      event: Event,
+      httpRequestId   : str,
+      grpcRequestId   : str,
+      grpcMethod      : str,
+  ) -> None :
+    """Log a system event."""
+    request = EventRequest()
+    addSystemRequestMetadata(
+      metadata      = request.requestMetadata,
+      grpcMethod    = grpcMethod,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+    )
+    request.event.CopyFrom(event)
+    self._logEvent(event = request)
+
+  def logError(self, *, exception: KhaleesiException) -> None :
+    """Log an exception."""
+    error = self._logErrorObject(exception = exception)
+    addRequestMetadata(metadata = error.requestMetadata)
+    self.sendLogError(grpc = error)
+
+  def logSystemError(
+      self, *,
+      exception    : KhaleesiException,
+      httpRequestId: str,
+      grpcRequestId: str,
+      grpcMethod   : str,
+  ) -> None :
+    """Log an exception."""
+    error = self._logErrorObject(exception = exception)
+    addSystemRequestMetadata(
+      metadata      = error.requestMetadata,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = grpcMethod,
+    )
+    self.sendLogError(grpc = error)
+
   def logGrpcRequest(self, *, upstreamRequest: RequestMetadata) -> None :
     """Log a microservice request."""
     LOGGER.info(
-      f'User "{STATE.request.user.id}" started request '
+      f'User "{STATE.request.user.id}" started gRPC request '
       f'{STATE.request.grpcCaller.grpcService}.{STATE.request.grpcCaller.grpcMethod}.'
     )
     LOGGER.info(
@@ -69,7 +152,7 @@ class StructuredLogger(ABC):
       grpcMethod   : str,
   ) -> None :
     """Log a microservice request."""
-    LOGGER.info(f'System started request "{grpcRequestId}".')
+    LOGGER.info(f'System started gRPC request "{grpcRequestId}".')
     grpcRequest = GrpcRequest()
     addSystemRequestMetadata(
       metadata      = grpcRequest.requestMetadata,
@@ -96,7 +179,7 @@ class StructuredLogger(ABC):
     )
     self._logResponseObject(
       status      = status,
-      requestName = 'Request',
+      requestName = 'gRPC Request',
       response    = grpcResponse.response,
     )
     self._logQueries(queries = grpcResponse.queries)
@@ -108,112 +191,26 @@ class StructuredLogger(ABC):
     addRequestMetadata(metadata = grpcResponse.requestMetadata)
     self._logResponseObject(
       status      = status,
-      requestName = 'Request',
+      requestName = 'gRPC Request',
       response    = grpcResponse.response,
     )
     self._logQueries(queries = grpcResponse.queries)
     self.sendLogGrpcResponse(grpcResponse = grpcResponse)
 
-  def logError(self, *, exception: KhaleesiException) -> None :
-    """Log an exception."""
-    error = self._logErrorObject(exception = exception)
-    addRequestMetadata(metadata = error.requestMetadata)
-    self.sendLogError(error = error)
-
-  def logSystemError(
+  def _logResponseObject(
       self, *,
-      exception    : KhaleesiException,
-      httpRequestId: str,
-      grpcRequestId: str,
-      grpcMethod   : str,
+      status     : StatusCode,
+      requestName: str,
+      response   : Response,
   ) -> None :
-    """Log an exception."""
-    error = self._logErrorObject(exception = exception)
-    addSystemRequestMetadata(
-      metadata      = error.requestMetadata,
-      httpRequestId = httpRequestId,
-      grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
-    )
-    self.sendLogError(error = error)
+    """Text log a response and return the response object."""
+    if status == StatusCode.OK:
+      LOGGER.info(f'{requestName} finished successfully.')
+    else:
+      LOGGER.warning(f'{requestName} finished with error code {status.name}.')
 
-  def logSystemHttpRequest(self, *, httpRequestId: str, grpcMethod: str) -> None :
-    """Log a HTTP request for system requests."""
-    LOGGER.info(
-      f'HTTP request "{httpRequestId}" started.'
-    )
-    httpRequest = EmptyRequest()
-    addSystemRequestMetadata(
-      metadata      = httpRequest.requestMetadata,
-      grpcMethod    = grpcMethod,
-      httpRequestId = httpRequestId,
-      grpcRequestId = 'system',
-    )
-    self.sendLogSystemHttpRequest(httpRequest = httpRequest)
-
-  def logHttpRequest(self) -> None :
-    """Log a HTTP request for system requests."""
-    LOGGER.info(f'HTTP request "{STATE.request.httpCaller.requestId}" started.')
-    httpRequest = HttpRequest()
-    addRequestMetadata(metadata = httpRequest.requestMetadata)
-    self.sendLogHttpRequest(httpRequest = httpRequest)
-
-  def logSystemHttpResponse(
-      self, *,
-      httpRequestId: str,
-      grpcMethod   : str,
-      status       : StatusCode,
-  ) -> None :
-    """Log a microservice system HTTP response."""
-    httpResponse = HttpResponseRequest()
-    addSystemRequestMetadata(
-      metadata      = httpResponse.requestMetadata,
-      grpcMethod    = grpcMethod,
-      httpRequestId = httpRequestId,
-      grpcRequestId = 'system',
-    )
-    self._logResponseObject(
-      status      = status,
-      requestName = f'HTTP request "{httpRequestId}"',
-      response    = httpResponse.response,
-    )
-    self.sendLogHttpResponse(httpResponse = httpResponse)
-
-  def logHttpResponse(self, *, status: StatusCode) -> None :
-    """Log a microservice HTTP response."""
-    httpResponse = HttpResponseRequest()
-    addRequestMetadata(metadata = httpResponse.requestMetadata)
-    self._logResponseObject(
-      status      = status,
-      requestName = f'HTTP request "{STATE.request.httpCaller.requestId}"',
-      response    = httpResponse.response,
-    )
-    self.sendLogHttpResponse(httpResponse = httpResponse)
-
-  def logSystemEvent(
-      self, *,
-      event: Event,
-      httpRequestId   : str,
-      grpcRequestId   : str,
-      grpcMethod      : str,
-  ) -> None :
-    """Log a system event."""
-    request = EventRequest()
-    addSystemRequestMetadata(
-      metadata      = request.requestMetadata,
-      grpcMethod    = grpcMethod,
-      httpRequestId = httpRequestId,
-      grpcRequestId = grpcRequestId,
-    )
-    request.event.CopyFrom(event)
-    self._logEvent(event = request)
-
-  def logEvent(self, *, event: Event) -> None :
-    """Log a user event."""
-    request = EventRequest()
-    addRequestMetadata(metadata = request.requestMetadata)
-    request.event.CopyFrom(event)
-    self._logEvent(event = request)
+    response.status = status.name
+    response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 
   def _logEvent(self, *, event: EventRequest) -> None :
     """Log an event."""
@@ -237,30 +234,7 @@ class StructuredLogger(ABC):
     else:
       LOGGER.fatal(logString)
 
-    self.sendLogEvent(event = event)
-
-  def _logQueries(self, *, queries: RepeatedCompositeFieldContainer[Query]) -> None :
-    """Attach queries to the gRPC object."""
-    count = 0
-    for query in STATE.queries:
-      queries.append(query)
-      count += 1
-    LOGGER.info(f'Reporting {count} queries.')
-
-  def _logResponseObject(
-      self, *,
-      status     : StatusCode,
-      requestName: str,
-      response   : Response,
-  ) -> None :
-    """Text log a response and return the response object."""
-    if status == StatusCode.OK:
-      LOGGER.info(f'{requestName} finished successfully.')
-    else:
-      LOGGER.warning(f'{requestName} finished with error code {status.name}.')
-
-    response.status = status.name
-    response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
+    self.sendLogEvent(grpc = event)
 
   def _logErrorObject(self, *, exception: KhaleesiException) -> ErrorRequest :
     """Text log an exception and return the error object."""
@@ -278,16 +252,20 @@ class StructuredLogger(ABC):
     error.error.stacktrace     = exception.stacktrace
     return error
 
+  def _logQueries(self, *, queries: RepeatedCompositeFieldContainer[Query]) -> None :
+    """Attach queries to the gRPC object."""
+    count = 0
+    for query in STATE.queries:
+      queries.append(query)
+      count += 1
+    LOGGER.info(f'Reporting {count} queries.')
+
   @abstractmethod
-  def sendLogSystemHttpRequest(self, *, httpRequest: EmptyRequest) -> None :
+  def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> None :
     """Send the HTTP log request to the logging facility."""
 
   @abstractmethod
-  def sendLogHttpRequest(self, *, httpRequest: HttpRequest) -> None :
-    """Send the HTTP log request to the logging facility."""
-
-  @abstractmethod
-  def sendLogHttpResponse(self, *, httpResponse: HttpResponseRequest) -> None :
+  def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the HTTP log response to the logging facility."""
 
   @abstractmethod
@@ -299,12 +277,12 @@ class StructuredLogger(ABC):
     """Send the gRPC log response to the logging facility."""
 
   @abstractmethod
-  def sendLogError(self, *, error: ErrorRequest) -> None :
-    """Send the log error to the logging facility."""
+  def sendLogEvent(self, *, grpc: EventRequest) -> None :
+    """Send the log event to the logging facility."""
 
   @abstractmethod
-  def sendLogEvent(self, *, event: EventRequest) -> None :
-    """Send the log event to the logging facility."""
+  def sendLogError(self, *, grpc: ErrorRequest) -> None :
+    """Send the log error to the logging facility."""
 
 
 class StructuredGrpcLogger(StructuredLogger):
@@ -316,17 +294,13 @@ class StructuredGrpcLogger(StructuredLogger):
     channel = CHANNEL_MANAGER.getChannel(gate = 'core', service = 'sawmill')
     self.stub = LumberjackStub(channel)  # type: ignore[no-untyped-call]
 
-  def sendLogSystemHttpRequest(self, *, httpRequest: EmptyRequest) -> None:
+  def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> None:
     """Send the HTTP log request to the logging facility."""
-    self.stub.LogSystemHttpRequest(httpRequest)
+    self.stub.LogHttpRequest(grpc)
 
-  def sendLogHttpRequest(self, *, httpRequest: HttpRequest) -> None:
-    """Send the HTTP log request to the logging facility."""
-    self.stub.LogHttpRequest(httpRequest)
-
-  def sendLogHttpResponse(self, *, httpResponse: HttpResponseRequest) -> None :
+  def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the HTTP log response to the logging facility."""
-    self.stub.LogHttpRequestResponse(httpResponse)
+    self.stub.LogHttpRequestResponse(grpc)
 
   def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
     """Send the gRPC log request to the logging facility."""
@@ -336,13 +310,13 @@ class StructuredGrpcLogger(StructuredLogger):
     """Send the gRPC log response to the logging facility."""
     self.stub.LogGrpcResponse(grpcResponse)
 
-  def sendLogError(self, *, error: ErrorRequest) -> None :
-    """Send the log error to the logging facility."""
-    self.stub.LogError(error)
-
-  def sendLogEvent(self, *, event: EventRequest) -> None :
+  def sendLogEvent(self, *, grpc: EventRequest) -> None :
     """Send the log event to the logging facility."""
-    self.stub.LogEvent(event)
+    self.stub.LogEvent(grpc)
+
+  def sendLogError(self, *, grpc: ErrorRequest) -> None :
+    """Send the log error to the logging facility."""
+    self.stub.LogError(grpc)
 
 
 def instantiateStructuredLogger() -> StructuredLogger:
