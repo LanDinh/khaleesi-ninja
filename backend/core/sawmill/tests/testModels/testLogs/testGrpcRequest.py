@@ -5,173 +5,164 @@
 # Python.
 from unittest.mock import patch, MagicMock
 
-# gRPC.
-from grpc import StatusCode
-
 # khaleesi.ninja.
-from khaleesi.core.testUtil.grpc import GrpcTestMixin
-from khaleesi.core.testUtil.testCase import TransactionTestCase, SimpleTestCase
-from khaleesi.proto.core_pb2 import User
-from khaleesi.proto.core_sawmill_pb2 import (
-  GrpcRequest as GrpcGrpcRequest,
-  GrpcResponseRequest as GrpcGrpcResponse,
-)
+from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_sawmill_pb2 import GrpcRequestRequest as GrpcGrpcRequest
 from microservice.models import GrpcRequest
-from microservice.testUtil import ModelResponseMetadataMixin
 
 
-class GrpcRequestManagerTestCase(GrpcTestMixin, TransactionTestCase):
-  """Test the request logs objects manager."""
-
-  @patch('microservice.models.logs.grpcRequest.parseString')
-  @patch.object(GrpcRequest.objects.model, 'logMetadata')
-  def testLogRequest(self, metadata: MagicMock, string: MagicMock) -> None :
-    """Test logging a gRPC request."""
-    for userLabel, userType in User.UserType.items():
-      with self.subTest(user = userLabel):
-        # Prepare data.
-        metadata.reset_mock()
-        metadata.return_value = {}
-        string.return_value   = 'parsed-string'
-        grpcRequest = GrpcGrpcRequest()
-        self.setRequestMetadata(requestMetadata = grpcRequest.requestMetadata, user = userType)
-        grpcRequest.upstreamRequest.requestId       = string.return_value
-        grpcRequest.upstreamRequest.khaleesiGate    = string.return_value
-        grpcRequest.upstreamRequest.khaleesiService = string.return_value
-        grpcRequest.upstreamRequest.grpcService     = string.return_value
-        grpcRequest.upstreamRequest.grpcMethod      = string.return_value
-        # Execute test.
-        result = GrpcRequest.objects.logRequest(grpcRequest = grpcRequest)
-        # Assert result.
-        metadata.assert_called_once()
-        self.assertEqual(grpcRequest.requestMetadata, metadata.call_args.kwargs['metadata'])
-        self.assertEqual([]                         , metadata.call_args.kwargs['errors'])
-        self.assertEqual(grpcRequest.upstreamRequest.requestId, result.upstreamRequestGrpcRequestId)
-        self.assertEqual(
-          grpcRequest.upstreamRequest.khaleesiGate,
-          result.upstreamRequestKhaleesiGate,
-        )
-        self.assertEqual(
-          grpcRequest.upstreamRequest.khaleesiService,
-          result.upstreamRequestKhaleesiService,
-        )
-        self.assertEqual(
-          grpcRequest.upstreamRequest.grpcService,
-          result.upstreamRequestGrpcService,
-        )
-        self.assertEqual(
-          grpcRequest.upstreamRequest.grpcMethod,
-          result.upstreamRequestGrpcMethod,
-        )
-
-  @patch('microservice.models.logs.grpcRequest.parseString')
-  @patch.object(GrpcRequest.objects.model, 'logMetadata')
-  def testLogRequestEmpty(self, metadata: MagicMock, string: MagicMock) -> None :
-    """Test logging an empty gRPC request."""
-    # Prepare data.
-    string.return_value   = 'parsed-string'
-    metadata.return_value = {}
-    grpcRequest           = GrpcGrpcRequest()
-    # Execute test.
-    result = GrpcRequest.objects.logRequest(grpcRequest = grpcRequest)
-    # Assert result.
-    metadata.assert_called_once()
-    self.assertEqual([], metadata.call_args.kwargs['errors'])
-    self.assertEqual('', result.metaLoggingErrors)
-
-  @patch.object(GrpcRequest.objects, 'get')
-  def testLogResponse(self, requestMock: MagicMock) -> None :
-    """Test logging a gRPC request response."""
-    for status in StatusCode:
-      with self.subTest(status = status):
-        # Prepare data.
-        request = ModelResponseMetadataMixin.getModelForResponseSaving(modelType = GrpcRequest)
-        request.logResponse = MagicMock()  # type: ignore[assignment]
-        requestMock.reset_mock()
-        requestMock.return_value = request
-        grpcResponse = GrpcGrpcResponse()
-        grpcResponse.requestMetadata.grpcCaller.requestId = 'request-id'
-        grpcResponse.response.status                      = status.name
-        grpcResponse.response.timestamp.FromDatetime(request.metaResponseLoggedTimestamp)
-        # Execute test.
-        result = GrpcRequest.objects.logResponse(grpcResponse = grpcResponse)
-        # Assert result.
-        result.save.assert_called_once_with()  # type: ignore[attr-defined]
-        result.logResponse.assert_called_once()  # type: ignore[attr-defined]
-
-  @patch.object(GrpcRequest.objects, 'get')
-  def testLogEmptyResponse(self, requestMock: MagicMock) -> None :
-    """Test logging an empty gRPC request response."""
-    # Prepare data.
-    request = ModelResponseMetadataMixin.getModelForResponseSaving(modelType = GrpcRequest)
-    request.logResponse = MagicMock()  # type: ignore[assignment]
-    requestMock.return_value = request
-    grpcResponse = GrpcGrpcResponse()
-    # Execute test.
-    result = GrpcRequest.objects.logResponse(grpcResponse = grpcResponse)
-    # Assert result.
-    result.save.assert_called_once_with()  # type: ignore[attr-defined]
-    result.logResponse.assert_called_once()  # type: ignore[attr-defined]
-
-
-class GrpcRequestTestCase(ModelResponseMetadataMixin, SimpleTestCase):
+class GrpcRequestTestCase(SimpleTestCase):
   """Test the request logs models."""
 
-  def testToGrpcRequest(self) -> None :
-    """Test that general mapping to gRPC works."""
-    for userLabel, userType in User.UserType.items():
-      for status in StatusCode:
-        with self.subTest(user = userLabel, status = status.name):
-          # Prepare data.
-          request = GrpcRequest(
-            upstreamRequestGrpcRequestId   = '',
-            upstreamRequestKhaleesiGate    = '',
-            upstreamRequestKhaleesiService = '',
-            upstreamRequestGrpcService     = '',
-            upstreamRequestGrpcMethod      = '',
-            **self.modelFullRequestMetadata(user = userType, status = status),
-          )
-          # Execute test.
-          result = request.toGrpc()
-          # Assert result.
-          self.assertGrpcRequestMetadata(
-            model        = request,
-            grpc         = result.request.requestMetadata,
-            grpcResponse = result.requestMetadata,
-          )
-          self.assertGrpcResponseMetadata(
-            model                 = request,
-            grpcResponse          = result.response,
-            grpcResponseResponse  = result.responseMetadata,
-            grpcResponseProcessed = result.processedResponse,
-          )
-          self.assertEqual(
-            request.upstreamRequestGrpcRequestId,
-            result.request.upstreamRequest.requestId,
-          )
-          self.assertEqual(
-            request.upstreamRequestKhaleesiGate,
-            result.request.upstreamRequest.khaleesiGate,
-          )
-          self.assertEqual(
-            request.upstreamRequestKhaleesiService,
-            result.request.upstreamRequest.khaleesiService,
-          )
-          self.assertEqual(
-            request.upstreamRequestGrpcService,
-            result.request.upstreamRequest.grpcService,
-          )
-          self.assertEqual(
-            request.upstreamRequestGrpcMethod,
-            result.request.upstreamRequest.grpcMethod,
-          )
-
-
-  def testEmptyToGrpcRequest(self) -> None :
-    """Test that mapping to gRPC for empty events works."""
+  @patch('microservice.models.logs.grpcRequest.Model.khaleesiSave')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataFromGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataFromGrpc')
+  def testKhaleesiSaveNew(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test saving a new instance."""
     # Prepare data.
-    request = GrpcRequest(**self.modelEmptyRequestMetadata())
+    instance = GrpcRequest()
+    instance._state.adding = True  # pylint: disable=protected-access
+    grpc = self._createGrpcGrpcRequest()
     # Execute test.
-    result = request.toGrpc()
+    instance.khaleesiSave(grpc = grpc)
     # Assert result.
-    self.assertIsNotNone(result)
+    parent.assert_called_once()
+    metadata.assert_called_once()
+    responseMetadata.assert_called_once()
+    upstream = grpc.request.upstreamRequest
+    self.assertEqual(upstream.requestId      , instance.upstreamRequestId)
+    self.assertEqual(upstream.khaleesiGate   , instance.upstreamRequestKhaleesiGate)
+    self.assertEqual(upstream.khaleesiService, instance.upstreamRequestKhaleesiService)
+    self.assertEqual(upstream.grpcService    , instance.upstreamRequestGrpcService)
+    self.assertEqual(upstream.grpcMethod     , instance.upstreamRequestGrpcMethod)
+    self.assertEqual(upstream.podId          , instance.upstreamRequestPodId)
+
+  @patch('microservice.models.logs.grpcRequest.Model.khaleesiSave')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataFromGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataFromGrpc')
+  def testKhaleesiSaveOld(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test saving an old instance."""
+    # Prepare data.
+    instance = GrpcRequest()
+    instance._state.adding = False  # pylint: disable=protected-access
+    grpc = self._createGrpcGrpcRequest()
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parent.assert_called_once()
+    metadata.assert_called_once()
+    responseMetadata.assert_called_once()
+    upstream = grpc.request.upstreamRequest
+    self.assertNotEqual(upstream.requestId      , instance.upstreamRequestId)
+    self.assertNotEqual(upstream.khaleesiGate   , instance.upstreamRequestKhaleesiGate)
+    self.assertNotEqual(upstream.khaleesiService, instance.upstreamRequestKhaleesiService)
+    self.assertNotEqual(upstream.grpcService    , instance.upstreamRequestGrpcService)
+    self.assertNotEqual(upstream.grpcMethod     , instance.upstreamRequestGrpcMethod)
+    self.assertNotEqual(upstream.podId          , instance.upstreamRequestPodId)
+
+  @patch('microservice.models.logs.grpcRequest.Model.khaleesiSave')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataFromGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataFromGrpc')
+  def testKhaleesiSaveNewEmpty(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test saving a new instance."""
+    # Prepare data.
+    instance = GrpcRequest()
+    instance._state.adding = True  # pylint: disable=protected-access
+    # Execute test.
+    instance.khaleesiSave(grpc = GrpcGrpcRequest())
+    # Assert result.
+    parent.assert_called_once()
+    metadata.assert_called_once()
+    responseMetadata.assert_called_once()
+
+  @patch('microservice.models.logs.grpcRequest.Model.toGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataToGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataToGrpc')
+  def testToGrpc(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test that general mapping to gRPC works."""
+    # Prepare data.
+    instance = GrpcRequest(
+    upstreamRequestId              = 'upstream-request-id',
+    upstreamRequestKhaleesiGate    = 'upstream-khaleesi-gate',
+    upstreamRequestKhaleesiService = 'upstream-khaleesi-service',
+    upstreamRequestGrpcService     = 'upstream-grpc-service',
+    upstreamRequestGrpcMethod      = 'upstream-grpc-method',
+    upstreamRequestPodId           = 'upstream-pod-id',
+    )
+    # Execute test.
+    grpc = instance.toGrpc()
+    # Assert result.
+    metadata.assert_called_once()
+    parent.assert_called_once()
+    responseMetadata.assert_called_once()
+    upstream = grpc.request.upstreamRequest
+    self.assertEqual(instance.upstreamRequestId             , upstream.requestId)
+    self.assertEqual(instance.upstreamRequestKhaleesiGate   , upstream.khaleesiGate)
+    self.assertEqual(instance.upstreamRequestKhaleesiService, upstream.khaleesiService)
+    self.assertEqual(instance.upstreamRequestGrpcService    , upstream.grpcService)
+    self.assertEqual(instance.upstreamRequestGrpcMethod     , upstream.grpcMethod)
+    self.assertEqual(instance.upstreamRequestPodId          , upstream.podId)
+
+
+  @patch('microservice.models.logs.grpcRequest.Model.toGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataToGrpc')
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataToGrpc')
+  def testEmptyToGrpc(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      parent          : MagicMock,
+  ) -> None :
+    """Test that mapping to gRPC for empty requests works."""
+    # Prepare data.
+    instance = GrpcRequest()
+    # Execute test.
+    grpc = instance.toGrpc()
+    # Assert result.
+    metadata.assert_called_once()
+    parent.assert_called_once()
+    responseMetadata.assert_called_once()
+    self.assertIsNotNone(grpc)
+
+  def testToObjectMetadata(self) -> None :
+    """Test getting the object metadata."""
+    # Prepare data.
+    instance = GrpcRequest()
+    instance.metaCallerGrpcRequestId = 'request-id'
+    # Execute test.
+    result = instance.toObjectMetadata()
+    # Assert result.
+    self.assertEqual(instance.metaCallerGrpcRequestId, result.id)
+
+  def _createGrpcGrpcRequest(self) -> GrpcGrpcRequest :
+    """Helper to create gRPC objects."""
+    grpc = GrpcGrpcRequest()
+
+    grpc.request.upstreamRequest.requestId       = 'upstream-request-id'
+    grpc.request.upstreamRequest.khaleesiGate    = 'upstream-khaleesi-gate'
+    grpc.request.upstreamRequest.khaleesiService = 'upstream-khaleesi-service'
+    grpc.request.upstreamRequest.grpcService     = 'upstream-grpc-service'
+    grpc.request.upstreamRequest.grpcMethod      = 'upstream-grpc-method'
+    grpc.request.upstreamRequest.podId           = 'upstream-pod-id'
+
+    return grpc

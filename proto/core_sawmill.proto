@@ -16,8 +16,7 @@ message LogRequestMetadata {
 }
 
 message Response {
-  string                    status    = 1;
-  google.protobuf.Timestamp timestamp = 2;
+  string status = 1;
 }
 
 message ResponseRequest {
@@ -56,6 +55,10 @@ message HttpRequest {
   string renderingAgent = 22;
   string os             = 23;
   string deviceType     = 24;
+}
+
+message GrpcRequest {
+  khaleesi.core.GrpcCallerDetails upstreamRequest = 1;
 }
 
 
@@ -102,20 +105,6 @@ message Event {
   Action action = 2;
 }
 
-message GrpcRequest {
-  khaleesi.core.RequestMetadata   requestMetadata = 1;
-  khaleesi.core.GrpcCallerDetails upstreamRequest = 2;
-}
-
-message Query {
-  string id         = 1;
-  string raw        = 2;
-  string connection = 3;
-
-  google.protobuf.Timestamp start = 10;
-  google.protobuf.Timestamp end   = 11;
-}
-
 message Error {
   string status          = 1;
   string loglevel        = 2;
@@ -128,10 +117,13 @@ message Error {
   string stacktrace      = 9;
 }
 
-message GrpcResponseRequest {
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-  Response                      response        = 2;
-  repeated Query                queries         = 3;
+message Query {
+  string id         = 1;
+  string raw        = 2;
+  string connection = 3;
+
+  google.protobuf.Timestamp start = 10;
+  google.protobuf.Timestamp end   = 11;
 }
 
 
@@ -152,6 +144,19 @@ message HttpRequestRequest {
   Response    response = 11;
 }
 
+message GrpcRequestRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  khaleesi.core.ObjectMetadata  objectMetadata  = 2;
+  LogRequestMetadata            logMetadata     = 3;
+
+  khaleesi.core.RequestMetadata responseMetadata    = 4;
+  LogRequestMetadata            responseLogMetadata = 5;
+  ProcessedResponse             processedResponse   = 6;
+
+  GrpcRequest request  = 10;
+  Response    response = 11;
+}
+
 message EventRequest {
   khaleesi.core.RequestMetadata requestMetadata = 1;
   khaleesi.core.ObjectMetadata  objectMetadata  = 2;
@@ -169,10 +174,10 @@ message ErrorRequest {
 }
 
 service Lumberjack {
-  rpc LogGrpcRequest         (GrpcRequest)         returns (LogStandardResponse);
-  rpc LogGrpcResponse        (GrpcResponseRequest) returns (LogStandardResponse);
   rpc LogHttpRequest         (HttpRequestRequest) returns (khaleesi.core.ObjectMetadata);
   rpc LogHttpRequestResponse (ResponseRequest)    returns (khaleesi.core.ObjectMetadata);
+  rpc LogGrpcRequest         (GrpcRequestRequest) returns (khaleesi.core.ObjectMetadata);
+  rpc LogGrpcResponse        (ResponseRequest)    returns (khaleesi.core.ObjectMetadata);
   rpc LogEvent               (EventRequest)       returns (khaleesi.core.ObjectMetadata);
   rpc LogError               (ErrorRequest)       returns (khaleesi.core.ObjectMetadata);
 }
@@ -209,17 +214,8 @@ message QueryList{
   repeated QueryResponse queries = 1;
 }
 
-
-message GrpcRequestResponse {
-  ResponseMetadata  requestMetadata   = 1;
-  GrpcRequest       request           = 2;
-  ResponseMetadata  responseMetadata  = 3;
-  Response          response          = 4;
-  ProcessedResponse processedResponse = 5;
-}
-
 message GrpcRequestList {
-  repeated GrpcRequestResponse requests = 1;
+  repeated GrpcRequestRequest requests = 1;
 }
 
 

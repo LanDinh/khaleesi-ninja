@@ -24,6 +24,8 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
   cronExpression = models.TextField()
   action         = models.TextField(default = 'UNKNOWN')
 
+  objects: models.Manager[Job]
+
 
   def toGrpcJobExecutionRequest(self) -> Tuple[str, JobExecutionRequest] :
     """Build a job start request based on the data of this job."""

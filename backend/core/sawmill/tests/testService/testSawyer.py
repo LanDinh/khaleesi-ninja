@@ -8,7 +8,7 @@ from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import (
   LogFilter,
   EventRequest as GrpcEventRequest,
-  GrpcRequestResponse as GrpcGrpcRequestResponse,
+  GrpcRequestRequest as GrpcGrpcRequest,
   ErrorRequest as GrpcErrorRequest,
   HttpRequestRequest as GrpcHttpRequest,
   QueryResponse as GrpcQueryResponse,
@@ -55,7 +55,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     """Test getting logged requests."""
     # Prepare data.
     dbRequest = MagicMock()
-    dbRequest.toGrpc.return_value = GrpcGrpcRequestResponse()
+    dbRequest.toGrpc.return_value = GrpcGrpcRequest()
     dbRequests.return_value       = [ dbRequest ]
     # Execute test.
     result = self.service.GetGrpcRequests(LogFilter(), MagicMock())

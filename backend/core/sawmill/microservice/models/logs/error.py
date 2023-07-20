@@ -1,5 +1,7 @@
 """Error logs."""
 
+from __future__ import annotations
+
 # Python.
 from typing import Any, List
 
@@ -28,6 +30,8 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
   privateMessage = models.TextField(default = '')
   privateDetails = models.TextField(default = '')
   stacktrace     = models.TextField(default = '')
+
+  objects: models.Manager[Error]
 
 
   def khaleesiSave(

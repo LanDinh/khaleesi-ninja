@@ -19,6 +19,8 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
 
   khaleesiId      = models.TextField(unique = True, editable = False)
 
+  objects: models.Manager[Model]  # type: ignore[type-arg]
+
   def khaleesiSave(
       self,
       *args   : Any,

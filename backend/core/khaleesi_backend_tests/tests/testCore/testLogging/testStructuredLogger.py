@@ -19,10 +19,9 @@ from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.shared.state import STATE
 from khaleesi.core.testUtil.exceptions import defaultKhaleesiException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import RequestMetadata, User
+from khaleesi.proto.core_pb2 import GrpcCallerDetails, User
 from khaleesi.proto.core_sawmill_pb2 import (
-  GrpcRequest,
-  GrpcResponseRequest,
+  GrpcRequestRequest,
   ErrorRequest,
   Event, EventRequest,
   HttpRequestRequest,
@@ -38,27 +37,27 @@ class StructuredTestLogger(StructuredLogger):
 
   def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = grpc)
+    self.sender.send(grpc = grpc)
 
   def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(response = grpc)
+    self.sender.send(grpc = grpc)
 
-  def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
+  def sendLogGrpcRequest(self, *, grpc: GrpcRequestRequest) -> None :
     """Send the log request to the logging facility."""
-    self.sender.send(request = grpcRequest)
+    self.sender.send(grpc = grpc)
 
-  def sendLogGrpcResponse(self, *, grpcResponse: GrpcResponseRequest) -> None :
+  def sendLogGrpcResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the log response to the logging facility."""
-    self.sender.send(response = grpcResponse)
+    self.sender.send(grpc = grpc)
 
   def sendLogEvent(self, *, grpc: EventRequest) -> None :
     """Send the log event to the logging facility."""
-    self.sender.send(event = grpc)
+    self.sender.send(grpc = grpc)
 
   def sendLogError(self, *, grpc: ErrorRequest) -> None :
     """Send the log error to the logging facility."""
-    self.sender.send(error = grpc)
+    self.sender.send(grpc = grpc)
 
 
 @patch('khaleesi.core.logging.structuredLogger.LOGGER')
@@ -103,7 +102,7 @@ class TestStructuredLogger(SimpleTestCase):
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
-        logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+        logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['grpc'])
         self.assertEqual(status.name, logResponse.response.status)
         metadata.assert_called_once()
 
@@ -122,7 +121,7 @@ class TestStructuredLogger(SimpleTestCase):
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
-    logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['grpc'])
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     metadata.assert_called_once()
 
@@ -133,20 +132,20 @@ class TestStructuredLogger(SimpleTestCase):
     self.logger.sender.reset_mock()
     logger.reset_mock()
     metadata.reset_mock()
-    upstreamRequest = RequestMetadata()
-    upstreamRequest.grpcCaller.requestId       = 'request-id'
-    upstreamRequest.grpcCaller.khaleesiGate    = 'khaleesi-gate'
-    upstreamRequest.grpcCaller.khaleesiService = 'khaleesi-service'
-    upstreamRequest.grpcCaller.grpcService     = 'grpc-service'
-    upstreamRequest.grpcCaller.grpcMethod      = 'grpc-method'
+    upstreamRequest = GrpcCallerDetails()
+    upstreamRequest.requestId       = 'request-id'
+    upstreamRequest.khaleesiGate    = 'khaleesi-gate'
+    upstreamRequest.khaleesiService = 'khaleesi-service'
+    upstreamRequest.grpcService     = 'grpc-service'
+    upstreamRequest.grpcMethod      = 'grpc-method'
     # Perform test.
     self.logger.logGrpcRequest(upstreamRequest = upstreamRequest)
     # Assert result.
     self.logger.sender.send.assert_called_once()
     self.assertEqual(2, logger.info.call_count)
     metadata.assert_called_once()
-    logGrpcRequest = cast(GrpcRequest, self.logger.sender.send.call_args.kwargs['request'])
-    self.assertEqual(upstreamRequest.grpcCaller, logGrpcRequest.upstreamRequest)
+    logGrpcRequest = cast(GrpcRequestRequest, self.logger.sender.send.call_args.kwargs['grpc'])
+    self.assertEqual(upstreamRequest, logGrpcRequest.request.upstreamRequest)
 
   @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogSystemGrpcRequest(self, metadata: MagicMock, logger: MagicMock) -> None :
@@ -169,6 +168,55 @@ class TestStructuredLogger(SimpleTestCase):
     logger.info.assert_called_once()
     metadata.assert_called_once()
 
+  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
+  def testLogNotOkGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    for status in [s for s in StatusCode if s != StatusCode.OK]:
+      with self.subTest(status = status.name):
+        # Prepare data.
+        self.logger.sender.reset_mock()
+        logger.reset_mock()
+        metadata.reset_mock()
+        STATE.reset()
+        # Perform test.
+        self.logger.logGrpcResponse(status = status)
+        # Assert result.
+        self.logger.sender.send.assert_called_once()
+        logger.warning.assert_called_once()
+        logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['grpc'])
+        self.assertEqual(status.name, logResponse.response.status)
+        self.assertEqual(0, len(logResponse.queries))
+        metadata.assert_called_once()
+
+  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
+  def testLogOkGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
+    """Test logging a response."""
+    # Prepare data.
+    self.logger.sender.reset_mock()
+    logger.reset_mock()
+    ids = [ 'id0', 'id1', 'id2', ]
+    STATE.reset()
+    for queryId in ids:
+      query = Query()
+      query.id = queryId
+      query.raw = 'raw'
+      query.start.FromDatetime(datetime.now(tz = timezone.utc))
+      query.connection = 'connection'
+      STATE.queries.append(query)
+    # Perform test.
+    self.logger.logGrpcResponse(status = StatusCode.OK)
+    # Assert result.
+    self.logger.sender.send.assert_called_once()
+    logger.info.assert_called()
+    logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['grpc'])
+    self.assertEqual(StatusCode.OK.name, logResponse.response.status)
+    self.assertEqual(3, len(logResponse.queries))
+    for query in logResponse.queries:
+      self.assertIn(query.id, ids)
+      self.assertEqual('connection', query.connection)
+      self.assertEqual('raw'       , query.raw)
+    metadata.assert_called_once()
+
   @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
   def testLogNotOkSystemGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
     """Test logging a response."""
@@ -189,10 +237,7 @@ class TestStructuredLogger(SimpleTestCase):
         # Assert result.
         self.logger.sender.send.assert_called_once()
         logger.warning.assert_called_once()
-        logResponse = cast(
-          GrpcResponseRequest,
-          self.logger.sender.send.call_args.kwargs['response'],
-        )
+        logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['grpc'])
         self.assertEqual(status.name, logResponse.response.status)
         self.assertEqual(0, len(logResponse.queries))
         metadata.assert_called_once()
@@ -222,59 +267,7 @@ class TestStructuredLogger(SimpleTestCase):
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called()
-    logResponse = cast(GrpcResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
-    self.assertEqual(StatusCode.OK.name, logResponse.response.status)
-    self.assertEqual(3, len(logResponse.queries))
-    for query in logResponse.queries:
-      self.assertIn(query.id, ids)
-      self.assertEqual('connection', query.connection)
-      self.assertEqual('raw'       , query.raw)
-    metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogNotOkGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a response."""
-    for status in [s for s in StatusCode if s != StatusCode.OK]:
-      with self.subTest(status = status.name):
-        # Prepare data.
-        self.logger.sender.reset_mock()
-        logger.reset_mock()
-        metadata.reset_mock()
-        STATE.reset()
-        # Perform test.
-        self.logger.logGrpcResponse(status = status)
-        # Assert result.
-        self.logger.sender.send.assert_called_once()
-        logger.warning.assert_called_once()
-        logResponse = cast(
-          GrpcResponseRequest,
-          self.logger.sender.send.call_args.kwargs['response'],
-        )
-        self.assertEqual(status.name, logResponse.response.status)
-        self.assertEqual(0, len(logResponse.queries))
-        metadata.assert_called_once()
-
-  @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')
-  def testLogOkGrpcResponse(self, metadata: MagicMock, logger: MagicMock) -> None :
-    """Test logging a response."""
-    # Prepare data.
-    self.logger.sender.reset_mock()
-    logger.reset_mock()
-    ids = [ 'id0', 'id1', 'id2', ]
-    STATE.reset()
-    for queryId in ids:
-      query = Query()
-      query.id = queryId
-      query.raw = 'raw'
-      query.start.FromDatetime(datetime.now(tz = timezone.utc))
-      query.connection = 'connection'
-      STATE.queries.append(query)
-    # Perform test.
-    self.logger.logGrpcResponse(status = StatusCode.OK)
-    # Assert result.
-    self.logger.sender.send.assert_called_once()
-    logger.info.assert_called()
-    logResponse = cast(GrpcResponseRequest, self.logger.sender.send.call_args.kwargs['response'])
+    logResponse = cast(ResponseRequest, self.logger.sender.send.call_args.kwargs['grpc'])
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     self.assertEqual(3, len(logResponse.queries))
     for query in logResponse.queries:
@@ -317,7 +310,7 @@ class TestStructuredLogger(SimpleTestCase):
               logger.info.call_count + logger.warning.call_count + logger.error.call_count
               + logger.fatal.call_count,
             )
-            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
+            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['grpc'])
             self.assertEqual(target                 , logEvent.event.target.id)
             self.assertEqual(targetType             , logEvent.event.target.type)
             self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
@@ -365,7 +358,7 @@ class TestStructuredLogger(SimpleTestCase):
               logger.info.call_count + logger.warning.call_count + logger.error.call_count
               + logger.fatal.call_count,
             )
-            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['event'])
+            logEvent = cast(EventRequest, self.logger.sender.send.call_args.kwargs['grpc'])
             self.assertIsNotNone(logEvent.event.target.type)
             self.assertEqual(target                 , logEvent.event.target.id)
             self.assertEqual(event.target.owner.id  , logEvent.event.target.owner.id)
@@ -391,7 +384,7 @@ class TestStructuredLogger(SimpleTestCase):
           # Assert result.
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
-          logError = cast(ErrorRequest, self.logger.sender.send.call_args.kwargs['error'])
+          logError = cast(ErrorRequest, self.logger.sender.send.call_args.kwargs['grpc'])
           self.assertEqual(status.name  , logError.error.status)
           self.assertEqual(loglevel.name, logError.error.loglevel)
           self._assertError(exception = exception, logError = logError)
@@ -421,7 +414,7 @@ class TestStructuredLogger(SimpleTestCase):
           # Assert result.
           self.logger.sender.send.assert_called_once()
           self.assertEqual(2, logger.log.call_count)
-          logError = cast(ErrorRequest, self.logger.sender.send.call_args.kwargs['error'])
+          logError = cast(ErrorRequest, self.logger.sender.send.call_args.kwargs['grpc'])
           self.assertEqual(status.name  , logError.error.status)
           self.assertEqual(loglevel.name, logError.error.loglevel)
           self._assertError(exception = exception, logError = logError)
@@ -465,7 +458,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     # Prepare data.
     self.logger.stub.LogGrpcRequest = MagicMock()
     # Perform test.
-    self.logger.sendLogGrpcRequest(grpcRequest = MagicMock())
+    self.logger.sendLogGrpcRequest(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogGrpcRequest.assert_called_once()
 
@@ -474,7 +467,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     # Prepare data.
     self.logger.stub.LogGrpcResponse = MagicMock()
     # Perform test.
-    self.logger.sendLogGrpcResponse(grpcResponse = MagicMock())
+    self.logger.sendLogGrpcResponse(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogGrpcResponse.assert_called_once()
 

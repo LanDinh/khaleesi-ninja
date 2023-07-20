@@ -129,7 +129,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     context = MagicMock()
     def _method(*_: Any) -> None :
       self._assertNotCleanState(userType = userType)
-      raise Exception('exception')
+      raise Exception('exception')  # pylint: disable=broad-exception-raised
     # Execute test.
     self.interceptor.khaleesiIntercept(
       request = finalRequest,

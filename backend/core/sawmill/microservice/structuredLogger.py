@@ -2,10 +2,10 @@
 
 # khaleesi.ninja.
 from khaleesi.core.logging.structuredLogger import StructuredLogger
+from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.proto.core_sawmill_pb2 import (
   HttpRequestRequest,
-  GrpcRequest,
-  GrpcResponseRequest,
+  GrpcRequestRequest,
   ErrorRequest,
   EventRequest,
   ResponseRequest,
@@ -23,53 +23,70 @@ from microservice.models import (
 class StructuredDbLogger(StructuredLogger):
   """Structured logger using gRPC."""
 
-  def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> None:
+  def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> DbHttpRequest:  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log request to the logging facility."""
-    dbRequest = DbHttpRequest()
-    dbRequest.khaleesiSave(grpc = grpc)
+    instance = DbHttpRequest()
+    instance.khaleesiSave(grpc = grpc)
+    return instance
 
-  def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> None :
+  def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> DbHttpRequest :  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log response to the logging facility."""
-    dbRequest = DbHttpRequest.objects.get(
+    instance = DbHttpRequest.objects.get(
       metaCallerHttpRequestId = grpc.requestMetadata.httpCaller.requestId,
     )
-    dbRequest.finish(request = grpc)
+    instance.finish(request = grpc)
+    return instance
 
-  def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
+  def sendLogGrpcRequest(self, *, grpc: GrpcRequestRequest) -> DbGrpcRequest :  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log request to the logging facility."""
-    DbGrpcRequest.objects.logRequest(grpcRequest = grpcRequest)
+    instance = DbGrpcRequest()
+    instance.khaleesiSave(grpc = grpc)
+    LOGGER.info('Adding call to service registry.')
     SERVICE_REGISTRY.addCall(
-      callerDetails = grpcRequest.upstreamRequest,
-      calledDetails = grpcRequest.requestMetadata.grpcCaller,
+      callerDetails = grpc.request.upstreamRequest,
+      calledDetails = grpc.requestMetadata.grpcCaller,
     )
+    return instance
 
-  def sendLogGrpcResponse(self, *, grpcResponse: GrpcResponseRequest) -> None :
+  def sendLogGrpcResponse(self, *, grpc: ResponseRequest) -> DbGrpcRequest :  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log response to the logging facility."""
-    result = DbGrpcRequest.objects.logResponse(grpcResponse = grpcResponse)
+    instance = DbGrpcRequest.objects.get(
+      metaCallerGrpcRequestId = grpc.requestMetadata.grpcCaller.requestId,
+    )
+    instance.finish(request = grpc)
     # noinspection PyBroadException
     try:
+      LOGGER.info('Adding the duration to the parent HTTP request.')
       dbHttpRequest = DbHttpRequest.objects.get(
-        metaCallerHttpRequestId = grpcResponse.requestMetadata.httpCaller.requestId,
+        metaCallerHttpRequestId = grpc.requestMetadata.httpCaller.requestId,
       )
-      dbHttpRequest.addChildDuration(request = result)
+      dbHttpRequest.addChildDuration(duration = instance.reportedDuration)
+      dbHttpRequest.khaleesiSave(grpc = dbHttpRequest.toGrpc())
     except Exception:  # pylint: disable=broad-except  # pragma: no cover
       # TODO(45) - remove this hack
       pass
-
+    LOGGER.info('Saving the corresponding queries to the database.')
     queries = DbQuery.objects.logQueries(
-      queries  = grpcResponse.queries,
-      metadata = result.toGrpc().request.requestMetadata,
+      queries  = grpc.queries,
+      metadata = instance.toGrpc().requestMetadata,
     )
+    LOGGER.info('Handling query errors and query duration.')
+    errors = instance.metaLoggingErrors
     for query in queries:
-      result.metaChildDuration += query.reportedDuration
-    result.save()
+      errors += query.metaLoggingErrors
+      instance.metaChildDuration += query.reportedDuration
+    instance.khaleesiSave(grpc = instance.toGrpc())
+    instance.metaLoggingErrors = errors  # Don't save it, but it might need to be handled.
+    return instance
 
-  def sendLogEvent(self, *, grpc: EventRequest) -> None :
+  def sendLogEvent(self, *, grpc: EventRequest) -> DbEvent :  # type: ignore[override]
     """Send the log event to the logging facility."""
-    dbEvent = DbEvent()
-    dbEvent.khaleesiSave(grpc = grpc)
+    instance = DbEvent()
+    instance.khaleesiSave(grpc = grpc)
+    return instance
 
-  def sendLogError(self, *, grpc: ErrorRequest) -> None :
+  def sendLogError(self, *, grpc: ErrorRequest) -> DbError :  # type: ignore[override]
     """Send the log error to the logging facility."""
-    dbError = DbError()
-    dbError.khaleesiSave(grpc = grpc)
+    instance = DbError()
+    instance.khaleesiSave(grpc = grpc)
+    return instance

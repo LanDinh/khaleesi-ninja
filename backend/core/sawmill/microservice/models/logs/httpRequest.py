@@ -1,5 +1,7 @@
 """Request logs."""
 
+# pylint:disable=duplicate-code
+
 # Python.
 from __future__ import annotations
 from typing import List, Any
@@ -10,10 +12,9 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.core.models.baseModel import Model
 from khaleesi.proto.core_pb2 import ObjectMetadata
-from khaleesi.proto.core_sawmill_pb2 import HttpRequestRequest as GrpcHttpRequest, ResponseRequest
+from khaleesi.proto.core_sawmill_pb2 import HttpRequestRequest as GrpcHttpRequest
 from microservice.models.logs.metadataMixin import MetadataMixin
 from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
-from microservice.models.logs.grpcRequest import GrpcRequest
 
 
 class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):  # type: ignore[misc]  # pylint: disable=line-too-long
@@ -35,20 +36,8 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
   os             = models.TextField(default = 'UNKNOWN')
   deviceType     = models.TextField(default = 'UNKNOWN')
 
-  def addChildDuration(self, *, request: GrpcRequest) -> None :
-    """Log request duration."""
-    metadata = ObjectMetadata()
-    grpc = self.toGrpc(metadata = metadata)
-    self.metaChildDuration += request.reportedDuration
-    self.khaleesiSave(metadata = metadata, grpc = grpc)
+  objects: models.Manager[HttpRequest]
 
-  def finish(self, *, request: ResponseRequest) -> None :
-    """Finish an in-progress HTTP request."""
-    metadata = ObjectMetadata()
-    grpc = self.toGrpc(metadata = metadata)
-    grpc.response.CopyFrom(request.response)
-    grpc.responseMetadata.CopyFrom(request.requestMetadata)
-    self.khaleesiSave(metadata = metadata, grpc = grpc)
 
   def khaleesiSave(
       self,
@@ -81,15 +70,15 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
     # Needs to be at the end because it saves errors to the model.
     self.responseMetadataFromGrpc(
       metadata = grpc.responseMetadata,
-      grpc = grpc.response,
-      errors = errors,
+      grpc     = grpc.response,
+      errors   = errors,
     )
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
     super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
   def toGrpc(
       self, *,
-      metadata: ObjectMetadata   = ObjectMetadata(),
+      metadata: ObjectMetadata  = ObjectMetadata(),
       grpc    : GrpcHttpRequest = GrpcHttpRequest(),
   ) -> GrpcHttpRequest :
     """Return a grpc object containing own values."""

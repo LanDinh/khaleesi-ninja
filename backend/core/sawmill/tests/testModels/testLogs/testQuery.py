@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.testUtil.grpc import GrpcTestMixin
 from khaleesi.core.testUtil.testCase import SimpleTestCase, TransactionTestCase
 from khaleesi.proto.core_pb2 import User, RequestMetadata
-from khaleesi.proto.core_sawmill_pb2 import GrpcResponseRequest as GrpcGrpcQueries
+from khaleesi.proto.core_sawmill_pb2 import ResponseRequest as GrpcGrpcQueries
 from microservice.models import Query
 from microservice.testUtil import ModelRequestMetadataMixin
 

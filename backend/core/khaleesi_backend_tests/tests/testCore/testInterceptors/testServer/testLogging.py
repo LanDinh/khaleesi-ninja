@@ -23,7 +23,7 @@ from khaleesi.core.testUtil.exceptions import (
 )
 from khaleesi.core.testUtil.interceptor import ServerInterceptorTestMixin
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import RequestMetadata, User
+from khaleesi.proto.core_pb2 import GrpcCallerDetails, RequestMetadata, User
 
 
 @patch('khaleesi.core.interceptors.server.logging.SINGLETON')
@@ -140,7 +140,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
   ) -> None :
     """Assert the logging calls were correct."""
     upstreamRequest = cast(
-      RequestMetadata,
+      GrpcCallerDetails,
       singleton.structuredLogger.logGrpcRequest.call_args.kwargs['upstreamRequest'],
     )
     status = cast(
@@ -149,7 +149,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     )
     context.set_code.assert_not_called()
     context.set_details.assert_not_called()
-    self.assertEqual(requestMetadata.grpcCaller, upstreamRequest.grpcCaller)
+    self.assertEqual(requestMetadata.grpcCaller, upstreamRequest)
     self.assertEqual(StatusCode.OK             , status)
 
   def _assertExceptionLoggingCall(

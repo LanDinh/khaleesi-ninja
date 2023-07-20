@@ -1,23 +1,13 @@
 """Sawmill test utility."""
 
 # Python.
-from datetime import datetime, timezone, timedelta
-from typing import Dict, Any, Callable, TypeVar, Type
-
-# gRPC.
-from unittest.mock import MagicMock
-
-from grpc import StatusCode
+from datetime import datetime, timezone
+from typing import Dict, Any, Callable
 
 # khaleesi.ninja.
 from khaleesi.proto.core_pb2 import RequestMetadata as GrpcRequestMetadata, User  # pylint: disable=unused-import
-from khaleesi.proto.core_sawmill_pb2 import (
-  ResponseMetadata as GrpcResponseMetadata,
-  Response as GrpcResponse,
-  ProcessedResponse as GrpcProcessedResponse,
-)
+from khaleesi.proto.core_sawmill_pb2 import ResponseMetadata as GrpcResponseMetadata
 from microservice.models.logs.abstract import Metadata
-from microservice.models.logs.abstractResponse import ResponseMetadata
 
 
 class ModelRequestMetadataMixin:
@@ -72,74 +62,3 @@ class ModelRequestMetadataMixin:
       model.metaLoggedTimestamp,
       grpcResponse.loggedTimestamp.ToDatetime().replace(tzinfo = timezone.utc),
     )
-
-
-M = TypeVar('M', bound = ResponseMetadata)
-
-
-class ModelResponseMetadataMixin(ModelRequestMetadataMixin):
-  """Sawmill test utility."""
-
-  assertLess: Callable  # type: ignore[type-arg]
-
-  # noinspection PyMethodOverriding
-  def modelFullRequestMetadata(  # type: ignore[override]  # pylint: disable=arguments-differ
-      self, *,
-      user  : 'User.UserType.V',
-      status: StatusCode,
-  ) -> Dict[str, Any] :
-    """Fill model request metadata for testing purposes."""
-    return {
-        'metaResponseStatus'           : status.name,
-        'metaResponseReportedTimestamp': datetime.now(tz = timezone.utc) + timedelta(days = 1),
-        'metaResponseLoggedTimestamp'  : datetime.now(tz = timezone.utc) + timedelta(days = 1),
-        'metaChildDuration'            : timedelta(hours = 12),
-        **super().modelFullRequestMetadata(user = user),
-    }
-
-  def modelEmptyRequestMetadata(self) -> Dict[str, datetime] :
-    """Provide necessary model metadata to avoid NPEs."""
-    return {
-        'metaResponseReportedTimestamp': datetime.now(tz = timezone.utc),
-        'metaResponseLoggedTimestamp'  : datetime.now(tz = timezone.utc),
-        **super().modelEmptyRequestMetadata(),
-    }
-
-  @staticmethod
-  def getModelForResponseSaving(*, modelType: Type[M]) -> M :
-    """Provide a model to be used for response saving tests."""
-    start = datetime.now(tz = timezone.utc)
-    end   = start + timedelta(days = 1)
-    model = modelType(
-      metaLoggedTimestamp = start,
-      metaReportedTimestamp = start,
-      # Logged timestamps get created at save time, which we mock.
-      metaResponseLoggedTimestamp = end
-    )
-    model.save = MagicMock()  # type: ignore[assignment]
-    return model
-
-  def assertGrpcResponseMetadata(
-      self, *,
-      model                : ResponseMetadata,
-      grpcResponse         : GrpcResponse,
-      grpcResponseResponse : GrpcResponseMetadata,
-      grpcResponseProcessed: GrpcProcessedResponse,
-  ) -> None :
-    """Assert that returned gRPC request metadata matches the original model metadata."""
-    self.assertEqual(model.metaResponseStatus, grpcResponse.status)
-    self.assertEqual(
-      model.metaResponseReportedTimestamp,
-      grpcResponse.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
-    )
-    self.assertEqual(
-      model.metaResponseLoggedTimestamp,
-      grpcResponseResponse.loggedTimestamp.ToDatetime().replace(tzinfo = timezone.utc),
-    )
-    self.assertEqual(
-      model.metaChildDuration.total_seconds(),
-      grpcResponseProcessed.childDurationAbsolute.seconds,
-    )
-    self.assertEqual(0.5, round(grpcResponseProcessed.childDurationRelative, 1))
-    self.assertLess(0   , grpcResponseProcessed.loggedDuration.nanos)
-    self.assertLess(0   , grpcResponseProcessed.reportedDuration.nanos)

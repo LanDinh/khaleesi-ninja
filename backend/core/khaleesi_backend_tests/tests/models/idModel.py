@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-
 # Python.
 from unittest.mock import MagicMock
+
+# Django.
+from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.models.idModel import Model as BaseModel
@@ -14,6 +16,8 @@ from tests.models.baseModel import Grpc
 
 class IdModel(BaseModel[Grpc]):
   """Allow instantiation of abstract model."""
+
+  objects: models.Manager[IdModel]
 
   def toGrpc(
       self, *,

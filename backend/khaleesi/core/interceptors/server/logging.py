@@ -25,7 +25,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     """Log the incoming request."""
 
     SINGLETON.structuredLogger.logGrpcRequest(
-      upstreamRequest = self.getUpstreamRequest(request = request),
+      upstreamRequest = self.getUpstreamRequest(request = request).grpcCaller,
     )
 
     try:

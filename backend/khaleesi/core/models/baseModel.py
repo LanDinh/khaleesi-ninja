@@ -24,6 +24,8 @@ class Model(models.Model, Generic[Grpc]):
 
   khaleesiVersion = models.IntegerField(default = 0)
 
+  objects: models.Manager[Model]  # type: ignore[type-arg]
+
   def khaleesiSave(
       self,
       *args   : Any,

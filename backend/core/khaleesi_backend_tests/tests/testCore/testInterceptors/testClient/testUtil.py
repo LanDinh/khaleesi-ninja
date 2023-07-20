@@ -32,7 +32,7 @@ class ClientInterceptorTest(SimpleTestCase):
         (khaleesiGateName, khaleesiServiceName, grpcServiceName, grpcMethodName),
         (khaleesiGate, khaleesiService, grpcService, grpcMethod),
       )
-    self.interceptor.khaleesiIntercept = khaleesiIntercept  # type: ignore[assignment]
+    self.interceptor.khaleesiIntercept = khaleesiIntercept
     # Execute test & assert result.
     self.interceptor.intercept(
       method              = lambda *args: None,

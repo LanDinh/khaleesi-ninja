@@ -1,6 +1,7 @@
 """Test the thread utility."""
 
 # Python.
+import sys
 from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
@@ -45,21 +46,21 @@ class StopBatchJobsTestCase(SimpleTestCase):
 class BatchJobThreadTestCase(SimpleTestCase):
   """Test the thread utility."""
 
-  @patch('khaleesi.core.shared.state.STATE')
-  def testRun(self, state: MagicMock) -> None :
+  def testRun(self) -> None :
     """Test if running the thread works as expected."""
-    # Prepare data.
-    job = MagicMock()
-    thread: BatchJobThread[MagicMock] = BatchJobThread(
-      job          = job,
-      stateRequest = RequestMetadata(),
-      stateQueries = [],
-    )
-    # Execute test.
-    thread.start()
-    # Assert result.
-    job.execute.assert_called_once_with(stopEvent = thread.stopEvent)
-    state.copyFrom.assert_called_once()
+    with patch.dict(sys.modules, {'khaleesi.core.shared.state': MagicMock()}) as importDict:
+      # Prepare data.
+      job = MagicMock()
+      thread: BatchJobThread[MagicMock] = BatchJobThread(
+        job          = job,
+        stateRequest = RequestMetadata(),
+        stateQueries = [],
+      )
+      # Execute test.
+      thread.start()
+      # Assert result.
+      job.execute.assert_called_once_with(stopEvent = thread.stopEvent)
+      importDict['khaleesi.core.shared.state'].STATE.copyFrom.assert_called_once()
 
   def testStop(self) -> None :
     """Test if stopping the thread works as expected."""

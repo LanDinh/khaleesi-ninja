@@ -17,7 +17,7 @@ class BatchJobThread(Thread, Generic[M]):
   job             : BaseJob[M]
   isBatchJobThread: bool
   stateRequest    : RequestMetadata
-  stateQueries         : List[Query]
+  stateQueries    : List[Query]
 
   def __init__(
       self, *,

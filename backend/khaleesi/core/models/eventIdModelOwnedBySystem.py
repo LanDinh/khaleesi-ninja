@@ -35,6 +35,8 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
   khaleesiModifiedById   = models.TextField()
   khaleesiModifiedByType = models.TextField()
 
+  objects: models.Manager[Model]  # type: ignore[type-arg]
+
 
   @property
   def khaleesiOwner(self) -> User :

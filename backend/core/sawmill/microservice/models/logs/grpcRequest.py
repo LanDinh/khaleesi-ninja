@@ -1,108 +1,113 @@
 """Request logs."""
 
+# pylint:disable=duplicate-code
+
 # Python.
 from __future__ import annotations
-from typing import List
+from typing import List, Any
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.models.baseModel import Model
 from khaleesi.core.shared.parseUtil import parseString
-from khaleesi.proto.core_sawmill_pb2 import (
-  GrpcRequest as GrpcGrpcRequest, GrpcRequestResponse as GrpcGrpcRequestResponse,
-  GrpcResponseRequest as GrpcGrpcResponse,
-)
-from microservice.models.logs.abstractResponse import ResponseMetadata
+from khaleesi.proto.core_pb2 import ObjectMetadata
+from khaleesi.proto.core_sawmill_pb2 import GrpcRequestRequest as GrpcGrpcRequest
+from microservice.models.logs.metadataMixin import GrpcMetadataMixin
+from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
 
 
-class GrpcRequestManager(models.Manager['GrpcRequest']):
-  """Custom model manager."""
-
-  def logRequest(self, *, grpcRequest: GrpcGrpcRequest) -> GrpcRequest :
-    """Log a gRPC request."""
-
-    errors: List[str] = []
-
-    upstreamRequest = {} if grpcRequest is None else {
-        "upstreamRequestGrpcRequestId": parseString(
-          raw    = grpcRequest.upstreamRequest.requestId,
-          name   = 'upstreamRequestGrpcRequestId',
-          errors = errors,
-        ),
-        "upstreamRequestKhaleesiGate": parseString(
-          raw    = grpcRequest.upstreamRequest.khaleesiGate,
-          name   = 'upstreamRequestKhaleesiGate',
-          errors = errors,
-        ),
-        "upstreamRequestKhaleesiService": parseString(
-          raw    = grpcRequest.upstreamRequest.khaleesiService,
-          name   = 'upstreamRequestKhaleesiService',
-          errors = errors,
-        ),
-        "upstreamRequestGrpcService": parseString(
-          raw    = grpcRequest.upstreamRequest.grpcService,
-          name   = 'upstreamRequestGrpcService',
-          errors = errors,
-        ),
-        "upstreamRequestGrpcMethod": parseString(
-          raw    = grpcRequest.upstreamRequest.grpcMethod,
-          name   = 'upstreamRequestGrpcMethod',
-          errors = errors,
-        ),
-    }
-
-    return self.create(
-      # Upstream request.
-      **upstreamRequest,
-      # Metadata.
-      **self.model.logMetadata(metadata = grpcRequest.requestMetadata, errors = errors),
-    )
-
-  def logResponse(self, *, grpcResponse: GrpcGrpcResponse) -> GrpcRequest :
-    """Log a gRPC response."""
-    request = self.get(
-      metaCallerGrpcRequestId = grpcResponse.requestMetadata.grpcCaller.requestId,
-      metaResponseStatus      = 'IN_PROGRESS',
-    )
-    request.logResponse(grpcResponse = grpcResponse.response)
-    request.save()
-    return request
-
-
-class GrpcRequest(ResponseMetadata):
+class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMixin):  # type: ignore[misc]  # pylint: disable=line-too-long
   """Request logs."""
 
-  upstreamRequestGrpcRequestId   = models.TextField(default = 'UNKNOWN')
+  upstreamRequestId              = models.TextField(default = 'UNKNOWN')
   upstreamRequestKhaleesiGate    = models.TextField(default = 'UNKNOWN')
   upstreamRequestKhaleesiService = models.TextField(default = 'UNKNOWN')
   upstreamRequestGrpcService     = models.TextField(default = 'UNKNOWN')
   upstreamRequestGrpcMethod      = models.TextField(default = 'UNKNOWN')
+  upstreamRequestPodId           = models.TextField(default = 'UNKNOWN')
 
-  objects = GrpcRequestManager()
+  objects: models.Manager[GrpcRequest]
 
-  def toGrpc(self) -> GrpcGrpcRequestResponse :
-    """Map to gRPC event message."""
 
-    grpcRequestResponse = GrpcGrpcRequestResponse()
+  def khaleesiSave(
+      self,
+      *args   : Any,
+      metadata: ObjectMetadata = ObjectMetadata(),
+      grpc    : GrpcGrpcRequest,
+      **kwargs: Any,
+  ) -> None :
+    """Change own values according to the grpc object."""
+    errors: List[str] = []
 
-    # Request metadata.
-    self.requestMetadataToGrpc(requestMetadata = grpcRequestResponse.request.requestMetadata)
-    self.responseMetadataToGrpc(responseMetadata = grpcRequestResponse.requestMetadata)
+    if self._state.adding:
+      self.upstreamRequestId = parseString(
+        raw    = grpc.request.upstreamRequest.requestId,
+        name   = 'upstreamRequestGrpcRequestId',
+        errors = errors,
+      )
+      self.upstreamRequestKhaleesiGate = parseString(
+        raw    = grpc.request.upstreamRequest.khaleesiGate,
+        name   = 'upstreamRequestKhaleesiGate',
+        errors = errors,
+      )
+      self.upstreamRequestKhaleesiService = parseString(
+        raw    = grpc.request.upstreamRequest.khaleesiService,
+        name   = 'upstreamRequestKhaleesiService',
+        errors = errors,
+      )
+      self.upstreamRequestGrpcService = parseString(
+        raw    = grpc.request.upstreamRequest.grpcService,
+        name   = 'upstreamRequestGrpcService',
+        errors = errors,
+      )
+      self.upstreamRequestGrpcMethod = parseString(
+        raw    = grpc.request.upstreamRequest.grpcMethod,
+        name   = 'upstreamRequestGrpcMethod',
+        errors = errors,
+      )
+      self.upstreamRequestPodId = parseString(
+        raw    = grpc.request.upstreamRequest.podId,
+        name   = 'upstreamRequestPodId',
+        errors = errors,
+      )
 
-    # Response.
-    self.responseToGrpc(
-      metadata  = grpcRequestResponse.responseMetadata,
-      response  = grpcRequestResponse.response,
-      processed = grpcRequestResponse.processedResponse,
+    # Needs to be at the end because it saves errors to the model.
+    self.responseMetadataFromGrpc(
+      metadata = grpc.responseMetadata,
+      grpc     = grpc.response,
+      errors   = errors,
+    )
+    self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
+    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+
+  def toGrpc(
+      self, *,
+      metadata: ObjectMetadata  = ObjectMetadata(),
+      grpc    : GrpcGrpcRequest = GrpcGrpcRequest(),
+  ) -> GrpcGrpcRequest :
+    """Return a grpc object containing own values."""
+    super().toGrpc(metadata = metadata, grpc = grpc)
+    self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+    self.responseMetadataToGrpc(
+      logMetadata = grpc.responseLogMetadata,
+      processed   = grpc.processedResponse,
+      response    = grpc.response,
     )
 
     # Upstream request.
-    grpcRequestResponse.request.upstreamRequest.requestId = self.upstreamRequestGrpcRequestId
-    grpcRequestResponse.request.upstreamRequest.khaleesiGate = self.upstreamRequestKhaleesiGate
-    grpcRequestResponse.request.upstreamRequest.khaleesiService = \
-      self.upstreamRequestKhaleesiService
-    grpcRequestResponse.request.upstreamRequest.grpcService = self.upstreamRequestGrpcService
-    grpcRequestResponse.request.upstreamRequest.grpcMethod = self.upstreamRequestGrpcMethod
+    grpc.request.upstreamRequest.requestId       = self.upstreamRequestId
+    grpc.request.upstreamRequest.khaleesiGate    = self.upstreamRequestKhaleesiGate
+    grpc.request.upstreamRequest.khaleesiService = self.upstreamRequestKhaleesiService
+    grpc.request.upstreamRequest.grpcService     = self.upstreamRequestGrpcService
+    grpc.request.upstreamRequest.grpcMethod      = self.upstreamRequestGrpcMethod
+    grpc.request.upstreamRequest.podId           = self.upstreamRequestPodId
 
-    return grpcRequestResponse
+    return grpc
+
+  def toObjectMetadata(self) -> ObjectMetadata :
+    """Return the object metadata representing this object."""
+    metadata = ObjectMetadata()
+    metadata.id = self.metaCallerGrpcRequestId
+    return metadata

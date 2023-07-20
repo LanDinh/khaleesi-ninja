@@ -46,6 +46,6 @@ class LoggingClientInterceptor(ClientInterceptor):
 
   def exceptionDetails(self, *, response: Call) -> str :
     """Return a pretty-print of the exception."""
-    if hasattr(response, 'exception') and response.exception and response.exception():  # type: ignore[attr-defined]  # pylint: disable=line-too-long
-      return ''.join(traceback.format_exception(response.exception()))  # type: ignore[attr-defined]
+    if hasattr(response, 'exception') and response.exception and response.exception():
+      return ''.join(traceback.format_exception(response.exception()))
     return response.details()

@@ -1,7 +1,6 @@
 """Test the HTTP request logs."""
 
 # Python.
-from datetime import timedelta
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
@@ -12,34 +11,6 @@ from microservice.models import HttpRequest
 
 class HttpRequestTestCase(SimpleTestCase):
   """Test the HTTP request logs models."""
-
-  @patch('microservice.models.logs.httpRequest.HttpRequest.toGrpc')
-  @patch('microservice.models.logs.httpRequest.HttpRequest.khaleesiSave')
-  def testAddChildDuration(self, parent: MagicMock, toGrpc: MagicMock) -> None :
-    """Test adding child durations."""
-    # Prepare data.
-    instance = HttpRequest()
-    instance.metaChildDuration = timedelta(hours = 1)
-    request = MagicMock()
-    request.reportedDuration = timedelta(hours = 13)
-    # Execute test.
-    instance.addChildDuration(request = request)
-    # Assert result.
-    parent.assert_called_once()
-    toGrpc.assert_called_once()
-    self.assertEqual(request.reportedDuration + timedelta(hours = 1), instance.metaChildDuration)
-
-  @patch('microservice.models.logs.httpRequest.HttpRequest.toGrpc')
-  @patch('microservice.models.logs.httpRequest.HttpRequest.khaleesiSave')
-  def testFinish(self, parent: MagicMock, toGrpc: MagicMock) -> None :
-    """Test logging a gRPC HTTP request response."""
-    # Prepare data.
-    instance = HttpRequest()
-    # Execute test.
-    instance.finish(request = MagicMock())
-    # Assert result.
-    parent.assert_called_once()
-    toGrpc.assert_called_once()
 
   @patch('microservice.models.logs.httpRequest.Model.khaleesiSave')
   @patch('microservice.models.logs.httpRequest.HttpRequest.metadataFromGrpc')
@@ -106,9 +77,8 @@ class HttpRequestTestCase(SimpleTestCase):
     # Prepare data.
     instance = HttpRequest()
     instance._state.adding = True  # pylint: disable=protected-access
-    grpc = GrpcHttpRequest()
     # Execute test.
-    instance.khaleesiSave(grpc = grpc)
+    instance.khaleesiSave(grpc = GrpcHttpRequest())
     # Assert result.
     parent.assert_called_once()
     metadata.assert_called_once()
@@ -164,7 +134,7 @@ class HttpRequestTestCase(SimpleTestCase):
       metadata        : MagicMock,
       parent          : MagicMock,
   ) -> None :
-    """Test that mapping to gRPC for empty events works."""
+    """Test that mapping to gRPC for empty requests works."""
     # Prepare data.
     instance = HttpRequest()
     # Execute test.

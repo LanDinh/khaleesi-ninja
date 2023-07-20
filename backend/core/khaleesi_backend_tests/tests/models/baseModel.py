@@ -6,6 +6,9 @@ from __future__ import annotations
 from abc import ABC
 from unittest.mock import MagicMock
 
+# Django.
+from django.db import models
+
 # gRPC.
 from google.protobuf.message import Message
 
@@ -20,6 +23,8 @@ class Grpc(Message, ABC):
 
 class BaseModel(Model[Grpc]):
   """Allow instantiation of abstract model."""
+
+  objects: models.Manager[BaseModel]
 
   def toGrpc(
       self, *,

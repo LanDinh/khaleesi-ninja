@@ -1,8 +1,10 @@
 """core-sawmill abstract logs models."""
 
+from __future__ import annotations
+
 # Python.
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Callable
 
 # Django.
 from django.db import models
@@ -14,6 +16,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   LogRequestMetadata,
   ProcessedResponse,
   Response,
+  ResponseRequest,
 )
 from microservice.models.logs.metadataMixin import MIN_TIMESTAMP
 
@@ -34,6 +37,13 @@ class ResponseMetadataMixin(models.Model):
   # From MetadataMixin.
   metaReportedTimestamp: datetime
   metaLoggedTimestamp  : datetime
+
+  # From base models.
+  toGrpc          : Callable  # type: ignore[type-arg]
+  khaleesiSave    : Callable  # type: ignore[type-arg]
+  toObjectMetadata: Callable  # type: ignore[type-arg]
+
+  objects: models.Manager[ResponseMetadataMixin]
 
   @property
   def inProgress(self) -> bool :
@@ -62,6 +72,18 @@ class ResponseMetadataMixin(models.Model):
     if self.inProgress or not self.loggedDuration:
       return 0
     return self.metaChildDuration / self.loggedDuration
+
+  def addChildDuration(self, *, duration: timedelta) -> None :
+    """Log request duration."""
+    self.metaChildDuration += duration
+
+  def finish(self, *, request: ResponseRequest) -> None :
+    """Finish an in-progress HTTP request."""
+    metadata = ObjectMetadata()
+    grpc = self.toGrpc(metadata = metadata)
+    grpc.response.CopyFrom(request.response)
+    grpc.responseMetadata.CopyFrom(request.requestMetadata)
+    self.khaleesiSave(metadata = metadata, grpc = grpc)
 
   def responseMetadataFromGrpc(
       self, *,
@@ -92,11 +114,9 @@ class ResponseMetadataMixin(models.Model):
   ) -> None :
     """Return a grpc object containing own values."""
     # Response.
-    if self.metaResponseReportedTimestamp:
-      response.timestamp.FromDatetime(self.metaResponseReportedTimestamp)
     response.status = self.metaResponseStatus
 
-    #
+    # Time.
     processed.loggedDuration.FromTimedelta(self.loggedDuration)
     processed.reportedDuration.FromTimedelta(self.reportedDuration)
     processed.childDurationAbsolute.FromTimedelta(self.metaChildDuration)
@@ -106,9 +126,6 @@ class ResponseMetadataMixin(models.Model):
     if self.metaResponseLoggedTimestamp:
       logMetadata.loggedTimestamp.FromDatetime(self.metaResponseLoggedTimestamp)
     logMetadata.errors = self.metaResponseLoggingErrors
-
-  def toObjectMetadata(self) -> ObjectMetadata :
-    """Return the object metadata representing this object."""
 
 
   class Meta:

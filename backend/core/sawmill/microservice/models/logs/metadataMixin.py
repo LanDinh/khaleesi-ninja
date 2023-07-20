@@ -1,15 +1,17 @@
 """core-sawmill abstract logs models."""
 
+from __future__ import annotations
+
 # Python.
 from datetime import datetime, timezone
-from typing import List
+from typing import Callable, List
 
 # Django.
 from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.shared.parseUtil import parseTimestamp, parseString
-from khaleesi.proto.core_pb2 import ObjectMetadata, RequestMetadata, User
+from khaleesi.proto.core_pb2 import RequestMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import LogRequestMetadata
 
 
@@ -30,9 +32,13 @@ class MetadataMixin(models.Model):
   metaUserType = models.TextField(default = 'UNKNOWN')
 
   # Misc.
-  metaReportedTimestamp  = models.DateTimeField(default = MIN_TIMESTAMP)
-  metaLoggedTimestamp = models.DateTimeField(auto_now_add = True)
-  metaLoggingErrors   = models.TextField(blank = True)
+  metaReportedTimestamp = models.DateTimeField(default = MIN_TIMESTAMP)
+  metaLoggedTimestamp   = models.DateTimeField(auto_now_add = True)
+  metaLoggingErrors     = models.TextField(blank = True)
+
+  toObjectMetadata: Callable  # type: ignore[type-arg]
+
+  objects: models.Manager[MetadataMixin]
 
   def metadataFromGrpc(self, *, grpc: RequestMetadata, errors: List[str]) -> None :
     """Change own values according to the grpc object."""
@@ -99,9 +105,6 @@ class MetadataMixin(models.Model):
       logMetadata.loggedTimestamp.FromDatetime(self.metaLoggedTimestamp)
     logMetadata.errors = self.metaLoggingErrors
 
-  def toObjectMetadata(self) -> ObjectMetadata :
-    """Return the object metadata representing this object."""
-
 
   class Meta:
     """Abstract class."""
@@ -117,6 +120,8 @@ class GrpcMetadataMixin(MetadataMixin):
   metaCallerGrpcGrpcService     = models.TextField(default = 'UNKNOWN')
   metaCallerGrpcGrpcMethod      = models.TextField(default = 'UNKNOWN')
   metaCallerGrpcPodId           = models.TextField(default = 'UNKNOWN')
+
+  objects: models.Manager[GrpcMetadataMixin]
 
 
   def metadataFromGrpc(self, *, grpc: RequestMetadata, errors: List[str]) -> None :

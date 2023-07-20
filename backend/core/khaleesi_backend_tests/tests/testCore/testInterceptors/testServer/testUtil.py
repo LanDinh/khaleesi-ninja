@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 # khaleesi.ninja.
 from khaleesi.core.interceptors.server.util import ServerInterceptor
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_sawmill_pb2 import GrpcRequest
+from khaleesi.proto.core_sawmill_pb2 import GrpcRequestRequest
 
 
 class ServerInterceptorTest(SimpleTestCase):
@@ -20,7 +20,7 @@ class ServerInterceptorTest(SimpleTestCase):
     service = 'Service'
     method  = 'Method'
     khaleesiIntercept = MagicMock()
-    self.interceptor.khaleesiIntercept = khaleesiIntercept  # type: ignore[assignment]
+    self.interceptor.khaleesiIntercept = khaleesiIntercept
     # Execute test.
     self.interceptor.intercept(
       method              = lambda *args: None,
@@ -36,7 +36,7 @@ class ServerInterceptorTest(SimpleTestCase):
     for method in self.interceptor.skipList:
       # Prepare data.
       khaleesiIntercept = MagicMock()
-      self.interceptor.khaleesiIntercept = khaleesiIntercept  # type: ignore[assignment]
+      self.interceptor.khaleesiIntercept = khaleesiIntercept
       # Execute test.
       self.interceptor.intercept(
         method              = lambda *args: None,
@@ -50,7 +50,7 @@ class ServerInterceptorTest(SimpleTestCase):
   def testGetUpstreamRequest(self) -> None :
     """Test if we can fetch the upstream request."""
     # Prepare data.
-    request = GrpcRequest()
+    request = GrpcRequestRequest()
     request.requestMetadata.grpcCaller.requestId = 'request-id'
     # Execute test.
     result = self.interceptor.getUpstreamRequest(request = request)

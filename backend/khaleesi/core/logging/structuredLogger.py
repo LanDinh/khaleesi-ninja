@@ -2,7 +2,6 @@
 
 # Python.
 from abc import ABC, abstractmethod
-from datetime import timezone, datetime
 from typing import cast
 
 # Django.
@@ -21,11 +20,11 @@ from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.state import STATE
-from khaleesi.proto.core_pb2 import RequestMetadata
+from khaleesi.proto.core_pb2 import GrpcCallerDetails
 from khaleesi.proto.core_sawmill_pb2 import (
   HttpRequestRequest,
-  ErrorRequest, GrpcRequest,
-  GrpcResponseRequest,
+  ErrorRequest,
+  GrpcRequestRequest,
   Event, EventRequest,
   ResponseRequest,
   Response,
@@ -75,6 +74,76 @@ class StructuredLogger(ABC):
     )
     self.sendLogHttpResponse(grpc = httpResponse)
 
+  def logGrpcRequest(self, *, upstreamRequest: GrpcCallerDetails) -> None :
+    """Log a microservice request."""
+    LOGGER.info(
+      f'User "{STATE.request.user.id}" started gRPC request '
+      f'{STATE.request.grpcCaller.grpcService}.{STATE.request.grpcCaller.grpcMethod}.'
+    )
+    LOGGER.info(
+      f'Upstream request "{upstreamRequest.requestId}" caller data: '
+      f'{upstreamRequest.khaleesiGate}-{upstreamRequest.khaleesiService}: '
+      f'{upstreamRequest.grpcService}.{upstreamRequest.grpcMethod}'
+    )
+
+    grpc = GrpcRequestRequest()
+    addRequestMetadata(metadata = grpc.requestMetadata)
+    grpc.request.upstreamRequest.CopyFrom(upstreamRequest)
+
+    self.sendLogGrpcRequest(grpc = grpc)
+
+  def logSystemGrpcRequest(
+      self, *,
+      httpRequestId: str,
+      grpcRequestId: str,
+      grpcMethod   : str,
+  ) -> None :
+    """Log a microservice request."""
+    LOGGER.info(f'System started gRPC request "{grpcRequestId}".')
+    grpc = GrpcRequestRequest()
+    addSystemRequestMetadata(
+      metadata      = grpc.requestMetadata,
+      grpcMethod    = grpcMethod,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+    )
+    self.sendLogGrpcRequest(grpc = grpc)
+
+  def logGrpcResponse(self, *, status: StatusCode) -> None :
+    """Log a microservice response."""
+    grpc = ResponseRequest()
+    addRequestMetadata(metadata = grpc.requestMetadata)
+    self._logResponseObject(
+      status      = status,
+      requestName = f'gRPC Request "{grpc.requestMetadata.grpcCaller.requestId}"',
+      response    = grpc.response,
+    )
+    self._logQueries(queries = grpc.queries)
+    self.sendLogGrpcResponse(grpc = grpc)
+
+  def logSystemGrpcResponse(
+      self, *,
+      httpRequestId: str,
+      grpcRequestId: str,
+      grpcMethod   : str,
+      status       : StatusCode,
+  ) -> None :
+    """Log a microservice system response."""
+    grpc = ResponseRequest()
+    addSystemRequestMetadata(
+      metadata      = grpc.requestMetadata,
+      httpRequestId = httpRequestId,
+      grpcRequestId = grpcRequestId,
+      grpcMethod    = grpcMethod,
+    )
+    self._logResponseObject(
+      status      = status,
+      requestName = f'gRPC Request "{grpcRequestId}"',
+      response    = grpc.response,
+    )
+    self._logQueries(queries = grpc.queries)
+    self.sendLogGrpcResponse(grpc = grpc)
+
   def logEvent(self, *, event: Event) -> None :
     """Log a user event."""
     request = EventRequest()
@@ -123,80 +192,6 @@ class StructuredLogger(ABC):
     )
     self.sendLogError(grpc = error)
 
-  def logGrpcRequest(self, *, upstreamRequest: RequestMetadata) -> None :
-    """Log a microservice request."""
-    LOGGER.info(
-      f'User "{STATE.request.user.id}" started gRPC request '
-      f'{STATE.request.grpcCaller.grpcService}.{STATE.request.grpcCaller.grpcMethod}.'
-    )
-    LOGGER.info(
-      f'Upstream request "{upstreamRequest.grpcCaller.requestId}" caller data: '
-      f'{upstreamRequest.grpcCaller.khaleesiGate}-{upstreamRequest.grpcCaller.khaleesiService}: '
-      f'{upstreamRequest.grpcCaller.grpcService}.{upstreamRequest.grpcCaller.grpcMethod}'
-    )
-
-    grpcRequest = GrpcRequest()
-    addRequestMetadata(metadata = grpcRequest.requestMetadata)
-    grpcRequest.upstreamRequest.requestId       = upstreamRequest.grpcCaller.requestId
-    grpcRequest.upstreamRequest.khaleesiGate    = upstreamRequest.grpcCaller.khaleesiGate
-    grpcRequest.upstreamRequest.khaleesiService = upstreamRequest.grpcCaller.khaleesiService
-    grpcRequest.upstreamRequest.grpcService     = upstreamRequest.grpcCaller.grpcService
-    grpcRequest.upstreamRequest.grpcMethod      = upstreamRequest.grpcCaller.grpcMethod
-
-    self.sendLogGrpcRequest(grpcRequest = grpcRequest)
-
-  def logSystemGrpcRequest(
-      self, *,
-      httpRequestId: str,
-      grpcRequestId: str,
-      grpcMethod   : str,
-  ) -> None :
-    """Log a microservice request."""
-    LOGGER.info(f'System started gRPC request "{grpcRequestId}".')
-    grpcRequest = GrpcRequest()
-    addSystemRequestMetadata(
-      metadata      = grpcRequest.requestMetadata,
-      grpcMethod    = grpcMethod,
-      httpRequestId = httpRequestId,
-      grpcRequestId = grpcRequestId,
-    )
-    self.sendLogGrpcRequest(grpcRequest = grpcRequest)
-
-  def logSystemGrpcResponse(
-      self, *,
-      httpRequestId: str,
-      grpcRequestId: str,
-      grpcMethod   : str,
-      status       : StatusCode,
-  ) -> None :
-    """Log a microservice system response."""
-    grpcResponse = GrpcResponseRequest()
-    addSystemRequestMetadata(
-      metadata      = grpcResponse.requestMetadata,
-      httpRequestId = httpRequestId,
-      grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
-    )
-    self._logResponseObject(
-      status      = status,
-      requestName = 'gRPC Request',
-      response    = grpcResponse.response,
-    )
-    self._logQueries(queries = grpcResponse.queries)
-    self.sendLogGrpcResponse(grpcResponse = grpcResponse)
-
-  def logGrpcResponse(self, *, status: StatusCode) -> None :
-    """Log a microservice response."""
-    grpcResponse = GrpcResponseRequest()
-    addRequestMetadata(metadata = grpcResponse.requestMetadata)
-    self._logResponseObject(
-      status      = status,
-      requestName = 'gRPC Request',
-      response    = grpcResponse.response,
-    )
-    self._logQueries(queries = grpcResponse.queries)
-    self.sendLogGrpcResponse(grpcResponse = grpcResponse)
-
   def _logResponseObject(
       self, *,
       status     : StatusCode,
@@ -210,7 +205,6 @@ class StructuredLogger(ABC):
       LOGGER.warning(f'{requestName} finished with error code {status.name}.')
 
     response.status = status.name
-    response.timestamp.FromDatetime(datetime.now(tz = timezone.utc))
 
   def _logEvent(self, *, event: EventRequest) -> None :
     """Log an event."""
@@ -269,11 +263,11 @@ class StructuredLogger(ABC):
     """Send the HTTP log response to the logging facility."""
 
   @abstractmethod
-  def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
+  def sendLogGrpcRequest(self, *, grpc: GrpcRequestRequest) -> None :
     """Send the gRPC log request to the logging facility."""
 
   @abstractmethod
-  def sendLogGrpcResponse(self, *, grpcResponse: GrpcResponseRequest) -> None :
+  def sendLogGrpcResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the gRPC log response to the logging facility."""
 
   @abstractmethod
@@ -302,13 +296,13 @@ class StructuredGrpcLogger(StructuredLogger):
     """Send the HTTP log response to the logging facility."""
     self.stub.LogHttpRequestResponse(grpc)
 
-  def sendLogGrpcRequest(self, *, grpcRequest: GrpcRequest) -> None :
+  def sendLogGrpcRequest(self, *, grpc: GrpcRequestRequest) -> None :
     """Send the gRPC log request to the logging facility."""
-    self.stub.LogGrpcRequest(grpcRequest)
+    self.stub.LogGrpcRequest(grpc)
 
-  def sendLogGrpcResponse(self, *, grpcResponse: GrpcResponseRequest) -> None :
+  def sendLogGrpcResponse(self, *, grpc: ResponseRequest) -> None :
     """Send the gRPC log response to the logging facility."""
-    self.stub.LogGrpcResponse(grpcResponse)
+    self.stub.LogGrpcResponse(grpc)
 
   def sendLogEvent(self, *, grpc: EventRequest) -> None :
     """Send the log event to the logging facility."""

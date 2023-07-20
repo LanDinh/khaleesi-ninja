@@ -22,6 +22,8 @@ class ServiceRegistryKhaleesiGate(models.Model):
   """Gates."""
   name = models.TextField(unique = True)
 
+  objects: models.Manager[ServiceRegistryKhaleesiGate]
+
 
 class ServiceRegistryKhaleesiService(models.Model):
   """Gates."""
@@ -31,6 +33,8 @@ class ServiceRegistryKhaleesiService(models.Model):
     on_delete    = models.CASCADE,
     related_name = 'khaleesiServices',
   )
+
+  objects: models.Manager[ServiceRegistryKhaleesiService]
 
   class Meta:
     constraints = [ models.UniqueConstraint(
@@ -48,6 +52,8 @@ class ServiceRegistryGrpcService(models.Model):
     related_name = 'grpcServices',
   )
 
+  objects: models.Manager[ServiceRegistryGrpcService]
+
   class Meta:
     constraints = [ models.UniqueConstraint(
       fields = [ 'name', 'khaleesiService' ],
@@ -63,6 +69,8 @@ class ServiceRegistryGrpcMethod(models.Model):
     on_delete    = models.CASCADE,
     related_name = 'grpcMethods',
   )
+
+  objects: models.Manager[ServiceRegistryGrpcMethod]
 
   class Meta:
     constraints = [ models.UniqueConstraint(
@@ -83,6 +91,8 @@ class ServiceRegistryGrpcCall(models.Model):
     on_delete    = models.CASCADE,
     related_name = 'calls',
   )
+
+  objects: models.Manager[ServiceRegistryGrpcCall]
 
   class Meta:
     constraints = [ models.UniqueConstraint(fields = [ 'caller', 'called' ], name = 'uniqueCalls')]

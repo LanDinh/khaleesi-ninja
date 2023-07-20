@@ -144,17 +144,35 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     # Assert result.
     self.assertEqual(0, result)
 
+  def testAddChildDuration(self) -> None :
+    """Test adding child durations."""
+    # Prepare data.
+    initialDuration = timedelta(hours = 1)
+    addedDuration = timedelta(hours = 13)
+    instance = ResponseMetadata()
+    instance.metaChildDuration = initialDuration
+    # Execute test.
+    instance.addChildDuration(duration = addedDuration)
+    # Assert result.
+    self.assertEqual(addedDuration + initialDuration, instance.metaChildDuration)
+
+  @patch('tests.models.ResponseMetadata.toGrpc')
+  @patch('tests.models.ResponseMetadata.khaleesiSave')
+  def testFinish(self, parent: MagicMock, toGrpc: MagicMock) -> None :
+    """Test logging a gRPC HTTP request response."""
+    # Prepare data.
+    instance = ResponseMetadata()
+    # Execute test.
+    instance.finish(request = MagicMock())
+    # Assert result.
+    parent.assert_called_once()
+    toGrpc.assert_called_once()
+
   @patch('microservice.models.logs.responseMetadataMixin.parseString')
-  @patch('microservice.models.logs.responseMetadataMixin.parseTimestamp')
-  def testResponseMetadataFromGrpcForCreation(
-      self,
-      timestamp: MagicMock,
-      string   : MagicMock,
-  ) -> None :
+  def testResponseMetadataFromGrpcForCreation(self, string: MagicMock) -> None :
     """Test logging metadata."""
     # Prepare data.
-    now = datetime.now(tz = timezone.utc)
-    grpc = self._createResponseRequest(now = now, timestamp = timestamp, string = string)
+    grpc = self._createResponseRequest(string = string)
     initialError = 'test errors'
     instance                    = ResponseMetadata()
     instance.metaResponseStatus = 'NOT_IN_PROGRESS'
@@ -192,12 +210,10 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     self.assertEqual('', instance.metaResponseLoggingErrors)
 
   @patch('microservice.models.logs.responseMetadataMixin.parseString')
-  @patch('microservice.models.logs.responseMetadataMixin.parseTimestamp')
-  def testResponseMetadataFromGrpcForUpdate(self, timestamp: MagicMock, string: MagicMock) -> None :
+  def testResponseMetadataFromGrpcForUpdate(self, string: MagicMock) -> None :
     """Test logging metadata."""
     # Prepare data.
-    now = datetime.now(tz = timezone.utc)
-    grpc = self._createResponseRequest(now = now, timestamp = timestamp, string = string)
+    grpc = self._createResponseRequest(string = string)
     initialError = 'test errors'
     instance                    = ResponseMetadata()
     instance.metaResponseStatus = 'IN_PROGRESS'
@@ -237,10 +253,6 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     )
 
     # Assert result.
-    self.assertEqual(
-      instance.metaResponseReportedTimestamp,
-      response.timestamp.ToDatetime().replace(tzinfo = timezone.utc),
-    )
     self.assertEqual(instance.metaResponseStatus, response.status)
 
     self.assertEqual(instance.loggedDuration       , processed.loggedDuration.ToTimedelta())
@@ -274,17 +286,10 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     # Execute test & assert result.
     instance.toObjectMetadata()
 
-  def _createResponseRequest(
-      self, *,
-      now      : datetime,
-      timestamp: MagicMock,
-      string   : MagicMock,
-  ) -> ResponseRequest :
+  def _createResponseRequest(self, *, string: MagicMock) -> ResponseRequest :
     """Utility for creating fully populated request metadata objects."""
-    timestamp.return_value = now
     string.return_value    = 'parsed-string'
     grpc = ResponseRequest()
-    grpc.response.timestamp.FromDatetime(now)
     grpc.response.status = 'status'
 
     return grpc
