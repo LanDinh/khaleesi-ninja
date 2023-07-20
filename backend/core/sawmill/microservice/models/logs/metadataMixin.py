@@ -126,7 +126,7 @@ class GrpcMetadataMixin(MetadataMixin):
 
   def metadataFromGrpc(self, *, grpc: RequestMetadata, errors: List[str]) -> None :
     """Change own values according to the grpc object."""
-    if not self._state.adding:
+    if self._state.adding:
       self.metaCallerGrpcRequestId = parseString(
         raw    = grpc.grpcCaller.requestId,
         name   = 'metaCallerGrpcRequestId',
