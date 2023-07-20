@@ -34,6 +34,8 @@ class MetadataMixinTestCase(SimpleTestCase):
         # Execute test.
         instance.metadataFromGrpc(grpc = grpc, errors = [ initialError ])
         # Assert result.
+        string.assert_called()
+        timestamp.assert_called()
         self.assertEqual(now         , instance.metaReportedTimestamp)
         self.assertEqual(userLabel   , instance.metaUserType)
         self.assertEqual(initialError, instance.metaLoggingErrors)
@@ -79,6 +81,8 @@ class MetadataMixinTestCase(SimpleTestCase):
     # Execute test.
     instance.metadataFromGrpc(grpc = RequestMetadata(), errors = [])
     # Assert result.
+    string.assert_called()
+    timestamp.assert_called()
     self.assertEqual('', instance.metaLoggingErrors)
 
   def testMetadataToGrpc(self) -> None :
@@ -177,14 +181,13 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
     """Test logging metadata."""
     # Prepare data.
     grpc = self._createRequestMetadata(string = string)
-    initialError = 'test errors'
     instance               = GrpcMetadata()
     instance._state.adding = True  # pylint: disable=protected-access
     # Execute test.
-    instance.metadataFromGrpc(grpc = grpc, errors = [ initialError ])
+    instance.metadataFromGrpc(grpc = grpc, errors = [])
     # Assert result.
     parent.assert_called_once()
-    self.assertEqual(initialError, instance.metaLoggingErrors)
+    string.assert_called()
 
   @patch('microservice.models.logs.metadataMixin.MetadataMixin.metadataFromGrpc')
   @patch('microservice.models.logs.metadataMixin.parseString')
@@ -192,15 +195,13 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
     """Test logging metadata."""
     # Prepare data.
     grpc = self._createRequestMetadata(string = string)
-    initialError = 'test errors'
     instance               = GrpcMetadata()
     instance._state.adding = False   # pylint: disable=protected-access
     # Execute test.
-    instance.metadataFromGrpc(grpc = grpc, errors = [ initialError ])
+    instance.metadataFromGrpc(grpc = grpc, errors = [])
     # Assert result.
     parent.assert_called_once()
     string.assert_not_called()
-    self.assertNotEqual(initialError, instance.metaLoggingErrors)
 
   @patch('microservice.models.logs.metadataMixin.MetadataMixin.metadataFromGrpc')
   @patch('microservice.models.logs.metadataMixin.parseString')

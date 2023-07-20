@@ -61,7 +61,10 @@ class StructuredDbLogger(StructuredLogger):
         metaCallerHttpRequestId = grpc.requestMetadata.httpCaller.requestId,
       )
       dbHttpRequest.addChildDuration(duration = instance.reportedDuration)
-      dbHttpRequest.khaleesiSave(grpc = dbHttpRequest.toGrpc())
+      dbHttpRequest.khaleesiSave(
+        metadata = dbHttpRequest.toObjectMetadata(),
+        grpc = dbHttpRequest.toGrpc(),
+      )
     except Exception:  # pylint: disable=broad-except  # pragma: no cover
       # TODO(45) - remove this hack
       pass
@@ -75,7 +78,7 @@ class StructuredDbLogger(StructuredLogger):
     for query in queries:
       errors += query.metaLoggingErrors
       instance.metaChildDuration += query.reportedDuration
-    instance.khaleesiSave(grpc = instance.toGrpc())
+    instance.khaleesiSave(metadata = instance.toObjectMetadata(), grpc = instance.toGrpc())
     instance.metaLoggingErrors = errors  # Don't save it, but it might need to be handled.
     return instance
 
