@@ -53,7 +53,6 @@ class StructuredDbLogger(StructuredLogger):
     instance = DbGrpcRequest.objects.get(
       metaCallerGrpcRequestId = grpc.requestMetadata.grpcCaller.requestId,
     )
-    instance.finish(request = grpc)
     # noinspection PyBroadException
     try:
       LOGGER.info('Adding the duration to the parent HTTP request.')
@@ -77,8 +76,8 @@ class StructuredDbLogger(StructuredLogger):
     errors = instance.metaLoggingErrors
     for query in queries:
       errors += query.metaLoggingErrors
-      instance.metaChildDuration += query.reportedDuration
-    instance.khaleesiSave(metadata = instance.toObjectMetadata(), grpc = instance.toGrpc())
+      instance.addChildDuration(duration = query.reportedDuration)
+    instance.finish(request = grpc)
     instance.metaLoggingErrors = errors  # Don't save it, but it might need to be handled.
     return instance
 

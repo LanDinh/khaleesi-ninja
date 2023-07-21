@@ -111,5 +111,6 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
   def toObjectMetadata(self) -> ObjectMetadata :
     """Return the object metadata representing this object."""
     metadata = ObjectMetadata()
-    metadata.id = self.metaCallerHttpRequestId
+    metadata.id      = self.metaCallerHttpRequestId
+    metadata.version = self.khaleesiVersion
     return metadata

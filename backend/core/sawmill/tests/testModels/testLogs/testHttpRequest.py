@@ -150,10 +150,12 @@ class HttpRequestTestCase(SimpleTestCase):
     # Prepare data.
     instance = HttpRequest()
     instance.metaCallerHttpRequestId = 'request-id'
+    instance.khaleesiVersion         = 1337
     # Execute test.
     result = instance.toObjectMetadata()
     # Assert result.
     self.assertEqual(instance.metaCallerHttpRequestId, result.id)
+    self.assertEqual(instance.khaleesiVersion        , result.version)
 
   def _createGrpcHttpRequest(self) -> GrpcHttpRequest :
     """Helper to create gRPC objects."""

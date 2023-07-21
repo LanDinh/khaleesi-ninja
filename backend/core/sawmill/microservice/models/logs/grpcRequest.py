@@ -109,5 +109,6 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
   def toObjectMetadata(self) -> ObjectMetadata :
     """Return the object metadata representing this object."""
     metadata = ObjectMetadata()
-    metadata.id = self.metaCallerGrpcRequestId
+    metadata.id      = self.metaCallerGrpcRequestId
+    metadata.version = self.khaleesiVersion
     return metadata

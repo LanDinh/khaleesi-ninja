@@ -149,10 +149,12 @@ class GrpcRequestTestCase(SimpleTestCase):
     # Prepare data.
     instance = GrpcRequest()
     instance.metaCallerGrpcRequestId = 'request-id'
+    instance.khaleesiVersion         = 1337
     # Execute test.
     result = instance.toObjectMetadata()
     # Assert result.
     self.assertEqual(instance.metaCallerGrpcRequestId, result.id)
+    self.assertEqual(instance.khaleesiVersion        , result.version)
 
   def _createGrpcGrpcRequest(self) -> GrpcGrpcRequest :
     """Helper to create gRPC objects."""
