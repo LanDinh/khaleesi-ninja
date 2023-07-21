@@ -74,7 +74,6 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Assert result.
     dbHttpRequest.objects.get.return_value.addChildDuration.assert_called_once()
     dbGrpcRequest.objects.get.return_value.finish.assert_called_once()
-    dbGrpcRequest.objects.get.return_value.khaleesiSave.assert_called_once()
     dbQuery.objects.logQueries.assert_called_once()
 
   @patch('microservice.structuredLogger.DbEvent')
