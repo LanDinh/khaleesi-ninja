@@ -23,6 +23,8 @@ khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 
 class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
   """Event logs."""
+  khaleesiId = models.TextField(unique = False, editable = False)  # Avoid index building.
+
   # Target.
   targetType      = models.TextField(default = 'UNKNOWN')
   targetId        = models.TextField(default = 'UNKNOWN')

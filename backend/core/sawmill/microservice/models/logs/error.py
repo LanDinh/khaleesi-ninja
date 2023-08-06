@@ -18,6 +18,8 @@ from microservice.models.logs.metadataMixin import GrpcMetadataMixin
 
 class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
   """Error logs."""
+  khaleesiId = models.TextField(unique = False, editable = False)  # Avoid index building.
+
   status   = models.TextField(default = 'UNKNOWN')
   loglevel = models.TextField(default = 'FATAL')
 

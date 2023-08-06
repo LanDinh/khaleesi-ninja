@@ -23,6 +23,8 @@ from microservice.models.logs.metadataMixin import GrpcMetadataMixin, MIN_TIMEST
 
 class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
   """Query logs."""
+  khaleesiId = models.TextField(unique = False, editable = False)  # Avoid index building.
+
   reportedStart = models.DateTimeField()
   reportedEnd   = models.DateTimeField()
 

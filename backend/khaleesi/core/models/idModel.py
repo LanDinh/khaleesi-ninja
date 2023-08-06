@@ -17,7 +17,7 @@ from .baseModel import Grpc, Model as BaseModel
 class Model(BaseModel[Grpc], Generic[Grpc]):
   """Basic model for gRPC conversions."""
 
-  khaleesiId      = models.TextField(unique = True, editable = False)
+  khaleesiId = models.TextField(unique = True, editable = False)
 
   objects: models.Manager[Model]  # type: ignore[type-arg]
 
