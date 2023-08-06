@@ -59,7 +59,7 @@ class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
         name   = 'start',
         errors = errors,
       )
-      self.reportedStart = parseTimestamp(
+      self.reportedEnd = parseTimestamp(
         raw    = grpc.query.end.ToDatetime(),
         name   = 'end',
         errors = errors,
