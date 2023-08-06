@@ -1,4 +1,5 @@
 """Structured logger using gRPC."""
+from typing import List
 
 # khaleesi.ninja.
 from khaleesi.core.logging.structuredLogger import StructuredLogger
@@ -8,6 +9,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   GrpcRequestRequest,
   ErrorRequest,
   EventRequest,
+  QueryRequest,
   ResponseRequest,
 )
 from microservice.models.serviceRegistry import SERVICE_REGISTRY
@@ -68,15 +70,19 @@ class StructuredDbLogger(StructuredLogger):
       # TODO(45) - remove this hack
       pass
     LOGGER.info('Saving the corresponding queries to the database.')
-    queries = DbQuery.objects.logQueries(
-      queries  = grpc.queries,
-      metadata = instance.toGrpc().requestMetadata,
-    )
-    LOGGER.info('Handling query errors and query duration.')
     errors = instance.metaLoggingErrors
-    for query in queries:
+    requestMetadata = instance.toGrpc().requestMetadata
+    newQueries: List[DbQuery] = []
+    for rawQuery in grpc.queries:
+      grpcQuery = QueryRequest()
+      grpcQuery.query.CopyFrom(rawQuery)
+      grpcQuery.requestMetadata.CopyFrom(requestMetadata)
+      query = DbQuery()
+      query.khaleesiSave(grpc = grpcQuery, update_fields = [])  # Don't save it - bulk creation.
+      newQueries.append(query)
       errors += query.metaLoggingErrors
       instance.addChildDuration(duration = query.reportedDuration)
+    DbQuery.objects.bulk_create(objs = newQueries, batch_size = 1000)
     instance.finish(request = grpc)
     instance.metaLoggingErrors = errors  # Don't save it, but it might need to be handled.
     return instance

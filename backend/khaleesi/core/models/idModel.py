@@ -33,16 +33,10 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
       self.khaleesiId = str(uuid4())
     super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
-  def toGrpc(self, *, metadata: ObjectMetadata = ObjectMetadata(), grpc: Grpc) -> Grpc :
-    """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
-    metadata.id = self.khaleesiId
-    return grpc
-
   def toObjectMetadata(self) -> ObjectMetadata :
     """Return the object metadata representing this object."""
-    metadata = ObjectMetadata()
-    self.toGrpc(metadata = metadata)  # type: ignore[call-arg]  # pylint: disable=missing-kwoa
+    metadata = super().toObjectMetadata()
+    metadata.id = self.khaleesiId
     return metadata
 
   class Meta(BaseModel.Meta):

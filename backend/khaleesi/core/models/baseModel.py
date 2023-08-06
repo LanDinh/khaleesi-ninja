@@ -12,7 +12,7 @@ from django.db import models, transaction
 from google.protobuf.message import Message
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import DbOutdatedInformationException
+from khaleesi.core.shared.exceptions import DbOutdatedInformationException, ProgrammingException
 from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
@@ -48,10 +48,15 @@ class Model(models.Model, Generic[Grpc]):
     """Model type for documentation purposes."""
     return f'{cls.__module__}.{cls.__qualname__}'
 
-  def toGrpc(self, *, metadata: ObjectMetadata = ObjectMetadata(), grpc: Grpc) -> Grpc :
+  def toGrpc(self) -> Grpc :
     """Return a grpc object containing own values."""
+    raise ProgrammingException(privateMessage = 'toGrpc not implemented!', privateDetails = '')
+
+  def toObjectMetadata(self) -> ObjectMetadata :
+    """Return a grpc object containing own values."""
+    metadata = ObjectMetadata()
     metadata.version = self.khaleesiVersion
-    return grpc
+    return metadata
 
   class Meta:
     abstract = True

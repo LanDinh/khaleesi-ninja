@@ -20,7 +20,6 @@ from microservice.models import (
   HttpRequest as DbHttpRequest,
   Query as DbQuery,
 )
-from microservice.models.cleanup import CleanupJob as OldCleanupJob
 from microservice.models.cleanupJob import CleanupJob
 
 
@@ -73,7 +72,7 @@ class Service(Servicer):
       'Cleaning up queries older than '
       f'{request.jobExecution.cleanupConfiguration.cleanupDelay.ToTimedelta()}.',
     )
-    return jobExecutor(job = OldCleanupJob(model = DbQuery, request = request))
+    return jobExecutor(job = CleanupJob(model = DbQuery, request = request))
 
 
 serviceConfiguration = ServiceConfiguration[Service](

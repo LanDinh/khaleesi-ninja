@@ -27,7 +27,6 @@ class QueryLoggerTestCase(SimpleTestCase):
         # Assert result.
         self.assertEqual(1, len(STATE.queries))
         self.assertEqual(sql, STATE.queries[0].raw)
-        self.assertIsNotNone(STATE.queries[0].id)
 
 
 class QueryLoggerContextManagerTestCase(SimpleTestCase):

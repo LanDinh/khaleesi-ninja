@@ -196,12 +196,10 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     ids = [ 'id0', 'id1', 'id2', ]
     STATE.reset()
-    for queryId in ids:
+    for _ in ids:
       query = Query()
-      query.id = queryId
       query.raw = 'raw'
       query.start.FromDatetime(datetime.now(tz = timezone.utc))
-      query.connection = 'connection'
       STATE.queries.append(query)
     # Perform test.
     self.logger.logGrpcResponse(status = StatusCode.OK)
@@ -212,9 +210,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     self.assertEqual(3, len(logResponse.queries))
     for query in logResponse.queries:
-      self.assertIn(query.id, ids)
-      self.assertEqual('connection', query.connection)
-      self.assertEqual('raw'       , query.raw)
+      self.assertEqual('raw', query.raw)
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addSystemRequestMetadata')
@@ -250,12 +246,10 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     ids = [ 'id0', 'id1', 'id2', ]
     STATE.reset()
-    for queryId in ids:
+    for _ in ids:
       query = Query()
-      query.id = queryId
       query.raw = 'raw'
       query.start.FromDatetime(datetime.now(tz = timezone.utc))
-      query.connection = 'connection'
       STATE.queries.append(query)
     # Perform test.
     self.logger.logSystemGrpcResponse(
@@ -271,9 +265,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.assertEqual(StatusCode.OK.name, logResponse.response.status)
     self.assertEqual(3, len(logResponse.queries))
     for query in logResponse.queries:
-      self.assertIn(query.id, ids)
-      self.assertEqual('connection', query.connection)
-      self.assertEqual('raw'       , query.raw)
+      self.assertEqual('raw', query.raw)
     metadata.assert_called_once()
 
   @patch('khaleesi.core.logging.structuredLogger.addRequestMetadata')

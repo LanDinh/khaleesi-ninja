@@ -4,7 +4,6 @@
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, Generator
-from uuid import uuid4
 
 # Django.
 from django.db import connection
@@ -27,8 +26,7 @@ class QueryLogger:
   ) -> Any :
     """Wrap the database call."""
     query = Query()
-    query.id         = str(uuid4())
-    query.raw        = sql
+    query.raw = sql
     query.start.FromDatetime(datetime.now(tz = timezone.utc))
     STATE.queries.append(query)
 

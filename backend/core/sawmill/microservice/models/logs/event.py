@@ -73,13 +73,9 @@ class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
     super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata   = ObjectMetadata(),
-      grpc    : GrpcEventRequest = GrpcEventRequest(),
-  ) -> GrpcEventRequest :
+  def toGrpc(self) -> GrpcEventRequest :
     """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    grpc = GrpcEventRequest()
     self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
 
     # Target.

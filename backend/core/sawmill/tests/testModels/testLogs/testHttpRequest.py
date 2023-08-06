@@ -84,15 +84,9 @@ class HttpRequestTestCase(SimpleTestCase):
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
 
-  @patch('microservice.models.logs.httpRequest.Model.toGrpc')
   @patch('microservice.models.logs.httpRequest.HttpRequest.metadataToGrpc')
   @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataToGrpc')
-  def testToGrpc(
-      self,
-      responseMetadata: MagicMock,
-      metadata        : MagicMock,
-      parent          : MagicMock,
-  ) -> None :
+  def testToGrpc(self, responseMetadata: MagicMock, metadata: MagicMock) -> None :
     """Test that general mapping to gRPC works."""
     # Prepare data.
     instance = HttpRequest(
@@ -111,7 +105,6 @@ class HttpRequestTestCase(SimpleTestCase):
     grpc = instance.toGrpc()
     # Assert result.
     metadata.assert_called_once()
-    parent.assert_called_once()
     responseMetadata.assert_called_once()
     self.assertEqual(instance.language      , grpc.request.language)
     self.assertEqual(instance.deviceId      , grpc.request.deviceId)
@@ -125,15 +118,9 @@ class HttpRequestTestCase(SimpleTestCase):
     self.assertEqual(instance.deviceType    , grpc.request.deviceType)
 
 
-  @patch('microservice.models.logs.httpRequest.Model.toGrpc')
   @patch('microservice.models.logs.httpRequest.HttpRequest.metadataToGrpc')
   @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataToGrpc')
-  def testEmptyToGrpc(
-      self,
-      responseMetadata: MagicMock,
-      metadata        : MagicMock,
-      parent          : MagicMock,
-  ) -> None :
+  def testToGrpcEmpty(self, responseMetadata: MagicMock, metadata: MagicMock) -> None :
     """Test that mapping to gRPC for empty requests works."""
     # Prepare data.
     instance = HttpRequest()
@@ -141,21 +128,20 @@ class HttpRequestTestCase(SimpleTestCase):
     grpc = instance.toGrpc()
     # Assert result.
     metadata.assert_called_once()
-    parent.assert_called_once()
     responseMetadata.assert_called_once()
     self.assertIsNotNone(grpc)
 
-  def testToObjectMetadata(self) -> None :
+  @patch('microservice.models.logs.grpcRequest.Model.toObjectMetadata')
+  def testToObjectMetadata(self, parent: MagicMock) -> None :
     """Test getting the object metadata."""
     # Prepare data.
     instance = HttpRequest()
     instance.metaCallerHttpRequestId = 'request-id'
-    instance.khaleesiVersion         = 1337
     # Execute test.
     result = instance.toObjectMetadata()
     # Assert result.
+    parent.assert_called_once()
     self.assertEqual(instance.metaCallerHttpRequestId, result.id)
-    self.assertEqual(instance.khaleesiVersion        , result.version)
 
   def _createGrpcHttpRequest(self) -> GrpcHttpRequest :
     """Helper to create gRPC objects."""

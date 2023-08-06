@@ -1,11 +1,10 @@
 """Test the structured logger."""
 # Python.
-from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock, patch
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from microservice.models.logs.query import Query
+from khaleesi.proto.core_sawmill_pb2 import ResponseRequest, Query, GrpcRequestRequest
 from microservice.structuredLogger import StructuredDbLogger
 
 
@@ -64,17 +63,17 @@ class TestStructuredDbLogger(SimpleTestCase):
   ) -> None :
     """Test sending a log response."""
     # Prepare data.
-    response = MagicMock()
-    now = datetime.now().replace(tzinfo = timezone.utc)
-    dbQuery.objects.logQueries.return_value = [ Query() ]
-    dbQuery.objects.logQueries.return_value[0].reportedStart = now
-    dbQuery.objects.logQueries.return_value[0].reportedEnd   = now + timedelta(days = 1)
+    response = ResponseRequest()
+    response.queries.append(Query())
+    dbGrpcRequest.objects.get.return_value.toGrpc.return_value = GrpcRequestRequest()
     # Perform test.
     self.logger.sendLogGrpcResponse(grpc = response)
     # Assert result.
     dbHttpRequest.objects.get.return_value.addChildDuration.assert_called_once()
+    dbGrpcRequest.objects.get.return_value.addChildDuration.assert_called_once()
     dbGrpcRequest.objects.get.return_value.finish.assert_called_once()
-    dbQuery.objects.logQueries.assert_called_once()
+    dbQuery.return_value.khaleesiSave.assert_called_once()
+    dbQuery.objects.bulk_create.assert_called_once()
 
   @patch('microservice.structuredLogger.DbEvent')
   def testSendLogEvent(self, dbEvent: MagicMock, *_: MagicMock) -> None :

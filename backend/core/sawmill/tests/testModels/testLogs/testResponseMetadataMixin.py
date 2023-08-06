@@ -12,10 +12,11 @@ from khaleesi.proto.core_sawmill_pb2 import (
   Response,
   ProcessedResponse,
 )
+from microservice.models.logs.metadataMixin import MIN_TIMESTAMP
 from tests.models import ResponseMetadata
 
 
-class ResponseMetadataMixinTestCase(SimpleTestCase):
+class ResponseMetadataMixinTestCase(SimpleTestCase):  # pylint: disable=too-many-public-methods
   """Test the log metadata."""
 
   def testInitialValues(self) -> None :
@@ -51,39 +52,89 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     self.assertFalse(result)
 
   def testReportedDuration(self) -> None :
-    """Test child duration."""
+    """Test reported duration."""
     # Prepare data.
     now = datetime.now().replace(tzinfo = timezone.utc)
     instance = ResponseMetadata()
-    instance.metaResponseStatus = 'NOT_IN_PROGRESS'
+    instance.metaResponseStatus            = 'NOT_IN_PROGRESS'
     instance.metaResponseReportedTimestamp = now
-    instance.metaReportedTimestamp = now - timedelta(hours = 1)
+    instance.metaReportedTimestamp         = now - timedelta(hours = 1)
     # Execute test.
     result = instance.reportedDuration
     # Assert result.
     self.assertEqual(timedelta(hours = 1), result)
 
   def testReportedDurationInProgress(self) -> None :
-    """Test child duration."""
+    """Test reported duration."""
     # Prepare data.
     now = datetime.now().replace(tzinfo = timezone.utc)
     instance = ResponseMetadata()
-    instance.metaResponseStatus = 'IN_PROGRESS'
+    instance.metaResponseStatus            = 'IN_PROGRESS'
     instance.metaResponseReportedTimestamp = now
-    instance.metaReportedTimestamp = now - timedelta(hours = 1)
+    instance.metaReportedTimestamp         = now - timedelta(hours = 1)
     # Execute test.
     result = instance.reportedDuration
     # Assert result.
     self.assertEqual(timedelta(0), result)
+
+  def testReportedDurationEmptyStart(self) -> None :
+    """Test reported duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus            = 'NOT_IN_PROGRESS'
+    instance.metaResponseReportedTimestamp = now
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDurationEmptyEnd(self) -> None :
+    """Test reported duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus    = 'NOT_IN_PROGRESS'
+    instance.metaReportedTimestamp = now
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDurationMinEnd(self) -> None :
+    """Test reported duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus            = 'NOT_IN_PROGRESS'
+    instance.metaResponseReportedTimestamp = MIN_TIMESTAMP
+    instance.metaReportedTimestamp         = now - timedelta(hours = 1)
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDurationMinStart(self) -> None :
+    """Test reported duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus            = 'NOT_IN_PROGRESS'
+    instance.metaResponseReportedTimestamp = now
+    instance.metaReportedTimestamp         = MIN_TIMESTAMP
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
 
   def testLoggedDuration(self) -> None :
     """Test child duration."""
     # Prepare data.
     now = datetime.now().replace(tzinfo = timezone.utc)
     instance = ResponseMetadata()
-    instance.metaResponseStatus = 'NOT_IN_PROGRESS'
+    instance.metaResponseStatus          = 'NOT_IN_PROGRESS'
     instance.metaResponseLoggedTimestamp = now
-    instance.metaLoggedTimestamp = now - timedelta(hours = 1)
+    instance.metaLoggedTimestamp         = now - timedelta(hours = 1)
     # Execute test.
     result = instance.loggedDuration
     # Assert result.
@@ -94,13 +145,63 @@ class ResponseMetadataMixinTestCase(SimpleTestCase):
     # Prepare data.
     now = datetime.now().replace(tzinfo = timezone.utc)
     instance = ResponseMetadata()
-    instance.metaResponseStatus = 'IN_PROGRESS'
+    instance.metaResponseStatus          = 'IN_PROGRESS'
     instance.metaResponseLoggedTimestamp = now
-    instance.metaLoggedTimestamp = now - timedelta(hours = 1)
+    instance.metaLoggedTimestamp         = now - timedelta(hours = 1)
     # Execute test.
     result = instance.loggedDuration
     # Assert result.
     self.assertEqual(timedelta(0), result)
+
+  def testLoggedDurationEmptyStart(self) -> None :
+    """Test child duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus          = 'NOT_IN_PROGRESS'
+    instance.metaResponseLoggedTimestamp = now
+    # Execute test.
+    result = instance.loggedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testLoggedDurationEmptyEnd(self) -> None :
+    """Test child duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus  = 'NOT_IN_PROGRESS'
+    instance.metaLoggedTimestamp = now - timedelta(hours = 1)
+    # Execute test.
+    result = instance.loggedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testLoggedDurationMinStart(self) -> None :
+    """Test child duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus          = 'NOT_IN_PROGRESS'
+    instance.metaResponseLoggedTimestamp = now
+    instance.metaLoggedTimestamp         = MIN_TIMESTAMP
+    # Execute test.
+    result = instance.loggedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testLoggedDurationMinEnd(self) -> None :
+    """Test child duration."""
+    # Prepare data.
+    now = datetime.now().replace(tzinfo = timezone.utc)
+    instance = ResponseMetadata()
+    instance.metaResponseStatus          = 'NOT_IN_PROGRESS'
+    instance.metaResponseLoggedTimestamp = MIN_TIMESTAMP
+    instance.metaLoggedTimestamp         = now - timedelta(hours = 1)
+    # Execute test.
+    result = instance.loggedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
 
   def testChildDurationRelative(self) -> None :
     """Test child duration."""

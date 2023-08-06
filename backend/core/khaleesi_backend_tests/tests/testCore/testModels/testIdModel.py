@@ -6,7 +6,6 @@ from uuid import UUID
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models.idModel import IdModel
 
 
@@ -42,20 +41,7 @@ class ModelTestCase(SimpleTestCase):
     parent.assert_called_once()
     self.assertEqual(oldId, instance.khaleesiId)
 
-  @patch('khaleesi.core.models.idModel.BaseModel.toGrpc')
-  def testToGrpc(self, parent: MagicMock) -> None :
-    """Test getting gRPC data."""
-    # Prepare data.
-    instance = IdModel()
-    instance.khaleesiId = 'id'
-    result = ObjectMetadata()
-    # Execute test.
-    instance.toGrpc(metadata = result)
-    # Assert result.
-    parent.assert_called_once()
-    self.assertEqual(instance.khaleesiId, result.id)
-
-  @patch('khaleesi.core.models.idModel.BaseModel.toGrpc')
+  @patch('khaleesi.core.models.idModel.BaseModel.toObjectMetadata')
   def testToObjectMetadata(self, parent: MagicMock) -> None :
     """Test getting gRPC data."""
     # Prepare data.

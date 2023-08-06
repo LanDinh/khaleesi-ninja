@@ -88,16 +88,16 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
       raise
 
 
-  def toGrpc(self, *, metadata: ObjectMetadata = ObjectMetadata(), grpc: Grpc) -> Grpc :
+  def toObjectMetadata(self) -> ObjectMetadata :
     """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    metadata = super().toObjectMetadata()
     metadata.created.FromDatetime(self.khaleesiCreated)
     metadata.createdBy.id   = self.khaleesiCreatedById
     metadata.createdBy.type = User.UserType.Value(self.khaleesiCreatedByType)
     metadata.modified.FromDatetime(self.khaleesiModified)
     metadata.modifiedBy.id   = self.khaleesiModifiedById
     metadata.modifiedBy.type = User.UserType.Value(self.khaleesiModifiedByType)
-    return grpc
+    return metadata
 
 
   def _logSuccessEvent(self, *, action: 'Event.Action.ActionType.V', details : str) -> None :

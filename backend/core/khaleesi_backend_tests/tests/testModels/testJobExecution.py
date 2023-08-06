@@ -64,25 +64,29 @@ class JobExecutionTestCase(SimpleTestCase):
         self.assertFalse(result)
 
   @patch('khaleesi.models.jobExecution.JobExecution.toGrpc')
+  @patch('khaleesi.models.jobExecution.JobExecution.toObjectMetadata')
   @patch('khaleesi.models.jobExecution.JobExecution.khaleesiSave')
-  def testSetTotal(self, save: MagicMock, toGrpc: MagicMock) -> None :
+  def testSetTotal(self, save: MagicMock, toObjectMetadata: MagicMock, toGrpc: MagicMock) -> None :
     """Test if a job execution is in progress."""
     # Prepare data.
     jobExecution = DbJobExecution()
     # Execute test.
     jobExecution.setTotal(total = 13)
     # Assert result.
+    toObjectMetadata.assert_called_once()
     toGrpc.assert_called_once()
     save.assert_called_once()
 
   @patch('khaleesi.models.jobExecution.JobExecution.toGrpc')
+  @patch('khaleesi.models.jobExecution.JobExecution.toObjectMetadata')
   @patch('khaleesi.models.jobExecution.JobExecution.khaleesiSave')
-  def testFinish(self, save: MagicMock, toGrpc: MagicMock) -> None :
+  def testFinish(self, save: MagicMock, toObjectMetadata: MagicMock, toGrpc: MagicMock) -> None :
     """Test finishing a job."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
         # Prepare data.
         save.reset_mock()
+        toObjectMetadata.reset_mock()
         toGrpc.reset_mock()
         jobExecution = DbJobExecution()
         # Execute test.
@@ -92,6 +96,7 @@ class JobExecutionTestCase(SimpleTestCase):
           statusDetails  = 'details',
         )
         # Assert result.
+        toObjectMetadata.assert_called_once()
         toGrpc.assert_called_once()
         save.assert_called_once()
 
@@ -191,14 +196,11 @@ class JobExecutionTestCase(SimpleTestCase):
     self.assertNotEqual(grpc.totalItems, instance.totalItems)
 
   @patch.object(DbJobExecution, 'jobConfigurationToGrpc')
-  @patch('khaleesi.models.jobExecution.Model.toGrpc')
-  def testToGrpc(self, metadata: MagicMock, jobConfiguration: MagicMock) -> None :
+  def testToGrpc(self, jobConfiguration: MagicMock) -> None :
     """Test transforming a job execution into a grpc request."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():
       with self.subTest(status = statusLabel):
         # Prepare data.
-        metadata.reset_mock()
-        metadata.return_value = GrpcJobExecution()
         jobConfiguration.reset_mock()
         jobExecution = DbJobExecution(
           jobId          = 'job-id',
@@ -212,7 +214,6 @@ class JobExecutionTestCase(SimpleTestCase):
         # Execute test.
         result = jobExecution.toGrpc()
         # Assert result.
-        metadata.assert_called_once()
         jobConfiguration.assert_called_once()
         self.assertEqual(jobExecution.jobId         , result.jobMetadata.id)
         self.assertEqual(jobExecution.executionId   , result.executionMetadata.id)

@@ -25,7 +25,8 @@ class Service(Servicer):
     job = Job()
     job.khaleesiSave(grpc = request.job)
     response = JobResponse()
-    job.toGrpc(metadata = response.metadata, grpc = response.job)
+    response.metadata.CopyFrom(job.toObjectMetadata())
+    response.job.CopyFrom(job.toGrpc())
     return response
 
   def ExecuteJob(self, request: ObjectMetadata, _: grpc.ServicerContext) -> ObjectMetadata :

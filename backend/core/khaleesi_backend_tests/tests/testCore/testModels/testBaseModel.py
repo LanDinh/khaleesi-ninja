@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.core.shared.exceptions import DbOutdatedInformationException
+from khaleesi.core.shared.exceptions import DbOutdatedInformationException, ProgrammingException
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from tests.models.baseModel import BaseModel
 
@@ -90,9 +90,16 @@ class ModelTestCase(SimpleTestCase):
     """Test mapping the instance to gRPC."""
     # Prepare data.
     instance = BaseModel()
+    # Execute test & assert result.
+    with self.assertRaises(ProgrammingException):
+      instance.toGrpc()
+
+  def testToObjectMetadata(self) -> None :
+    """Test mapping the instance metadata to gRPC."""
+    # Prepare data.
+    instance = BaseModel()
     instance.khaleesiVersion  = 1337
-    result = ObjectMetadata()
     # Execute test.
-    instance.toGrpc(metadata = result)
+    result = instance.toObjectMetadata()
     # Assert result.
     self.assertEqual(instance.khaleesiVersion , result.version)

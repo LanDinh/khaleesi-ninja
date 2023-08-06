@@ -61,8 +61,8 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
 
   def setTotal(self, *, total: int) -> None :
     """Set the total amount of items for the job."""
-    metadata = ObjectMetadata()
-    grpc = self.toGrpc(metadata = metadata)
+    metadata = self.toObjectMetadata()
+    grpc = self.toGrpc()
     grpc.totalItems = total
     self.khaleesiSave(metadata = metadata, grpc = grpc)
 
@@ -73,8 +73,8 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
       statusDetails : str,
   ) -> None :
     """Register job finish."""
-    metadata = ObjectMetadata()
-    grpc = self.toGrpc(metadata = metadata)
+    metadata = self.toObjectMetadata()
+    grpc = self.toGrpc()
     grpc.status         = status
     grpc.itemsProcessed = itemsProcessed
     grpc.statusDetails  = statusDetails
@@ -114,14 +114,10 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
 
     super().khaleesiSave(metadata = metadata, grpc = grpc)
 
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata   = ObjectMetadata(),
-      grpc    : GrpcJobExecution = GrpcJobExecution(),
-  ) -> GrpcJobExecution :
+  def toGrpc(self) -> GrpcJobExecution :
     """Return a grpc object containing own values."""
     # Metadata.
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    grpc = GrpcJobExecution()
     grpc.jobMetadata.id       = self.jobId
     grpc.executionMetadata.id = self.executionId
 

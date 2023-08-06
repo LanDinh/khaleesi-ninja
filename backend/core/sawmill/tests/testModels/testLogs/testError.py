@@ -11,10 +11,9 @@ from khaleesi.core.logging.textLogger import LogLevel
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_sawmill_pb2 import ErrorRequest as GrpcErrorRequest
 from microservice.models import Error
-from microservice.testUtil import ModelRequestMetadataMixin
 
 
-class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
+class ErrorTestCase(SimpleTestCase):
   """Test the error logs models."""
 
   @patch('microservice.models.logs.error.parseString')
@@ -72,10 +71,10 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           # Assert result.
           metadata.assert_called_once()
           parent.assert_called_once()
-          self.assertNotEqual(grpc.error.publicDetails  , instance.publicDetails)
-          self.assertNotEqual(grpc.error.privateMessage , instance.privateMessage)
-          self.assertNotEqual(grpc.error.privateDetails , instance.privateDetails)
-          self.assertNotEqual(grpc.error.stacktrace     , instance.stacktrace)
+          self.assertNotEqual(grpc.error.publicDetails , instance.publicDetails)
+          self.assertNotEqual(grpc.error.privateMessage, instance.privateMessage)
+          self.assertNotEqual(grpc.error.privateDetails, instance.privateDetails)
+          self.assertNotEqual(grpc.error.stacktrace    , instance.stacktrace)
 
   @patch('microservice.models.logs.error.parseString')
   @patch('microservice.models.logs.error.Model.khaleesiSave')
@@ -98,16 +97,14 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
     metadata.assert_called_once()
     parent.assert_called_once()
 
-  @patch('microservice.models.logs.error.Model.toGrpc')
   @patch('microservice.models.logs.error.Error.metadataToGrpc')
-  def testToGrpc(self, metadata: MagicMock, parent: MagicMock) -> None :
+  def testToGrpc(self, metadata: MagicMock) -> None :
     """Test that general mapping to gRPC works."""
     for status in StatusCode:
       for loglevel in LogLevel:
         with self.subTest(status = status.name):
           # Prepare data.
           metadata.reset_mock()
-          parent.reset_mock()
           instance = Error(
             status         = status.name,
             loglevel       = loglevel.name,
@@ -132,9 +129,8 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
           self.assertEqual(instance.privateDetails, result.error.privateDetails)
           self.assertEqual(instance.stacktrace    , result.error.stacktrace)
 
-  @patch('microservice.models.logs.error.Model.toGrpc')
   @patch('microservice.models.logs.error.Error.metadataToGrpc')
-  def testToGrpcEmpty(self, metadata: MagicMock, parent: MagicMock) -> None :
+  def testToGrpcEmpty(self, metadata: MagicMock) -> None :
     """Test that mapping to gRPC for empty errors works."""
     # Prepare data.
     error = Error()
@@ -142,10 +138,9 @@ class ErrorTestCase(ModelRequestMetadataMixin, SimpleTestCase):
     error.toGrpc()
     # Assert result.
     metadata.assert_called_once()
-    parent.assert_called_once()
 
   def _createGrpcError(self, *, status: StatusCode, loglevel: LogLevel) -> GrpcErrorRequest :
-    """Utility method for creating gRPC Events."""
+    """Utility method for creating gRPC Errors."""
     grpc = GrpcErrorRequest()
 
     grpc.error.status         = status.name

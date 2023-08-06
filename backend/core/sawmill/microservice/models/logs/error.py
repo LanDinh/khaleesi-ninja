@@ -59,13 +59,9 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
     super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata   = ObjectMetadata(),
-      grpc    : GrpcErrorRequest = GrpcErrorRequest(),
-  ) -> GrpcErrorRequest :
+  def toGrpc(self) -> GrpcErrorRequest :
     """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    grpc = GrpcErrorRequest()
     self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
 
     # Error.

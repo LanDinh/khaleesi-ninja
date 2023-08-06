@@ -25,12 +25,6 @@ message ResponseRequest {
   repeated Query                queries         = 3;
 }
 
-
-message ResponseMetadata {
-  google.protobuf.Timestamp loggedTimestamp = 1;
-  string                    errors          = 2;
-}
-
 message ProcessedResponse {
   google.protobuf.Duration reportedDuration = 1;
   google.protobuf.Duration loggedDuration   = 2;
@@ -118,12 +112,15 @@ message Error {
 }
 
 message Query {
-  string id         = 1;
-  string raw        = 2;
-  string connection = 3;
+  string raw = 1;
 
-  google.protobuf.Timestamp start = 10;
-  google.protobuf.Timestamp end   = 11;
+  google.protobuf.Timestamp start            = 10;
+  google.protobuf.Timestamp end              = 11;
+  google.protobuf.Duration  reportedDuration = 12;
+
+  string          normalized = 20;
+  repeated string tables     = 21;
+  repeated string columns    = 22;
 }
 
 
@@ -173,6 +170,14 @@ message ErrorRequest {
   Error error = 10;
 }
 
+message QueryRequest {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+  khaleesi.core.ObjectMetadata  objectMetadata  = 2;
+  LogRequestMetadata            logMetadata     = 3;
+
+  Query query = 10;
+}
+
 service Lumberjack {
   rpc LogHttpRequest         (HttpRequestRequest) returns (khaleesi.core.ObjectMetadata);
   rpc LogHttpRequestResponse (ResponseRequest)    returns (khaleesi.core.ObjectMetadata);
@@ -186,8 +191,17 @@ service Lumberjack {
 /* SAWYER *****************************************************************************************/
 
 
+message LogFilter {
+  khaleesi.core.RequestMetadata requestMetadata = 1;
+}
+
+
 message HttpRequestList {
   repeated HttpRequestRequest requests = 1;
+}
+
+message GrpcRequestList {
+  repeated GrpcRequestRequest requests = 1;
 }
 
 message EventsList {
@@ -198,29 +212,8 @@ message ErrorList {
   repeated ErrorRequest errors = 1;
 }
 
-message QueryResponse {
-  khaleesi.core.RequestMetadata queryRequestMetadata  = 1;
-  ResponseMetadata              queryResponseMetadata = 2;
-  Query                         query                 = 3;
-
-  string                   normalized       = 10;
-  repeated string          tables           = 11;
-  repeated string          columns          = 12;
-  google.protobuf.Duration reportedDuration = 20;
-
-}
-
 message QueryList{
-  repeated QueryResponse queries = 1;
-}
-
-message GrpcRequestList {
-  repeated GrpcRequestRequest requests = 1;
-}
-
-
-message LogFilter {
-  khaleesi.core.RequestMetadata requestMetadata = 1;
+  repeated QueryRequest queries = 1;
 }
 
 

@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from khaleesi.core.shared.state import STATE
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import User, ObjectMetadata, RequestMetadata
+from khaleesi.proto.core_pb2 import User, RequestMetadata
 from tests.models.eventIdModelOwnedBySystem import EventSystemModel
 
 
@@ -133,7 +133,7 @@ class ModelTestCase(SimpleTestCase):
     parent.assert_called_once()
     singleton.structuredLogger.logEvent.assert_called_once()
 
-  def testToGrpc(self) -> None :
+  def testToObjectMetadata(self) -> None :
     """Test getting gRPC data."""
     for creatorLabel, creatorType in User.UserType.items():
       for modifierLabel, modifierType in User.UserType.items():
@@ -146,9 +146,8 @@ class ModelTestCase(SimpleTestCase):
           instance.khaleesiModified = datetime.now(tz = timezone.utc)
           instance.khaleesiModifiedById   = 'modifier'
           instance.khaleesiModifiedByType = modifierLabel
-          result = ObjectMetadata()
           # Execute test.
-          instance.toGrpc(metadata = result)
+          result = instance.toObjectMetadata()
           # Assert result.
           self.assertEqual(
             instance.khaleesiCreated,

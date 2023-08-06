@@ -82,13 +82,9 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
     super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata  = ObjectMetadata(),
-      grpc    : GrpcGrpcRequest = GrpcGrpcRequest(),
-  ) -> GrpcGrpcRequest :
+  def toGrpc(self) -> GrpcGrpcRequest :
     """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    grpc = GrpcGrpcRequest()
     self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
     self.responseMetadataToGrpc(
       logMetadata = grpc.responseLogMetadata,
@@ -108,7 +104,6 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
 
   def toObjectMetadata(self) -> ObjectMetadata :
     """Return the object metadata representing this object."""
-    metadata = ObjectMetadata()
-    metadata.id      = self.metaCallerGrpcRequestId
-    metadata.version = self.khaleesiVersion
+    metadata = super().toObjectMetadata()
+    metadata.id = self.metaCallerGrpcRequestId
     return metadata

@@ -3,13 +3,8 @@ from typing import Any
 
 # khaleesi.ninja.
 from khaleesi.proto.core_pb2 import ObjectMetadata
-from microservice.models.logs.abstract import Metadata as AbstractMetadata
 from microservice.models.logs.metadataMixin import MetadataMixin, GrpcMetadataMixin
 from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
-
-
-class OldMetadata(AbstractMetadata):
-  """Allow instantiation of abstract model."""
 
 
 class Metadata(MetadataMixin):
@@ -28,12 +23,8 @@ class GrpcMetadata(GrpcMetadataMixin):
     return ObjectMetadata()
 
 
-class ResponseMetadata(ResponseMetadataMixin):
+class ResponseMetadata(MetadataMixin, ResponseMetadataMixin):  # type: ignore[misc]
   """Allow instantiation of abstract model."""
-
-  def toObjectMetadata(self) -> ObjectMetadata :
-    """Return the object metadata representing this object."""
-    return ObjectMetadata()
 
   def khaleesiSave(
       self,
@@ -44,9 +35,9 @@ class ResponseMetadata(ResponseMetadataMixin):
   ) -> None :
     """Change own values according to the grpc object."""
 
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata   = ObjectMetadata(),
-      grpc    : Any,
-  ) -> Any :
+  def toGrpc(self) -> Any :
     """Return a grpc object containing own values."""
+
+  def toObjectMetadata(self) -> ObjectMetadata :
+    """Return the object metadata representing this object."""
+    return ObjectMetadata()

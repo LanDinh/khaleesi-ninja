@@ -59,13 +59,9 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
 
     super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
 
-  def toGrpc(
-      self, *,
-      metadata: ObjectMetadata = ObjectMetadata(),
-      grpc    : GrpcJob        = GrpcJob(),
-  ) -> GrpcJob :
+  def toGrpc(self) -> GrpcJob :
     """Return a grpc object containing own values."""
-    super().toGrpc(metadata = metadata, grpc = grpc)
+    grpc = GrpcJob()
 
     grpc.name           = self.name
     grpc.description    = self.description

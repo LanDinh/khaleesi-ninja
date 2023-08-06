@@ -2,135 +2,223 @@
 
 # Python.
 from datetime import datetime, timedelta, timezone
-from math import floor
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
-from khaleesi.core.testUtil.grpc import GrpcTestMixin
-from khaleesi.core.testUtil.testCase import SimpleTestCase, TransactionTestCase
-from khaleesi.proto.core_pb2 import User, RequestMetadata
-from khaleesi.proto.core_sawmill_pb2 import ResponseRequest as GrpcGrpcQueries
+from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_sawmill_pb2 import QueryRequest as GrpcQueryRequest
 from microservice.models import Query
-from microservice.testUtil import ModelRequestMetadataMixin
+from microservice.models.logs.metadataMixin import MIN_TIMESTAMP
 
 
-@patch('microservice.models.logs.query.Parser')
-@patch('microservice.models.logs.query.parseTimestamp')
-@patch('microservice.models.logs.query.parseString', return_value = 'parsed-string')
-@patch.object(Query.objects.model, 'logMetadata')
-class QueryManagerTestCase(GrpcTestMixin, TransactionTestCase):
-  """Test the query logs objects manager."""
-
-  def testLogQueries(
-      self,
-      metadata : MagicMock,
-      string   : MagicMock,
-      timestamp: MagicMock,
-      sqlParser: MagicMock,
-  ) -> None :
-    """Test logging queries."""
-    for userLabel, userType in User.UserType.items():
-      with self.subTest(user = userLabel):
-        # Prepare data.
-        metadata.reset_mock()
-        string.reset_mock()
-        timestamp.reset_mock()
-        start = datetime.now(tz = timezone.utc)
-        end   = start + timedelta(days = 1)
-        metadata.return_value = { 'metaReportedTimestamp': start }
-        timestamp.side_effect = [ start, end, start, datetime.max.replace(tzinfo = timezone.utc) ]
-        sqlParser.reset_mock()
-        sqlParser.return_value.generalize = 'generalized'
-        sqlParser.return_value.tables     = [ 'table1', 'table2' ]
-        sqlParser.return_value.columns    = []
-        queries = GrpcGrpcQueries()
-        queries.queries.add()
-        queries.queries.add()
-        requestMetadata = RequestMetadata()
-        self.setRequestMetadata(
-          requestMetadata = requestMetadata,
-          now             = start,
-          user            = userType,
-        )
-        # Execute test.
-        result = Query.objects.logQueries(queries = queries.queries, metadata = requestMetadata)
-        # Assert result.
-        self.assertEqual(2, len(result))
-        self.assertEqual('table1,table2', result[0].tables)
-        self.assertEqual(''             , result[1].columns)
-        self.assertEqual(timedelta(days = 1), result[0].reportedDuration)
-        self.assertEqual(timedelta(0)       , result[1].reportedDuration)
-        self.assertEqual(2, metadata.call_count)
-        self.assertEqual(requestMetadata, metadata.call_args_list[0].kwargs['metadata'])
-        self.assertEqual(requestMetadata, metadata.call_args_list[1].kwargs['metadata'])
-        self.assertEqual([]             , metadata.call_args_list[0].kwargs['errors'])
-        self.assertEqual([]             , metadata.call_args_list[1].kwargs['errors'])
-
-  def testLogQueriesEmpty(self, *_: MagicMock) -> None :
-    """Test logging queries."""
-    # Execute test.
-    result = Query.objects.logQueries(
-      queries  = GrpcGrpcQueries().queries,
-      metadata = RequestMetadata(),
-    )
-    # Assert result.
-    self.assertEqual(0, len(result))
-
-
-class QueryTestCase(ModelRequestMetadataMixin, SimpleTestCase):
+class QueryTestCase(SimpleTestCase):
   """Test the query logs models."""
 
-  def testToGrpcQuery(self) -> None :
-    """Test that general mapping to gRPC works."""
-    for userLabel, userType in User.UserType.items():
-      with self.subTest(user = userLabel):
-        # Prepare data.
-        query = Query(
-          queryId       = 'query-id',
-          connection    = 'connection',
-          raw           = 'raw',
-          normalized    = 'normalized',
-          tables        = 'table1,table2',
-          columns       = '',
-          reportedStart = datetime.now(tz = timezone.utc),
-          reportedEnd   = datetime.now(tz = timezone.utc) + timedelta(days = 1),
-          **self.modelFullRequestMetadata(user = userType),
-        )
-        # Execute test.
-        result = query.toGrpc()
-        # Assert result.
-        self.assertGrpcRequestMetadata(
-          model        = query,
-          grpc         = result.queryRequestMetadata,
-          grpcResponse = result.queryResponseMetadata,
-        )
-        self.assertEqual(query.queryId   , result.query.id)
-        self.assertEqual(query.connection, result.query.connection)
-        self.assertEqual(query.raw       , result.query.raw)
-        self.assertEqual(query.normalized, result.normalized)
-        self.assertEqual(2               , len(result.tables))
-        self.assertEqual('table1'        , result.tables[0])
-        self.assertEqual('table2'        , result.tables[1])
-        self.assertEqual(0               , len(result.columns))
-        self.assertEqual(
-          query.reportedStart.replace(tzinfo = None),  # pylint: disable=unexpected-keyword-arg
-          result.query.start.ToDatetime(),
-        )
-        self.assertEqual(query.reportedEnd.replace(tzinfo = None), result.query.end.ToDatetime())  # pylint: disable=unexpected-keyword-arg
-        self.assertEqual(
-          floor(query.reportedDuration.total_seconds()),
-          result.reportedDuration.seconds,
-        )
-
-  def testEmptyToGrpcQuery(self) -> None :
-    """Test that mapping to gRPC for empty queries works."""
+  def testReportedDurationEmptyStart(self) -> None :
+    """Test calculating the duration."""
     # Prepare data.
-    query = Query(
+    instance = Query()
+    instance.reportedEnd = datetime.now(tz = timezone.utc)
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDurationEmptyEnd(self) -> None :
+    """Test calculating the duration."""
+    # Prepare data.
+    instance = Query()
+    instance.reportedStart = datetime.now(tz = timezone.utc)
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDurationMinStart(self) -> None :
+    """Test calculating the duration."""
+    # Prepare data.
+    instance = Query()
+    instance.reportedStart = MIN_TIMESTAMP
+    instance.reportedEnd   = datetime.now(tz = timezone.utc)
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDurationMinEnd(self) -> None :
+    """Test calculating the duration."""
+    # Prepare data.
+    instance = Query()
+    instance.reportedStart = datetime.now(tz = timezone.utc)
+    instance.reportedEnd   = MIN_TIMESTAMP
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(timedelta(), result)
+
+  def testReportedDuration(self) -> None :
+    """Test calculating the duration."""
+    # Prepare data.
+    delta = timedelta(hours = 13)
+    instance = Query()
+    instance.reportedStart = datetime.now(tz = timezone.utc)
+    instance.reportedEnd   = instance.reportedStart + delta
+    # Execute test.
+    result = instance.reportedDuration
+    # Assert result.
+    self.assertEqual(delta, result)
+
+  @patch('microservice.models.logs.query.parseTimestamp')
+  @patch('microservice.models.logs.query.parseString')
+  @patch('microservice.models.logs.query.Model.khaleesiSave')
+  @patch('microservice.models.logs.query.Query.metadataFromGrpc')
+  @patch('microservice.models.logs.query.Parser')
+  def testKhaleesiSaveNew(
+      self,
+      parser   : MagicMock,
+      metadata : MagicMock,
+      parent   : MagicMock,
+      string   : MagicMock,
+      timestamp: MagicMock,
+  ) -> None :
+    """Test reading from gRPC."""
+    # Prepare data.
+    instance               = Query()
+    instance._state.adding = True  # pylint: disable=protected-access
+    grpc = self._createGrpcQuery(string = string, timestamp = timestamp)
+    parser.return_value.generalize = 'new-normalized'
+    parser.return_value.tables     = [ 'new-table1' ]
+    parser.return_value.columns    = [ 'new-column1', 'new-column2' ]
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parser.assert_called_once()
+    metadata.assert_called_once()
+    parent.assert_called_once()
+    self.assertEqual('new-normalized'         , instance.normalized)
+    self.assertEqual('new-table1'             , instance.tables)
+    self.assertEqual('new-column1,new-column2', instance.columns)
+
+  @patch('microservice.models.logs.query.parseTimestamp')
+  @patch('microservice.models.logs.query.parseString')
+  @patch('microservice.models.logs.query.Model.khaleesiSave')
+  @patch('microservice.models.logs.query.Query.metadataFromGrpc')
+  @patch('microservice.models.logs.query.Parser')
+  def testKhaleesiSaveOld(
+      self,
+      parser   : MagicMock,
+      metadata : MagicMock,
+      parent   : MagicMock,
+      string   : MagicMock,
+      timestamp: MagicMock,
+  ) -> None :
+    """Test reading from gRPC."""
+    # Prepare data.
+    instance               = Query()
+    instance._state.adding = False  # pylint: disable=protected-access
+    grpc = self._createGrpcQuery(string = string, timestamp = timestamp)
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parser.assert_not_called()
+    metadata.assert_called_once()
+    parent.assert_called_once()
+    self.assertNotEqual(
+      grpc.query.start.ToDatetime().replace(tzinfo = timezone.utc),
+      instance.reportedStart,
+    )
+    self.assertNotEqual(
+      grpc.query.end.ToDatetime().replace(tzinfo = timezone.utc),
+      instance.reportedEnd,
+    )
+    self.assertNotEqual('', instance.normalized)
+    self.assertNotEqual('', instance.tables)
+    self.assertNotEqual('', instance.columns)
+
+  @patch('microservice.models.logs.query.parseTimestamp')
+  @patch('microservice.models.logs.query.parseString')
+  @patch('microservice.models.logs.query.Model.khaleesiSave')
+  @patch('microservice.models.logs.query.Query.metadataFromGrpc')
+  @patch('microservice.models.logs.query.Parser')
+  def testKhaleesiSaveNewEmpty(
+      self,
+      parser   : MagicMock,
+      metadata : MagicMock,
+      parent   : MagicMock,
+      string   : MagicMock,
+      timestamp: MagicMock,
+  ) -> None :
+    """Test reading from gRPC."""
+    # Prepare data.
+    string.return_value = 'parsed-string'
+    now = datetime.now(tz = timezone.utc)
+    timestamp.return_value = now
+    instance               = Query()
+    instance._state.adding = True  # pylint: disable=protected-access
+    grpc = GrpcQueryRequest()
+    # Execute test.
+    instance.khaleesiSave(grpc = grpc)
+    # Assert result.
+    parser.assert_called_once()
+    metadata.assert_called_once()
+    parent.assert_called_once()
+
+  @patch('microservice.models.logs.query.Query.metadataToGrpc')
+  def testToGrpc(self, metadata: MagicMock) -> None :
+    """Test that general mapping to gRPC works."""
+    # Prepare data.
+    instance = Query(
       reportedStart = datetime.now(tz = timezone.utc),
-      reportedEnd   = datetime.now(tz = timezone.utc) + timedelta(days = 1),
-      **self.modelEmptyRequestMetadata(),
+      reportedEnd   = datetime.now(tz = timezone.utc),
+      raw           = 'raw',
+      normalized    = 'normalized',
+      tables        = 'table1',
+      columns       = 'column1,column2',
     )
     # Execute test.
-    result = query.toGrpc()
+    result = instance.toGrpc()
     # Assert result.
-    self.assertIsNotNone(result)
+    metadata.assert_called_once()
+    self.assertEqual(
+      instance.reportedStart,
+      result.query.start.ToDatetime().replace(tzinfo = timezone.utc),
+    )
+    self.assertEqual(
+      instance.reportedEnd,
+      result.query.end.ToDatetime().replace(tzinfo = timezone.utc),
+    )
+    self.assertEqual(instance.raw       , result.query.raw)
+    self.assertEqual(instance.normalized, result.query.normalized)
+    self.assertEqual(1                  , len(result.query.tables))
+    self.assertEqual(2                  , len(result.query.columns))
+    self.assertEqual(instance.tables    , result.query.tables[0])
+    self.assertEqual('column1'          , result.query.columns[0])
+    self.assertEqual('column2'          , result.query.columns[1])
+
+  @patch('microservice.models.logs.query.Query.metadataToGrpc')
+  def testToGrpcEmpty(self, metadata: MagicMock) -> None :
+    """Test that mapping to gRPC for empty queries works."""
+    # Prepare data.
+    query = Query()
+    # Execute test.
+    query.toGrpc()
+    # Assert result.
+    metadata.assert_called_once()
+
+  def _createGrpcQuery(self, *, string: MagicMock, timestamp: MagicMock) -> GrpcQueryRequest :
+    """Utility method for creating gRPC Queries."""
+    string.return_value = 'parsed-string'
+    now = datetime.now(tz = timezone.utc)
+    timestamp.return_value = now
+    grpc = GrpcQueryRequest()
+
+    grpc.query.start.FromDatetime(datetime.now(tz = timezone.utc))
+    grpc.query.end.FromDatetime(datetime.now(tz = timezone.utc))
+
+    grpc.query.raw        = 'raw'
+    grpc.query.normalized = 'normalized'
+    grpc.query.tables.append('table1')
+    grpc.query.columns.append('column1')
+    grpc.query.columns.append('column2')
+
+    return grpc

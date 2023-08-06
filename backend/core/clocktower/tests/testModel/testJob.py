@@ -54,8 +54,7 @@ class JobTestCase(SimpleTestCase):
     self.assertEqual(grpc.action        , job.action)
 
   @patch('microservice.models.job.JobConfigurationMixin.jobConfigurationToGrpc')
-  @patch('microservice.models.job.Model.toGrpc')
-  def testToGrpc(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
+  def testToGrpc(self, jobConfiguration: MagicMock) -> None :
     """Test returning a gRPC."""
     # Prepare data.
     job = Job(
@@ -67,7 +66,6 @@ class JobTestCase(SimpleTestCase):
     # Execute test.
     result = job.toGrpc()
     # Assert result.
-    parent.assert_called_once()
     jobConfiguration.assert_called_once()
     self.assertEqual(job.name          , result.name)
     self.assertEqual(job.description   , result.description)

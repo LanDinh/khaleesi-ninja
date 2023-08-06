@@ -11,7 +11,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.shared.parseUtil import parseTimestamp, parseString
-from khaleesi.proto.core_pb2 import ObjectMetadata, RequestMetadata
+from khaleesi.proto.core_pb2 import RequestMetadata
 from khaleesi.proto.core_sawmill_pb2 import (
   LogRequestMetadata,
   ProcessedResponse,
@@ -54,15 +54,17 @@ class ResponseMetadataMixin(models.Model):
   def reportedDuration(self) -> timedelta :
     """Get the reported duration."""
     if self.inProgress or \
-        self.metaReportedTimestamp == MIN_TIMESTAMP or \
-        self.metaResponseReportedTimestamp == MIN_TIMESTAMP:
+        not self.metaReportedTimestamp or not self.metaResponseReportedTimestamp or \
+        MIN_TIMESTAMP in (self.metaReportedTimestamp, self.metaResponseReportedTimestamp):
       return timedelta()
     return self.metaResponseReportedTimestamp - self.metaReportedTimestamp
 
   @property
   def loggedDuration(self) -> timedelta :
     """Get the logged duration."""
-    if self.inProgress:
+    if self.inProgress or \
+        not self.metaLoggedTimestamp or not self.metaResponseLoggedTimestamp or \
+        MIN_TIMESTAMP in (self.metaLoggedTimestamp, self.metaResponseLoggedTimestamp):
       return timedelta()
     return self.metaResponseLoggedTimestamp - self.metaLoggedTimestamp
 
@@ -79,8 +81,8 @@ class ResponseMetadataMixin(models.Model):
 
   def finish(self, *, request: ResponseRequest) -> None :
     """Finish an in-progress HTTP request."""
-    metadata = ObjectMetadata()
-    grpc = self.toGrpc(metadata = metadata)
+    metadata = self.toObjectMetadata()
+    grpc = self.toGrpc()
     grpc.response.CopyFrom(request.response)
     grpc.responseMetadata.CopyFrom(request.requestMetadata)
     self.khaleesiSave(metadata = metadata, grpc = grpc)

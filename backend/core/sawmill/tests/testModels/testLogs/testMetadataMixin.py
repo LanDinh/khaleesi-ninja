@@ -141,13 +141,6 @@ class MetadataMixinTestCase(SimpleTestCase):
     # Execute test & assert result.
     instance.metadataToGrpc(requestMetadata = requestMetadata, logMetadata = logMetadata)
 
-  def testToObjectMetadata(self) -> None :
-    """Test the signature is there."""
-    # Prepare data.
-    instance = Metadata()
-    # Execute test & assert result.
-    instance.toObjectMetadata()
-
   def _createRequestMetadata(
       self, *,
       now      : datetime,
@@ -259,13 +252,6 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
     instance.metadataToGrpc(requestMetadata = requestMetadata, logMetadata = logMetadata)
     # Assert result.
     parent.assert_called_once()
-
-  def testToObjectMetadata(self) -> None :
-    """Test the signature is there."""
-    # Prepare data.
-    instance = GrpcMetadata()
-    # Execute test & assert result.
-    instance.toObjectMetadata()
 
   def _createRequestMetadata(self, *, string: MagicMock) -> RequestMetadata :
     """Utility for creating fully populated request metadata objects."""
