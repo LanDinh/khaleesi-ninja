@@ -27,9 +27,7 @@ class StructuredDbLogger(StructuredLogger):
 
   def sendLogHttpRequest(self, *, grpc: HttpRequestRequest) -> DbHttpRequest:  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log request to the logging facility."""
-    instance = DbHttpRequest()
-    instance.khaleesiSave(grpc = grpc)
-    return instance
+    return DbHttpRequest.objects.khaleesiCreate(grpc = grpc)
 
   def sendLogHttpResponse(self, *, grpc: ResponseRequest) -> DbHttpRequest :  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log response to the logging facility."""
@@ -41,8 +39,7 @@ class StructuredDbLogger(StructuredLogger):
 
   def sendLogGrpcRequest(self, *, grpc: GrpcRequestRequest) -> DbGrpcRequest :  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log request to the logging facility."""
-    instance = DbGrpcRequest()
-    instance.khaleesiSave(grpc = grpc)
+    instance = DbGrpcRequest.objects.khaleesiCreate(grpc = grpc)
     LOGGER.info('Adding call to service registry.')
     SERVICE_REGISTRY.addCall(
       callerDetails = grpc.request.upstreamRequest,
@@ -77,8 +74,8 @@ class StructuredDbLogger(StructuredLogger):
       grpcQuery = QueryRequest()
       grpcQuery.query.CopyFrom(rawQuery)
       grpcQuery.requestMetadata.CopyFrom(requestMetadata)
-      query = DbQuery()
-      query.khaleesiSave(grpc = grpcQuery, update_fields = [])  # Don't save it - bulk creation.
+      # Don't save it - bulk creation.
+      query = DbQuery.objects.khaleesiCreate(grpc = grpcQuery, update_fields = [])
       newQueries.append(query)
       errors += query.metaLoggingErrors
       instance.addChildDuration(duration = query.reportedDuration)
@@ -89,12 +86,8 @@ class StructuredDbLogger(StructuredLogger):
 
   def sendLogEvent(self, *, grpc: EventRequest) -> DbEvent :  # type: ignore[override]
     """Send the log event to the logging facility."""
-    instance = DbEvent()
-    instance.khaleesiSave(grpc = grpc)
-    return instance
+    return DbEvent.objects.khaleesiCreate(grpc = grpc)
 
   def sendLogError(self, *, grpc: ErrorRequest) -> DbError :  # type: ignore[override]
     """Send the log error to the logging facility."""
-    instance = DbError()
-    instance.khaleesiSave(grpc = grpc)
-    return instance
+    return DbError.objects.khaleesiCreate(grpc = grpc)

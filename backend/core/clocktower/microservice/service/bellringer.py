@@ -22,8 +22,7 @@ class Service(Servicer):
   def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> JobResponse :
     """Create a new job."""
     LOGGER.info('Creating the new job.')
-    job = Job()
-    job.khaleesiSave(grpc = request.job)
+    job = Job.objects.khaleesiCreate(grpc = request.job)
     response = JobResponse()
     response.metadata.CopyFrom(job.toObjectMetadata())
     response.job.CopyFrom(job.toGrpc())

@@ -217,12 +217,10 @@ class BaseJob(ABC, Generic[M]):
         self.request.status = GrpcJobExecution.Status.IN_PROGRESS
         if DbJobExecution.objects.countJobExecutionsInProgress(job = self.request.jobMetadata) > 0:
           self.request.status = GrpcJobExecution.Status.SKIPPED
-        self.jobExecution = DbJobExecution()
-        self.jobExecution.khaleesiSave(grpc = self.request)
+        self.jobExecution = DbJobExecution.objects.khaleesiCreate(grpc = self.request)
     except Exception as exception:
       LOGGER.fatal(f'{self._loggingPrefix()} Failed to start.')
-      self.jobExecution = DbJobExecution()
-      self.jobExecution.khaleesiSave(grpc = self.request)
+      self.jobExecution = DbJobExecution.objects.khaleesiCreate(grpc = self.request)
       self._logEvent(
         action  = Event.Action.ActionType.START,
         result  = Event.Action.ResultType.FATAL,

@@ -10,7 +10,7 @@ from typing import List, Any
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.models.baseModel import Model
+from khaleesi.core.models.baseModel import Model, Manager
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import HttpRequestRequest as GrpcHttpRequest
 from microservice.models.logs.metadataMixin import MetadataMixin
@@ -36,7 +36,7 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
   os             = models.TextField(default = 'UNKNOWN')
   deviceType     = models.TextField(default = 'UNKNOWN')
 
-  objects: models.Manager[HttpRequest]
+  objects: Manager[HttpRequest]
 
 
   def khaleesiSave(

@@ -10,6 +10,7 @@ from django.db import models
 from django.conf import settings
 
 # khaleesi.ninja.
+from khaleesi.core.models.baseModel import Manager
 from khaleesi.core.models.idModel import Model
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.parseUtil import parseString
@@ -37,7 +38,7 @@ class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
   actionResult     = models.TextField(default = 'UNKNOWN_RESULT')
   actionDetails    = models.TextField(default = 'UNKNOWN')
 
-  objects: models.Manager[Event]
+  objects: Manager[Event]
 
 
   def khaleesiSave(

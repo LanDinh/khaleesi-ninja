@@ -10,14 +10,14 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
-from khaleesi.core.models.baseModel import Model
+from khaleesi.core.models.baseModel import Model, Manager
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, ObjectMetadata
 
 
 IN_PROGRESS = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS)
 
 
-class JobExecutionManager(models.Manager['JobExecution']):
+class JobExecutionManager(Manager['JobExecution']):
   """Basic job manager."""
 
   def countJobExecutionsInProgress(self, *, job: ObjectMetadata) -> int :
@@ -52,7 +52,7 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin):
   itemsProcessed = models.IntegerField(default = 0)
   totalItems     = models.IntegerField(default = 0)
 
-  objects: JobExecutionManager = JobExecutionManager()
+  objects: JobExecutionManager = JobExecutionManager()  # type: ignore[assignment]
 
   @property
   def inProgress(self) -> bool :

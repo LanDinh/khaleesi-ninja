@@ -14,6 +14,7 @@ from sql_metadata import Parser  # type: ignore[import]
 
 # khaleesi.ninja.
 from khaleesi.core.logging.textLogger import LOGGER
+from khaleesi.core.models.baseModel import Manager
 from khaleesi.core.models.idModel import Model
 from khaleesi.core.shared.parseUtil import parseString, parseTimestamp
 from khaleesi.proto.core_pb2 import ObjectMetadata
@@ -33,7 +34,7 @@ class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
   tables     = models.TextField(default = 'UNKNOWN')
   columns    = models.TextField(default = 'UNKNOWN')
 
-  objects: models.Manager[Query]
+  objects: Manager[Query]
 
   @property
   def reportedDuration(self) -> timedelta :

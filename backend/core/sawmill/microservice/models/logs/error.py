@@ -9,6 +9,7 @@ from typing import Any, List
 from django.db import models
 
 # khaleesi.ninja.
+from khaleesi.core.models.baseModel import Manager
 from khaleesi.core.models.idModel import Model
 from khaleesi.core.shared.parseUtil import parseString
 from khaleesi.proto.core_pb2 import ObjectMetadata
@@ -33,7 +34,7 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
   privateDetails = models.TextField(default = '')
   stacktrace     = models.TextField(default = '')
 
-  objects: models.Manager[Error]
+  objects: Manager[Error]
 
 
   def khaleesiSave(

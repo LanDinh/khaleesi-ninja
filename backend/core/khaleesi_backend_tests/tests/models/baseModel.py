@@ -5,14 +5,11 @@ from __future__ import annotations
 # Python.
 from abc import ABC
 
-# Django.
-from django.db import models
-
 # gRPC.
 from google.protobuf.message import Message
 
 # khaleesi.ninja.
-from khaleesi.core.models.baseModel import Model
+from khaleesi.core.models.baseModel import Model, Manager
 
 
 class Grpc(Message, ABC):
@@ -22,4 +19,4 @@ class Grpc(Message, ABC):
 class BaseModel(Model[Grpc]):
   """Allow instantiation of abstract model."""
 
-  objects: models.Manager[BaseModel]
+  objects: Manager[BaseModel]  # type: ignore[assignment]

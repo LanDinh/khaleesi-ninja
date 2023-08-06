@@ -18,7 +18,7 @@ from khaleesi.core.shared.singleton import SINGLETON
 from khaleesi.core.shared.state import STATE
 from khaleesi.proto.core_pb2 import ObjectMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import Event
-from .baseModel import Grpc
+from .baseModel import Grpc, Manager
 from .idModel import Model as BaseModel
 
 
@@ -35,7 +35,7 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
   khaleesiModifiedById   = models.TextField()
   khaleesiModifiedByType = models.TextField()
 
-  objects: models.Manager[Model]  # type: ignore[type-arg]
+  objects: Manager[Model]  # type: ignore[type-arg,assignment]
 
 
   @property

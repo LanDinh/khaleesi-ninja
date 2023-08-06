@@ -17,6 +17,17 @@ from khaleesi.proto.core_pb2 import ObjectMetadata
 
 
 Grpc = TypeVar('Grpc', bound = Message)
+M = TypeVar('M', bound = models.Model)
+
+
+class Manager(models.Manager[M]):
+  """Basic manager for basic models."""
+
+  def khaleesiCreate(self, *args: Any, grpc: Grpc, **kwargs: Any) -> M :
+    """Create a new object."""
+    instance = self.model()
+    instance.khaleesiSave(*args, grpc = grpc, **kwargs)  # type: ignore[attr-defined]
+    return instance
 
 
 class Model(models.Model, Generic[Grpc]):
@@ -24,7 +35,7 @@ class Model(models.Model, Generic[Grpc]):
 
   khaleesiVersion = models.IntegerField(default = 0)
 
-  objects: models.Manager[Model]  # type: ignore[type-arg]
+  objects: Manager[Model] = Manager()  # type: ignore[type-arg]
 
   def khaleesiSave(
       self,

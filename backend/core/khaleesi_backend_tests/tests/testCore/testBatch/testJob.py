@@ -64,7 +64,7 @@ class JobTestMixin:
     jobExecution.inProcess = True
     jobExecution.setTotal  = setTotal
     jobExecution.finish    = finish
-    start.return_value = jobExecution
+    start.objects.khaleesiCreate.return_value = jobExecution
     start.objects.countJobExecutionsInProgress.return_value = 0
     paginator.return_value.count = 6
     paginator.return_value.page_range = [ 1, 2, 3 ]

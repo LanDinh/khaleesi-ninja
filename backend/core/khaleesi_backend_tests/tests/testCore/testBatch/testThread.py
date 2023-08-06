@@ -59,8 +59,8 @@ class BatchJobThreadTestCase(SimpleTestCase):
       # Execute test.
       thread.start()
       # Assert result.
-      job.execute.assert_called_once_with(stopEvent = thread.stopEvent)
       importDict['khaleesi.core.shared.state'].STATE.copyFrom.assert_called_once()
+      job.execute.assert_called_once_with(stopEvent = thread.stopEvent)
 
   def testStop(self) -> None :
     """Test if stopping the thread works as expected."""

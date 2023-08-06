@@ -11,7 +11,7 @@ from django.db import models
 
 # khaleesi.ninja.
 from khaleesi.proto.core_pb2 import ObjectMetadata
-from .baseModel import Grpc, Model as BaseModel
+from .baseModel import Grpc, Model as BaseModel, Manager
 
 
 class Model(BaseModel[Grpc], Generic[Grpc]):
@@ -19,7 +19,7 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
 
   khaleesiId = models.TextField(unique = True, editable = False)
 
-  objects: models.Manager[Model]  # type: ignore[type-arg]
+  objects: Manager[Model]  # type: ignore[type-arg,assignment]
 
   def khaleesiSave(
       self,

@@ -12,6 +12,7 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
 from khaleesi.core.grpc.requestMetadata import addRequestMetadata
+from khaleesi.core.models.baseModel import Manager
 from khaleesi.core.models.eventIdModelOwnedBySystem import Model
 from khaleesi.proto.core_pb2 import JobExecutionRequest, ObjectMetadata
 from khaleesi.proto.core_clocktower_pb2 import Job as GrpcJob
@@ -24,7 +25,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
   cronExpression = models.TextField()
   action         = models.TextField(default = 'UNKNOWN')
 
-  objects: models.Manager[Job]
+  objects: Manager[Job]
 
 
   def toGrpcJobExecutionRequest(self) -> Tuple[str, JobExecutionRequest] :

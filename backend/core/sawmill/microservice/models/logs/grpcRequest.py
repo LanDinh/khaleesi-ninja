@@ -10,7 +10,7 @@ from typing import List, Any
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.models.baseModel import Model
+from khaleesi.core.models.baseModel import Model, Manager
 from khaleesi.core.shared.parseUtil import parseString
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import GrpcRequestRequest as GrpcGrpcRequest
@@ -28,7 +28,7 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
   upstreamRequestGrpcMethod      = models.TextField(default = 'UNKNOWN')
   upstreamRequestPodId           = models.TextField(default = 'UNKNOWN')
 
-  objects: models.Manager[GrpcRequest]
+  objects: Manager[GrpcRequest]
 
 
   def khaleesiSave(
