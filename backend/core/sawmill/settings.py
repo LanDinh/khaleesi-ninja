@@ -17,8 +17,8 @@ KHALEESI_NINJA['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['MIGRATION'] = '0001
 
 # Cache.
 # noinspection SpellCheckingInspection
-CACHES['service-registry'] = {
+CACHES['site-registry'] = {
     'BACKEND' : 'django.core.cache.backends.locmem.LocMemCache',
-    'LOCATION': 'service-registry',
+    'LOCATION': 'site-registry',
     'TIMEOUT' : 86400,  # type: ignore[dict-item]
 }

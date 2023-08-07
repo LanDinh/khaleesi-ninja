@@ -1,0 +1,45 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: "ServiceMonitor"
+metadata:
+  name: "{{ .Values.site.name }}-{{ .Values.app.name }}"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}-monitoring"
+  labels:
+    khaleesi-ninja: "monitoring"
+    site: "{{ .Values.site.name }}"
+    name: "{{ .Values.app.name }}"
+    type: "{{ .Values.type.name }}"
+    monitoring: "khaleesi-ninja-{{ .Values.environment.name }}"
+spec:
+  endpoints:
+    - port: "metrics"
+      metricRelabelings:
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "container"
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "endpoint"
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "instance"
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "job"
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "pod"
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "service"
+        - action: "labeldrop"
+          sourceLabels: []
+          regex: "namespace"
+  namespaceSelector:
+    matchNames:
+      - "khaleesi-ninja-{{ .Values.environment.name }}"
+  selector:
+    matchLabels:
+      khaleesi-ninja: "app"
+      site: "{{ .Values.site.name }}"
+      name: "{{ .Values.app.name }}"
+      type: "{{ .Values.type.name }}"

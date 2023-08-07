@@ -55,11 +55,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
         self._executeInterceptOtherExceptionTest,
     ]:
       with self.subTest(test = test.__name__):
-        _, finalRequest = self.getRequest(
-          request = request,
-          user    = userType,  # type: ignore[arg-type]
-          **requestParams,
-        )
+        _, finalRequest = self.getRequest(request = request, user = userType, **requestParams)  # type: ignore[arg-type]  # pylint: disable=line-too-long
         test(finalRequest = finalRequest, userType = userType)  # pylint: disable=no-value-for-parameter
 
   @patch('khaleesi.core.interceptors.server.requestState.queryLogger')
@@ -68,7 +64,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
       queryLogger: MagicMock,
       *,
       finalRequest: Any,
-      userType: int,
+      userType    : int,
   ) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
@@ -77,7 +73,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     # Execute test.
     self.interceptor.khaleesiIntercept(
       request = finalRequest,
-      **self.getInterceptParams(method = _method),
+      **self.getInterceptParams(executableMethod = _method),
     )
     # Assert result.
     self._assertCleanState()
@@ -89,7 +85,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
       queryLogger: MagicMock,
       *,
       finalRequest: Any,
-      userType: int,
+      userType    : int,
   ) -> None :
     """Test the counter gets incremented."""
     context = MagicMock()
@@ -104,7 +100,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
             request = finalRequest,
             **self.getInterceptParams(
               context = context,
-              method  = khaleesiRaisingMethod(
+              executableMethod = khaleesiRaisingMethod(
                 method   = partial(self._assertNotCleanState, userType = userType),
                 status   = status,
                 loglevel = loglevel,
@@ -122,7 +118,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
       queryLogger: MagicMock,
       *,
       finalRequest: Any,
-      userType: int,
+      userType    : int,
   ) -> None :
     """Test the counter gets incremented."""
     # Prepare data.
@@ -133,7 +129,7 @@ class RequestStateServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCa
     # Execute test.
     self.interceptor.khaleesiIntercept(
       request = finalRequest,
-      **self.getInterceptParams(context = context, method = _method),
+      **self.getInterceptParams(context = context, executableMethod = _method),
     )
     # Assert result.
     self._assertCleanState()

@@ -9,18 +9,18 @@ jobs:
   matrix:
     runs-on: "ubuntu-latest"
     outputs:
-      all-services: ${{ steps.set-services.outputs.full-json }}
-      deploy-services: ${{ steps.set-services.outputs.deploy-json }}
+      all-app: ${{ steps.set-apps.outputs.full-json }}
+      deploy-apps: ${{ steps.set-apps.outputs.deploy-json }}
       all-environments: ${{ steps.set-environments.outputs.full-json }}
       deploy-environments: ${{ steps.set-environments.outputs.deploy-json }}
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
-      - id: "set-services"
-        name: "Read services into matrix"
+      - id: "set-apps"
+        name: "Read apps into matrix"
         uses: "./.github/actions/set-json-output"
         with:
-          filename: "data/services.json"
+          filename: "data/apps.json"
       - id: "set-environments"
         name: "Read environments into matrix"
         uses: "./.github/actions/set-json-output"
@@ -96,7 +96,7 @@ jobs:
     needs: [ "matrix" ]
     strategy:
       matrix:
-        service: ${{ fromJson(needs.matrix.outputs.deploy-services) }}
+        app: ${{ fromJson(needs.matrix.outputs.deploy-apps) }}
         environment: ${{ fromJson(needs.matrix.outputs.all-environments) }}
     steps:
       - name: "Checkout repository"
@@ -107,17 +107,17 @@ jobs:
         run: |
           helm lint ./kubernetes/khaleesi-ninja-environment \
           --values ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
-      - name: "Helm lint gate"
+      - name: "Helm lint site"
         run: |
-          helm lint ./kubernetes/khaleesi-ninja-gate \
-          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml \
+          helm lint ./kubernetes/khaleesi-ninja-site \
+          --values ./kubernetes/configuration/site/${{ matrix.app.site }}.yml \
           --values ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
-      - name: "Helm lint service"
+      - name: "Helm lint app"
         run: |
-          helm lint ./kubernetes/khaleesi-ninja-service \
-          --values ./kubernetes/configuration/gate/${{ matrix.service.gate }}.yml \
-          --values ./kubernetes/configuration/type/${{ matrix.service.type }}.yml \
-          --values ./kubernetes/configuration/service/${{ matrix.service.gate }}/${{ matrix.service.name }}.yml \
+          helm lint ./kubernetes/khaleesi-ninja-app \
+          --values ./kubernetes/configuration/site/${{ matrix.app.site }}.yml \
+          --values ./kubernetes/configuration/type/${{ matrix.app.type }}.yml \
+          --values ./kubernetes/configuration/app/${{ matrix.app.site }}/${{ matrix.app.name }}.yml \
           --values ./kubernetes/configuration/environment/${{ matrix.environment.name }}.yml
   
   # Build the images for reuse.
@@ -126,34 +126,34 @@ jobs:
     needs: [ "matrix", "generate-protos", "build-backend-base-images" ]
     strategy:
       matrix:
-        service: ${{ fromJson(needs.matrix.outputs.all-services) }}
+        app: ${{ fromJson(needs.matrix.outputs.all-app) }}
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
       - name: "Get cached backend data"
-        if: matrix.service.type == 'micro'
+        if: matrix.app.type == 'micro'
         uses: "./.github/actions/get-cached-backend-data"
         with:
-          gate: ${{ matrix.service.gate }}
-          service: ${{ matrix.service.name }}
+          site: ${{ matrix.app.site }}
+          app: ${{ matrix.app.name }}
       - name: "Download typescript protos"
-        if: matrix.service.type == 'frontend'
+        if: matrix.app.type == 'frontend'
         uses: "actions/download-artifact@v3"
         with:
           name: "protos-typescript"
-          path: frontend/${{ matrix.service.gate }}/app/khaleesi/proto/
+          path: frontend/${{ matrix.app.site }}/app/khaleesi/proto/
       - name: "Build the development container image"
-        run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} development
+        run: ./scripts/build.sh ${{ matrix.app.site }} ${{ matrix.app.name }} ${{ matrix.app.type }} ${{ matrix.app.version }} ${{ matrix.app.deploy }} development
       - name: "Build the production container image"
-        run: ./scripts/build.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }} production
+        run: ./scripts/build.sh ${{ matrix.app.site }} ${{ matrix.app.name }} ${{ matrix.app.type }} ${{ matrix.app.version }} ${{ matrix.app.deploy }} production
       - name: "Cache development image"
         uses: "./.github/actions/cache-image"
         with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
+          image: khaleesi-ninja/${{ matrix.app.site }}/${{ matrix.app.name }}:latest-development
       - name: "Cache production image"
         uses: "./.github/actions/cache-image"
         with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-production
+          image: khaleesi-ninja/${{ matrix.app.site }}/${{ matrix.app.name }}:latest-production
 
   # Execute the unit tests in parallel.
   unit-test:
@@ -161,16 +161,16 @@ jobs:
     needs: [ "matrix", "build" ]
     strategy:
       matrix:
-        service: ${{ fromJson(needs.matrix.outputs.all-services) }}
+        app: ${{ fromJson(needs.matrix.outputs.all-apps) }}
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
       - name: "Load image"
         uses: "./.github/actions/load-image"
         with:
-          image: khaleesi-ninja/${{ matrix.service.gate }}/${{ matrix.service.name }}:latest-development
+          image: khaleesi-ninja/${{ matrix.app.site }}/${{ matrix.app.name }}:latest-development
       - name: "Execute the container test"
-        run: ./scripts/test.sh ${{ matrix.service.gate }} ${{ matrix.service.name }} ${{ matrix.service.type }} ${{ matrix.service.version }} ${{ matrix.service.deploy }}
+        run: ./scripts/test.sh ${{ matrix.app.site }} ${{ matrix.app.name }} ${{ matrix.app.type }} ${{ matrix.app.version }} ${{ matrix.app.deploy }}
       - name: "Upload coverage to codecov"
         if: ${{ always() }}
         uses: "codecov/codecov-action@v3"
@@ -207,7 +207,7 @@ jobs:
       - name: "Load all images"
         uses: "./.github/actions/load-all-images"
         with:
-          services: ${{ needs.matrix.outputs.deploy-services }}
+          apps: ${{ needs.matrix.outputs.deploy-apps }}
           containerMode: ${{ matrix.environment.container_mode }}
       - name: "Wait for the environment to be ready"
         run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m

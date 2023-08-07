@@ -74,7 +74,7 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     httpRequestId = 'http-request'
     # Perform test.
-    self.logger.logHttpRequest(httpRequestId = httpRequestId, grpcMethod = 'LIFECYCLE')
+    self.logger.logHttpRequest(httpRequestId = httpRequestId, method = 'LIFECYCLE')
     # Assert result.
     self.logger.sender.send.assert_called_once()
     logger.info.assert_called_once()
@@ -97,7 +97,7 @@ class TestStructuredLogger(SimpleTestCase):
         self.logger.logHttpResponse(
           httpRequestId = 'http-request',
           status        = status,
-          grpcMethod    = 'grpc-method',
+          method        = 'method',
         )
         # Assert result.
         self.logger.sender.send.assert_called_once()
@@ -115,7 +115,7 @@ class TestStructuredLogger(SimpleTestCase):
     # Perform test.
     self.logger.logHttpResponse(
       httpRequestId = 'http-request',
-      grpcMethod    = 'grpc-method',
+      method        = 'method',
       status        = StatusCode.OK,
     )
     # Assert result.
@@ -133,11 +133,11 @@ class TestStructuredLogger(SimpleTestCase):
     logger.reset_mock()
     metadata.reset_mock()
     upstreamRequest = GrpcCallerDetails()
-    upstreamRequest.requestId       = 'request-id'
-    upstreamRequest.khaleesiGate    = 'khaleesi-gate'
-    upstreamRequest.khaleesiService = 'khaleesi-service'
-    upstreamRequest.grpcService     = 'grpc-service'
-    upstreamRequest.grpcMethod      = 'grpc-method'
+    upstreamRequest.requestId = 'request-id'
+    upstreamRequest.site      = 'site'
+    upstreamRequest.app       = 'app'
+    upstreamRequest.service   = 'service'
+    upstreamRequest.method    = 'method'
     # Perform test.
     self.logger.logGrpcRequest(upstreamRequest = upstreamRequest)
     # Assert result.
@@ -156,12 +156,12 @@ class TestStructuredLogger(SimpleTestCase):
     metadata.reset_mock()
     httpRequestId = 'http-request'
     grpcRequestId = 'grpc-request'
-    grpcMethod    = 'grpc-method'
+    method        = 'method'
     # Perform test.
     self.logger.logSystemGrpcRequest(
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
+      method        = method,
     )
     # Assert result.
     self.logger.sender.send.assert_called_once()
@@ -227,7 +227,7 @@ class TestStructuredLogger(SimpleTestCase):
         self.logger.logSystemGrpcResponse(
           httpRequestId = 'http-request-id',
           grpcRequestId = 'grpc-request-id',
-          grpcMethod    = 'grpcMethod',
+          method        = 'method',
           status        = status,
         )
         # Assert result.
@@ -255,7 +255,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.logger.logSystemGrpcResponse(
       httpRequestId = 'http-request-id',
       grpcRequestId = 'grpc-request-id',
-      grpcMethod    = 'grpc-method',
+      method        = 'method',
       status        = StatusCode.OK,
     )
     # Assert result.
@@ -337,7 +337,7 @@ class TestStructuredLogger(SimpleTestCase):
             event.action.details    = details
             # Perform test.
             self.logger.logSystemEvent(
-              grpcMethod    = method,
+              method    = method,
               httpRequestId = httpRequestId,
               grpcRequestId = grpcRequestId,
               event         = event,
@@ -387,7 +387,7 @@ class TestStructuredLogger(SimpleTestCase):
     """Test logging an error."""
     httpRequestId = 'http-request'
     grpcRequestId = 'grpc-request'
-    grpcMethod    = 'grpc-method'
+    method        = 'method'
     for status in StatusCode:
       for loglevel in LogLevel:
         with self.subTest(status = status.name, loglevel = loglevel.name):
@@ -401,7 +401,7 @@ class TestStructuredLogger(SimpleTestCase):
             exception     = exception,
             httpRequestId = httpRequestId,
             grpcRequestId = grpcRequestId,
-            grpcMethod    = grpcMethod,
+            method        = method,
           )
           # Assert result.
           self.logger.sender.send.assert_called_once()
@@ -413,8 +413,8 @@ class TestStructuredLogger(SimpleTestCase):
           metadata.assert_called_once()
 
   def _assertError(self, exception: KhaleesiException, logError: ErrorRequest) -> None :
-    self.assertEqual(exception.gate          , logError.error.gate)
-    self.assertEqual(exception.service       , logError.error.service)
+    self.assertEqual(exception.site          , logError.error.site)
+    self.assertEqual(exception.app           , logError.error.app)
     self.assertEqual(exception.publicKey     , logError.error.publicKey)
     self.assertEqual(exception.publicDetails , logError.error.publicDetails)
     self.assertEqual(exception.privateMessage, logError.error.privateMessage)

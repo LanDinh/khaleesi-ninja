@@ -19,26 +19,23 @@ class LoggingClientInterceptor(ClientInterceptor):
 
   def khaleesiIntercept(
       self, *,
-      method           : Callable[[Any, ClientCallDetails], Any],
+      executableMethod : Callable[[Any, ClientCallDetails], Any],
       requestOrIterator: Any,
       callDetails      : ClientCallDetails,
-      khaleesiGate     : str,
-      khaleesiService  : str,
-      grpcService      : str,
-      grpcMethod       : str,
+      site             : str,
+      app              : str,
+      service          : str,
+      method           : str,
   ) -> Any :
     """Log data."""
-    LOGGER.info(f'Calling {khaleesiGate}-{khaleesiService}: {grpcService}.{grpcMethod}...')
+    LOGGER.info(f'Calling {site}-{app}: {service}.{method}...')
 
-    response: Call = method(requestOrIterator, callDetails)
+    response: Call = executableMethod(requestOrIterator, callDetails)
 
     if response.code() == StatusCode.OK:
-      LOGGER.info(f'Call to {khaleesiGate}-{khaleesiService}: {grpcService}.{grpcMethod} was ok.')
+      LOGGER.info(f'Call to {site}-{app}: {service}.{method} was ok.')
       return response
-    LOGGER.warning(
-      f'Call to {khaleesiGate}-{khaleesiService}: {grpcService}.{grpcMethod} '
-      f'returned {response.code()}.'
-    )
+    LOGGER.warning(f'Call to {site}-{app}: {service}.{method} returned {response.code()}.')
     raise UpstreamGrpcException(
       status         = response.code(),
       privateDetails = self.exceptionDetails(response = response)

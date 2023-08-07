@@ -10,7 +10,7 @@ from microservice.actuator.core import CORE
 
 
 class Actuator:
-  """Actuate batch jobs for a specific service."""
+  """Actuate batch jobs for a specific app."""
 
   actions = {
       'core': CORE
@@ -25,18 +25,18 @@ class Actuator:
         privateMessage = 'actionName has the wrong format.',
         privateDetails = f'actionName = ${action}',
       )
-    gate    = parts[0]
-    service = parts[1]
-    name    = parts[2]
+    site = parts[0]
+    app  = parts[1]
+    name = parts[2]
     try:
-      method = self.actions[gate][service][name]
+      method = self.actions[site][app][name]
       method(request)
       return request.jobExecution.executionMetadata
     except KeyError as exception:
       raise InvalidArgumentException(
-        publicDetails  = f'gate = ${gate}, service = ${service}, action = ${action}',
+        publicDetails  = f'site = ${site}, app = ${app}, action = ${action}',
         privateMessage = 'No such action exists.',
-        privateDetails = f'gate = ${gate}, service = ${service}, action = ${action}',
+        privateDetails = f'site = ${site}, app = ${app}, action = ${action}',
       ) from exception
 
 

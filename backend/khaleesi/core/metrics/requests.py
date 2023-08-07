@@ -22,12 +22,12 @@ class RequestsMetric(CounterMetric):
       additionalLabels = [
           'status',
           'user',
-          'grpcService',
-          'grpcMethod',
-          'peerKhaleesiGate',
-          'peerKhaleesiService',
-          'peerGrpcService',
-          'peerGrpcMethod',
+          'service',
+          'method',
+          'peerSite',
+          'peerApp',
+          'peerService',
+          'peerMethod',
       ],
     )
 
@@ -78,13 +78,13 @@ class RequestsMetric(CounterMetric):
   ) -> Dict[str, Any] :
     """Transform the request metadata into arguments."""
     return {
-        'user'               : request.user.type,
-        'grpcService'        : self.stringOrUnknown(request.grpcCaller.grpcService),
-        'grpcMethod'         : self.stringOrUnknown(request.grpcCaller.grpcMethod),
-        'peerKhaleesiGate'   : self.stringOrUnknown(peer.grpcCaller.khaleesiGate),
-        'peerKhaleesiService': self.stringOrUnknown(peer.grpcCaller.khaleesiService),
-        'peerGrpcService'    : self.stringOrUnknown(peer.grpcCaller.grpcService),
-        'peerGrpcMethod'     : self.stringOrUnknown(peer.grpcCaller.grpcMethod),
+        'user'       : request.user.type,
+        'service'    : self.stringOrUnknown(request.grpcCaller.service),
+        'method'     : self.stringOrUnknown(request.grpcCaller.method),
+        'peerSite'   : self.stringOrUnknown(peer.grpcCaller.site),
+        'peerApp'    : self.stringOrUnknown(peer.grpcCaller.app),
+        'peerService': self.stringOrUnknown(peer.grpcCaller.service),
+        'peerMethod' : self.stringOrUnknown(peer.grpcCaller.method),
     }
 
   def _mapGrpcStatus(self, *, status: StatusCode) -> str :

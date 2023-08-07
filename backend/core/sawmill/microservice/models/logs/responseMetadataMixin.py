@@ -28,8 +28,8 @@ class ResponseMetadataMixin(models.Model):
 
   # Time.
   metaResponseReportedTimestamp = models.DateTimeField(default = MIN_TIMESTAMP)
-  metaResponseLoggedTimestamp = models.DateTimeField(auto_now = True)
-  metaChildDuration = models.DurationField(default = timedelta())
+  metaResponseLoggedTimestamp   = models.DateTimeField(auto_now = True)
+  metaChildDuration             = models.DurationField(default = timedelta())
 
   # Misc.
   metaResponseLoggingErrors = models.TextField(blank = True)

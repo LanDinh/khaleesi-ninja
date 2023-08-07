@@ -18,4 +18,4 @@ This is a `create-remix` template for creating new frontends.
 
 ## `kubernetes` folder
 
-This contains templates for helm chart value files for services. 
+This contains templates for helm chart value files for apps. 

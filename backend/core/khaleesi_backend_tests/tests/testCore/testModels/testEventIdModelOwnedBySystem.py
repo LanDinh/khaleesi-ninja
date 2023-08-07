@@ -143,7 +143,7 @@ class ModelTestCase(SimpleTestCase):
           instance.khaleesiCreated       = datetime.now(tz = timezone.utc)
           instance.khaleesiCreatedById   = 'creator'
           instance.khaleesiCreatedByType = creatorLabel
-          instance.khaleesiModified = datetime.now(tz = timezone.utc)
+          instance.khaleesiModified       = datetime.now(tz = timezone.utc)
           instance.khaleesiModifiedById   = 'modifier'
           instance.khaleesiModifiedByType = modifierLabel
           # Execute test.

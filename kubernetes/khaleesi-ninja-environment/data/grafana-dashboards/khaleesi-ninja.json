@@ -150,9 +150,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status=\"ok\"}[$__rate_interval])) > 0",
+          "expr": "sum by(site, peer_site) (increase(khaleesi_incoming_requests_total{status=\"ok\"}[$__rate_interval])) > 0",
           "interval": "",
-          "legendFormat": "{{`OK: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
+          "legendFormat": "{{`OK: {{site}} called by {{peer_site}}`}}",
           "refId": "OK"
         },
         {
@@ -161,10 +161,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (increase(khaleesi_incoming_requests_total{status!=\"ok\"}[$__rate_interval])) > 0",
+          "expr": "sum by(site, peer_site) (increase(khaleesi_incoming_requests_total{status!=\"ok\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`NOK: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
+          "legendFormat": "{{`NOK: {{site}} called by {{peer_site}}`}}",
           "refId": "NOK"
         }
       ],
@@ -267,10 +267,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate, status) (increase(khaleesi_incoming_requests_total{status!=\"ok\"}[$__rate_interval])) > 0",
+          "expr": "sum by(site, peer_site, status) (increase(khaleesi_incoming_requests_total{status!=\"ok\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`{{status}}: {{khaleesi_gate}} called by {{peer_khaleesi_gate}}`}}",
+          "legendFormat": "{{`{{status}}: {{site}} called by {{peer_site}}`}}",
           "refId": "NOK"
         }
       ],
@@ -374,9 +374,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status=\"ok\"}[$__rate_interval])) > 0",
+          "expr": "sum by(site, peer_site) (increase(khaleesi_outgoing_requests_total{status=\"ok\"}[$__rate_interval])) > 0",
           "interval": "",
-          "legendFormat": "{{`OK: {{khaleesi_gate}} calling {{peer_khaleesi_gate}}`}}",
+          "legendFormat": "{{`OK: {{site}} calling {{peer_site}}`}}",
           "refId": "OK"
         },
         {
@@ -385,10 +385,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate) (increase(khaleesi_outgoing_requests_total{status!=\"ok\"}[$__rate_interval])) > 0",
+          "expr": "sum by(site, peer_site) (increase(khaleesi_outgoing_requests_total{status!=\"ok\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`NOK: {{khaleesi_gate}} calling {{peer_khaleesi_gate}}`}}",
+          "legendFormat": "{{`NOK: {{site}} calling {{peer_site}}`}}",
           "refId": "NOK"
         }
       ],
@@ -491,10 +491,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by(khaleesi_gate, peer_khaleesi_gate, status) (increase(khaleesi_outgoing_requests_total{status!=\"ok\"}[$__rate_interval]))",
+          "expr": "sum by(site, peer_site, status) (increase(khaleesi_outgoing_requests_total{status!=\"ok\"}[$__rate_interval]))",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`{{status}}: {{khaleesi_gate}} calling {{peer_khaleesi_gate}}`}}",
+          "legendFormat": "{{`{{status}}: {{site}} calling {{peer_site}}`}}",
           "refId": "NOK"
         }
       ],
@@ -619,9 +619,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_gate) (khaleesi_health{khaleesi_health=\"healthy\"}) > 0",
+          "expr": "sum by (site) (khaleesi_health{khaleesi_health=\"healthy\"}) > 0",
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: healthy`}}",
+          "legendFormat": "{{`{{site}}: healthy`}}",
           "refId": "healthy"
         },
         {
@@ -630,10 +630,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_gate) (khaleesi_health{khaleesi_health!=\"healthy\"}) > 0",
+          "expr": "sum by (site) (khaleesi_health{khaleesi_health!=\"healthy\"}) > 0",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: not healthy`}}",
+          "legendFormat": "{{`{{site}}: not healthy`}}",
           "refId": "not healthy"
         }
       ],
@@ -762,9 +762,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_health, khaleesi_gate) (khaleesi_health{khaleesi_health!=\"healthy\"}) > 0",
+          "expr": "sum by (khaleesi_health, site) (khaleesi_health{khaleesi_health!=\"healthy\"}) > 0",
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: {{khaleesi_health}}`}}",
+          "legendFormat": "{{`{{site}}: {{khaleesi_health}}`}}",
           "refId": "A"
         }
       ],
@@ -863,9 +863,9 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_gate, action_crud_type) (increase(khaleesi_audit_event_total{target=\"core.core.server\", result=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
+          "expr": "sum by (site, action_crud_type) (increase(khaleesi_audit_event_total{target=\"core.core.server\", result=\"success\", method=\"lifecycle\"}[$__rate_interval])) > 0",
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: {{action_crud_type}} - success`}}",
+          "legendFormat": "{{`{{site}}: {{action_crud_type}} - success`}}",
           "refId": "success"
         },
         {
@@ -874,10 +874,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_gate, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", result!=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
+          "expr": "sum by (site, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", result!=\"success\", method=\"lifecycle\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: {{action_crud_type}} - {{result}}`}}",
+          "legendFormat": "{{`{{site}}: {{action_crud_type}} - {{result}}`}}",
           "refId": "not success"
         }
       ],
@@ -960,10 +960,10 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum by (khaleesi_gate, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", result!=\"success\", grpc_method=\"lifecycle\"}[$__rate_interval])) > 0",
+          "expr": "sum by (site, action_crud_type, result) (increase(khaleesi_audit_event_total{target=\"core.core.server\", result!=\"success\", method=\"lifecycle\"}[$__rate_interval])) > 0",
           "hide": false,
           "interval": "",
-          "legendFormat": "{{`{{khaleesi_gate}}: {{action_crud_type}} - {{result}}`}}",
+          "legendFormat": "{{`{{site}}: {{action_crud_type}} - {{result}}`}}",
           "refId": "not success"
         }
       ],
@@ -1004,14 +1004,14 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(khaleesi_gate)",
+        "definition": "label_values(site)",
         "hide": 2,
         "includeAll": true,
         "multi": false,
-        "name": "gate",
+        "name": "site",
         "options": [],
         "query": {
-          "query": "label_values(khaleesi_gate)",
+          "query": "label_values(site)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,

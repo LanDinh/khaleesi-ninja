@@ -18,7 +18,7 @@ It is structured as follows:
   * `test_util` contains test utility.
 * `management` contains a custom management command to start the server.
 * `migrations` contains the database migrations.
-* `models` contains the models shared by all services.
+* `models` contains the models shared by all apps.
 * `proto` contains the generated proto files.
 
 

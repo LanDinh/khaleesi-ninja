@@ -1,8 +1,8 @@
 name: "Load all images"
-description: "Load the images of all services defined in the input."
+description: "Load the images of all apps defined in the input."
 inputs:
-  services:
-    description: "JSON object containing all services."
+  apps:
+    description: "JSON object containing all apps."
     required: true
   containerMode:
     description: "Container mode."

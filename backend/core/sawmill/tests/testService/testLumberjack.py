@@ -44,14 +44,14 @@ class LumberjackServiceTestCase(SimpleTestCase):
       loggingObject = 'sendLogGrpcResponse',
     )
 
-  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
-  def testLogEvent(self, serviceRegistry: MagicMock, *_: MagicMock) -> None :
+  @patch('microservice.service.lumberjack.SITE_REGISTRY')
+  def testLogEvent(self, siteRegistry: MagicMock, *_: MagicMock) -> None :
     """Test logging events."""
     self._executeLoggingTests(
       method        = lambda : self.service.LogEvent(MagicMock(), MagicMock()),
       loggingObject = 'sendLogEvent',
     )
-    serviceRegistry.addService.assert_called()
+    siteRegistry.addService.assert_called()
 
   def testLogError(self, *_: MagicMock) -> None :
     """Test logging events."""
@@ -60,11 +60,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
       loggingObject = 'sendLogError',
     )
 
-  def _executeLoggingTests(
-      self, *,
-      method        : Callable[[], Any],
-      loggingObject : str,
-  ) -> None :
+  def _executeLoggingTests(self, *, method: Callable[[], Any], loggingObject: str) -> None :
     """Execute all typical logging tests."""
     for test in [ self._executeSuccessfulLoggingTest, self._executeLoggingTestWithParsingError ]:
       with self.subTest(test = test.__name__):
@@ -72,11 +68,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
             as logging:
           test(method = method, logging = logging)  # type: ignore[operator]  # pylint: disable=line-too-long
 
-  def _executeResponseLoggingTests(
-      self, *,
-      method        : Callable[[], Any],
-      loggingObject : str,
-  ) -> None :
+  def _executeResponseLoggingTests(self, *, method: Callable[[], Any], loggingObject: str) -> None :
     """Execute all typical logging tests."""
     for test in [
         self._executeSuccessfulResponseLoggingTest,
@@ -90,8 +82,8 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _executeSuccessfulLoggingTest(
       self, *,
-      method      : Callable[[], Any],
-      logging     : MagicMock,
+      method : Callable[[], Any],
+      logging: MagicMock,
   ) -> None :
     """Successful call to logging method."""
     # Prepare data.
@@ -104,13 +96,13 @@ class LumberjackServiceTestCase(SimpleTestCase):
     logging.return_value.toObjectMetadata.assert_called_once()
 
   # noinspection PyUnusedLocal
-  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
+  @patch('microservice.service.lumberjack.SITE_REGISTRY')
   def _executeLoggingTestWithParsingError(
       self,
       _: MagicMock,
       *,
-      method      : Callable[[], Any],
-      logging     : MagicMock,
+      method : Callable[[], Any],
+      logging: MagicMock,
   ) -> None :
     """Call to logging method that results in parsing errors."""
     # Prepare data.
@@ -124,8 +116,8 @@ class LumberjackServiceTestCase(SimpleTestCase):
 
   def _executeSuccessfulResponseLoggingTest(
       self, *,
-      method      : Callable[[], Any],
-      logging     : MagicMock,
+      method : Callable[[], Any],
+      logging: MagicMock,
   ) -> None :
     """Successful call to logging method."""
     # Prepare data.
@@ -138,13 +130,13 @@ class LumberjackServiceTestCase(SimpleTestCase):
     logging.return_value.toObjectMetadata.assert_called_once()
 
   # noinspection PyUnusedLocal
-  @patch('microservice.service.lumberjack.SERVICE_REGISTRY')
+  @patch('microservice.service.lumberjack.SITE_REGISTRY')
   def _executeResponseLoggingTestWithParsingError(
       self,
       _: MagicMock,
       *,
-      method      : Callable[[], Any],
-      logging     : MagicMock,
+      method : Callable[[], Any],
+      logging: MagicMock,
   ) -> None :
     """Call to logging method that results in parsing errors."""
     # Prepare data.

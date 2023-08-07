@@ -1,4 +1,4 @@
-"""core_clocktower service."""
+"""core_clocktower bellringer service."""
 
 # gRPC.
 import grpc
@@ -17,7 +17,7 @@ from microservice.models import Job
 
 
 class Service(Servicer):
-  """core_clocktower service."""
+  """core_clocktower bellringer service."""
 
   def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> JobResponse :
     """Create a new job."""

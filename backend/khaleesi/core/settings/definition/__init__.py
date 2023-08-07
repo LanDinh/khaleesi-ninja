@@ -11,6 +11,6 @@ from .grpc import (
   GrpcServerMethodNames as GrpcServerMethodNames,
   GrpcEventMethodNames as GrpcEventMethodNames,
 )
-from .metadata import Metadata as Metadata, ServiceType as ServiceType
+from .metadata import Metadata as Metadata, AppType as AppType
 from .monitoring import Monitoring as Monitoring
 from .startup import Startup as Startup, MigrationsBeforeServerStart as MigrationsBeforeServerStart

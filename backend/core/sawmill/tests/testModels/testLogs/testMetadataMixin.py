@@ -93,10 +93,10 @@ class MetadataMixinTestCase(SimpleTestCase):
         now = datetime.now(tz = timezone.utc)
         instance = Metadata()
 
-        instance.metaCallerHttpRequestId    = 'http-request-id'
-        instance.metaCallerHttpKhaleesiGate = 'http-gate'
-        instance.metaCallerHttpPath         = 'http-path'
-        instance.metaCallerHttpPodId        = 'http-pod'
+        instance.metaCallerHttpRequestId = 'http-request-id'
+        instance.metaCallerHttpSite      = 'http-site'
+        instance.metaCallerHttpPath      = 'http-path'
+        instance.metaCallerHttpPodId     = 'http-pod'
 
         instance.metaUserId   = 'user-id'
         instance.metaUserType = userLabel
@@ -111,13 +111,10 @@ class MetadataMixinTestCase(SimpleTestCase):
         # Execute test.
         instance.metadataToGrpc(requestMetadata = requestMetadata, logMetadata = logMetadata)
         # Assert result.
-        self.assertEqual(instance.metaCallerHttpRequestId   , requestMetadata.httpCaller.requestId)
-        self.assertEqual(
-          instance.metaCallerHttpKhaleesiGate,
-          requestMetadata.httpCaller.khaleesiGate,
-        )
-        self.assertEqual(instance.metaCallerHttpPath        , requestMetadata.httpCaller.path)
-        self.assertEqual(instance.metaCallerHttpPodId       , requestMetadata.httpCaller.podId)
+        self.assertEqual(instance.metaCallerHttpRequestId, requestMetadata.httpCaller.requestId)
+        self.assertEqual(instance.metaCallerHttpSite     , requestMetadata.httpCaller.site)
+        self.assertEqual(instance.metaCallerHttpPath     , requestMetadata.httpCaller.path)
+        self.assertEqual(instance.metaCallerHttpPodId    , requestMetadata.httpCaller.podId)
 
         self.assertEqual(instance.metaUserId, requestMetadata.user.id)
         self.assertEqual(userType           , requestMetadata.user.type)
@@ -154,13 +151,13 @@ class MetadataMixinTestCase(SimpleTestCase):
     grpc = RequestMetadata()
     grpc.timestamp.FromDatetime(now)
 
-    grpc.httpCaller.requestId    = 'http-request-id'
-    grpc.httpCaller.path         = 'http-path'
-    grpc.httpCaller.khaleesiGate = 'http-gate'
-    grpc.httpCaller.podId        = 'http-pod'
+    grpc.httpCaller.requestId = 'http-request-id'
+    grpc.httpCaller.path      = 'http-path'
+    grpc.httpCaller.site      = 'http-site'
+    grpc.httpCaller.podId     = 'http-pod'
 
-    grpc.user.id    = 'user-id'
-    grpc.user.type  = userType
+    grpc.user.id   = 'user-id'
+    grpc.user.type = userType
 
     return grpc
 
@@ -216,12 +213,12 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
     # Prepare data.
     instance = GrpcMetadata()
 
-    instance.metaCallerGrpcRequestId       = 'grpc-request-id'
-    instance.metaCallerGrpcKhaleesiGate    = 'grpc-gate'
-    instance.metaCallerGrpcKhaleesiService = 'grpc-service'
-    instance.metaCallerGrpcGrpcService     = 'grpc-service'
-    instance.metaCallerGrpcGrpcMethod      = 'grpc-method'
-    instance.metaCallerGrpcPodId           = 'grpc-pod'
+    instance.metaCallerGrpcRequestId = 'grpc-request-id'
+    instance.metaCallerGrpcSite      = 'grpc-site'
+    instance.metaCallerGrpcApp       = 'service'
+    instance.metaCallerGrpcService   = 'service'
+    instance.metaCallerGrpcMethod    = 'method'
+    instance.metaCallerGrpcPodId     = 'grpc-pod'
 
     requestMetadata = RequestMetadata()
     logMetadata     = LogRequestMetadata()
@@ -230,15 +227,12 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
     instance.metadataToGrpc(requestMetadata = requestMetadata, logMetadata = logMetadata)
     # Assert result.
     parent.assert_called_once()
-    self.assertEqual(instance.metaCallerGrpcRequestId   , requestMetadata.grpcCaller.requestId)
-    self.assertEqual(instance.metaCallerGrpcKhaleesiGate, requestMetadata.grpcCaller.khaleesiGate)
-    self.assertEqual(
-      instance.metaCallerGrpcKhaleesiService,
-      requestMetadata.grpcCaller.khaleesiService,
-    )
-    self.assertEqual(instance.metaCallerGrpcGrpcService, requestMetadata.grpcCaller.grpcService)
-    self.assertEqual(instance.metaCallerGrpcGrpcMethod , requestMetadata.grpcCaller.grpcMethod)
-    self.assertEqual(instance.metaCallerGrpcPodId      , requestMetadata.grpcCaller.podId)
+    self.assertEqual(instance.metaCallerGrpcRequestId, requestMetadata.grpcCaller.requestId)
+    self.assertEqual(instance.metaCallerGrpcSite     , requestMetadata.grpcCaller.site)
+    self.assertEqual(instance.metaCallerGrpcApp      , requestMetadata.grpcCaller.app)
+    self.assertEqual(instance.metaCallerGrpcService  , requestMetadata.grpcCaller.service)
+    self.assertEqual(instance.metaCallerGrpcMethod   , requestMetadata.grpcCaller.method)
+    self.assertEqual(instance.metaCallerGrpcPodId    , requestMetadata.grpcCaller.podId)
 
   @patch('microservice.models.logs.metadataMixin.MetadataMixin.metadataToGrpc')
   def testMetadataToGrpcEmpty(self, parent: MagicMock) -> None :
@@ -258,11 +252,11 @@ class GrpcMetadataMixinTestCase(SimpleTestCase):
     string.return_value    = 'parsed-string'
     grpc = RequestMetadata()
 
-    grpc.grpcCaller.requestId       = 'grpc-request'
-    grpc.grpcCaller.khaleesiGate    = 'grpc-gate'
-    grpc.grpcCaller.khaleesiService = 'grpc-service'
-    grpc.grpcCaller.grpcService     = 'grpc-service'
-    grpc.grpcCaller.grpcMethod      = 'grpc-method'
-    grpc.grpcCaller.podId           = 'grpc-pod'
+    grpc.grpcCaller.requestId = 'grpc-request'
+    grpc.grpcCaller.site      = 'grpc-site'
+    grpc.grpcCaller.app       = 'service'
+    grpc.grpcCaller.service   = 'service'
+    grpc.grpcCaller.method    = 'method'
+    grpc.grpcCaller.podId     = 'grpc-pod'
 
     return grpc

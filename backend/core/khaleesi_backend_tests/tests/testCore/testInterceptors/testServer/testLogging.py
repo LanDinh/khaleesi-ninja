@@ -68,7 +68,7 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
               self.interceptor.khaleesiIntercept(
                 request = finalRequest,
                 **self.getInterceptParams(
-                  method = khaleesiRaisingMethod(status = status, loglevel = loglevel),
+                  executableMethod = khaleesiRaisingMethod(status = status, loglevel = loglevel),
                 ),
               )
             # Assert result.
@@ -94,7 +94,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
         with self.assertRaises(KhaleesiException):
           self.interceptor.khaleesiIntercept(
             request = finalRequest,
-            **self.getInterceptParams(method = exceptionRaisingMethod(exception = exception)),
+            **self.getInterceptParams(
+              executableMethod = exceptionRaisingMethod(exception = exception)),
           )
         # Assert result.
         self._assertExceptionLoggingCall(
@@ -105,9 +106,9 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
 
   def _executeInterceptGrpcLoggingTest(
       self, *,
-      request       : Optional[Any] = None,
+      request      : Optional[Any] = None,
       requestParams: Dict[str, Any],
-      singleton     : MagicMock,
+      singleton    : MagicMock,
   ) -> None :
     """Execute the logging tests."""
     for userLabel, userType in User.UserType.items():
@@ -171,8 +172,8 @@ class LoggingServerInterceptorTestCase(ServerInterceptorTestMixin, SimpleTestCas
     self.assertEqual(exception.status        , loggedException.status)
     self.assertEqual(exception.loglevel      , loglevel)
     self.assertEqual(exception.loglevel      , loggedException.loglevel)
-    self.assertEqual(exception.gate          , loggedException.gate)
-    self.assertEqual(exception.service       , loggedException.service)
+    self.assertEqual(exception.site          , loggedException.site)
+    self.assertEqual(exception.app           , loggedException.app)
     self.assertEqual(exception.publicKey     , loggedException.publicKey)
     self.assertEqual(exception.publicDetails , loggedException.publicDetails)
     self.assertEqual(exception.privateMessage, loggedException.privateMessage)

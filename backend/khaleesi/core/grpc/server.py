@@ -45,10 +45,10 @@ khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 class Server:
   """The gRPC server."""
 
-  server              : GrpcServer
-  healthServicer      : HealthServicer
-  metricInitializer   : MetricInitializer
-  serviceNames        : List[str]
+  server            : GrpcServer
+  healthServicer    : HealthServicer
+  metricInitializer : MetricInitializer
+  serviceNames      : List[str]
   startHttpRequestId: str
 
   def __init__(self, *, startHttpRequestId: str, initializeGrpcRequestId: str) -> None :
@@ -156,12 +156,12 @@ class Server:
     try:
       SINGLETON.structuredLogger.logHttpRequest(
         httpRequestId = stopHttpRequestId,
-        grpcMethod    = 'LIFECYCLE',
+        method        = 'LIFECYCLE',
       )
       SINGLETON.structuredLogger.logSystemGrpcRequest(
         httpRequestId = stopHttpRequestId,
         grpcRequestId = grpcRequestId,
-        grpcMethod    = 'LIFECYCLE',
+        method        = 'LIFECYCLE',
       )
       HEALTH_METRIC.set(value = HealthMetricType.TERMINATING)
       self.healthServicer.enter_graceful_shutdown()
@@ -274,15 +274,15 @@ class Server:
       exception     = exception,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = 'LIFECYCLE'
+      method        = 'LIFECYCLE'
     )
     self._logServerStateEvent(
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
       action        = action,
       result        = Event.Action.ResultType.FATAL,
-      details = f'Server {activity} failed.'
-                f' {exception.privateMessage}: {exception.privateDetails}',
+      details       = f'Server {activity} failed.'
+                      f' {exception.privateMessage}: {exception.privateDetails}',
     )
 
   def _logServerStartEvent(
@@ -309,13 +309,13 @@ class Server:
       details      : str,
   ) -> None :
     """Log the server state."""
-    grpcMethod = 'LIFECYCLE'
+    method = 'LIFECYCLE'
     metadataSettings = khaleesiSettings["METADATA"]
     event = Event()
     event.target.owner.type = User.UserType.SYSTEM
-    event.target.owner.id   = f'{metadataSettings["GATE"]}-{metadataSettings["SERVICE"]}'
+    event.target.owner.id   = f'{metadataSettings["SITE"]}-{metadataSettings["APP"]}'
     event.target.id         = metadataSettings['POD_ID']
-    event.target.type = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES'][grpcMethod]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
+    event.target.type = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES'][method]['TARGET']  # type: ignore[literal-required]  # pylint: disable=line-too-long
     event.action.crudType = action
     event.action.result   = result
     event.action.details  = details
@@ -323,7 +323,7 @@ class Server:
       event         = event,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
+      method        = method,
     )
 
   def _logShutdown(
@@ -336,11 +336,11 @@ class Server:
     SINGLETON.structuredLogger.logSystemGrpcResponse(
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = 'LIFECYCLE',
+      method        = 'LIFECYCLE',
       status        = status,
     )
     SINGLETON.structuredLogger.logHttpResponse(
       httpRequestId = httpRequestId,
-      grpcMethod    = 'LIFECYCLE',
+      method        = 'LIFECYCLE',
       status        = status,
     )

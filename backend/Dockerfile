@@ -5,19 +5,19 @@
 FROM khaleesi/base/backend-construction:1.0.0 as base
 
 # Arguments & environment.
-ARG gate
-ARG service
+ARG site
+ARG app
 ARG version
-ENV KHALEESI_GATE=${gate}
-ENV KHALEESI_SERVICE=${service}
+ENV SITE=${site}
+ENV APP=${app}
 ENV KHALEESI_VERSION=${version}
 
 # Metadata.
-WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
-COPY ./manage.py /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./requirements.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/requirements-service.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pip install -r requirements-service.txt
+WORKDIR /code/backend/${SITE}/${APP}
+COPY ./manage.py /code/backend/${SITE}/${APP}/
+COPY ./requirements.txt /code/backend/${SITE}/${APP}/
+COPY ./${SITE}/${APP}/requirements-app.txt /code/backend/${SITE}/${APP}/
+RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pip install -r requirements-app.txt
 
 ################################################################################
 #                               Development Base                               #
@@ -25,24 +25,24 @@ RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pi
 FROM base as development-base
 
 # Arguments & environment.
-ARG gate
-ARG service
+ARG site
+ARG app
 ARG version
-ENV KHALEESI_GATE=${gate}
-ENV KHALEESI_SERVICE=${service}
+ENV SITE=${site}
+ENV APP=${app}
 ENV KHALEESI_VERSION=${version}
 
 # Metadata.
-WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
-COPY ./requirements-develop.txt /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./mypy.ini /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./pylintrc /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./execute_develop.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
+WORKDIR /code/backend/${SITE}/${APP}
+COPY ./requirements-develop.txt /code/backend/${SITE}/${APP}/
+COPY ./mypy.ini /code/backend/${SITE}/${APP}/
+COPY ./pylintrc /code/backend/${SITE}/${APP}/
+COPY ./execute_develop.sh /code/backend/${SITE}/${APP}/execute.sh
 RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pip install -r requirements-develop.txt
 
 # Data. Copy here instead of Base to avoid re-running pip install for dev tools.
-COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
+COPY ./${SITE}/${APP}/ /code/backend/${SITE}/${APP}/
+COPY ./khaleesi/ /code/backend/${SITE}/${APP}/khaleesi/
 
 ################################################################################
 #                              Development Image                               #
@@ -50,20 +50,20 @@ COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
 FROM khaleesi/base/backend-image:1.0.0 as development
 
 # Arguments & environment.
-ARG gate
-ARG service
+ARG site
+ARG app
 ARG version
-ENV KHALEESI_GATE=${gate}
-ENV KHALEESI_SERVICE=${service}
+ENV SITE=${site}
+ENV APP=${app}
 ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_DEBUG=true
 ENV KHALEESI_METRICS_PORT=8020
 ENV PORT=8000
-ENV PYTHONPATH=/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}:/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/proto
+ENV PYTHONPATH=/code/backend/${SITE}/${APP}:/code/backend/${SITE}/${APP}/khaleesi/proto
 ENV DJANGO_SETTINGS_MODULE="settings"
 
 # Data.
-WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
+WORKDIR /code/backend/${SITE}/${APP}
 COPY --from=development-base /code/ /code/
 RUN chmod +x ./execute.sh
 
@@ -77,20 +77,20 @@ CMD ["run"]
 FROM base as production-base
 
 # Arguments & environment.
-ARG gate
-ARG service
+ARG site
+ARG app
 ARG version
-ENV KHALEESI_GATE=${gate}
-ENV KHALEESI_SERVICE=${service}
+ENV SITE=${site}
+ENV APP=${app}
 ENV KHALEESI_VERSION=${version}
 
 # Metadata.
-WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
-COPY ./execute_production.sh /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/execute.sh
+WORKDIR /code/backend/${SITE}/${APP}
+COPY ./execute_production.sh /code/backend/${SITE}/${APP}/execute.sh
 
 # Data. Copy here instead of Base to avoid re-running pip install for dev tools for dev image.
-COPY ./${KHALEESI_GATE}/${KHALEESI_SERVICE}/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/
-COPY ./khaleesi/ /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/
+COPY ./${SITE}/${APP}/ /code/backend/${SITE}/${APP}/
+COPY ./khaleesi/ /code/backend/${SITE}/${APP}/khaleesi/
 RUN rm -r tests
 
 ################################################################################
@@ -99,19 +99,19 @@ RUN rm -r tests
 FROM khaleesi/base/backend-image:1.0.0 as production
 
 # Arguments & environment.
-ARG gate
-ARG service
+ARG site
+ARG app
 ARG version
-ENV KHALEESI_GATE=${gate}
-ENV KHALEESI_SERVICE=${service}
+ENV SITE=${site}
+ENV APP=${app}
 ENV KHALEESI_VERSION=${version}
 ENV KHALEESI_METRICS_PORT=8020
 ENV PORT=8000
-ENV PYTHONPATH=/code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}/khaleesi/proto
+ENV PYTHONPATH=/code/backend/${SITE}/${APP}/khaleesi/proto
 ENV DJANGO_SETTINGS_MODULE="settings"
 
 # Data.
-WORKDIR /code/backend/${KHALEESI_GATE}/${KHALEESI_SERVICE}
+WORKDIR /code/backend/${SITE}/${APP}
 COPY --from=production-base /code/ /code/
 RUN chmod +x ./execute.sh
 

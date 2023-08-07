@@ -12,6 +12,6 @@ class MigrationsBeforeServerStart(TypedDict):
 
 
 class Startup(TypedDict):
-  """Startup configuration for khaleesi.ninja services."""
+  """Startup configuration for khaleesi.ninja apps."""
 
   MIGRATIONS_BEFORE_SERVER_START: MigrationsBeforeServerStart

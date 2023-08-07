@@ -11,7 +11,7 @@ from khaleesi.core.metrics.metricInitializer import (
 )
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import User, GrpcCallerDetails
-from khaleesi.proto.core_sawmill_pb2 import EventRequest, Event, ServiceCallData
+from khaleesi.proto.core_sawmill_pb2 import EventRequest, Event, AppCallData
 
 
 class MetricInitializer(BaseMetricInitializer):
@@ -36,7 +36,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
       self.metricInitializer.requests()
       # Assert result.
       addMetadata.assert_called_once()
-      stub.GetServiceCallData.assert_called_once()
+      stub.GetAppCallData.assert_called_once()
 
   @patch('khaleesi.core.metrics.metricInitializer.AUDIT_EVENT')
   def testInitializingEvents(self, auditEvent: MagicMock) -> None :
@@ -44,10 +44,10 @@ class BaseMetricInitializerTest(SimpleTestCase):
     # Prepare data.
     eventData = EventData(
       caller = GrpcData(
-        khaleesiGate    = 'khaleesi-gate',
-        khaleesiService = 'khaleesi-service',
-        grpcService     = 'grpc-service',
-        grpcMethod      = 'grpc-method',
+        site    = 'site',
+        app     = 'app',
+        service = 'service',
+        method  = 'method',
       ),
       targetType        = 'target',
       actionCustomTypes = [ 'custom' ]
@@ -91,14 +91,14 @@ class BaseMetricInitializerTest(SimpleTestCase):
     """Test initializing request metrics."""
     # Prepare data.
     self.metricInitializer.stub = MagicMock()
-    serviceCallData = ServiceCallData()
-    callSelf = serviceCallData.callList.add()
-    callSelf.call.grpcService = 'grpc-server'
+    appCallData = AppCallData()
+    callSelf = appCallData.callList.add()
+    callSelf.call.service = 'grpc-server'
     callSelf.calls.add()
-    callOther = serviceCallData.callList.add()
-    callOther.call.grpcService = 'some-other-service'
+    callOther = appCallData.callList.add()
+    callOther.call.service = 'some-other-service'
     callOther.calledBy.add()
-    self.metricInitializer.stub.GetServiceCallData.return_value = serviceCallData
+    self.metricInitializer.stub.GetAppCallData.return_value = appCallData
     # Execute test.
     self.metricInitializer.initializeMetricsWithData(events = [])
     # Assert result.
@@ -107,7 +107,7 @@ class BaseMetricInitializerTest(SimpleTestCase):
 
   def assertCaller(self, *, expected: GrpcData, actual: GrpcCallerDetails) -> None :
     """Assert the caller data is correct."""
-    self.assertEqual(expected.khaleesiGate   , actual.khaleesiGate)
-    self.assertEqual(expected.khaleesiService, actual.khaleesiService)
-    self.assertEqual(expected.grpcService    , actual.grpcService)
-    self.assertEqual(expected.grpcMethod     , actual.grpcMethod)
+    self.assertEqual(expected.site   , actual.site)
+    self.assertEqual(expected.app    , actual.app)
+    self.assertEqual(expected.service, actual.service)
+    self.assertEqual(expected.method , actual.method)

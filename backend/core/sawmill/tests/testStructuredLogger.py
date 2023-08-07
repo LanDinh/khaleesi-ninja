@@ -34,13 +34,13 @@ class TestStructuredDbLogger(SimpleTestCase):
     # Assert result.
     dbHttpRequest.objects.get.return_value.finish.assert_called_once()
 
-  @patch('microservice.structuredLogger.SERVICE_REGISTRY')
+  @patch('microservice.structuredLogger.SITE_REGISTRY')
   @patch('microservice.structuredLogger.DbGrpcRequest')
   def testSendLogGrpcRequest(
       self,
-      dbGrpcRequest  : MagicMock,
-      serviceRegistry: MagicMock,
-      *_             : MagicMock,
+      dbGrpcRequest: MagicMock,
+      siteRegistry : MagicMock,
+      *_           : MagicMock,
   ) -> None :
     """Test sending a log request."""
     # Prepare data.
@@ -49,7 +49,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     self.logger.sendLogGrpcRequest(grpc = grpcRequest)
     # Assert result.
     dbGrpcRequest.return_value.khaleesiSave.assert_called_once_with(grpc = grpcRequest)
-    serviceRegistry.addCall.assert_called_once()
+    siteRegistry.addCall.assert_called_once()
 
   @patch('microservice.structuredLogger.DbQuery')
   @patch('microservice.structuredLogger.DbGrpcRequest')

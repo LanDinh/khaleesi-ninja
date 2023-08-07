@@ -1,4 +1,4 @@
-"""Base settings for backend services."""
+"""Base settings for backend apps."""
 
 # Python.
 from pathlib import Path

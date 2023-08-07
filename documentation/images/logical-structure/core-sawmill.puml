@@ -26,10 +26,10 @@ agent metadata[
   userId
   userType
   ----
-  metaLoggerKhaleesiApp
-  metaLoggerKhaleesiService
-  metaLoggerGrpcService
-  metaLoggerGrpcMethod
+  metaLoggerSite
+  metaLoggerApp
+  metaLoggerService
+  metaLoggerMethod
   ----
   podId
   errors
@@ -67,10 +67,10 @@ rectangle grpc_request [
   ====
   upstreamRequestId
   ----
-  upstreamRequestKhaleesiApp
-  upstreamRequestKhaleesiService
-  upstreamRequestGrpcService
-  upstreamRequestGrpcMethod
+  upstreamRequestSite
+  upstreamRequestApp
+  upstreamRequestService
+  upstreamRequestMethod
 ]
 rectangle http_request [
   HttpRequest
@@ -98,8 +98,8 @@ rectangle error [
   status
   loglevel
   ----
+  site
   app
-  service
   ----
   publicKey
   publicDetails

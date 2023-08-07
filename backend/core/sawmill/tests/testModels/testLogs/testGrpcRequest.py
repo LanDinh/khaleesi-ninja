@@ -35,12 +35,12 @@ class GrpcRequestTestCase(SimpleTestCase):
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
     upstream = grpc.request.upstreamRequest
-    self.assertEqual(upstream.requestId      , instance.upstreamRequestId)
-    self.assertEqual(upstream.khaleesiGate   , instance.upstreamRequestKhaleesiGate)
-    self.assertEqual(upstream.khaleesiService, instance.upstreamRequestKhaleesiService)
-    self.assertEqual(upstream.grpcService    , instance.upstreamRequestGrpcService)
-    self.assertEqual(upstream.grpcMethod     , instance.upstreamRequestGrpcMethod)
-    self.assertEqual(upstream.podId          , instance.upstreamRequestPodId)
+    self.assertEqual(upstream.requestId, instance.upstreamRequestId)
+    self.assertEqual(upstream.site     , instance.upstreamRequestSite)
+    self.assertEqual(upstream.app      , instance.upstreamRequestApp)
+    self.assertEqual(upstream.service  , instance.upstreamRequestService)
+    self.assertEqual(upstream.method   , instance.upstreamRequestMethod)
+    self.assertEqual(upstream.podId    , instance.upstreamRequestPodId)
 
   @patch('microservice.models.logs.grpcRequest.Model.khaleesiSave')
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataFromGrpc')
@@ -63,12 +63,12 @@ class GrpcRequestTestCase(SimpleTestCase):
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
     upstream = grpc.request.upstreamRequest
-    self.assertNotEqual(upstream.requestId      , instance.upstreamRequestId)
-    self.assertNotEqual(upstream.khaleesiGate   , instance.upstreamRequestKhaleesiGate)
-    self.assertNotEqual(upstream.khaleesiService, instance.upstreamRequestKhaleesiService)
-    self.assertNotEqual(upstream.grpcService    , instance.upstreamRequestGrpcService)
-    self.assertNotEqual(upstream.grpcMethod     , instance.upstreamRequestGrpcMethod)
-    self.assertNotEqual(upstream.podId          , instance.upstreamRequestPodId)
+    self.assertNotEqual(upstream.requestId, instance.upstreamRequestId)
+    self.assertNotEqual(upstream.site     , instance.upstreamRequestSite)
+    self.assertNotEqual(upstream.app      , instance.upstreamRequestApp)
+    self.assertNotEqual(upstream.service  , instance.upstreamRequestService)
+    self.assertNotEqual(upstream.method   , instance.upstreamRequestMethod)
+    self.assertNotEqual(upstream.podId    , instance.upstreamRequestPodId)
 
   @patch('microservice.models.logs.grpcRequest.Model.khaleesiSave')
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataFromGrpc')
@@ -96,12 +96,12 @@ class GrpcRequestTestCase(SimpleTestCase):
     """Test that general mapping to gRPC works."""
     # Prepare data.
     instance = GrpcRequest(
-    upstreamRequestId              = 'upstream-request-id',
-    upstreamRequestKhaleesiGate    = 'upstream-khaleesi-gate',
-    upstreamRequestKhaleesiService = 'upstream-khaleesi-service',
-    upstreamRequestGrpcService     = 'upstream-grpc-service',
-    upstreamRequestGrpcMethod      = 'upstream-grpc-method',
-    upstreamRequestPodId           = 'upstream-pod-id',
+    upstreamRequestId      = 'upstream-request-id',
+    upstreamRequestSite    = 'upstream-site',
+    upstreamRequestApp     = 'upstream-app',
+    upstreamRequestService = 'upstream-service',
+    upstreamRequestMethod  = 'upstream-method',
+    upstreamRequestPodId   = 'upstream-pod-id',
     )
     # Execute test.
     grpc = instance.toGrpc()
@@ -109,12 +109,12 @@ class GrpcRequestTestCase(SimpleTestCase):
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
     upstream = grpc.request.upstreamRequest
-    self.assertEqual(instance.upstreamRequestId             , upstream.requestId)
-    self.assertEqual(instance.upstreamRequestKhaleesiGate   , upstream.khaleesiGate)
-    self.assertEqual(instance.upstreamRequestKhaleesiService, upstream.khaleesiService)
-    self.assertEqual(instance.upstreamRequestGrpcService    , upstream.grpcService)
-    self.assertEqual(instance.upstreamRequestGrpcMethod     , upstream.grpcMethod)
-    self.assertEqual(instance.upstreamRequestPodId          , upstream.podId)
+    self.assertEqual(instance.upstreamRequestId     , upstream.requestId)
+    self.assertEqual(instance.upstreamRequestSite   , upstream.site)
+    self.assertEqual(instance.upstreamRequestApp    , upstream.app)
+    self.assertEqual(instance.upstreamRequestService, upstream.service)
+    self.assertEqual(instance.upstreamRequestMethod , upstream.method)
+    self.assertEqual(instance.upstreamRequestPodId  , upstream.podId)
 
 
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataToGrpc')
@@ -146,11 +146,11 @@ class GrpcRequestTestCase(SimpleTestCase):
     """Helper to create gRPC objects."""
     grpc = GrpcGrpcRequest()
 
-    grpc.request.upstreamRequest.requestId       = 'upstream-request-id'
-    grpc.request.upstreamRequest.khaleesiGate    = 'upstream-khaleesi-gate'
-    grpc.request.upstreamRequest.khaleesiService = 'upstream-khaleesi-service'
-    grpc.request.upstreamRequest.grpcService     = 'upstream-grpc-service'
-    grpc.request.upstreamRequest.grpcMethod      = 'upstream-grpc-method'
-    grpc.request.upstreamRequest.podId           = 'upstream-pod-id'
+    grpc.request.upstreamRequest.requestId = 'upstream-request-id'
+    grpc.request.upstreamRequest.site      = 'upstream-site'
+    grpc.request.upstreamRequest.app       = 'upstream-app'
+    grpc.request.upstreamRequest.service   = 'upstream-service'
+    grpc.request.upstreamRequest.method    = 'upstream-method'
+    grpc.request.upstreamRequest.podId     = 'upstream-pod-id'
 
     return grpc

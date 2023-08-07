@@ -24,8 +24,8 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
   status   = models.TextField(default = 'UNKNOWN')
   loglevel = models.TextField(default = 'FATAL')
 
-  gate    = models.TextField(default = 'UNKNOWN')
-  service = models.TextField(default = 'UNKNOWN')
+  site = models.TextField(default = 'UNKNOWN')
+  app  = models.TextField(default = 'UNKNOWN')
 
   publicKey     = models.TextField(default = 'UNKNOWN')
   publicDetails = models.TextField(default = '')
@@ -50,8 +50,8 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
     if self._state.adding:
       self.status    = parseString(raw = grpc.error.status   , name = 'status'   , errors = errors)
       self.loglevel  = parseString(raw = grpc.error.loglevel , name = 'loglevel' , errors = errors)
-      self.gate      = parseString(raw = grpc.error.gate     , name = 'gate'     , errors = errors)
-      self.service   = parseString(raw = grpc.error.service  , name = 'service'  , errors = errors)
+      self.site      = parseString(raw = grpc.error.site     , name = 'site'     , errors = errors)
+      self.app       = parseString(raw = grpc.error.app      , name = 'app'      , errors = errors)
       self.publicKey = parseString(raw = grpc.error.publicKey, name = 'publicKey', errors = errors)
       self.publicDetails  = grpc.error.publicDetails
       self.privateMessage = grpc.error.privateMessage
@@ -70,8 +70,8 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
     # Error.
     grpc.error.status         = self.status
     grpc.error.loglevel       = self.loglevel
-    grpc.error.gate           = self.gate
-    grpc.error.service        = self.service
+    grpc.error.site           = self.site
+    grpc.error.app            = self.app
     grpc.error.publicKey      = self.publicKey
     grpc.error.publicDetails  = self.publicDetails
     grpc.error.privateMessage = self.privateMessage

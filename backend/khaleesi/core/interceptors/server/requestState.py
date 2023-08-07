@@ -27,10 +27,10 @@ class RequestStateServerInterceptor(ServerInterceptor):
 
   def khaleesiIntercept(  # pylint: disable=inconsistent-return-statements
       self, *,
-      method    : Callable[[Any, ServicerContext], Any],
-      request   : Any,
-      context   : ServicerContext,
-      methodName: str,
+      executableMethod: Callable[[Any, ServicerContext], Any],
+      request         : Any,
+      context         : ServicerContext,
+      rawMethod       : str,
   ) -> Any :
     """Handle the state of requests."""
     STATE.reset()  # Always start with a clean state.
@@ -38,9 +38,9 @@ class RequestStateServerInterceptor(ServerInterceptor):
       with queryLogger():
         STATE.request.grpcCaller.requestId = str(uuid4())
         # Process request data.
-        _, _, serviceName, methodName = self.processMethodName(raw = methodName)
-        STATE.request.grpcCaller.grpcService = serviceName
-        STATE.request.grpcCaller.grpcMethod  = methodName
+        _, _, service, method = self.processMethodName(raw = rawMethod)
+        STATE.request.grpcCaller.service = service
+        STATE.request.grpcCaller.method  = method
 
         upstream = self.getUpstreamRequest(request = request)
         STATE.request.httpCaller.requestId = upstream.httpCaller.requestId
@@ -49,7 +49,7 @@ class RequestStateServerInterceptor(ServerInterceptor):
         STATE.request.user.type = upstream.user.type
 
         # Continue execution.
-        response = method(request, context)
+        response = executableMethod(request, context)
         STATE.reset()  # Always clean up afterwards.
         return response
     except KhaleesiException as exception:

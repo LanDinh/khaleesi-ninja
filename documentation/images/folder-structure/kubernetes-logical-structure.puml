@@ -1,7 +1,7 @@
 @startuml
 actor user as user #lightpink;line:darkred;text:darkred
 
-' APP
+' SITE
 cloud       "frontend"      as frontend     #lavender;line:darkviolet;text:darkviolet
 collections "microservices" as microservice #lavender;line:darkviolet;text:darkviolet
 
@@ -14,7 +14,7 @@ card        "prometheus" as prometheus #bisque;line:saddlebrown;text:saddlebrown
 card        "grafana"    as grafana    #bisque;line:saddlebrown;text:saddlebrown
 collections "gRPC UI"    as grpcui     #bisque;line:saddlebrown;text:saddlebrown
 
-' app connections
+' site connections
 user      --> frontend          #saddlebrown;text:saddlebrown : https
 frontend  --> core_microservice #darkviolet;text:darkviolet   : gGRPC
 frontend  --> microservice      #darkviolet;text:darkviolet   : gGRPC

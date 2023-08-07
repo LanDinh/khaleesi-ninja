@@ -14,21 +14,21 @@ clear_color='\033[0m'
 
 
 # Options.
-current_service_file="./data/current_service"
+current_app_file="./data/current_app"
 
 
 # Check if interactive mode.
-services=("$@")
+apps=("$@")
 arguments=
 if [[ $# -eq 1 ]]; then
-  if [[ "${1}" == "current_service" ]] || [[ "${1}" == "specific_test" ]]; then
-    if [[ ! -f "${current_service_file}" ]]; then
-      . ./scripts/development/switch_current_service.sh
+  if [[ "${1}" == "current_app" ]] || [[ "${1}" == "specific_test" ]]; then
+    if [[ ! -f "${current_app_file}" ]]; then
+      . ./scripts/development/switch_current_app.sh
     fi
     while read -r raw_line; do
-      read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
-      services=("${line[@]}")
-    done <${current_service_file}
+      read -r -a line <<< "$(./scripts/util/parse_app.sh "${raw_line}")"
+      apps=("${line[@]}")
+    done <${current_app_file}
   fi
 
   if [[ "${1}" == "specific_test" ]]; then
@@ -39,17 +39,17 @@ fi
 
 
 test_container() {
-  local gate=${1}
-  local service=${2}
+  local site=${1}
+  local app=${2}
   local type=${3}
   local version=${4}
   local deploy=${5}
 
   echo -e "${yellow}Building the image...${clear_color}"
-  . scripts/build.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "development"
+  . scripts/build.sh "${site}" "${app}" "${type}" "${version}" "${deploy}" "development"
 
-  echo -e "${yellow}Testing the service...${clear_color}"
-  . scripts/test.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${arguments}"
+  echo -e "${yellow}Testing the app...${clear_color}"
+  . scripts/test.sh "${site}" "${app}" "${type}" "${version}" "${deploy}" "${arguments}"
 }
 
 
@@ -64,8 +64,8 @@ echo -e "${magenta}Building the base images...${clear_color}"
 . scripts/util/build-backend-base.sh 1.0.0 construction
 . scripts/util/build-backend-base.sh 1.0.0 image
 
-echo -e "${magenta}Testing the services...${clear_color}"
+echo -e "${magenta}Testing the apps...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh test_container ${services[@]}
+. scripts/util/app_loop.sh test_container ${apps[@]}
 
 echo -e "${green}DONE! :D${clear_color}"

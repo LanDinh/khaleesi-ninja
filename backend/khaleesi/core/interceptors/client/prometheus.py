@@ -18,25 +18,25 @@ class PrometheusClientInterceptor(ClientInterceptor):
 
   def khaleesiIntercept(
       self, *,
-      method           : Callable[[Any, ClientCallDetails], Any],
+      executableMethod : Callable[[Any, ClientCallDetails], Any],
       requestOrIterator: Any,
       callDetails      : ClientCallDetails,
-      khaleesiGate     : str,
-      khaleesiService  : str,
-      grpcService      : str,
-      grpcMethod       : str,
+      site             : str,
+      app              : str,
+      service          : str,
+      method           : str,
   ) -> Any :
     """Collect the prometheus metrics."""
     peer = RequestMetadata()
-    peer.grpcCaller.khaleesiGate    = khaleesiGate
-    peer.grpcCaller.khaleesiService = khaleesiService
-    peer.grpcCaller.grpcService     = grpcService
-    peer.grpcCaller.grpcMethod      = grpcMethod
+    peer.grpcCaller.site    = site
+    peer.grpcCaller.app     = app
+    peer.grpcCaller.service = service
+    peer.grpcCaller.method  = method
     if hasattr(requestOrIterator, 'requestMetadata'):
       requestMetadata: RequestMetadata = requestOrIterator.requestMetadata
     else:
       requestMetadata = RequestMetadata()
-    response: Call = method(requestOrIterator, callDetails)
+    response: Call = executableMethod(requestOrIterator, callDetails)
     OUTGOING_REQUESTS.inc(status = response.code(), request = requestMetadata, peer = peer)
 
     return response

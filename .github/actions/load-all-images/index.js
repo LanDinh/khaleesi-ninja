@@ -4,11 +4,11 @@ import * as core from '@actions/core'
 import * as loadImage from '../load-image/action.js'
 
 async function runAction() {
-  const services = JSON.parse(core.getInput('services'))
+  const apps = JSON.parse(core.getInput('apps'))
   const containerMode = core.getInput('containerMode')
   const commit = core.getInput('commit')
-  for (const service of services){
-    const image = `khaleesi-ninja/${service.gate}/${service.name}:latest-${containerMode}`
+  for (const app of apps){
+    const image = `khaleesi-ninja/${app.site}/${app.name}:latest-${containerMode}`
     await loadImage.runAction(image, commit)
   }
 }

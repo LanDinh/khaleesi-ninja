@@ -1,0 +1,31 @@
+{{- if .Values.grpcui.enabled }}
+apiVersion: "networking.k8s.io/v1"
+kind: "Ingress"
+metadata:
+  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-grpcui"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
+  labels:
+    khaleesi-ninja: "app"
+    site: "{{ .Values.site.name }}"
+    name: "{{ .Values.app.name }}"
+    type: "grpcui"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+spec:
+  ingressClassName: "ingress-class-{{ .Values.environment.name }}"
+  tls:
+    - secretName: "tls-certificate"
+      hosts:
+      - "admin.{{ .Values.environment.domain }}"
+  rules:
+    - host: "admin.{{ .Values.environment.domain }}"
+      http:
+        paths:
+          - path: "/grpcui/{{ .Values.site.name }}/{{ .Values.app.name }}/(.*)"
+            pathType: "Prefix"
+            backend:
+              service:
+                name: "{{ .Values.site.name }}-{{ .Values.app.name }}-grpcui"
+                port:
+                  name: "grpcui"
+{{- end }}

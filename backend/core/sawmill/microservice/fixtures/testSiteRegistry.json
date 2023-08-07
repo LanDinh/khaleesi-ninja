@@ -1,0 +1,120 @@
+[
+  {
+    "model": "microservice.SiteRegistrySite",
+    "pk": 1,
+    "fields": {
+      "name": "site-1"
+    }
+  },
+  {
+    "model": "microservice.SiteRegistrySite",
+    "pk": 2,
+    "fields": {
+      "name": "site-2"
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryApp",
+    "pk": 1,
+    "fields": {
+      "name": "app-1",
+      "site": 1
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryApp",
+    "pk": 2,
+    "fields": {
+      "name": "app-2",
+      "site": 2
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryApp",
+    "pk": 3,
+    "fields": {
+      "name": "app-3",
+      "site": 2
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryService",
+    "pk": 1,
+    "fields": {
+      "name": "service-1",
+      "app": 1
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryService",
+    "pk": 2,
+    "fields": {
+      "name": "service-2",
+      "app": 2
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryService",
+    "pk": 3,
+    "fields": {
+      "name": "service-3",
+      "app": 3
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryService",
+    "pk": 4,
+    "fields": {
+      "name": "service-4",
+      "app": 3
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryMethod",
+    "pk": 1,
+    "fields": {
+      "name": "method-1",
+      "service": 1
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryMethod",
+    "pk": 2,
+    "fields": {
+      "name": "method-2",
+      "service": 2
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryMethod",
+    "pk": 3,
+    "fields": {
+      "name": "method-3",
+      "service": 3
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryMethod",
+    "pk": 4,
+    "fields": {
+      "name": "method-4",
+      "service": 4
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryMethod",
+    "pk": 5,
+    "fields": {
+      "name": "method-5",
+      "service": 4
+    }
+  },
+  {
+    "model": "microservice.SiteRegistryCall",
+    "pk": 1,
+    "fields": {
+      "caller": 1,
+      "called": 2
+    }
+  }
+]

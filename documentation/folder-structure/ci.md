@@ -51,6 +51,6 @@ It contains the following jobs:
 1. `build-backend-base-images` will build the backend base images which speeds up the build.
 1. `build` will build all images.
 1. `test-helm` will verify the helm templates.
-1. `unit-test` will execute the unit tests of all services.
+1. `unit-test` will execute the unit tests of all apps.
 1. `e2e-tests` will spin up all deployments and execute the E2E tests on them.
 1. `clean-cache` ensures that the cache is always as empty as possible.

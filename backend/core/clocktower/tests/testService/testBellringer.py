@@ -1,4 +1,4 @@
-"""Test the core-sawmill sawyer service."""
+"""Test the core-clocktower bellringer service."""
 
 # Python.
 from unittest.mock import patch, MagicMock
@@ -11,7 +11,7 @@ from microservice.service.bellringer import Service
 
 @patch('microservice.service.bellringer.LOGGER')
 class BellRingerServiceTestCase(SimpleTestCase):
-  """Test the core-sawmill sawyer service."""
+  """Test the core-clocktower bellringer service."""
 
   service = Service()
 

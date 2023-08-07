@@ -15,7 +15,7 @@ clear_color='\033[0m'
 
 # Options.
 environment=${1}
-current_service_file="./data/current_service"
+current_app_file="./data/current_app"
 drop_database=false
 container_mode=production
 
@@ -25,15 +25,15 @@ container_mode=production
 
 
 # Check if interactive mode.
-services=("${@:2}")
-if { [[ $# -eq 2 ]] || [[ $# -eq 3 ]]; } && [[ "${2}" == "current_service" ]]; then
-  if [[ ! -f "${current_service_file}" ]]; then
-      . ./scripts/development/switch_current_service.sh
+apps=("${@:2}")
+if { [[ $# -eq 2 ]] || [[ $# -eq 3 ]]; } && [[ "${2}" == "current_app" ]]; then
+  if [[ ! -f "${current_app_file}" ]]; then
+      . ./scripts/development/switch_current_app.sh
   fi
   while read -r raw_line; do
-    read -r -a line <<< "$(./scripts/util/parse_service.sh "${raw_line}")"
-    services=("${line[@]}")
-  done <${current_service_file}
+    read -r -a line <<< "$(./scripts/util/parse_app.sh "${raw_line}")"
+    apps=("${line[@]}")
+  done <${current_app_file}
 
   if [[ $# -eq 3 ]] && [[ "${3}" == "drop_database" ]]; then
     drop_database=true
@@ -45,27 +45,27 @@ if [[ "${environment}" == "development" ]]; then
 fi
 
 
-deploy_service() {
-  local gate=${1}
-  local service=${2}
+deploy_app() {
+  local site=${1}
+  local app=${2}
   local type=${3}
   local version=${4}
   local deploy=${5}
 
   echo -e "${yellow}Building the image...${clear_color}"
-  . scripts/build.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${container_mode}"
+  . scripts/build.sh "${site}" "${app}" "${type}" "${version}" "${deploy}" "${container_mode}"
 
-  echo -e "${yellow}Deploying the service...${clear_color}"
-  . scripts/deploy.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${environment}" "${drop_database}"
+  echo -e "${yellow}Deploying the app...${clear_color}"
+  . scripts/deploy.sh "${site}" "${app}" "${type}" "${version}" "${deploy}" "${environment}" "${drop_database}"
 }
 
 echo -e "${magenta}Building the base images...${clear_color}"
 . scripts/util/build-backend-base.sh 1.0.0 construction
 . scripts/util/build-backend-base.sh 1.0.0 image
 
-echo -e "${magenta}Deploying the services...${clear_color}"
+echo -e "${magenta}Deploying the apps...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh deploy_service ${services[@]}
+. scripts/util/app_loop.sh deploy_app ${apps[@]}
 
 
 echo -e "${green}DONE! :D${clear_color}"

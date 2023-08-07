@@ -5,7 +5,7 @@ environment:
 kubegres:
   replicas: 1
   size: "200Mi"
-service:
+app:
   version: "latest-production"
   replicas: 1
   image_pull_policy: "Never"

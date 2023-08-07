@@ -21,12 +21,12 @@ from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
 class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMixin):  # type: ignore[misc]  # pylint: disable=line-too-long
   """Request logs."""
 
-  upstreamRequestId              = models.TextField(default = 'UNKNOWN')
-  upstreamRequestKhaleesiGate    = models.TextField(default = 'UNKNOWN')
-  upstreamRequestKhaleesiService = models.TextField(default = 'UNKNOWN')
-  upstreamRequestGrpcService     = models.TextField(default = 'UNKNOWN')
-  upstreamRequestGrpcMethod      = models.TextField(default = 'UNKNOWN')
-  upstreamRequestPodId           = models.TextField(default = 'UNKNOWN')
+  upstreamRequestId      = models.TextField(default = 'UNKNOWN')
+  upstreamRequestSite    = models.TextField(default = 'UNKNOWN')
+  upstreamRequestApp     = models.TextField(default = 'UNKNOWN')
+  upstreamRequestService = models.TextField(default = 'UNKNOWN')
+  upstreamRequestMethod  = models.TextField(default = 'UNKNOWN')
+  upstreamRequestPodId   = models.TextField(default = 'UNKNOWN')
 
   objects: Manager[GrpcRequest]
 
@@ -44,27 +44,27 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
     if self._state.adding:
       self.upstreamRequestId = parseString(
         raw    = grpc.request.upstreamRequest.requestId,
-        name   = 'upstreamRequestGrpcRequestId',
+        name   = 'upstreamRequestRequestId',
         errors = errors,
       )
-      self.upstreamRequestKhaleesiGate = parseString(
-        raw    = grpc.request.upstreamRequest.khaleesiGate,
-        name   = 'upstreamRequestKhaleesiGate',
+      self.upstreamRequestSite = parseString(
+        raw    = grpc.request.upstreamRequest.site,
+        name   = 'upstreamRequestSite',
         errors = errors,
       )
-      self.upstreamRequestKhaleesiService = parseString(
-        raw    = grpc.request.upstreamRequest.khaleesiService,
-        name   = 'upstreamRequestKhaleesiService',
+      self.upstreamRequestApp = parseString(
+        raw    = grpc.request.upstreamRequest.app,
+        name   = 'upstreamRequestApp',
         errors = errors,
       )
-      self.upstreamRequestGrpcService = parseString(
-        raw    = grpc.request.upstreamRequest.grpcService,
-        name   = 'upstreamRequestGrpcService',
+      self.upstreamRequestService = parseString(
+        raw    = grpc.request.upstreamRequest.service,
+        name   = 'upstreamRequestService',
         errors = errors,
       )
-      self.upstreamRequestGrpcMethod = parseString(
-        raw    = grpc.request.upstreamRequest.grpcMethod,
-        name   = 'upstreamRequestGrpcMethod',
+      self.upstreamRequestMethod = parseString(
+        raw    = grpc.request.upstreamRequest.method,
+        name   = 'upstreamRequestMethod',
         errors = errors,
       )
       self.upstreamRequestPodId = parseString(
@@ -93,12 +93,12 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
     )
 
     # Upstream request.
-    grpc.request.upstreamRequest.requestId       = self.upstreamRequestId
-    grpc.request.upstreamRequest.khaleesiGate    = self.upstreamRequestKhaleesiGate
-    grpc.request.upstreamRequest.khaleesiService = self.upstreamRequestKhaleesiService
-    grpc.request.upstreamRequest.grpcService     = self.upstreamRequestGrpcService
-    grpc.request.upstreamRequest.grpcMethod      = self.upstreamRequestGrpcMethod
-    grpc.request.upstreamRequest.podId           = self.upstreamRequestPodId
+    grpc.request.upstreamRequest.requestId = self.upstreamRequestId
+    grpc.request.upstreamRequest.site      = self.upstreamRequestSite
+    grpc.request.upstreamRequest.app       = self.upstreamRequestApp
+    grpc.request.upstreamRequest.service   = self.upstreamRequestService
+    grpc.request.upstreamRequest.method    = self.upstreamRequestMethod
+    grpc.request.upstreamRequest.podId     = self.upstreamRequestPodId
 
     return grpc
 

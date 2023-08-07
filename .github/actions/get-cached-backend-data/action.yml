@@ -1,11 +1,11 @@
 name: "Get cached data"
 description: "Get dependency cache, built protos, and base images"
 inputs:
-  gate:
-    description: "The name of the gate"
+  site:
+    description: "The name of the site"
     required: true
-  service:
-    description: "The name of the service"
+  app:
+    description: "The name of the app"
     required: true
   base-image-version:
     description: "The version of the base images to be fetched"
@@ -19,7 +19,7 @@ runs:
         python-version: '3.10'
         cache: 'pip'
     - shell: "bash"
-      run: pip install -r ./backend/${{ inputs.gate }}/${{ inputs.service }}/requirements-service.txt
+      run: pip install -r ./backend/${{ inputs.site }}/${{ inputs.app }}/requirements-app.txt
     - uses: "actions/download-artifact@v3"
       with:
         name: "protos-python"

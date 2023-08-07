@@ -19,15 +19,15 @@ class PrometheusServerInterceptor(ServerInterceptor):
 
   def khaleesiIntercept(
       self, *,
-      method : Callable[[Any, ServicerContext], Any],
-      request: Any,
-      context: ServicerContext,
-      **_    : Any,
+      executableMethod: Callable[[Any, ServicerContext], Any],
+      request         : Any,
+      context         : ServicerContext,
+      **_             : Any,
   ) -> Any :
     """Collect the prometheus metrics."""
     requestMetadata = RequestMetadata()
-    requestMetadata.grpcCaller.grpcService = STATE.request.grpcCaller.grpcService
-    requestMetadata.grpcCaller.grpcMethod  = STATE.request.grpcCaller.grpcMethod
+    requestMetadata.grpcCaller.service = STATE.request.grpcCaller.service
+    requestMetadata.grpcCaller.method  = STATE.request.grpcCaller.method
     if hasattr(request, 'requestMetadata'):
       peer: RequestMetadata = request.requestMetadata
       requestMetadata.user.id   = peer.user.id
@@ -35,7 +35,7 @@ class PrometheusServerInterceptor(ServerInterceptor):
     else:
       peer = RequestMetadata()
     try:
-      response = method(request, context)
+      response = executableMethod(request, context)
       INCOMING_REQUESTS.inc(status = StatusCode.OK, request = requestMetadata, peer = peer)
       return response
     except KhaleesiException as exception:

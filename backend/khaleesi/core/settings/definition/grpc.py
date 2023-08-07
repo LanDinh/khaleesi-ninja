@@ -34,7 +34,7 @@ class GrpcInterceptors(TypedDict):
 
 
 class Grpc(TypedDict):
-  """gRPC configuration for khaleesi.ninja services."""
+  """gRPC configuration for khaleesi.ninja apps."""
 
   PORT               : int
   THREADS            : int

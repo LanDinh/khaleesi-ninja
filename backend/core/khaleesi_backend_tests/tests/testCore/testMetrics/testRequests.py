@@ -44,29 +44,24 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
   @patch('khaleesi.core.metrics.requests.CounterMetric.getValue')
   def testGetValue(self, superGetValue: MagicMock) -> None :
     """Test string replacement for empty strings."""
-    calleeGrpcService = 'callee-service'
-    calleeGrpcMethod  = 'callee-method'
+    calleeService = 'callee-service'
+    calleeMethod  = 'callee-method'
     for status, (userLabel, userType) in product(StatusCode, User.UserType.items()):
       for label, requestAttributes in [
-          ( 'full input'        , {} ),
-          ( 'empty input'       , {
-              'khaleesiGate'   : '',
-              'khaleesiService': '',
-              'grpcService'    : '',
-              'grpcMethod'     : '',
-          } ),
-          ( 'empty gate'        , {'khaleesiGate'   : ''} ),
-          ( 'empty service'     , {'khaleesiService': ''} ),
-          ( 'empty grpc service', {'grpcService'    : ''} ),
-          ( 'empty grpc method' , {'grpcMethod'     : ''} ),
+          ( 'full input'   , {} ),
+          ( 'empty input'  , { 'site': '', 'app': '', 'service': '', 'method': '' } ),
+          ( 'empty site'   , {'site'   : ''} ),
+          ( 'empty app'    , {'app'    : ''} ),
+          ( 'empty service', {'service': ''} ),
+          ( 'empty method' , {'method' : ''} ),
       ]:
         with self.subTest(user = userLabel, status = status, test = label):
           # Prepare data.
           superGetValue.reset_mock()
           request = self._getRequestMetadata(user = userType, **requestAttributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
           peer    = self._getRequestMetadata(user = userType, **requestAttributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-          peer.grpcCaller.grpcService = calleeGrpcService
-          peer.grpcCaller.grpcMethod  = calleeGrpcMethod
+          peer.grpcCaller.service = calleeService
+          peer.grpcCaller.method  = calleeMethod
           # Execute test.
           self.metric.getValue(
             status  = status,
@@ -75,32 +70,32 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
           )
           # Assert result.
           superGetValue.assert_called_once_with(
-            status              = status,
-            user                = userType,
-            grpcService         = request.grpcCaller.grpcService  or 'UNKNOWN',
-            grpcMethod          = request.grpcCaller.grpcMethod   or 'UNKNOWN',
-            peerKhaleesiGate    = peer.grpcCaller.khaleesiGate    or 'UNKNOWN',
-            peerKhaleesiService = peer.grpcCaller.khaleesiService or 'UNKNOWN',
-            peerGrpcService     = peer.grpcCaller.grpcService     or 'UNKNOWN',
-            peerGrpcMethod      = peer.grpcCaller.grpcMethod      or 'UNKNOWN',
+            status      = status,
+            user        = userType,
+            service     = request.grpcCaller.service or 'UNKNOWN',
+            method      = request.grpcCaller.method  or 'UNKNOWN',
+            peerSite    = peer.grpcCaller.site       or 'UNKNOWN',
+            peerApp     = peer.grpcCaller.app        or 'UNKNOWN',
+            peerService = peer.grpcCaller.service    or 'UNKNOWN',
+            peerMethod  = peer.grpcCaller.method     or 'UNKNOWN',
           )
 
 
   def _getRequestMetadata(
       self, *,
-      user           : 'User.UserType.V',
-      khaleesiGate   : str = 'khaleesi-gate',
-      khaleesiService: str = 'khaleesi-service',
-      grpcService    : str = 'grpc-service',
-      grpcMethod     : str = 'grpc-method',
+      user   : 'User.UserType.V',
+      site   : str = 'site',
+      app    : str = 'app',
+      service: str = 'service',
+      method : str = 'method',
   ) -> RequestMetadata :
     """Get the request metadata."""
     requestMetadata = RequestMetadata()
-    requestMetadata.grpcCaller.khaleesiGate    = khaleesiGate
-    requestMetadata.grpcCaller.khaleesiService = khaleesiService
-    requestMetadata.grpcCaller.grpcService     = grpcService
-    requestMetadata.grpcCaller.grpcMethod      = grpcMethod
-    requestMetadata.user.type                  = user
+    requestMetadata.grpcCaller.site    = site
+    requestMetadata.grpcCaller.app     = app
+    requestMetadata.grpcCaller.service = service
+    requestMetadata.grpcCaller.method  = method
+    requestMetadata.user.type          = user
     return requestMetadata
 
 

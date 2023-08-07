@@ -21,8 +21,8 @@ class KhaleesiException(Exception):
   def __init__(
       self, *,
       status        : StatusCode,
-      gate          : str,
-      service       : str,
+      site          : str,
+      app           : str,
       publicKey     : str,
       publicDetails : str,
       privateMessage: str,
@@ -32,8 +32,8 @@ class KhaleesiException(Exception):
     """Initialize the exception."""
     super().__init__(privateMessage)
     self.status         = status
-    self.gate           = gate
-    self.service        = service
+    self.site           = site
+    self.app            = app
     self.publicKey      = publicKey
     self.publicDetails  = publicDetails
     self.privateMessage = privateMessage
@@ -49,8 +49,8 @@ class KhaleesiException(Exception):
     """Return a json string to encode this object."""
     result = {
         'status'        : self.status.name,
-        'gate'          : self.gate,
-        'service'       : self.service,
+        'site'          : self.site,
+        'app'           : self.app,
         'publicKey'     : self.publicKey,
         'publicDetails' : self.publicDetails,
     }
@@ -76,8 +76,8 @@ class KhaleesiCoreException(KhaleesiException):
     """Initialize the exception."""
     super().__init__(
       status         = status,
-      gate           = 'core',
-      service        = 'core',
+      site           = 'core',
+      app            = 'core',
       publicKey      = publicKey,
       publicDetails  = publicDetails,
       privateMessage = privateMessage,

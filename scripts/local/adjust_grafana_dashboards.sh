@@ -59,48 +59,48 @@ echo -e "${magenta}Enter the environment:${clear_color}"
   sed -i -E "s#(\"uid\": \")${environment}(.*\")#\1{{ .Values.environment.name }}\2#g" "${file}"
 }
 
-fixate_gate() {
-  echo -e "${magenta}Enter gate name:${clear_color}"
-  read -r gate
-  # Replace all filters for the gate.
-  sed -i -E "s#\\\\\"${gate}\\\\\"#\\\\\"{{ .Values.gate.name }}\\\\\"#g" "${file}"
+fixate_site() {
+  echo -e "${magenta}Enter site name:${clear_color}"
+  read -r site
+  # Replace all filters for the site.
+  sed -i -E "s#\\\\\"${site}\\\\\"#\\\\\"{{ .Values.site.name }}\\\\\"#g" "${file}"
   # Replace uid.
-  sed -i -E "s#(\"uid\": \"\{\{ .Values.environment.name \}\}-)${gate}(.*\")#\1{{ .Values.gate.name }}\2#g" "${file}"
+  sed -i -E "s#(\"uid\": \"\{\{ .Values.environment.name \}\}-)${site}(.*\")#\1{{ .Values.site.name }}\2#g" "${file}"
   # Replace title.
-  sed -i -E "s#(\"title\": \")${gate}(.*\")#\1{{ .Values.gate.name }}\2#g" "${file}"
+  sed -i -E "s#(\"title\": \")${site}(.*\")#\1{{ .Values.site.name }}\2#g" "${file}"
 }
 
-fixate_service() {
-  echo -e "${magenta}Enter service name:${clear_color}"
-  read -r service
-  # Replace all filters for the service.
-  sed -i -E "s#\\\\\"${service}\\\\\"#\\\\\"{{ .Values.service.name }}\\\\\"#g" "${file}"
+fixate_app() {
+  echo -e "${magenta}Enter app name:${clear_color}"
+  read -r app
+  # Replace all filters for the app.
+  sed -i -E "s#\\\\\"${app}\\\\\"#\\\\\"{{ .Values.app.name }}\\\\\"#g" "${file}"
   # Replace uid.
-  sed -i -E "s#(\"uid\": \"\{\{ .Values.environment.name \}\}-\{\{ .Values.gate.name \}\}-)${service}(\")#\1{{ .Values.service.name }}\2#g" "${file}"
+  sed -i -E "s#(\"uid\": \"\{\{ .Values.environment.name \}\}-\{\{ .Values.site.name \}\}-)${app}(\")#\1{{ .Values.app.name }}\2#g" "${file}"
   # Replace title.
-  sed -i -E "s#(\"title\": \"\{\{ .Values.gate.name \}\}-)${service}(\")#\1{{ .Values.service.name }}\2#g" "${file}"
+  sed -i -E "s#(\"title\": \"\{\{ .Values.site.name \}\}-)${app}(\")#\1{{ .Values.app.name }}\2#g" "${file}"
 }
 
 # Interactive user input.
 echo -e "${magenta}Enter dashboard type:${clear_color}"
-select input_type in overview gate service; do
+select input_type in overview site app; do
   case $input_type in
   overview)
     file=kubernetes/khaleesi-ninja-environment/data/grafana-dashboards/khaleesi-ninja.json
     adjust_grafana_dashboards "${file}"
     break
     ;;
-  gate)
-    file=kubernetes/khaleesi-ninja-gate/data/grafana-dashboards/gate.json
+  site)
+    file=kubernetes/khaleesi-ninja-site/data/grafana-dashboards/site.json
     adjust_grafana_dashboards "${file}"
-    fixate_gate
+    fixate_site
     break
     ;;
-  service)
-    file=kubernetes/khaleesi-ninja-service/data/grafana-dashboards/service.json
+  app)
+    file=kubernetes/khaleesi-ninja-app/data/grafana-dashboards/app.json
     adjust_grafana_dashboards "${file}"
-    fixate_gate
-    fixate_service
+    fixate_site
+    fixate_app
     break
     ;;
   *)

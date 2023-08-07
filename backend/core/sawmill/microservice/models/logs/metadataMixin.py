@@ -22,10 +22,10 @@ class MetadataMixin(models.Model):
   """Common metadata."""
 
   # HTTP caller.
-  metaCallerHttpRequestId    = models.TextField(default = 'UNKNOWN')
-  metaCallerHttpKhaleesiGate = models.TextField(default = 'UNKNOWN')
-  metaCallerHttpPath         = models.TextField(default = 'UNKNOWN')
-  metaCallerHttpPodId        = models.TextField(default = 'UNKNOWN')
+  metaCallerHttpRequestId = models.TextField(default = 'UNKNOWN')
+  metaCallerHttpSite      = models.TextField(default = 'UNKNOWN')
+  metaCallerHttpPath      = models.TextField(default = 'UNKNOWN')
+  metaCallerHttpPodId     = models.TextField(default = 'UNKNOWN')
 
   # User.
   metaUserId   = models.TextField(default = 'UNKNOWN')
@@ -49,9 +49,9 @@ class MetadataMixin(models.Model):
         name   = 'metaCallerHttpRequestId',
         errors = errors,
       )
-      self.metaCallerHttpKhaleesiGate = parseString(
-        raw    = grpc.httpCaller.khaleesiGate,
-        name   = 'metaCallerHttpKhaleesiGate',
+      self.metaCallerHttpSite = parseString(
+        raw    = grpc.httpCaller.site,
+        name   = 'metaCallerHttpSite',
         errors = errors,
       )
       self.metaCallerHttpPath = parseString(
@@ -89,10 +89,10 @@ class MetadataMixin(models.Model):
   ) -> None :
     """Return a grpc object containing own values."""
     # HTTP caller.
-    requestMetadata.httpCaller.requestId    = self.metaCallerHttpRequestId
-    requestMetadata.httpCaller.khaleesiGate = self.metaCallerHttpKhaleesiGate
-    requestMetadata.httpCaller.path         = self.metaCallerHttpPath
-    requestMetadata.httpCaller.podId        = self.metaCallerHttpPodId
+    requestMetadata.httpCaller.requestId = self.metaCallerHttpRequestId
+    requestMetadata.httpCaller.site      = self.metaCallerHttpSite
+    requestMetadata.httpCaller.path      = self.metaCallerHttpPath
+    requestMetadata.httpCaller.podId     = self.metaCallerHttpPodId
 
     # User.
     requestMetadata.user.id   = self.metaUserId
@@ -114,12 +114,12 @@ class MetadataMixin(models.Model):
 class GrpcMetadataMixin(MetadataMixin):
   """gRPC related log metadata."""
 
-  metaCallerGrpcRequestId       = models.TextField(default = 'UNKNOWN')
-  metaCallerGrpcKhaleesiGate    = models.TextField(default = 'UNKNOWN')
-  metaCallerGrpcKhaleesiService = models.TextField(default = 'UNKNOWN')
-  metaCallerGrpcGrpcService     = models.TextField(default = 'UNKNOWN')
-  metaCallerGrpcGrpcMethod      = models.TextField(default = 'UNKNOWN')
-  metaCallerGrpcPodId           = models.TextField(default = 'UNKNOWN')
+  metaCallerGrpcRequestId = models.TextField(default = 'UNKNOWN')
+  metaCallerGrpcSite      = models.TextField(default = 'UNKNOWN')
+  metaCallerGrpcApp       = models.TextField(default = 'UNKNOWN')
+  metaCallerGrpcService   = models.TextField(default = 'UNKNOWN')
+  metaCallerGrpcMethod    = models.TextField(default = 'UNKNOWN')
+  metaCallerGrpcPodId     = models.TextField(default = 'UNKNOWN')
 
   objects: models.Manager[GrpcMetadataMixin]
 
@@ -132,29 +132,29 @@ class GrpcMetadataMixin(MetadataMixin):
         name   = 'metaCallerGrpcRequestId',
         errors = errors,
       )
-      self.metaCallerGrpcKhaleesiGate = parseString(
-        raw    = grpc.grpcCaller.khaleesiGate,
-        name   = 'metaCallerKhaleesiGate',
+      self.metaCallerGrpcSite = parseString(
+        raw    = grpc.grpcCaller.site,
+        name   = 'metaCallerGrpcSite',
         errors = errors,
       )
-      self.metaCallerGrpcKhaleesiService = parseString(
-        raw    = grpc.grpcCaller.khaleesiService,
-        name   = 'metaCallerKhaleesiService',
+      self.metaCallerGrpcApp = parseString(
+        raw    = grpc.grpcCaller.app,
+        name   = 'metaCallerGrpcApp',
         errors = errors,
       )
-      self.metaCallerGrpcGrpcService = parseString(
-        raw    = grpc.grpcCaller.grpcService,
+      self.metaCallerGrpcService = parseString(
+        raw    = grpc.grpcCaller.service,
         name   = 'metaCallerGrpcService',
         errors = errors,
       )
-      self.metaCallerGrpcGrpcMethod = parseString(
-        raw    = grpc.grpcCaller.grpcMethod,
+      self.metaCallerGrpcMethod = parseString(
+        raw    = grpc.grpcCaller.method,
         name   = 'metaCallerGrpcMethod',
         errors = errors,
       )
       self.metaCallerGrpcPodId = parseString(
         raw    = grpc.grpcCaller.podId,
-        name   = 'metaCallerPodId',
+        name   = 'metaCallerGrpcPodId',
         errors = errors,
       )
     # Needs to be at the end because it saves errors to the model.
@@ -169,12 +169,12 @@ class GrpcMetadataMixin(MetadataMixin):
     """Return a grpc object containing own values."""
     super().metadataToGrpc(logMetadata = logMetadata, requestMetadata = requestMetadata)
 
-    requestMetadata.grpcCaller.requestId       = self.metaCallerGrpcRequestId
-    requestMetadata.grpcCaller.khaleesiGate    = self.metaCallerGrpcKhaleesiGate
-    requestMetadata.grpcCaller.khaleesiService = self.metaCallerGrpcKhaleesiService
-    requestMetadata.grpcCaller.grpcService     = self.metaCallerGrpcGrpcService
-    requestMetadata.grpcCaller.grpcMethod      = self.metaCallerGrpcGrpcMethod
-    requestMetadata.grpcCaller.podId           = self.metaCallerGrpcPodId
+    requestMetadata.grpcCaller.requestId = self.metaCallerGrpcRequestId
+    requestMetadata.grpcCaller.site      = self.metaCallerGrpcSite
+    requestMetadata.grpcCaller.app       = self.metaCallerGrpcApp
+    requestMetadata.grpcCaller.service   = self.metaCallerGrpcService
+    requestMetadata.grpcCaller.method    = self.metaCallerGrpcMethod
+    requestMetadata.grpcCaller.podId     = self.metaCallerGrpcPodId
 
   class Meta(MetadataMixin.Meta):
     abstract = True

@@ -26,17 +26,17 @@ message User {
 
 message HttpCallerDetails {
   string requestId    = 1;
-  string khaleesiGate = 2;
+  string site = 2;
   string path         = 3;
   string podId        = 4;
 }
 
 message GrpcCallerDetails {
   string requestId       = 1;
-  string khaleesiGate    = 2;
-  string khaleesiService = 3;
-  string grpcService     = 4;
-  string grpcMethod      = 5;
+  string site    = 2;
+  string app = 3;
+  string service     = 4;
+  string method      = 5;
   string podId           = 6;
 }
 

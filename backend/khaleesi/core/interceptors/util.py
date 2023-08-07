@@ -19,17 +19,17 @@ class Interceptor:
 
   def processMethodName(self, *, raw: str) -> Tuple[str, str, str, str] :
     """Process the method name and return (service, method)."""
-    parts = raw.split('/')
-    service         = parts[1].split('.') if len(parts) > 1 else ''.split('.')
-    khaleesiGate    = service[1] if len(service) > 1 else ''
-    khaleesiService = service[2] if len(service) > 2 else ''
-    grpcService     = service[3] if len(service) > 3 else ''
-    grpcMethod      = parts[2]   if len(parts) > 2   else ''
+    parts      = raw.split('/')
+    rawService = parts[1].split('.') if len(parts) > 1 else ''.split('.')
+    site       = rawService[1] if len(rawService) > 1 else ''
+    app        = rawService[2] if len(rawService) > 2 else ''
+    service    = rawService[3] if len(rawService) > 3 else ''
+    method     = parts[2]   if len(parts) > 2   else ''
     return (
-        self.stringOrUnknown(value = khaleesiGate),
-        self.stringOrUnknown(value = khaleesiService),
-        self.stringOrUnknown(value = grpcService),
-        self.stringOrUnknown(value = grpcMethod),
+        self.stringOrUnknown(value = site),
+        self.stringOrUnknown(value = app),
+        self.stringOrUnknown(value = service),
+        self.stringOrUnknown(value = method),
     )
 
   def stringOrUnknown(self, *, value: str) -> str :

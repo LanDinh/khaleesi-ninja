@@ -17,16 +17,16 @@ class ChannelManagerTestCase(SimpleTestCase):
     """Test getting a channel."""
     # Prepare data.
     channel = MagicMock()
-    insecure.return_value = channel
+    insecure.return_value  = channel
     intercept.return_value = channel
-    gate = 'gate'
-    service = 'service'
+    site = 'site'
+    app  = 'app'
     with self.subTest(test = 'first access'):
       # Execute test.
-      result = CHANNEL_MANAGER.getChannel(gate = gate, service = service)
+      result = CHANNEL_MANAGER.getChannel(site = site, app = app)
       # Assert result.
       self.assertEqual(channel, result)
-      insecure.assert_called_once_with(f'{gate}-{service}:8000')
+      insecure.assert_called_once_with(f'{site}-{app}:8000')
       intercept.assert_called_once()
       self.assertEqual(channel, intercept.call_args.args[0])
     with self.subTest(test = 'second access'):
@@ -34,7 +34,7 @@ class ChannelManagerTestCase(SimpleTestCase):
       insecure.reset_mock()
       intercept.reset_mock()
       # Execute test.
-      result = CHANNEL_MANAGER.getChannel(gate = gate, service = service)
+      result = CHANNEL_MANAGER.getChannel(site = site, app = app)
       # Assert result.
       self.assertEqual(channel, result)
       insecure.assert_not_called()

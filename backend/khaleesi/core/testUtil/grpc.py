@@ -15,22 +15,22 @@ class GrpcTestMixin:
       requestMetadata: RequestMetadata = RequestMetadata(),
       now            : datetime        = datetime.now(tz = timezone.utc),
       user           : 'User.UserType.V',
-      khaleesiGate   : str             = 'metadata-khaleesi-gate',
-      khaleesiService: str             = 'metadata-khaleesi-service',
-      grpcService    : str             = 'metadata-grpc-service',
-      grpcMethod     : str             = 'metadata-grpc-method',
+      site           : str             = 'metadata-site',
+      app            : str             = 'metadata-app',
+      service        : str             = 'metadata-service',
+      method         : str             = 'metadata-method',
   ) -> RequestMetadata :
     """Fill gRPC request metadata for testing purposes."""
-    requestMetadata.httpCaller.requestId    = 'http-request-id'
-    requestMetadata.httpCaller.khaleesiGate = 'amazing-gate'
-    requestMetadata.httpCaller.path         = '/a/random/path'
-    requestMetadata.httpCaller.podId        = 'frontend-pod'
-    requestMetadata.grpcCaller.requestId       = 'grpc-request-id'
-    requestMetadata.grpcCaller.khaleesiGate    = khaleesiGate
-    requestMetadata.grpcCaller.khaleesiService = khaleesiService
-    requestMetadata.grpcCaller.grpcService     = grpcService
-    requestMetadata.grpcCaller.grpcMethod      = grpcMethod
-    requestMetadata.grpcCaller.podId           = 'random-pod'
+    requestMetadata.httpCaller.requestId = 'http-request-id'
+    requestMetadata.httpCaller.site      = 'amazing-site'
+    requestMetadata.httpCaller.path      = '/a/random/path'
+    requestMetadata.httpCaller.podId     = 'frontend-pod'
+    requestMetadata.grpcCaller.requestId  = 'grpc-request-id'
+    requestMetadata.grpcCaller.site       = site
+    requestMetadata.grpcCaller.app        = app
+    requestMetadata.grpcCaller.service    = service
+    requestMetadata.grpcCaller.method     = method
+    requestMetadata.grpcCaller.podId      = 'random-pod'
     requestMetadata.user.id   = 'metadata-user-id'
     requestMetadata.user.type = user
     requestMetadata.timestamp.FromDatetime(now)

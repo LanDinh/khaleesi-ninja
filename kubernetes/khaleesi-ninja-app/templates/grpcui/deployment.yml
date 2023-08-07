@@ -1,0 +1,44 @@
+{{- if .Values.grpcui.enabled }}
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-grpcui"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
+  labels:
+    khaleesi-ninja: "app"
+    site: "{{ .Values.site.name }}"
+    name: "{{ .Values.app.name }}"
+    type: "grpcui"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      khaleesi-ninja: "app"
+      site: "{{ .Values.site.name }}"
+      name: "{{ .Values.app.name }}"
+      type: "grpcui"
+  template:
+    metadata:
+      labels:
+        khaleesi-ninja: "app"
+        site: "{{ .Values.site.name }}"
+        name: "{{ .Values.app.name }}"
+        type: "grpcui"
+    spec:
+      containers:
+        - name: "grpcui"
+          image: "fullstorydev/grpcui:{{ .Values.grpcui.version }}"
+          imagePullPolicy: "Always"
+          args: [ "-port=9000", "-plaintext", "{{ .Values.site.name }}-{{ .Values.app.name }}:8000" ]
+          ports:
+            - name: "grpcui"
+              containerPort: 9000
+          readinessProbe:
+            httpGet:
+              path: "/"
+              port: "grpcui"
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: "grpcui"
+{{- end }}

@@ -43,7 +43,7 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
     """Get the owner of an instance."""
     user = User()
     user.type = User.UserType.SYSTEM
-    user.id   = f'{khaleesiSettings["METADATA"]["GATE"]}-{khaleesiSettings["METADATA"]["SERVICE"]}'
+    user.id   = f'{khaleesiSettings["METADATA"]["SITE"]}-{khaleesiSettings["METADATA"]["APP"]}'
     return user
 
   def khaleesiSave(
@@ -116,12 +116,12 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
   ) -> None :
     """Log a CRUD event."""
     event = Event()
-    event.target.id = self.khaleesiId
+    event.target.id   = self.khaleesiId
     event.target.type = self.modelType()
     event.target.owner.CopyFrom(self.khaleesiOwner)
     event.action.crudType = action
-    event.action.result = result
-    event.action.details = details
+    event.action.result   = result
+    event.action.details  = details
     SINGLETON.structuredLogger.logEvent(event = event)
 
   class Meta(BaseModel.Meta):

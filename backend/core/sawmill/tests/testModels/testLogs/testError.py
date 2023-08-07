@@ -41,10 +41,10 @@ class ErrorTestCase(SimpleTestCase):
           # Assert result.
           metadata.assert_called_once()
           parent.assert_called_once()
-          self.assertEqual(grpc.error.publicDetails  , instance.publicDetails)
-          self.assertEqual(grpc.error.privateMessage , instance.privateMessage)
-          self.assertEqual(grpc.error.privateDetails , instance.privateDetails)
-          self.assertEqual(grpc.error.stacktrace     , instance.stacktrace)
+          self.assertEqual(grpc.error.publicDetails , instance.publicDetails)
+          self.assertEqual(grpc.error.privateMessage, instance.privateMessage)
+          self.assertEqual(grpc.error.privateDetails, instance.privateDetails)
+          self.assertEqual(grpc.error.stacktrace    , instance.stacktrace)
 
   @patch('microservice.models.logs.error.parseString')
   @patch('microservice.models.logs.error.Model.khaleesiSave')
@@ -108,8 +108,8 @@ class ErrorTestCase(SimpleTestCase):
           instance = Error(
             status         = status.name,
             loglevel       = loglevel.name,
-            gate           = 'gate',
-            service        = 'service',
+            site           = 'site',
+            app            = 'app',
             publicKey      = 'public-key',
             publicDetails  = 'public-details',
             privateMessage = 'private-message',
@@ -121,8 +121,8 @@ class ErrorTestCase(SimpleTestCase):
           # Assert result.
           self.assertEqual(instance.status        , result.error.status)
           self.assertEqual(instance.loglevel      , result.error.loglevel)
-          self.assertEqual(instance.gate          , result.error.gate)
-          self.assertEqual(instance.service       , result.error.service)
+          self.assertEqual(instance.site          , result.error.site)
+          self.assertEqual(instance.app           , result.error.app)
           self.assertEqual(instance.publicKey     , result.error.publicKey)
           self.assertEqual(instance.publicDetails , result.error.publicDetails)
           self.assertEqual(instance.privateMessage, result.error.privateMessage)
@@ -145,8 +145,8 @@ class ErrorTestCase(SimpleTestCase):
 
     grpc.error.status         = status.name
     grpc.error.loglevel       = loglevel.name
-    grpc.error.gate           = 'gate'
-    grpc.error.service        = 'service'
+    grpc.error.site           = 'site'
+    grpc.error.app            = 'app'
     grpc.error.publicKey      = 'public-key'
     grpc.error.publicDetails  = 'public-details'
     grpc.error.privateMessage = 'private-message'

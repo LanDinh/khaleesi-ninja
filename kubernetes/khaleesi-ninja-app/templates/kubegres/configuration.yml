@@ -1,0 +1,15 @@
+{{- if .Values.kubegres.enabled }}
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
+  labels:
+    khaleesi-ninja: "app"
+    site: "{{ .Values.site.name }}"
+    name: "{{ .Values.app.name }}"
+    type: "kubegres"
+data:
+  database: "{{ .Values.app.name }}"
+  user: "{{ .Values.app.name }}"
+{{- end }}

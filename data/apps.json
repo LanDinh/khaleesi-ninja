@@ -1,0 +1,6 @@
+[
+  { "site": "core", "name": "khaleesi_backend_tests", "type": "micro", "version": "1.0.0", "deploy": "false" },
+  { "site": "khaleesi_frontend_tests", "name": "frontend", "type": "frontend", "version": "1.0.0", "deploy": "false" },
+  { "site": "core", "name": "sawmill", "type": "micro", "version": "1.0.0", "deploy": "true" },
+  { "site": "core", "name": "clocktower", "type": "micro", "version": "1.0.0", "deploy": "true" }
+]

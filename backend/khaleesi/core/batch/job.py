@@ -130,9 +130,9 @@ class BaseJob(ABC, Generic[M]):
     return khaleesiSettings['BATCH']['TARGET_TYPE']
 
   def owner(self) -> User :
-    """Return the owner of the target resources. By default, this is the service."""
+    """Return the owner of the target resources. By default, this is the app."""
     owner = User()
-    owner.id   = f'{khaleesiSettings["METADATA"]["GATE"]}-{khaleesiSettings["METADATA"]["SERVICE"]}'
+    owner.id   = f'{khaleesiSettings["METADATA"]["SITE"]}-{khaleesiSettings["METADATA"]["APP"]}'
     owner.type = User.UserType.SYSTEM
     return owner
 

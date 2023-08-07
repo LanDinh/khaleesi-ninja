@@ -14,10 +14,10 @@ class ForesterServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch('microservice.service.forester.SERVICE_REGISTRY')
-  def testGetServiceCallData(self, serviceRegistry: MagicMock, *_: MagicMock) -> None :
+  @patch('microservice.service.forester.SITE_REGISTRY')
+  def testGetAppCallData(self, siteRegistry: MagicMock, *_: MagicMock) -> None :
     """Test getting service call data."""
     # Execute test.
-    self.service.GetServiceCallData(EmptyRequest(), MagicMock())
+    self.service.GetAppCallData(EmptyRequest(), MagicMock())
     # Assert result.
-    serviceRegistry.getCallData.assert_called_once()
+    siteRegistry.getCallData.assert_called_once()

@@ -102,8 +102,8 @@ message Event {
 message Error {
   string status          = 1;
   string loglevel        = 2;
-  string gate            = 3;
-  string service         = 4;
+  string site            = 3;
+  string app         = 4;
   string publicKey       = 5;
   string publicDetails   = 6;
   string privateMessage  = 7;
@@ -246,10 +246,10 @@ message CallData {
   repeated khaleesi.core.GrpcCallerDetails calledBy = 3;
 }
 
-message ServiceCallData {
+message AppCallData {
   repeated CallData callList = 1;
 }
 
 service Forester {
-  rpc GetServiceCallData (khaleesi.core.EmptyRequest) returns (ServiceCallData);
+  rpc GetAppCallData (khaleesi.core.EmptyRequest) returns (AppCallData);
 }

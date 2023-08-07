@@ -16,8 +16,8 @@ class KhaleesiExceptionTestCase(SimpleTestCase):
   """Test the exceptions."""
 
   data = {
-      'gate'           : 'gate',
-      'service'        : 'service',
+      'site'           : 'site',
+      'app'            : 'app',
       'publicKey'      : 'public-key',
       'publicDetails'  : 'public-details',
       'privateMessage' : 'private-message',
@@ -37,7 +37,7 @@ class KhaleesiExceptionTestCase(SimpleTestCase):
           # Assert result.
           self.assertIn('privateMessage', result)
           self.assertIn('privateDetails', result)
-          self.assertIn('stacktrace', result)
+          self.assertIn('stacktrace'    , result)
 
   @override_settings(DEBUG = False)
   def testOnlyPublicDetailsInProductionMode(self) -> None :
@@ -52,4 +52,4 @@ class KhaleesiExceptionTestCase(SimpleTestCase):
           # Assert result.
           self.assertNotIn('privateMessage', result)
           self.assertNotIn('privateDetails', result)
-          self.assertNotIn('stacktrace', result)
+          self.assertNotIn('stacktrace'    , result)

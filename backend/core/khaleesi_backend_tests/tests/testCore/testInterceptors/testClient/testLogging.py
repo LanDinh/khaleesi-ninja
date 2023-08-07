@@ -66,7 +66,7 @@ class LoggingClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase):
     # Execute test.
     self.interceptor.khaleesiIntercept(
       requestOrIterator = finalRequest,
-      **self.getInterceptParams(method = lambda *args : response),
+      **self.getInterceptParams(executableMethod = lambda *args : response),
     )
     # Assert result.
     self.assertEqual(2, logger.info.call_count)
@@ -91,7 +91,8 @@ class LoggingClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase):
           with self.assertRaises(UpstreamGrpcException):
             self.interceptor.khaleesiIntercept(
               requestOrIterator = finalRequest,
-              **self.getInterceptParams(method = partial(
+              **self.getInterceptParams(
+                executableMethod = partial(
                 lambda innerResponse, *args : innerResponse,
                 response,
               )),

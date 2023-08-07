@@ -1,6 +1,6 @@
 # core
 
-This app contains the common logic shared by all apps.
+This site contains the common logic shared by all sites.
 
 ![Core Structure](/documentation/images/logical-structure/core.svg)
 
@@ -10,7 +10,7 @@ This app contains the common logic shared by all apps.
 
 ## sawmill
 
-This service is responsible for logging.
+This app is responsible for logging.
 
 ![Sawmill Structure](/documentation/images/logical-structure/core-sawmill.svg)
 

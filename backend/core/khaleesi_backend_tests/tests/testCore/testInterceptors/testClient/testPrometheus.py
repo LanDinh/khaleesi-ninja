@@ -54,7 +54,7 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
       metric: MagicMock,
       *,
       requestMetadata: RequestMetadata,
-      finalRequest: Any,
+      finalRequest   : Any,
   ) -> None :
     """Test the counter gets incremented."""
     for code in StatusCode:
@@ -66,7 +66,8 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
         # Execute test.
         self.interceptor.khaleesiIntercept(
           requestOrIterator = finalRequest,
-          **self.getInterceptParams(method = partial(
+          **self.getInterceptParams(
+            executableMethod = partial(
             lambda innerResponse, *args : innerResponse,
             response,
           )),
@@ -80,9 +81,9 @@ class PrometheusClientInterceptorTest(ClientInterceptorTestMixin, SimpleTestCase
 
   def _assertMetricCall(
       self, *,
-      metric: MagicMock,
+      metric         : MagicMock,
       requestMetadata: RequestMetadata,
-      status: StatusCode,
+      status         : StatusCode,
   ) -> None :
     """Assert the metric call was correct."""
     metric.inc.assert_called_once()

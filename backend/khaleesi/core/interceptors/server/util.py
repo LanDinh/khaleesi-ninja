@@ -29,10 +29,10 @@ class ServerInterceptor(Interceptor, GrpcServerInterceptor):
       return method(request_or_iterator, context)
 
     return self.khaleesiIntercept(
-      method     = method,
-      request    = request_or_iterator,
-      context    = context,
-      methodName = method_name,
+      executableMethod = method,
+      request          = request_or_iterator,
+      context          = context,
+      rawMethod        = method_name,
     )
 
   def getUpstreamRequest(self, *, request: Any) -> RequestMetadata :

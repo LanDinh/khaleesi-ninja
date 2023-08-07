@@ -20,21 +20,21 @@ def addSystemRequestMetadata(
     metadata     : RequestMetadata,
     httpRequestId: str,
     grpcRequestId: str,
-    grpcMethod   : str,
+    method       : str,
 ) -> None :
   """Add request metadata to request protobufs."""
   systemConfiguration = khaleesiSettings['GRPC']['SERVER_METHOD_NAMES']
 
   # Systems won't call HTTP endpoints directly.
-  metadata.httpCaller.requestId    = httpRequestId
-  metadata.httpCaller.khaleesiGate = khaleesiSettings['METADATA']['GATE']
-  metadata.httpCaller.path         = '/'
-  metadata.httpCaller.podId        = ''
+  metadata.httpCaller.requestId = httpRequestId
+  metadata.httpCaller.site      = khaleesiSettings['METADATA']['SITE']
+  metadata.httpCaller.path      = '/'
+  metadata.httpCaller.podId     = ''
 
   # gRPC details are specified in the configuration.
-  metadata.grpcCaller.requestId    = grpcRequestId
-  metadata.grpcCaller.grpcService  = systemConfiguration['SERVICE_NAME']
-  metadata.grpcCaller.grpcMethod   = systemConfiguration[grpcMethod]['METHOD']  # type: ignore[literal-required]  # pylint: disable=line-too-long
+  metadata.grpcCaller.requestId = grpcRequestId
+  metadata.grpcCaller.service   = systemConfiguration['SERVICE_NAME']
+  metadata.grpcCaller.method    = systemConfiguration[method]['METHOD']  # type: ignore[literal-required]  # pylint: disable=line-too-long
 
   # User details are specified in the configuration.
   metadata.user.id   = systemConfiguration['USER_ID']
@@ -48,7 +48,7 @@ def addRequestMetadata(*, metadata : RequestMetadata) -> None :
 
 def _addCommonRequestMetadata(*, metadata: RequestMetadata) -> None :
   """Add request metadata to request protobufs."""
-  metadata.grpcCaller.khaleesiGate    = khaleesiSettings['METADATA']['GATE']
-  metadata.grpcCaller.khaleesiService = khaleesiSettings['METADATA']['SERVICE']
-  metadata.grpcCaller.podId           = khaleesiSettings['METADATA']['POD_ID']
+  metadata.grpcCaller.site  = khaleesiSettings['METADATA']['SITE']
+  metadata.grpcCaller.app   = khaleesiSettings['METADATA']['APP']
+  metadata.grpcCaller.podId = khaleesiSettings['METADATA']['POD_ID']
   metadata.timestamp.FromDatetime(datetime.now(tz = timezone.utc))

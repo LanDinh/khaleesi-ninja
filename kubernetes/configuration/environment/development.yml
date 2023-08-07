@@ -3,7 +3,7 @@ environment:
   name: "development"
   domain: "development.khaleesi.ninja"
   development_credentials: true
-service:
+app:
   version: "latest-development"
   replicas: 1
   image_pull_policy: "Never"

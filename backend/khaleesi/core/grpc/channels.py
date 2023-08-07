@@ -26,9 +26,9 @@ class ChannelManager:
   def __init__(self) -> None :
     self.channels = {}
 
-  def getChannel(self, *, gate: str, service: str) -> grpc.Channel :
+  def getChannel(self, *, site: str, app: str) -> grpc.Channel :
     """Get the named channel. If it doesn't exist yet, it is opened."""
-    address = f'{gate}-{service}'
+    address = f'{site}-{app}'
     port    = khaleesiSettings["GRPC"]["PORT"]
     if not address in self.channels:
       channel = grpc.insecure_channel(f'{address}:{port}')

@@ -1,0 +1,4 @@
+app:
+  name: "${APP}"
+  version: "1.0.0"
+  replicas: 1

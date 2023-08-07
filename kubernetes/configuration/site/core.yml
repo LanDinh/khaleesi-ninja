@@ -1,0 +1,5 @@
+site:
+  name: "core"
+kubegres:
+  replicas: 1
+  size: "200Mi"

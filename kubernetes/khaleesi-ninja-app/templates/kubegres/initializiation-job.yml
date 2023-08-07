@@ -1,0 +1,79 @@
+{{- if .Values.kubegres.enabled }}
+apiVersion: "batch/v1"
+kind: "Job"
+metadata:
+  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres-initialization"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
+  labels:
+    khaleesi-ninja: "app"
+    site: "{{ .Values.site.name }}"
+    name: "{{ .Values.app.name }}"
+    type: "kubegres"
+spec:
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        job: "true"
+    spec:
+      containers:
+        - name: "create-user-and-database"
+          image: "{{ .Values.kubegres.image }}"
+          command: [ "bin/bash", "/config/perform-initialization.sh"{{ if .Values.app.drop_database }}, "drop_database"{{ end }} ]
+          volumeMounts:
+            - name: "kubegres-initialization"
+              readOnly: true
+              mountPath: "/config"
+          env:
+            - name: "PGHOST"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "host"
+            - name: "PGPORT"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "port"
+            - name: "PGUSER"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "superUser"
+            - name: "PGPASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "superUserPassword"
+            - name: "KHALEESI_DATABASE_NAME"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+                  key: "database"
+            - name: "KHALEESI_DATABASE_SUPERUSER"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "superUser"
+            - name: "KHALEESI_DATABASE_SUPERUSER_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "superUserPassword"
+            - name: "KHALEESI_DATABASE_USER"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+                  key: "user"
+            - name: "KHALEESI_DATABASE_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+                  key: "password"
+      volumes:
+        - name: "kubegres-initialization"
+          configMap:
+            name: "kubegres-initialization"
+      restartPolicy: "Never"
+  backoffLimit: 1
+{{- end }}

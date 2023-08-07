@@ -20,7 +20,7 @@ from khaleesi.core.metrics.requests import INCOMING_REQUESTS, OUTGOING_REQUESTS,
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import ProgrammingException
 from khaleesi.proto.core_pb2 import User, RequestMetadata, GrpcCallerDetails, EmptyRequest
-from khaleesi.proto.core_sawmill_pb2 import Event, EventRequest, ServiceCallData
+from khaleesi.proto.core_sawmill_pb2 import Event, EventRequest, AppCallData
 from khaleesi.proto.core_sawmill_pb2_grpc import ForesterStub
 
 
@@ -30,16 +30,16 @@ khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
 @dataclass
 class GrpcData:
   """Data representing gRPC calls."""
-  khaleesiGate   : str
-  khaleesiService: str
-  grpcService    : str
-  grpcMethod     : str
+  site   : str
+  app    : str
+  service: str
+  method : str
 
 
 @dataclass
 class EventData:
   """Data for initializing event metrics."""
-  caller: GrpcData
+  caller    : GrpcData
   targetType: str
   userTypes: List['User.UserType.V'] = field(
     default_factory = lambda: [ v for l, v in User.UserType.items() ],
@@ -76,19 +76,19 @@ class BaseMetricInitializer(ABC):
     self._initializeEvents(events = events)
 
   @abstractmethod
-  def getServiceCallData(self, *, request: EmptyRequest) -> ServiceCallData :
-    """Fetch service registry data."""
+  def getAppCallData(self, *, request: EmptyRequest) -> AppCallData :
+    """Fetch app registry data."""
 
-  def requests(self) -> ServiceCallData :
+  def requests(self) -> AppCallData :
     """Fetch the data for request metrics."""
     request = EmptyRequest()
     addSystemRequestMetadata(
       metadata      = request.requestMetadata,
       httpRequestId = self.httpRequestId,
       grpcRequestId = self.grpcRequestId,
-      grpcMethod    = 'INITIALIZE_REQUEST_METRICS',
+      method = 'INITIALIZE_REQUEST_METRICS',
     )
-    return self.getServiceCallData(request = request)
+    return self.getAppCallData(request = request)
 
   def _initializeRequests(self) -> None :
     """Initialize the request metrics to 0."""
@@ -96,7 +96,7 @@ class BaseMetricInitializer(ABC):
     for request in requests.callList:
       requestMetadata = RequestMetadata()
       self._buildRequestMetadata(requestMetadata = requestMetadata, caller = request.call)
-      if requestMetadata.grpcCaller.grpcService == self.ownName:
+      if requestMetadata.grpcCaller.service == self.ownName:
         userList = [ (User.UserType.Name(User.UserType.SYSTEM), User.UserType.SYSTEM) ]
       else:
         userList = User.UserType.items()
@@ -124,7 +124,7 @@ class BaseMetricInitializer(ABC):
     """Register the request to the specified metric."""
     peer = RequestMetadata()
     self._buildRequestMetadata(requestMetadata = peer, caller = rawPeer)
-    if peer.grpcCaller.grpcService == self.ownName and \
+    if peer.grpcCaller.service == self.ownName and \
         requestMetadata.user.type != User.UserType.SYSTEM:
       return  # pragma: no cover
     for status in StatusCode:
@@ -134,13 +134,13 @@ class BaseMetricInitializer(ABC):
   def _buildRequestMetadata(
       self, *,
       requestMetadata: RequestMetadata,
-      caller: GrpcCallerDetails,
+      caller         : GrpcCallerDetails,
   ) -> None :
     """Build the request metadata to register metrics."""
-    requestMetadata.grpcCaller.khaleesiGate    = caller.khaleesiGate
-    requestMetadata.grpcCaller.khaleesiService = caller.khaleesiService
-    requestMetadata.grpcCaller.grpcService     = caller.grpcService
-    requestMetadata.grpcCaller.grpcMethod      = caller.grpcMethod
+    requestMetadata.grpcCaller.site    = caller.site
+    requestMetadata.grpcCaller.app     = caller.app
+    requestMetadata.grpcCaller.service = caller.service
+    requestMetadata.grpcCaller.method  = caller.method
 
   def _initializeEvents(self, *, events: List[EventData]) -> None :
     """Initialize the event metrics to 0."""
@@ -177,13 +177,13 @@ class BaseMetricInitializer(ABC):
         privateDetails = '',
       )
     event = EventRequest()
-    event.requestMetadata.user.type                  = userType
-    event.requestMetadata.grpcCaller.khaleesiGate    = eventData.caller.khaleesiGate
-    event.requestMetadata.grpcCaller.khaleesiService = eventData.caller.khaleesiService
-    event.requestMetadata.grpcCaller.grpcService     = eventData.caller.grpcService
-    event.requestMetadata.grpcCaller.grpcMethod      = eventData.caller.grpcMethod
-    event.event.target.type                          = eventData.targetType
-    event.event.action.result                        = resultType
+    event.requestMetadata.user.type          = userType
+    event.requestMetadata.grpcCaller.site    = eventData.caller.site
+    event.requestMetadata.grpcCaller.app     = eventData.caller.app
+    event.requestMetadata.grpcCaller.service = eventData.caller.service
+    event.requestMetadata.grpcCaller.method  = eventData.caller.method
+    event.event.target.type                  = eventData.targetType
+    event.event.action.result                = resultType
 
     if actionCrudType:
       event.event.action.crudType = actionCrudType
@@ -195,15 +195,15 @@ class BaseMetricInitializer(ABC):
 
 # noinspection PyAbstractClass
 class MetricInitializer(BaseMetricInitializer):
-  """MetricInitializer which gets service registry data via gRPC."""
+  """MetricInitializer which gets app registry data via gRPC."""
 
   stub    : ForesterStub
 
   def __init__(self, *, httpRequestId: str) -> None :
     super().__init__(httpRequestId = httpRequestId)
-    channel = CHANNEL_MANAGER.getChannel(gate = 'core', service = 'sawmill')
+    channel   = CHANNEL_MANAGER.getChannel(site = 'core', app = 'sawmill')
     self.stub = ForesterStub(channel)  # type: ignore[no-untyped-call]
 
-  def getServiceCallData(self, *, request: EmptyRequest) -> ServiceCallData :
+  def getAppCallData(self, *, request: EmptyRequest) -> AppCallData :
     """Fetch the data for request metrics."""
-    return cast(ServiceCallData, self.stub.GetServiceCallData(request))
+    return cast(AppCallData, self.stub.GetAppCallData(request))

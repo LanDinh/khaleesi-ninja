@@ -5,9 +5,9 @@
 FROM node:20.2.0-slim as base
 
 # Arguments & environment.
-ARG gate
+ARG site
 ARG version
-ENV KHALEESI_GATE=${gate}
+ENV SITE=${site}
 ENV KHALEESI_VERSION=${version}
 
 # Metadata.
@@ -17,14 +17,14 @@ COPY ./package-lock.json /code/
 COPY ./tsconfig.json /code/
 COPY ./remix.config.js /code/
 COPY ./remix.env.d.ts /code/
-RUN sed -i "s/\${KHALEESI_GATE}/${KHALEESI_GATE}/" "/code/package.json"
+RUN sed -i "s/\${SITE}/${SITE}/" "/code/package.json"
 RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package.json"
-RUN sed -i "s/\${KHALEESI_GATE}/${KHALEESI_GATE}/" "/code/package-lock.json"
+RUN sed -i "s/\${SITE}/${SITE}/" "/code/package-lock.json"
 RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package-lock.json"
 RUN mkdir node_modules && npm ci
 
 # Data.
-COPY ./${KHALEESI_GATE}/ /code/
+COPY ./${SITE}/ /code/
 RUN rm /code/app/khaleesi
 COPY ./khaleesi/app/khaleesi/ /code/app/khaleesi/
 
@@ -34,8 +34,8 @@ COPY ./khaleesi/app/khaleesi/ /code/app/khaleesi/
 FROM base AS development-base
 
 # Arguments & environment.
-ARG gate
-ENV KHALEESI_GATE=${gate}
+ARG site
+ENV SITE=${site}
 
 # Data.
 COPY ./.eslintrc.js /code/
@@ -49,13 +49,13 @@ FROM node:20.2.0-slim as development
 LABEL environment=development
 
 # Arguments & environment.
-ARG gate
+ARG site
 ENV PORT=8000
-ENV KHALEESI_GATE=${gate}
+ENV SITE=${site}
 
 # Data.
-WORKDIR /code/frontend/${KHALEESI_GATE}/
-COPY --from=development-base /code/ /code/frontend/${KHALEESI_GATE}/
+WORKDIR /code/frontend/${SITE}/
+COPY --from=development-base /code/ /code/frontend/${SITE}/
 RUN chmod +x ./execute.sh
 
 # Execute the tests.
@@ -68,9 +68,9 @@ CMD ["run"]
 FROM base AS production
 
 # Arguments & environment.
-ARG gate
+ARG site
 ENV PORT=8000
-ENV KHALEESI_GATE=${gate}
+ENV SITE=${site}
 
 # Data.
 WORKDIR /code/

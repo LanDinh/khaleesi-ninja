@@ -99,7 +99,7 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
             self.interceptor.khaleesiIntercept(
               request = finalRequest,
               **self.getInterceptParams(
-                method = khaleesiRaisingMethod(status = status, loglevel = loglevel),
+                executableMethod = khaleesiRaisingMethod(status = status, loglevel = loglevel),
               ),
             )
           # Assert result.
@@ -115,14 +115,14 @@ class PrometheusServerInterceptorTest(ServerInterceptorTestMixin, SimpleTestCase
       metric: MagicMock,
       *,
       requestMetadata: RequestMetadata,
-      finalRequest: Any,
+      finalRequest   : Any,
   ) -> None :
     """Test the counter gets incremented."""
     # Execute test.
     with self.assertRaises(Exception):
       self.interceptor.khaleesiIntercept(
         request = finalRequest,
-        **self.getInterceptParams(method = exceptionRaisingMethod()),
+        **self.getInterceptParams(executableMethod = exceptionRaisingMethod()),
       )
     # Assert result.
     self._assertMetricCall(

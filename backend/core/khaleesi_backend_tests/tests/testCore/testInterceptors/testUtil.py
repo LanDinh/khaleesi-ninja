@@ -12,24 +12,22 @@ class InterceptorTest(SimpleTestCase):
 
   def testProcessMethodName(self) -> None :
     """Test the method name gets processed correctly."""
-    for description, iGate, iService, iGrpcService, iGrpcMethod, raw in [
-        ( 'full', 'gate', 'service', 'GrpcService', 'Method', '/khaleesi.gate.service.GrpcService/Method' ),  # pylint: disable=line-too-long
-        ( 'no g service', 'gate', 'service', 'UNKNOWN', 'Method', '/khaleesi.gate.service/Method' ),
-        ( 'no k service', 'gate', 'UNKNOWN', 'UNKNOWN', 'Method', '/khaleesi.gate/Method' ),
-        ( 'no service', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'Method', '/khaleesi/Method' ),
-        ( 'no method', 'gate', 'service', 'GrpcService', 'UNKNOWN', '/khaleesi.gate.service.GrpcService/' ),  # pylint: disable=line-too-long
+    for description, iSite, iApp, iService, iMethod, raw in [
+        ( 'full' , 'site', 'app', 'Service', 'Method', '/khaleesi.site.app.Service/Method' ),
+        ( 'no service', 'site', 'app', 'UNKNOWN', 'Method', '/khaleesi.site.app/Method' ),
+        ( 'no app', 'site', 'UNKNOWN', 'UNKNOWN', 'Method', '/khaleesi.site/Method' ),
+        ( 'no site', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'Method', '/khaleesi/Method' ),
+        ( 'no method', 'site', 'app', 'Service', 'UNKNOWN', '/khaleesi.site.app.Service/' ),
         ( 'empty input', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', '' ),
     ]:
       with self.subTest(case = description):
         # Execute test.
-        oGate, oService, oGrpcService, oGrpcMethod = self.interceptor.processMethodName(
-          raw = raw,
-        )
+        oSite, oApp, oService, oMethod = self.interceptor.processMethodName(raw = raw)
         # Assert result.
-        self.assertEqual(iGate       , oGate)
-        self.assertEqual(iService    , oService)
-        self.assertEqual(iGrpcService, oGrpcService)
-        self.assertEqual(iGrpcMethod , oGrpcMethod)
+        self.assertEqual(iSite   , oSite)
+        self.assertEqual(iApp    , oApp)
+        self.assertEqual(iService, oService)
+        self.assertEqual(iMethod , oMethod)
 
   def testSkipInterceptors(self) -> None :
     """Test skipping of interceptors."""

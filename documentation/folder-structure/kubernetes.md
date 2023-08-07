@@ -4,7 +4,7 @@
 
 ![Kubernetes Logical Structure](/documentation/images/folder-structure/kubernetes-logical-structure.svg)
 
-Each app has the same base structure within kubernetes.
+Each site has the same base structure within kubernetes.
 
 It has a `frontend`, which serves the SPA to the user via an `ingress` configuration.
 There are multiple `microservices` which have access to their own `postgres` databases deployed by `kubegres`.
@@ -14,11 +14,11 @@ One `prometheus` instance scrapes metrics from everywhere, and they are availabl
 
 ### Conventions
 
-| Port | Use             |
-|------|-----------------|
-| 8000 | General service |
-| 8010 | Sidecar proxy   |
-| 8020 | Metrics         |
+| Port | Use           |
+|------|---------------|
+| 8000 | General app   |
+| 8010 | Sidecar proxy |
+| 8020 | Metrics       |
 
 ## Folder Structure
 
@@ -29,15 +29,15 @@ All kubernetes configuration is managed via `helm` charts.
 The configuration consists of four parts, all of which must be specified when installing a helm chart:
 
 * environment: this contains environment-specific configuration like e.g. the domain used for that environment
-* app: this contains app-specific configuration, like e.g. the number of postgres replicas to use for the database
-* type: this contains service-type specific configuration, like e.g. if an ingress resource should be set up
-* service: this contains service-specific configuration, like e.g. how many replicas should be used for that service
+* site: this contains site-specific configuration, like e.g. the number of postgres replicas to use for the database
+* type: this contains app-type specific configuration, like e.g. if an ingress resource should be set up
+* app: this contains app-specific configuration, like e.g. how many replicas should be used for that app
 * third-party: this contains configuration necessary for third parties
   * `kube-prometheus-stack.yml` is the configuration of the monitoring stack
 
 The combination of these parts must provide valid input for the helm charts.
 They are passed in order, with the exception of the environment, which is last.
-That way, the more specific types can override the less specific configuration, with the environment bein able to override everything (e.g. in `development`, only a single replica is required per service).
+That way, the more specific types can override the less specific configuration, with the environment bein able to override everything (e.g. in `development`, only a single replica is required per app).
 
 ### `khaleesi-ninja-cluster`
 
@@ -64,9 +64,9 @@ Additionally, the following resources are necessary for monitoring:
 * `grafana` datasource for the `prometheus` instance, including custom dashboards
 * `ingress` making monitoring accessible
     
-### `khaleesi-ninja-app`
+### `khaleesi-ninja-site`
 
-This contains basic resources shared within an app:
+This contains basic resources shared within an site:
 
 * `kubegres` manifest to deploy a database cluster
 * `kubegres` instance configuration - this includes:
@@ -78,9 +78,9 @@ This contains basic resources shared within an app:
   * `kubegres` replication user password
 * `grafana` custom dashboards
 
-### `khaleesi-ninja-service`
+### `khaleesi-ninja-app`
 
-This contains manifests necessary for the services to work:
+This contains manifests necessary for the apps to work:
 
 * deployment
 * service

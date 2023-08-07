@@ -17,10 +17,10 @@ class LoggingServerInterceptor(ServerInterceptor):
 
   def khaleesiIntercept(
       self, *,
-      method : Callable[[Any, ServicerContext], Any],
-      request: Any,
-      context: ServicerContext,
-      **_    : Any,
+      executableMethod: Callable[[Any, ServicerContext], Any],
+      request         : Any,
+      context         : ServicerContext,
+      **_             : Any,
   ) -> Any :
     """Log the incoming request."""
 
@@ -29,7 +29,7 @@ class LoggingServerInterceptor(ServerInterceptor):
     )
 
     try:
-      response = method(request, context)
+      response = executableMethod(request, context)
       SINGLETON.structuredLogger.logGrpcResponse(status = StatusCode.OK)
       return response
     except KhaleesiException as exception:

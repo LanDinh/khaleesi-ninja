@@ -8,54 +8,54 @@ from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 from microservice.metricInitializer import MetricInitializer
-from microservice.models.serviceRegistry import (
-  KhaleesiGate,
-  KhaleesiService,
-  GrpcService,
-  GrpcMethod,
+from microservice.models.siteRegistry import (
+  Site,
+  App,
+  Service,
+  Method,
 )
 
 
 @patch('microservice.metricInitializer.BaseMetricInitializer.initializeMetricsWithData')
-@patch('microservice.metricInitializer.SERVICE_REGISTRY')
+@patch('microservice.metricInitializer.SITE_REGISTRY')
 class MetricInitializerTestCase(SimpleTestCase):
   """Test the metric initializer."""
 
-  def testInit(self, serviceRegistry: MagicMock, *_: MagicMock) -> None :
+  def testInit(self, siteRegistry: MagicMock, *_: MagicMock) -> None :
     """Test initialization."""
     # Prepare data & execute test.
     MetricInitializer(httpRequestId = 'http-request')
     # Assert result.
-    serviceRegistry.addService.assert_called_once()
+    siteRegistry.addService.assert_called_once()
 
-  def testRequests(self, serviceRegistry: MagicMock, *_: MagicMock) -> None :
+  def testRequests(self, siteRegistry: MagicMock, *_: MagicMock) -> None :
     """Test the requests are fetched correctly."""
     # Prepare data.
     metricInitializer = MetricInitializer(httpRequestId = 'http-request')
     # Execute test.
     metricInitializer.requests()
     # Assert result.
-    serviceRegistry.getCallData.assert_called_once()
+    siteRegistry.getCallData.assert_called_once()
 
   def testInitializeMetrics(
       self,
-      serviceRegistry: MagicMock,
+      siteRegistry: MagicMock,
       parent: MagicMock,
   ) -> None :
     """Test initialization of metrics."""
     # Prepare data.
     metricInitializer = MetricInitializer(httpRequestId = 'http-request')
-    khaleesiGateName    = 'khaleesi-gate'
-    khaleesiServiceName = 'khaleesi-service'
-    grpcServiceName     = 'grpc-server'
-    grpcMethodName      = 'lifecycle'
-    serviceRegistry.getServiceRegistry.return_value = {
-        khaleesiGateName: KhaleesiGate(
-          services = {
-              khaleesiServiceName: KhaleesiService(
+    siteName    = 'site'
+    appName     = 'app'
+    serviceName = 'grpc-server'
+    methodName  = 'lifecycle'
+    siteRegistry.getSiteRegistry.return_value = {
+        siteName: Site(
+          apps = {
+              appName: App(
                 services = {
-                    grpcServiceName: GrpcService(
-                      methods = { grpcMethodName: GrpcMethod() }
+                    serviceName: Service(
+                      methods = { methodName: Method() }
                     )
                 }
               )
@@ -68,12 +68,12 @@ class MetricInitializerTestCase(SimpleTestCase):
     parent.assert_called_once()
     arguments = parent.call_args
     start = False
-    end = False
+    end  = False
     for event in arguments.kwargs['events']:
-      self.assertEqual(khaleesiGateName     , event.caller.khaleesiGate)
-      self.assertEqual(khaleesiServiceName  , event.caller.khaleesiService)
-      self.assertEqual(grpcServiceName      , event.caller.grpcService)
-      self.assertEqual(grpcMethodName       , event.caller.grpcMethod)
+      self.assertEqual(siteName   , event.caller.site)
+      self.assertEqual(appName    , event.caller.app)
+      self.assertEqual(serviceName, event.caller.service)
+      self.assertEqual(methodName , event.caller.method)
       self.assertEqual('core.core.server'   , event.targetType)
       self.assertEqual(1                    , len(event.userTypes))
       self.assertEqual(User.UserType.SYSTEM , event.userTypes[0])

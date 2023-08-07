@@ -13,18 +13,18 @@ class InterceptorTestMixin(GrpcTestMixin):
   """Interceptor test utility."""
 
   emptyInput = {
-      'khaleesiGate'   : '',
-      'khaleesiService': '',
-      'grpcService'    : '',
-      'grpcMethod'     : '',
+      'site'   : '',
+      'app'    : '',
+      'service': '',
+      'method' : '',
   }
   metadataRequestParams: List[Tuple[str, Dict[str, Any]]] = [
-      ( 'full input'           , {} ),
-      ( 'empty khaleesiGate'   , { 'khaleesiGate'   : '' } ),
-      ( 'empty khaleesiService', { 'khaleesiService': '' } ),
-      ( 'empty grpcService'    , { 'grpcService'    : '' } ),
-      ( 'empty grpcMethod'     , { 'grpcMethod'     : '' } ),
-      ( 'empty input'          , emptyInput ),
+      ( 'full input'   , {} ),
+      ( 'empty site'   , { 'site'   : '' } ),
+      ( 'empty app'    , { 'app': '' } ),
+      ( 'empty service', { 'service'    : '' } ),
+      ( 'empty method' , { 'method'     : '' } ),
+      ( 'empty input'  , emptyInput ),
   ]
 
   def getRequest(
@@ -44,11 +44,11 @@ class InterceptorTestMixin(GrpcTestMixin):
 
   def getInterceptParams(
       self, *,
-      method: Callable[[], Any] = lambda *args : None,
+      executableMethod: Callable[[], Any] = lambda *args : None,
   ) -> Dict[str, Any] :
     """Get parameters to pass into the interceptor."""
     return {
-        'method': method,
+        'executableMethod': executableMethod,
     }
 
 class ServerInterceptorTestMixin(InterceptorTestMixin):
@@ -56,35 +56,35 @@ class ServerInterceptorTestMixin(InterceptorTestMixin):
 
   def getInterceptParams(
       self, *,
-      context   : MagicMock = MagicMock(),
-      method    : Callable[[], Any] = lambda *args : None,
-      methodName: str               = '/khaleesi.gate.service.serviceName/methodName',
+      context         : MagicMock = MagicMock(),
+      executableMethod: Callable[[], Any] = lambda *args : None,
+      rawMethod       : str               = '/khaleesi.site.service.serviceName/methodName',
   ) -> Dict[str, Any] :
     """Get parameters to pass into the server interceptor."""
     return {
-        'context'   : context,
-        'methodName': methodName,
-        **super().getInterceptParams(method = method),
+        'context'  : context,
+        'rawMethod': rawMethod,
+        **super().getInterceptParams(executableMethod = executableMethod),
     }
 
 class ClientInterceptorTestMixin(InterceptorTestMixin):
   """Server interceptor test utility."""
 
-  khaleesiGate    = 'Gate'
-  khaleesiService = 'Service'
-  grpcService     = 'service'
-  grpcMethod      = 'method'
+  site    = 'site'
+  app     = 'app'
+  service = 'service'
+  method  = 'method'
 
   def getInterceptParams(
       self, *,
-      method: Callable[[], Any] = lambda *args : None,
+      executableMethod: Callable[[], Any] = lambda *args : None,
   ) -> Dict[str, Any] :
     """Get parameters to pass into the server interceptor."""
     return {
-        'callDetails'    : MagicMock(),
-        'khaleesiGate'   : self.khaleesiGate,
-        'khaleesiService': self.khaleesiService,
-        'grpcService'    : self.grpcService,
-        'grpcMethod'     : self.grpcMethod,
-        **super().getInterceptParams(method = method),
+        'callDetails': MagicMock(),
+        'site'       : self.site,
+        'app'        : self.app,
+        'service'    : self.service,
+        'method'     : self.method,
+        **super().getInterceptParams(executableMethod = executableMethod),
     }

@@ -42,10 +42,7 @@ class ServerTestCase(SimpleTestCase):
   def testInitializationSuccess(self, *_: MagicMock) -> None :
     """Test initialization success."""
     # Execute test & assert result.
-    Server(
-      startHttpRequestId      = 'http-request-id',
-      initializeGrpcRequestId = 'grpc-request-id',
-    )
+    Server(startHttpRequestId = 'http-request-id', initializeGrpcRequestId = 'grpc-request-id')
 
   def testInitializationKhaleesiFailure(
       self,
@@ -331,7 +328,7 @@ class ServerTestCase(SimpleTestCase):
   ) -> None :
     """Assert the result."""
     kwargs = singleton.structuredLogger.logSystemEvent.call_args.kwargs
-    self.assertEqual(kwargs['grpcMethod']             , 'LIFECYCLE')
+    self.assertEqual(kwargs['method']                 , 'LIFECYCLE')
     self.assertEqual(kwargs['event'].target.owner.type, User.UserType.SYSTEM)
     self.assertEqual(kwargs['event'].action.crudType  , action)
     self.assertEqual(kwargs['event'].action.result    , result)

@@ -21,8 +21,8 @@ def defaultKhaleesiException(*, status: StatusCode, loglevel: LogLevel) -> Khale
   return KhaleesiException(
     status         = status,
     loglevel       = loglevel,
-    gate           = 'gate',
-    service        = 'service',
+    site           = 'site',
+    app            = 'app',
     publicKey      = 'public-key',
     publicDetails  = 'public-details',
     privateMessage = 'private-message',

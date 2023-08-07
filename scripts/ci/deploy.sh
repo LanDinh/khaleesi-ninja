@@ -17,19 +17,19 @@ clear_color='\033[0m'
 environment=${1}
 
 
-deploy_service() {
-  local gate=${1}
-  local service=${2}
+deploy_app() {
+  local site=${1}
+  local app=${2}
   local type=${3}
   local version=${4}
   local deploy=${5}
 
-  echo -e "${yellow}Deploying the service...${clear_color}"
-  ./scripts/deploy.sh "${gate}" "${service}" "${type}" "${version}" "${deploy}" "${environment}"
+  echo -e "${yellow}Deploying the app...${clear_color}"
+  ./scripts/deploy.sh "${site}" "${app}" "${type}" "${version}" "${deploy}" "${environment}"
 }
 
 echo -e "${magenta}Uploading the images...${clear_color}"
 # shellcheck disable=SC2068
-. scripts/util/service_loop.sh deploy_service
+. scripts/util/app_loop.sh deploy_app
 
 echo -e "${green}DONE! :D${clear_color}"

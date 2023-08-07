@@ -5,24 +5,24 @@ import { khaleesi } from '../proto/proto'
 
 export class Client<Type extends $protobuf.rpc.Service> {
 
-  gate: string
-  service: string
+  site: string
+  app: string
   stubName: string
   stub: Type
 
-  constructor(gate: string, service: string, stubName: string) {
-    this.gate = gate
-    this.service = service
+  constructor(site: string, app: string, stubName: string) {
+    this.site = site
+    this.app = app
     this.stubName = stubName
 
-    const serviceName = `khaleesi.${gate}.${service}.${stubName}`
-    const serviceUrl = `${gate}-${service}:8000`
+    const serviceName = `khaleesi.${site}.${app}.${stubName}`
+    const serviceUrl = `${site}-${app}:8000`
 
     const Channel = makeGenericClientConstructor({}, serviceName)
     const channel = new Channel(serviceUrl, credentials.createInsecure())
 
     // @ts-ignore
-    this.stub = khaleesi[gate][service][stubName].create(
+    this.stub = khaleesi[site][app][stubName].create(
       (method: any, requestData: any, callback: any) => channel.makeUnaryRequest(
         `/${serviceName}/${method.name}`,
           arg => arg,

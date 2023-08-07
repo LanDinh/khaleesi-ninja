@@ -17,8 +17,8 @@ fi
 
 
 # Options.
-gate=${1}
-service=${2}
+site=${1}
+app=${2}
 arguments=${6:-}
 
 
@@ -26,7 +26,7 @@ echo -e "${yellow}Cleaning up old files and create mount directory...${clear_col
 rm -r -f temp
 mkdir temp
 
-echo -e "${yellow}Executing tests for the ${gate} ${service} service...${clear_color}"
-docker run --rm --env CI --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${gate}/${service}:latest-development" test "${arguments}"
+echo -e "${yellow}Executing tests for the ${site} ${app} app...${clear_color}"
+docker run --rm --env CI --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${site}/${app}:latest-development" test "${arguments}"
 
 echo -e "${yellow}DONE testing! :D${clear_color}"

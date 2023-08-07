@@ -9,7 +9,7 @@ from khaleesi.proto.core_pb2 import JobExecutionRequest, EmptyResponse
 from khaleesi.proto.core_sawmill_pb2_grpc import MaidStub
 
 
-STUB = MaidStub(CHANNEL_MANAGER.getChannel(gate = 'core', service = 'sawmill'))  # type: ignore[no-untyped-call]  # pylint: disable=line-too-long
+STUB = MaidStub(CHANNEL_MANAGER.getChannel(site = 'core', app = 'sawmill'))  # type: ignore[no-untyped-call]  # pylint: disable=line-too-long
 
 
 def cleanupEvents(request: JobExecutionRequest) -> EmptyResponse :

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "properties": {
+    "environment": {
+      "description": "environment-specific configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "the name of the environment",
+          "type": "string"
+        },
+        "domain": {
+          "description": "the domain to use",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "domain"
+      ]
+    },
+    "site": {
+      "description": "site configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "the name of the site",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "app": {
+      "description": "app configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "the name of the app",
+          "type": "string"
+        },
+        "version": {
+          "description": "the version to deploy in production",
+          "type": "string"
+        },
+        "replicas": {
+          "description": "the number of replicas required in production",
+          "type": "integer"
+        },
+        "image_pull_policy": {
+          "description": "whether or not to pull for an image or expect it locally",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "version",
+        "replicas",
+        "image_pull_policy"
+      ]
+    },
+    "type": {
+      "description": "type configuration",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "the name of the app type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "ingress": {
+      "description": "ingress configuration for apps exposed to the internet",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not this app requires exposure through the ingress",
+          "type": "boolean"
+        },
+        "path": {
+          "description": "the path pointing to the app",
+          "type": "string"
+        },
+        "regex_path": {
+          "description": "Whether or not the path requires regex parsing",
+          "type": "boolean"
+        },
+        "port": {
+          "description": "the named port the ingress should access for requests",
+          "type": "string"
+        },
+        "root": {
+          "description": "whether or not the frontend is hosted at the main domain",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled",
+        "path",
+        "regex_path",
+        "port",
+        "root"
+      ]
+    },
+    "kubegres": {
+      "description": "kubgres configuration",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not an app uses kubegres",
+          "type": "boolean"
+        },
+        "replicas": {
+          "description": "number of replicas for the postgres cluster",
+          "type": "integer"
+        },
+        "size": {
+          "description": "space available to the database",
+          "type": "string"
+        },
+        "image": {
+          "description": "the postgres image to use for the postgres cluster",
+          "type": "string"
+        },
+        "port": {
+          "description": "the port to run postgres in",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "enabled",
+        "replicas",
+        "size",
+        "image",
+        "port"
+      ]
+    },
+    "django": {
+      "description": "django configuration",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not this app uses django",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled"
+      ]
+    },
+    "probe": {
+      "description": "kubernetes probe configuration",
+      "type": "object",
+      "properties": {
+        "http": {
+          "description": "kubernetes http probe configuration",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "whether to use http probes",
+              "type": "boolean"
+            },
+            "readiness": {
+              "description": "path for the readiness probe",
+              "type": "string"
+            },
+            "liveness": {
+              "description": "path for the liveness probe",
+              "type": "string"
+            },
+            "startup": {
+              "description": "path for the startup probe",
+              "type": "string"
+            }
+          },
+          "required": [
+            "enabled",
+            "readiness",
+            "liveness",
+            "startup"
+          ]
+        },
+        "grpc": {
+          "description": "kubernetes grpc probe configuration",
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "description": "whether to use grpc probes",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled"
+          ]
+        }
+      },
+      "required": [
+        "http"
+      ]
+    },
+    "grpcui": {
+      "description": "grpcui configuration for gRPC apps",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "whether or not this app requires exposure through grpcui",
+          "type": "boolean"
+        },
+        "version": {
+          "description": "the grpcui version to use",
+          "type": "string"
+        }
+      },
+      "required": [
+        "enabled",
+        "version"
+      ]
+    }
+  },
+  "required": [
+    "environment",
+    "site",
+    "app",
+    "type",
+    "ingress",
+    "kubegres",
+    "django",
+    "probe",
+    "grpcui"
+  ],
+  "title": "Values",
+  "type": "object"
+}

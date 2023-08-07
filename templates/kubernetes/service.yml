@@ -1,4 +1,0 @@
-service:
-  name: "${SERVICE}"
-  version: "1.0.0"
-  replicas: 1

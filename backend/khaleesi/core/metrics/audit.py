@@ -18,8 +18,8 @@ class AuditEventMetric(CounterMetric):
       description      ='Audit event count.',
       additionalLabels = [
           'user',
-          'grpcService',
-          'grpcMethod',
+          'service',
+          'method',
           'target',
           'actionCrudType',
           'actionCustomType',
@@ -58,10 +58,10 @@ class AuditEventMetric(CounterMetric):
     """Transform the event into arguments."""
     return {
         'user'            : event.requestMetadata.user.type,
-        'khaleesiGate'    : event.requestMetadata.grpcCaller.khaleesiGate,
-        'khaleesiService' : event.requestMetadata.grpcCaller.khaleesiService,
-        'grpcService'     : event.requestMetadata.grpcCaller.grpcService,
-        'grpcMethod'      : event.requestMetadata.grpcCaller.grpcMethod,
+        'site'            : event.requestMetadata.grpcCaller.site,
+        'app'             : event.requestMetadata.grpcCaller.app,
+        'service'         : event.requestMetadata.grpcCaller.service,
+        'method'          : event.requestMetadata.grpcCaller.method,
         'target'          : event.event.target.type,
         'actionCrudType'  : event.event.action.crudType,
         'actionCustomType': event.event.action.customType,

@@ -34,9 +34,9 @@ if [[ "${CI:-false}" != "true" ]]; then
   ./scripts/util/recreate_tls_certificate.sh "${environment}"
 fi
 
-echo -e "${magenta}Deploying the core gate...${clear_color}"
-helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-gate \
-  --values "kubernetes/configuration/gate/core.yml" \
+echo -e "${magenta}Deploying the core site...${clear_color}"
+helm upgrade --install "khaleesi-ninja-${environment}-core" kubernetes/khaleesi-ninja-site \
+  --values "kubernetes/configuration/site/core.yml" \
   --values "kubernetes/configuration/environment/${environment}.yml"
 
 

@@ -1,0 +1,126 @@
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "{{ .Values.site.name }}-{{ .Values.app.name }}"
+  namespace: "khaleesi-ninja-{{ .Values.environment.name }}"
+  labels:
+    khaleesi-ninja: "app"
+    site: "{{ .Values.site.name }}"
+    name: "{{ .Values.app.name }}"
+    type: "{{ .Values.type.name }}"
+spec:
+  replicas: {{ .Values.app.replicas }}
+  selector:
+    matchLabels:
+      khaleesi-ninja: "app"
+      site: "{{ .Values.site.name }}"
+      name: "{{ .Values.app.name }}"
+      type: "{{ .Values.type.name }}"
+  template:
+    metadata:
+      labels:
+        khaleesi-ninja: "app"
+        site: "{{ .Values.site.name }}"
+        name: "{{ .Values.app.name }}"
+        type: "{{ .Values.type.name }}"
+    spec:
+      containers:
+        - name: "deployment"
+          image: "khaleesi-ninja/{{ .Values.site.name }}/{{ .Values.app.name }}:{{ .Values.app.version }}"
+          imagePullPolicy: "{{ .Values.app.image_pull_policy }}"
+          ports:
+            - name: "deployment"
+              containerPort: 8000
+            {{- if .Values.django.enabled }}
+            - name: "metrics"
+              containerPort: 8020
+            {{- end }}
+          {{- if or .Values.probe.http.enabled .Values.probe.grpc.enabled }}
+          startupProbe:
+            failureThreshold: 30
+            periodSeconds: 10
+            {{- if .Values.probe.http.enabled }}
+            httpGet:
+              path: "{{ .Values.probe.http.startup }}"
+              port: "deployment"
+            {{- end }}
+            {{- if .Values.probe.grpc.enabled }}
+            grpc:
+              port: 8000
+            {{- end }}
+          readinessProbe:
+            failureThreshold: 1
+            periodSeconds: 10
+            {{- if .Values.probe.http.enabled }}
+            httpGet:
+              path: "{{ .Values.probe.http.readiness }}"
+              port: "deployment"
+            {{- end }}
+            {{- if .Values.probe.grpc.enabled }}
+            grpc:
+              port: 8000
+            {{- end }}
+          livenessProbe:
+            failureThreshold: 10
+            periodSeconds: 10
+            {{- if .Values.probe.http.enabled }}
+            httpGet:
+              path: "{{ .Values.probe.http.liveness }}"
+              port: "deployment"
+            {{- end }}
+            {{- if .Values.probe.grpc.enabled }}
+            grpc:
+              port: 8000
+            {{- end }}
+          {{- end }}
+          {{- if or .Values.django.enabled .Values.kubegres.enabled .Values.ingress.enabled }}
+          env:
+          {{- end }}
+          {{- if .Values.django.enabled }}
+            - name: "KHALEESI_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-django"
+                  key: "secretKey"
+          {{- end }}
+          {{- if .Values.ingress.enabled }}
+            - name: "KHALEESI_DOMAIN"
+              value: "{{ .Values.environment.domain }}"
+          {{- end }}
+          {{- if .Values.kubegres.enabled }}
+            - name: "KHALEESI_DATABASE_HOST"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "host"
+            - name: "KHALEESI_DATABASE_PORT"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "port"
+            - name: "KHALEESI_DATABASE_SUPERUSER"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "superUser"
+            - name: "KHALEESI_DATABASE_SUPERUSER_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.site.name }}-kubegres"
+                  key: "superUserPassword"
+            - name: "KHALEESI_DATABASE_NAME"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+                  key: "database"
+            - name: "KHALEESI_DATABASE_USER"
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+                  key: "user"
+            - name: "KHALEESI_DATABASE_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.site.name }}-{{ .Values.app.name }}-kubegres"
+                  key: "password"
+          {{- end }}

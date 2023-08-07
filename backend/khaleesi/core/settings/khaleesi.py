@@ -1,4 +1,4 @@
-"""Base settings for backend services."""
+"""Base settings for backend apps."""
 
 # Python.
 from os import environ
@@ -66,9 +66,9 @@ LOGGING = {
 # khaleesi.ninja.
 KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSettings(
   METADATA = definition.Metadata(
-    GATE    = environ['KHALEESI_GATE'],
-    SERVICE = environ['KHALEESI_SERVICE'],
-    TYPE    = definition.ServiceType.MICRO,
+    SITE    = environ['SITE'],
+    APP     = environ['APP'],
+    TYPE    = definition.AppType.MICRO,
     VERSION = environ['KHALEESI_VERSION'],
     POD_ID  = environ['HOSTNAME'],
   ),

@@ -10,7 +10,7 @@
 /.idea/*
 *.iml
 /temp/*
-/data/current_service
+/data/current_app
 
 # Operations
 /letsencrypt/*

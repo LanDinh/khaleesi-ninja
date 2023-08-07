@@ -26,7 +26,7 @@ class ServerInterceptorTest(SimpleTestCase):
       method              = lambda *args: None,
       request_or_iterator = MagicMock(),
       context             = MagicMock(),
-      method_name         = f'/khaleesi.gate.service.{service}/{method}',
+      method_name         = f'/khaleesi.site.app.{service}/{method}',
     )
     # Assert result.
     khaleesiIntercept.assert_called_once()

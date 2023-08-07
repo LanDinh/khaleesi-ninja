@@ -28,7 +28,7 @@ rectangle sawmill [
   logging
   checking logs
   cleanup logs
-  service call data
+  app call data
 ]
 
 ' ******************************************* RELATIONS ********************************************

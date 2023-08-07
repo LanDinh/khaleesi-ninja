@@ -12,7 +12,7 @@ from khaleesi.proto.core_sawmill_pb2 import (
   QueryRequest,
   ResponseRequest,
 )
-from microservice.models.serviceRegistry import SERVICE_REGISTRY
+from microservice.models.siteRegistry import SITE_REGISTRY
 from microservice.models import (
   GrpcRequest as DbGrpcRequest,
   Error as DbError,
@@ -40,8 +40,8 @@ class StructuredDbLogger(StructuredLogger):
   def sendLogGrpcRequest(self, *, grpc: GrpcRequestRequest) -> DbGrpcRequest :  # type: ignore[override]  # pylint: disable=line-too-long
     """Send the log request to the logging facility."""
     instance = DbGrpcRequest.objects.khaleesiCreate(grpc = grpc)
-    LOGGER.info('Adding call to service registry.')
-    SERVICE_REGISTRY.addCall(
+    LOGGER.info('Adding call to site registry.')
+    SITE_REGISTRY.addCall(
       callerDetails = grpc.request.upstreamRequest,
       calledDetails = grpc.requestMetadata.grpcCaller,
     )
@@ -61,7 +61,7 @@ class StructuredDbLogger(StructuredLogger):
       dbHttpRequest.addChildDuration(duration = instance.reportedDuration)
       dbHttpRequest.khaleesiSave(
         metadata = dbHttpRequest.toObjectMetadata(),
-        grpc = dbHttpRequest.toGrpc(),
+        grpc     = dbHttpRequest.toGrpc(),
       )
     except Exception:  # pylint: disable=broad-except  # pragma: no cover
       # TODO(45) - remove this hack

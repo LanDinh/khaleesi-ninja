@@ -42,7 +42,7 @@ class ImportUtilTestcase(SimpleTestCase):
     importString.return_value.registerService.assert_called_once_with(server)
 
   def testInvalidRegisterService(self, importString: MagicMock, *_: MagicMock) -> None :
-    """Test valid service registration."""
+    """Test invalid service registration."""
     # Prepare data.
     server = MagicMock()
     importString.side_effect = ImportError('error')

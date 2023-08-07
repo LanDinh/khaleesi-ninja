@@ -22,15 +22,15 @@ class ClientInterceptor(Interceptor, GrpcClientInterceptor):
       call_details       : ClientCallDetails,
   ) -> Any :
     """Intercept the method call."""
-    khaleesiGate, khaleesiService, grpcService, grpcMethod = self.processMethodName(
+    site, app, service, methodName = self.processMethodName(
       raw = call_details.method,
     )
     return self.khaleesiIntercept(
-      method            = method,
+      executableMethod  = method,
       requestOrIterator = request_or_iterator,
       callDetails       = call_details,
-      khaleesiGate      = self.stringOrUnknown(value = khaleesiGate),
-      khaleesiService   = self.stringOrUnknown(value = khaleesiService),
-      grpcService       = self.stringOrUnknown(value = grpcService),
-      grpcMethod        = self.stringOrUnknown(value = grpcMethod),
+      site              = self.stringOrUnknown(value = site),
+      app               = self.stringOrUnknown(value = app),
+      service           = self.stringOrUnknown(value = service),
+      method            = self.stringOrUnknown(value = methodName),
     )

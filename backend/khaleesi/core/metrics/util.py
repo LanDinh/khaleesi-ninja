@@ -18,10 +18,10 @@ from khaleesi.core.settings.definition import Metadata
 
 khaleesiSettings: Metadata = settings.KHALEESI_NINJA['METADATA']
 serverLabels = {
-    'khaleesiGate'    : khaleesiSettings['GATE'],
-    'khaleesiService' : khaleesiSettings['SERVICE'],
-    'khaleesiType'    : khaleesiSettings['TYPE'].name.lower(),
-    'khaleesiVersion' : khaleesiSettings['VERSION'],
+    'site'           : khaleesiSettings['SITE'],
+    'app'            : khaleesiSettings['APP'],
+    'khaleesiType'   : khaleesiSettings['TYPE'].name.lower(),
+    'khaleesiVersion': khaleesiSettings['VERSION'],
 }
 
 
@@ -38,7 +38,7 @@ class AbstractMetric:
   """Basic metric."""
 
   _metric: MetricWrapperBase
-  _id: Metric
+  _id    : Metric
 
   def __init__(
       self, *,

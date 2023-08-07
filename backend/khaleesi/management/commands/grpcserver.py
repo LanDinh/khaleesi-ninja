@@ -47,16 +47,16 @@ class Command(BaseCommand, DjangoMigrateCommand):
 
       SINGLETON.structuredLogger.logHttpRequest(
         httpRequestId = self.serverStartHttpRequestId,
-        grpcMethod    = 'LIFECYCLE',
+        method        = 'LIFECYCLE',
       )
 
-      self._logSystemRequest(**options, method = self._migrate   , grpcMethod = 'MIGRATE')
-      self._logSystemRequest(**options, method = self._initialize, grpcMethod = 'INITIALIZE')
-      self._logSystemRequest(**options, method = self._start     , grpcMethod = 'LIFECYCLE')
+      self._logSystemRequest(**options, executableMethod = self._migrate   , method = 'MIGRATE')
+      self._logSystemRequest(**options, executableMethod = self._initialize, method = 'INITIALIZE')
+      self._logSystemRequest(**options, executableMethod = self._start     , method = 'LIFECYCLE')
 
       SINGLETON.structuredLogger.logHttpResponse(
         httpRequestId = self.serverStartHttpRequestId,
-        grpcMethod    = 'LIFECYCLE',
+        method        = 'LIFECYCLE',
         status        = StatusCode.OK,
       )
 
@@ -64,14 +64,14 @@ class Command(BaseCommand, DjangoMigrateCommand):
     except KhaleesiException as exception:
       SINGLETON.structuredLogger.logHttpResponse(
         httpRequestId = self.serverStartHttpRequestId,
-        grpcMethod    = 'LIFECYCLE',
+        method        = 'LIFECYCLE',
         status        = exception.status,
       )
       raise
     except Exception:
       SINGLETON.structuredLogger.logHttpResponse(
         httpRequestId = self.serverStartHttpRequestId,
-        grpcMethod    = 'LIFECYCLE',
+        method        = 'LIFECYCLE',
         status        = StatusCode.INTERNAL,
       )
       raise
@@ -100,27 +100,27 @@ class Command(BaseCommand, DjangoMigrateCommand):
     start_http_server(int(khaleesiSettings['MONITORING']['PORT']))
     self.server.start(startGrpcRequestId = grpcRequestId)
 
-  def _logSystemRequest(self, *, method: Callable, grpcMethod: str, **options: Any) -> None :  # type: ignore[type-arg]  # pylint: disable=line-too-long
+  def _logSystemRequest(self, *, executableMethod: Callable, method: str, **options: Any) -> None :  # type: ignore[type-arg]  # pylint: disable=line-too-long
     """Log the passed method as system request."""
     grpcRequestId = str(uuid4())
     SINGLETON.structuredLogger.logSystemGrpcRequest(
       httpRequestId = self.serverStartHttpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
+      method        = method,
     )
     try:
-      method(grpcRequestId = grpcRequestId, **options)
+      executableMethod(grpcRequestId = grpcRequestId, **options)
       SINGLETON.structuredLogger.logSystemGrpcResponse(
         httpRequestId = self.serverStartHttpRequestId,
         grpcRequestId = grpcRequestId,
-        grpcMethod    = grpcMethod,
+        method        = method,
         status        = StatusCode.OK,
       )
     except KhaleesiException as exception:
       self._logException(
         exception     = exception,
         grpcRequestId = grpcRequestId,
-        grpcMethod    = grpcMethod,
+        method        = method,
       )
       raise
     except Exception as exception:
@@ -128,24 +128,24 @@ class Command(BaseCommand, DjangoMigrateCommand):
       self._logException(
         exception     = khaleesiException,
         grpcRequestId = grpcRequestId,
-        grpcMethod    = grpcMethod,
+        method        = method,
       )
       raise khaleesiException from exception
 
   def _logException(self, *,
       exception    : KhaleesiException,
       grpcRequestId: str,
-      grpcMethod   : str,
+      method       : str,
   ) -> None :
     SINGLETON.structuredLogger.logSystemError(
       exception     = exception,
       httpRequestId = self.serverStartHttpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
+      method        = method,
     )
     SINGLETON.structuredLogger.logSystemGrpcResponse(
       httpRequestId = self.serverStartHttpRequestId,
       grpcRequestId = grpcRequestId,
-      grpcMethod    = grpcMethod,
+      method        = method,
       status        = exception.status,
     )

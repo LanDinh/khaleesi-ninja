@@ -26,7 +26,7 @@ from khaleesi.proto.core_sawmill_pb2_grpc import (
 )
 from microservice.models.logs.metadataMixin import MetadataMixin
 from microservice.models.logs.responseMetadataMixin import ResponseMetadataMixin
-from microservice.models.serviceRegistry import SERVICE_REGISTRY
+from microservice.models.siteRegistry import SITE_REGISTRY
 
 
 class Service(Servicer):
@@ -91,8 +91,8 @@ class Service(Servicer):
   def LogEvent(self, request: EventRequest, _: grpc.ServicerContext) -> ObjectMetadata :
     """Log events."""
     def method() -> MetadataMixin :
-      LOGGER.info('Adding service to service registry.')
-      SERVICE_REGISTRY.addService(callerDetails = request.requestMetadata.grpcCaller)
+      LOGGER.info('Adding service to site registry.')
+      SITE_REGISTRY.addApp(callerDetails = request.requestMetadata.grpcCaller)
       LOGGER.info(
         f'Saving an event to the request "{request.requestMetadata.grpcCaller.requestId}" '
         f'to the database.',
