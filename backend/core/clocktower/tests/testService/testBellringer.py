@@ -15,7 +15,7 @@ class BellRingerServiceTestCase(SimpleTestCase):
 
   service = Service()
 
-  @patch('microservice.service.bellringer.Job')
+  @patch('microservice.service.bellringer.Job.objects.khaleesiCreate')
   def testCreateJob(self, create: MagicMock, *_: MagicMock) -> None :
     """Test creating a new job."""
     # Prepare data.
