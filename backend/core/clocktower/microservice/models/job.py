@@ -25,7 +25,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
   cronExpression = models.TextField()
   action         = models.TextField(default = 'UNKNOWN')
 
-  objects: Manager[Job]
+  objects: Manager[Job]  # type: ignore[assignment]
 
 
   def toGrpcJobExecutionRequest(self) -> Tuple[str, JobExecutionRequest] :
