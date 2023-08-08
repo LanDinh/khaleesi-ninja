@@ -18,9 +18,9 @@ class TestCleanupJob(SimpleTestCase):
     """Test executing a batch."""
     # Prepare data.
     request = JobExecutionRequest()
-    request.jobExecution.actionConfiguration.batchSize = 1
-    request.jobExecution.actionConfiguration.timelimit.FromSeconds(60)
-    request.jobExecution.cleanupConfiguration.isCleanupJob = True
+    request.jobExecution.configuration.action.batchSize = 1
+    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
+    request.jobExecution.configuration.cleanup.isCleanupJob = True
     job: CleanupJob[Metadata] = CleanupJob(model = Metadata, request = request)
     filterRequests.reset_mock()  # Is getting called in the __init__ method.
     # Execute test.

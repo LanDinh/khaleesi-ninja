@@ -22,6 +22,6 @@ class CleanupJob(BaseCleanupJob[Log], Generic[Log]):
     return cast(
       QuerySet[Log],
       self.model.objects.filter(
-        metaLoggedTimestamp__lt = self.request.cleanupConfiguration.cleanupDelay,
+        metaLoggedTimestamp__lt = self.request.configuration.cleanup.cleanupDelay,
       ),
     )
