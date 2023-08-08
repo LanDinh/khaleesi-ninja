@@ -9,10 +9,9 @@ message Job {
   string name           = 1;
   string description    = 2;
   string cronExpression = 3;
-  string action         = 4;
 
-  khaleesi.core.JobActionConfiguration        actionConfiguration  = 20;
-  khaleesi.core.JobCleanupActionConfiguration cleanupConfiguration = 21;
+  khaleesi.core.Action           action        = 10;
+  khaleesi.core.JobConfiguration configuration = 11;
 }
 
 message JobRequest {

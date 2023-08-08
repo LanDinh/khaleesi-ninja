@@ -56,7 +56,7 @@ class JobExecutionTestCase(SimpleTestCase):
     instance.khaleesiSave(grpc = grpc)
     # Assert result.
     parent.assert_called_once()
-    jobConfiguration.assert_called_once()
+    jobConfiguration.assert_not_called()
     jobExecution.assert_called_once()
     self.assertNotEqual(
       GrpcJobExecution.Status.SCHEDULED,

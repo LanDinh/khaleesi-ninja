@@ -81,6 +81,17 @@ message JobCleanupActionConfiguration {
   google.protobuf.Duration cleanupDelay = 2;
 }
 
+message JobConfiguration {
+  JobActionConfiguration        action  = 1;
+  JobCleanupActionConfiguration cleanup = 2;
+}
+
+message Action {
+  string site   = 1;
+  string app    = 2;
+  string action = 3;
+}
+
 message JobExecution {
   enum Status {
     // Not ended.
@@ -100,8 +111,8 @@ message JobExecution {
   ObjectMetadata jobMetadata       = 1;
   ObjectMetadata executionMetadata = 2;
 
-  JobActionConfiguration        actionConfiguration  = 10;
-  JobCleanupActionConfiguration cleanupConfiguration = 11;
+  Action           action        = 10;
+  JobConfiguration configuration = 11;
 
   Status                    status        = 20;
   google.protobuf.Timestamp start         = 21;

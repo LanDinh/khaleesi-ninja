@@ -1,6 +1,7 @@
 """Actuate batch jobs."""
 
 # khaleesi.ninja.
+from khaleesi.core.grpc.requestMetadata import addRequestMetadata
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.proto.core_pb2 import (
   ObjectMetadata,
@@ -8,6 +9,7 @@ from khaleesi.proto.core_pb2 import (
   JobExecution as GrpcJobExecution,
 )
 from microservice.actuator.core import CORE
+from microservice.models.job import Job
 from microservice.models.jobExecution import JobExecution as DbJobExecution
 
 
@@ -18,34 +20,30 @@ class Actuator:
       'core': CORE
   }
 
-  def actuate(self, *, action: str, request: JobExecutionRequest) -> ObjectMetadata :
+  def actuate(self, *, jobId: str) -> ObjectMetadata :
     """Actuate a batch job request."""
-    parts = action.split('.')
-    if len(parts) != 3:
-      raise InvalidArgumentException(
-        publicDetails  = f'actionName = ${action}',
-        privateMessage = 'actionName has the wrong format.',
-        privateDetails = f'actionName = ${action}',
-      )
-    site = parts[0]
-    app  = parts[1]
-    name = parts[2]
     # Register execution attempt.
-    execution = DbJobExecution.objects.khaleesiCreate(grpc = request.jobExecution)
+    job = Job.objects.get(khaleesiId = jobId)
+    grpc = job.toGrpcJobExecutionRequest()
+    action = grpc.action
+    instance = DbJobExecution.objects.khaleesiCreate(grpc = grpc)
     try:
       # Execute actuator.
-      method = self.actions[site][app][name]
+      request = JobExecutionRequest()
+      addRequestMetadata(metadata = request.requestMetadata)
+      request.jobExecution.CopyFrom(grpc)
+      method = self.actions[action.site][action.app][action.action]
       method(request)
       # Return execution metadata.
-      return execution.toObjectMetadata()
+      return instance.toObjectMetadata()
     except KeyError as exception:
-      request.jobExecution.status = GrpcJobExecution.Status.FATAL
-      request.jobExecution.statusDetails = f'The action ${site}.${app}.${action} does not exist.'
-      execution.khaleesiSave(grpc = request.jobExecution, metadata = execution.toObjectMetadata())
+      grpc.status = GrpcJobExecution.Status.FATAL
+      grpc.statusDetails = f'No action "${action.site}.${action.app}.${action.action}"'
+      instance.khaleesiSave(grpc = grpc, metadata = instance.toObjectMetadata())
       raise InvalidArgumentException(
-        publicDetails  = f'site = ${site}, app = ${app}, action = ${action}',
+        publicDetails  = f'site = ${action.site}, app = ${action.app}, action = ${action.action}',
         privateMessage = 'No such action exists.',
-        privateDetails = f'site = ${site}, app = ${app}, action = ${action}',
+        privateDetails = f'site = ${action.site}, app = ${action.app}, action = ${action.action}',
       ) from exception
 
 

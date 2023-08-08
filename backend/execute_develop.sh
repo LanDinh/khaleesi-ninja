@@ -8,7 +8,6 @@ set -o pipefail # Make pipes fail
 
 command=${1}
 arguments=${2:-}
-parallel=
 
 
 test() {
@@ -16,7 +15,7 @@ test() {
   return_code=0
 
   echo "Django tests..."
-  if [[ "${KHALEESI_PARALLEL:-true}" == "false" ]]; then
+  if [[ "${KHALEESI_PARALLEL:-parallel}" == "sequential" ]]; then
     # shellcheck disable=SC2086
     if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest --exclude-tag=isolation; then
       return_code=1

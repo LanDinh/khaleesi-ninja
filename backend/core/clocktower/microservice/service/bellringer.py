@@ -31,9 +31,7 @@ class Service(Servicer):
   def ExecuteJob(self, request: ObjectMetadataRequest, _: grpc.ServicerContext) -> ObjectMetadata :
     """Execute a job by ID."""
     LOGGER.info(f'Executing job "{request.object.id}".')
-    job = Job.objects.get(khaleesiId = request.object.id)
-    action, jobExecutionRequest = job.toGrpcJobExecutionRequest()
-    return ACTUATOR.actuate(action = action, request = jobExecutionRequest)
+    return ACTUATOR.actuate(jobId = request.object.id)
 
 
 serviceConfiguration = ServiceConfiguration[Service](

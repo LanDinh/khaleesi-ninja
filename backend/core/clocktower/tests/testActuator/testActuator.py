@@ -6,42 +6,54 @@ from unittest.mock import MagicMock, patch
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import JobExecutionRequest
+from khaleesi.proto.core_pb2 import JobExecution
 from microservice.actuator.actuator import ACTUATOR
 
 
 class ActuatorTest(SimpleTestCase):
   """Test the actuator."""
 
-  def testActuateWrongActionNameFormat(self) -> None :
-    """Actuating a job should fail if the action name has the wrong format."""
-    with self.assertRaises(InvalidArgumentException) as exception:
-      # Execute test.
-      ACTUATOR.actuate(action = 'invalid-name', request = JobExecutionRequest())
-      # Assert result.
-      self.assertIn('wrong format', exception.exception.privateMessage)
-
+  @patch('microservice.actuator.actuator.addRequestMetadata')
   @patch('microservice.actuator.actuator.DbJobExecution.objects.khaleesiCreate')
-  def testActuateUnknownAction(self, jobExecution: MagicMock) -> None :
+  @patch('microservice.actuator.actuator.Job.objects.get')
+  def testActuateUnknownAction(
+      self,
+      job            : MagicMock,
+      execution      : MagicMock,
+      requestMetadata: MagicMock,
+  ) -> None :
     """Actuating a job should fail if the action name has the wrong format."""
     with self.assertRaises(InvalidArgumentException) as exception:
+      # Prepare data.
+      grpc = JobExecution()
+      grpc.action.site   = 'unknown'
+      grpc.action.app    = 'unknown'
+      grpc.action.action = 'unknown'
+      job.return_value.toGrpcJobExecutionRequest.return_value = grpc
       # Execute test.
-      ACTUATOR.actuate(action = 'unknown.action.name', request = JobExecutionRequest())
+      ACTUATOR.actuate(jobId = 'job-id')
       # Assert result.
+      requestMetadata.assert_called_once()
       self.assertIn('exists', exception.exception.privateMessage)
-      jobExecution.return_value.toObjectMetadata.assert_called_once()
-      jobExecution.return_value.khaleesiSave.assert_called_once()
+      execution.return_value.toObjectMetadata.assert_called_once()
+      execution.return_value.khaleesiSave.assert_called_once()
 
+  @patch('microservice.actuator.actuator.addRequestMetadata')
   @patch('microservice.actuator.actuator.DbJobExecution.objects.khaleesiCreate')
-  def testActuate(self, jobExecution: MagicMock) -> None :
+  @patch('microservice.actuator.actuator.Job.objects.get')
+  def testActuate(self, job: MagicMock, execution: MagicMock, requestMetadata: MagicMock) -> None :
     """Actuating a job should fail if the action name has the wrong format."""
     # Prepare data.
+    grpc = JobExecution()
+    grpc.action.site   = 'core'
+    grpc.action.app    = 'app'
+    grpc.action.action = 'action'
+    job.return_value.toGrpcJobExecutionRequest.return_value = grpc
     mock = MagicMock()
-    request = JobExecutionRequest()
-    request.jobExecution.executionMetadata.id = 'execution-id'
     # Execute test.
-    with patch.dict('microservice.actuator.actuator.CORE', { 'some': { 'action': mock } }):
-      ACTUATOR.actuate(action = 'core.some.action', request = request)
+    with patch.dict('microservice.actuator.actuator.CORE', { 'app': { 'action': mock } }):
+      ACTUATOR.actuate(jobId = 'job-id')
     # Assert result.
+    requestMetadata.assert_called_once()
     mock.assert_called_once()
-    jobExecution.return_value.toObjectMetadata.assert_called_once()
+    execution.return_value.toObjectMetadata.assert_called_once()

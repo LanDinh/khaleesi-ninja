@@ -69,8 +69,8 @@ class JobTestMixin:
     paginator.return_value.count = 6
     paginator.return_value.page_range = [ 1, 2, 3 ]
     request = JobExecutionRequest()
-    request.jobExecution.actionConfiguration.batchSize = 2
-    request.jobExecution.actionConfiguration.timelimit.FromSeconds(60)
+    request.jobExecution.configuration.action.batchSize = 2
+    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
     return request
 
 
@@ -95,21 +95,21 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     with self.assertRaises(InvalidArgumentException) as context:
       self.job = Job(model = DbJobExecution, request = JobExecutionRequest())
     # Assert result.
-    self.assertIn('actionConfiguration.batchSize', context.exception.publicDetails)
-    self.assertIn('actionConfiguration.batchSize', context.exception.privateMessage)
-    self.assertIn('actionConfiguration.batchSize', context.exception.privateDetails)
+    self.assertIn('configuration.action.batchSize', context.exception.publicDetails)
+    self.assertIn('configuration.action.batchSize', context.exception.privateMessage)
+    self.assertIn('configuration.action.batchSize', context.exception.privateDetails)
 
   def testMandatoryTimeLimit(self, *_: MagicMock) -> None :
     """Test that the timelimit is specified."""
     # Execute test.
     with self.assertRaises(InvalidArgumentException) as context:
       request = JobExecutionRequest()
-      request.jobExecution.actionConfiguration.batchSize = 5
+      request.jobExecution.configuration.action.batchSize = 5
       self.job = Job(model = DbJobExecution, request = request)
     # Assert result.
-    self.assertIn('actionConfiguration.timelimit', context.exception.publicDetails)
-    self.assertIn('actionConfiguration.timelimit', context.exception.privateMessage)
-    self.assertIn('actionConfiguration.timelimit', context.exception.privateDetails)
+    self.assertIn('configuration.action.timelimit', context.exception.publicDetails)
+    self.assertIn('configuration.action.timelimit', context.exception.privateMessage)
+    self.assertIn('configuration.action.timelimit', context.exception.privateDetails)
 
   def testJobFailsToStart(self, start: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :
     """Test failure for the job to start."""
@@ -117,8 +117,8 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     start.objects.countJobExecutionsInProgress.side_effect = Exception('start failure')
     start.return_value = MagicMock()
     request = JobExecutionRequest()
-    request.jobExecution.actionConfiguration.batchSize = 2
-    request.jobExecution.actionConfiguration.timelimit.FromSeconds(60)
+    request.jobExecution.configuration.action.batchSize = 2
+    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
     self._setJob(request = request)
     # Execute test.
     with self.assertRaises(Exception):
@@ -133,8 +133,8 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Prepare data.
     start.objects.countJobExecutionsInProgress.return_value = 1337
     request = JobExecutionRequest()
-    request.jobExecution.actionConfiguration.batchSize = 2
-    request.jobExecution.actionConfiguration.timelimit.FromSeconds(60)
+    request.jobExecution.configuration.action.batchSize = 2
+    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
     self._setJob(request = request)
     # Execute test.
     self.job.execute(stopEvent = Event())
@@ -200,7 +200,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test job timeout."""
     # Prepare data.
     request = self._successfullyStartJob(start = start, paginator = paginator)
-    request.jobExecution.actionConfiguration.timelimit.FromNanoseconds(1)
+    request.jobExecution.configuration.action.timelimit.FromNanoseconds(1)
     self._setJob(request = request)
     # Execute test.
     self.job.execute(stopEvent = Event())
@@ -294,9 +294,9 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     with self.assertRaises(InvalidArgumentException) as context:
       self.job = CleanupJob(model = DbJobExecution, request = request)
     # Assert result.
-    self.assertIn('cleanupConfiguration', context.exception.publicDetails)
-    self.assertIn('cleanupConfiguration', context.exception.privateMessage)
-    self.assertIn('cleanupConfiguration', context.exception.privateDetails)
+    self.assertIn('configuration.cleanup', context.exception.publicDetails)
+    self.assertIn('configuration.cleanup', context.exception.privateMessage)
+    self.assertIn('configuration.cleanup', context.exception.privateDetails)
 
   def testJobSuccess(
       self,
@@ -308,7 +308,7 @@ class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
     """Test successful job run."""
     # Prepare data.
     request = self._successfullyStartJob(start = start, paginator = paginator)
-    request.jobExecution.cleanupConfiguration.isCleanupJob = True
+    request.jobExecution.configuration.cleanup.isCleanupJob = True
     self._setJob(request = request)
     self.job.mock.getQueryset.return_value.filter.return_value.delete.return_value = (2, 0)
     # Execute test.

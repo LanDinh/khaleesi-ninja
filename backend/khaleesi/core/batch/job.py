@@ -51,21 +51,21 @@ class BaseJob(ABC, Generic[M]):
   def __init__(self, *, model: Type[M], request: JobExecutionRequest) -> None :
     """Initialize the job."""
 
-    action = request.jobExecution.actionConfiguration
+    action = request.jobExecution.configuration.action
 
     if not action.batchSize:
       # Without the batch size, the paginator tries to divide by 0.
       raise InvalidArgumentException(
-        publicDetails  = f'actionConfiguration.batchSize = {action.batchSize}',
-        privateMessage = 'actionConfiguration.batchSize is mandatory!',
-        privateDetails = f'actionConfiguration.batchSize = {action.batchSize}',
+        publicDetails  = f'configuration.action.batchSize = {action.batchSize}',
+        privateMessage = 'configuration.action.batchSize is mandatory!',
+        privateDetails = f'configuration.action.batchSize = {action.batchSize}',
       )
     if not action.timelimit.ToNanoseconds() > 0:
       # Without the time limit, the job will not run at all.
       raise InvalidArgumentException(
-        publicDetails  = f'actionConfiguration.timelimit = {action.timelimit}',
-        privateMessage = 'actionConfiguration.timelimit is mandatory!',
-        privateDetails = f'actionConfiguration.timelimit = {action.timelimit}',
+        publicDetails  = f'configuration.action.timelimit = {action.timelimit}',
+        privateMessage = 'configuration.action.timelimit is mandatory!',
+        privateDetails = f'configuration.action.timelimit = {action.timelimit}',
       )
     self.model          = model
     self.start          = datetime.now(tz = timezone.utc)
@@ -76,7 +76,7 @@ class BaseJob(ABC, Generic[M]):
     """Execute the job."""
     # Start job execution.
     LOGGER.info(f'{self._loggingPrefix()} Attempting to start.')
-    self.paginator = Paginator(self.getQueryset(), self.request.actionConfiguration.batchSize)
+    self.paginator = Paginator(self.getQueryset(), self.request.configuration.action.batchSize)
 
     self._startJobExecution()
 
@@ -272,7 +272,7 @@ class BaseJob(ABC, Generic[M]):
   def _checkTimeout(self) -> bool :
     """Check if the job timed out."""
     if datetime.now(tz = timezone.utc) > \
-        self.start + self.request.actionConfiguration.timelimit.ToTimedelta():
+        self.start + self.request.configuration.action.timelimit.ToTimedelta():
       self._handleJobEnd(
         details         = 'Job timed out.',
         executionStatus = GrpcJobExecution.Status.TIMEOUT,
@@ -293,14 +293,14 @@ class CleanupJob(BaseJob[M], Generic[M]):
     """Initialize the job."""
     super().__init__(model = model, request = request)
 
-    cleanup = request.jobExecution.cleanupConfiguration
+    cleanup = request.jobExecution.configuration.cleanup
 
     if not cleanup.isCleanupJob:
       # Without the cleanup configuration, the job will not run at all.
       raise InvalidArgumentException(
-        publicDetails  = f'cleanupConfiguration = {MessageToJson(cleanup)}',
-        privateMessage = 'cleanupConfiguration is mandatory!',
-        privateDetails = f'cleanupConfiguration = {MessageToJson(cleanup)}',
+        publicDetails  = f'configuration.cleanup = {MessageToJson(cleanup)}',
+        privateMessage = 'configuration.cleanup is mandatory!',
+        privateDetails = f'configuration.cleanup = {MessageToJson(cleanup)}',
       )
 
   def executeBatch(self, *, page: Page[M]) -> int :

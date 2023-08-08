@@ -7,11 +7,15 @@ from datetime import timedelta
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.proto.core_pb2 import JobActionConfiguration, JobCleanupActionConfiguration
+from khaleesi.proto.core_pb2 import JobConfiguration, Action
 
 
 class JobConfigurationMixin(models.Model):
   """Mixin for job configuration."""
+  # Target configuration.
+  site    = models.TextField(default = 'UNKNOWN')
+  app     = models.TextField(default = 'UNKNOWN')
+  action  = models.TextField(default = 'UNKNOWN')
 
   # Action configuration.
   actionTimelimit = models.DurationField(default = timedelta(hours = 1))
@@ -24,31 +28,34 @@ class JobConfigurationMixin(models.Model):
   class Meta:
     abstract = True
 
-  def jobConfigurationFromGrpc(
-      self, *,
-      action : JobActionConfiguration,
-      cleanup: JobCleanupActionConfiguration,
-  ) -> None :
+  def jobConfigurationFromGrpc(self, *, action: Action, configuration: JobConfiguration) -> None :
     """Change own values according to the grpc object."""
+    # Target configuration.
+    self.site   = action.site
+    self.app    = action.app
+    self.action = action.action
+
     # Action configuration.
-    self.actionBatchSize = action.batchSize if action.batchSize else 1000
-    self.actionTimelimit = action.timelimit.ToTimedelta() \
-      if action.timelimit.ToNanoseconds() > 0 else timedelta(hours = 1)
+    self.actionBatchSize = configuration.action.batchSize \
+      if configuration.action.batchSize else 1000
+    self.actionTimelimit = configuration.action.timelimit.ToTimedelta() \
+      if configuration.action.timelimit.ToNanoseconds() > 0 else timedelta(hours = 1)
 
     # Cleanup configuration.
-    self.cleanupIs    = cleanup.isCleanupJob
-    self.cleanupDelay = cleanup.cleanupDelay.ToTimedelta()
+    self.cleanupIs    = configuration.cleanup.isCleanupJob
+    self.cleanupDelay = configuration.cleanup.cleanupDelay.ToTimedelta()
 
-  def jobConfigurationToGrpc(
-      self, *,
-      action : JobActionConfiguration,
-      cleanup: JobCleanupActionConfiguration,
-  ) -> None :
+  def jobConfigurationToGrpc(self, *, action: Action, configuration: JobConfiguration) -> None :
     """Return a grpc object containing own values."""
+    # Target configuration.
+    action.site   = self.site
+    action.app    = self.app
+    action.action = self.action
+
     # Action configuration.
-    action.batchSize = self.actionBatchSize
-    action.timelimit.FromTimedelta(self.actionTimelimit)
+    configuration.action.batchSize = self.actionBatchSize
+    configuration.action.timelimit.FromTimedelta(self.actionTimelimit)
 
     # Cleanup configuration.
-    cleanup.isCleanupJob = self.cleanupIs
-    cleanup.cleanupDelay.FromTimedelta(self.cleanupDelay)
+    configuration.cleanup.isCleanupJob = self.cleanupIs
+    configuration.cleanup.cleanupDelay.FromTimedelta(self.cleanupDelay)

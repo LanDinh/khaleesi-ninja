@@ -27,6 +27,6 @@ rm -r -f temp
 mkdir temp
 
 echo -e "${yellow}Executing tests for the ${site} ${app} app...${clear_color}"
-docker run --rm --env CI --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${site}/${app}:latest-development" test "${arguments}"
+docker run --rm --env KHALEESI_PARALLEL --mount "type=bind,source=$(pwd)/temp,target=/data/" "khaleesi-ninja/${site}/${app}:latest-development" test "${arguments}"
 
 echo -e "${yellow}DONE testing! :D${clear_color}"
