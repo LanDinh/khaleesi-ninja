@@ -16,16 +16,21 @@ test() {
   return_code=0
 
   echo "Django tests..."
-  if [[ "${CI:-false}" == "true" ]]; then
+  if [[ "${KHALEESI_PARALLEL:-true}" == "false" ]]; then
     # shellcheck disable=SC2086
-    if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest; then
+    if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest --exclude-tag=isolation; then
       return_code=1
     fi
   else
     # shellcheck disable=SC2086
-    if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest --parallel; then
+    if ! python -m coverage run manage.py test ${arguments} --settings=khaleesi.core.settings.unittest --parallel --exclude-tag=isolation; then
       return_code=1
     fi
+  fi
+
+  # Tests that need to be run in isolation.
+  if ! python -m coverage run manage.py test --settings=khaleesi.core.settings.unittest --tag=isolation; then
+    return_code=1
   fi
 
   echo "Copy coverage reports..."

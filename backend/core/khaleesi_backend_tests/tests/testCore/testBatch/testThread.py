@@ -4,6 +4,9 @@
 import sys
 from unittest.mock import MagicMock, patch
 
+# Django.
+from django.test import tag
+
 # khaleesi.ninja.
 from khaleesi.core.batch.thread import BatchJobThread, stopJob, stopAllJobs
 from khaleesi.core.testUtil.testCase import SimpleTestCase
@@ -46,6 +49,7 @@ class StopBatchJobsTestCase(SimpleTestCase):
 class BatchJobThreadTestCase(SimpleTestCase):
   """Test the thread utility."""
 
+  @tag('isolation')
   def testRun(self) -> None :
     """Test if running the thread works as expected."""
     with patch.dict(sys.modules, {'khaleesi.core.shared.state': MagicMock()}) as importDict:
