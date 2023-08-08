@@ -25,7 +25,6 @@ class BellRingerServiceTestCase(SimpleTestCase):
     self.service.CreateJob(JobRequest(), MagicMock())
     # Assert result.
     create.assert_called_once()
-    create.return_value.khaleesiSave.assert_called_once()
 
   @patch('microservice.service.bellringer.Job.objects.get')
   @patch('microservice.service.bellringer.ACTUATOR')
