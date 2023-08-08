@@ -220,6 +220,7 @@ class BaseJob(ABC, Generic[M]):
         self.jobExecution = DbJobExecution.objects.khaleesiCreate(grpc = self.request)
     except Exception as exception:
       LOGGER.fatal(f'{self._loggingPrefix()} Failed to start.')
+      self.request.status = GrpcJobExecution.Status.FATAL
       self.jobExecution = DbJobExecution.objects.khaleesiCreate(grpc = self.request)
       self._logEvent(
         action  = Event.Action.ActionType.START,

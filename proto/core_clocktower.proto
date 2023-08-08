@@ -22,14 +22,8 @@ message JobRequest {
   Job job = 10;
 }
 
-message JobResponse {
-  khaleesi.core.ObjectMetadata  metadata        = 1;
-
-  Job job = 10;
-}
-
 
 service BellRinger {
-  rpc CreateJob  (JobRequest)                   returns (JobResponse);
+  rpc CreateJob  (JobRequest)                   returns (JobRequest);
   rpc ExecuteJob (khaleesi.core.ObjectMetadata) returns (khaleesi.core.ObjectMetadata);
 }

@@ -5,8 +5,10 @@ from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.proto.core_pb2 import (
   ObjectMetadata,
   JobExecutionRequest,
+  JobExecution as GrpcJobExecution,
 )
 from microservice.actuator.core import CORE
+from microservice.models.jobExecution import JobExecution as DbJobExecution
 
 
 class Actuator:
@@ -28,11 +30,18 @@ class Actuator:
     site = parts[0]
     app  = parts[1]
     name = parts[2]
+    # Register execution attempt.
+    execution = DbJobExecution.objects.khaleesiCreate(grpc = request.jobExecution)
     try:
+      # Execute actuator.
       method = self.actions[site][app][name]
       method(request)
-      return request.jobExecution.executionMetadata
+      # Return execution metadata.
+      return execution.toObjectMetadata()
     except KeyError as exception:
+      request.jobExecution.status = GrpcJobExecution.Status.FATAL
+      request.jobExecution.statusDetails = f'The action ${site}.${app}.${action} does not exist.'
+      execution.khaleesiSave(grpc = request.jobExecution, metadata = execution.toObjectMetadata())
       raise InvalidArgumentException(
         publicDetails  = f'site = ${site}, app = ${app}, action = ${action}',
         privateMessage = 'No such action exists.',

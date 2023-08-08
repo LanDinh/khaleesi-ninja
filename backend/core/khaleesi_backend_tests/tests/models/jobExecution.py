@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 # khaleesi.ninja.
-from khaleesi.core.batch.jobConfigurationMixin import JobConfigurationMixin
+from khaleesi.core.batch.jobExecutionMixin import JobExecutionMixin
 from khaleesi.core.models.baseModel import Manager
 
 
-class JobConfiguration(JobConfigurationMixin):
+class JobExecution(JobExecutionMixin):
   """For testing the job configuration mixin."""
 
-  objects: Manager[JobConfiguration] = Manager()
+  objects: Manager[JobExecution]

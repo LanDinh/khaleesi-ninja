@@ -7,7 +7,7 @@ import grpc
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
 from khaleesi.proto.core_pb2 import ObjectMetadata
-from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest, JobResponse
+from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
     add_BellRingerServicer_to_server as addToServer
@@ -19,11 +19,11 @@ from microservice.models import Job
 class Service(Servicer):
   """core_clocktower bellringer service."""
 
-  def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> JobResponse :
+  def CreateJob(self, request: JobRequest, _: grpc.ServicerContext) -> JobRequest :
     """Create a new job."""
     LOGGER.info('Creating the new job.')
     job = Job.objects.khaleesiCreate(grpc = request.job)
-    response = JobResponse()
+    response = JobRequest()
     response.metadata.CopyFrom(job.toObjectMetadata())
     response.job.CopyFrom(job.toGrpc())
     return response

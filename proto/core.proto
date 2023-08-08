@@ -78,16 +78,18 @@ message JobCleanupActionConfiguration {
 
 message JobExecution {
   enum Status {
-    // Only for pulling the status.
+    // Not ended.
     UNKNOWN     = 0;
-    IN_PROGRESS = 1;
+    SCHEDULED   = 1;
+    IN_PROGRESS = 2;
 
-    // For pushing the status.
-    SUCCESS = 2;
-    TIMEOUT = 10;
-    ABORT   = 11;
-    ERROR   = 12;
-    SKIPPED = 13;
+    // Ended.
+    SUCCESS = 10;
+    TIMEOUT = 12;
+    ABORT   = 13;
+    ERROR   = 14;
+    SKIPPED = 15;
+    FATAL   = 16;
   }
 
   ObjectMetadata jobMetadata       = 1;
@@ -97,8 +99,9 @@ message JobExecution {
   JobCleanupActionConfiguration cleanupConfiguration = 11;
 
   Status                    status        = 20;
-  google.protobuf.Timestamp end           = 21;
-  string                    statusDetails = 22;
+  google.protobuf.Timestamp start         = 21;
+  google.protobuf.Timestamp end           = 22;
+  string                    statusDetails = 23;
 
   int64 itemsProcessed = 30;
   int64 totalItems     = 31;

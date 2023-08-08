@@ -1,7 +1,6 @@
 """Test basic job tracking."""
 
 # Python.
-from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
@@ -38,30 +37,6 @@ class JobExecutionManagerTestCase(SimpleTestCase):
 
 class JobExecutionTestCase(SimpleTestCase):
   """Test job executions."""
-
-  def testInProgress(self) -> None :
-    """Test if a job execution is in progress."""
-    # Prepare data.
-    jobExecution = DbJobExecution(status = 'IN_PROGRESS')
-    # Execute test.
-    result = jobExecution.inProgress
-    # Assert result.
-    self.assertTrue(result)
-
-  def testNotInProgress(self) -> None :
-    """Test if a job execution is in progress."""
-    for statusLabel, statusType in [
-        (statusLabel, statusType)
-        for statusLabel, statusType in GrpcJobExecution.Status.items()
-        if statusType != GrpcJobExecution.Status.IN_PROGRESS
-    ]:
-      with self.subTest(status = statusLabel):
-        # Prepare data.
-        jobExecution = DbJobExecution(status = statusLabel)
-        # Execute test.
-        result = jobExecution.inProgress
-        # Assert result.
-        self.assertFalse(result)
 
   @patch('khaleesi.models.jobExecution.JobExecution.toGrpc')
   @patch('khaleesi.models.jobExecution.JobExecution.toObjectMetadata')
@@ -100,125 +75,45 @@ class JobExecutionTestCase(SimpleTestCase):
         toGrpc.assert_called_once()
         save.assert_called_once()
 
-  @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
+  @patch.object(DbJobExecution, 'jobExecutionFromGrpc')
   @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
-  def testSaveNew(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
+  def testSaveNew(self, parent: MagicMock, jobExecution: MagicMock) -> None :
     """Test creating an instance from gRPC."""
-    for statusLabel, statusType in GrpcJobExecution.Status.items():
-      with self.subTest(status = statusLabel):
-        # Prepare data.
-        instance = DbJobExecution()
-        instance._state.adding = True  # pylint: disable=protected-access
-        grpc = GrpcJobExecution()
-        jobConfiguration.reset_mock()
-        parent.reset_mock()
-        # Relevant attributes.
-        grpc.jobMetadata.id       = 'job-id'
-        grpc.executionMetadata.id = 'execution-id'
-        grpc.status               = statusType
-        # Ignored attributes.
-        grpc.end.FromDatetime(datetime.now(tz = timezone.utc))
-        grpc.statusDetails  = 'details'
-        grpc.itemsProcessed = 42
-        # Execute test.
-        instance.khaleesiSave(grpc = grpc)
-        # Assert result.
-        parent.assert_called_once()
-        jobConfiguration.assert_called_once()
-        self.assertEqual(grpc.jobMetadata.id      , instance.jobId)
-        self.assertEqual(grpc.executionMetadata.id, instance.executionId)
-        self.assertEqual(statusLabel              , instance.status)
-        self.assertFalse(instance.end)
-        self.assertFalse(instance.statusDetails)
-        self.assertFalse(instance.totalItems)
-        self.assertFalse(instance.itemsProcessed)
-
-  @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
-  @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
-  def testSaveInProgress(self, parent: MagicMock, jobConfiguration: MagicMock) -> None :
-    """Test updating an instance from gRPC."""
-    for statusLabel, statusType in GrpcJobExecution.Status.items():
-      with self.subTest(status = statusLabel):
-        # Prepare data.
-        parent.reset_mock()
-        instance = DbJobExecution()
-        instance._state.adding = False  # pylint: disable=protected-access
-        instance.status = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS)
-        grpc = GrpcJobExecution()
-        # Ignored attributes.
-        grpc.jobMetadata.id       = 'job-id'
-        grpc.executionMetadata.id = 'execution-id'
-        grpc.end.FromDatetime(datetime.now(tz = timezone.utc))
-        # Relevant attributes.
-        grpc.statusDetails  = 'details'
-        grpc.itemsProcessed = 42
-        grpc.status         = statusType
-        # Execute test.
-        instance.khaleesiSave(grpc = grpc)
-        # Assert result.
-        parent.assert_called_once()
-        jobConfiguration.assert_not_called()
-        self.assertFalse(instance.jobId)
-        self.assertFalse(instance.executionId)
-        self.assertFalse(instance.end)
-        self.assertEqual(statusLabel        , instance.status)
-        self.assertEqual(grpc.statusDetails , instance.statusDetails)
-        self.assertEqual(grpc.itemsProcessed, instance.itemsProcessed)
-        self.assertFalse(instance.totalItems)
-
-  @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
-  @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
-  def testSaveTotalItems(self, parent: MagicMock, *_: MagicMock) -> None :
-    """Test updating an instance from gRPC."""
     # Prepare data.
     instance = DbJobExecution()
+    instance._state.adding = True  # pylint: disable=protected-access
     grpc = GrpcJobExecution()
-    grpc.totalItems = 1337
+    grpc.executionMetadata.id = 'execution-id'
     # Execute test.
     instance.khaleesiSave(grpc = grpc)
     # Assert result.
     parent.assert_called_once()
-    self.assertEqual(grpc.totalItems, instance.totalItems)
+    jobExecution.assert_called_once()
+    self.assertEqual(grpc.executionMetadata.id, instance.executionId)
 
-  @patch.object(DbJobExecution, 'jobConfigurationFromGrpc')
+  @patch.object(DbJobExecution, 'jobExecutionFromGrpc')
   @patch('khaleesi.models.jobExecution.Model.khaleesiSave')
-  def testSaveDontOverwriteTotalItems(self, parent: MagicMock, *_: MagicMock) -> None :
+  def testSaveInProgress(self, parent: MagicMock, jobExecution: MagicMock) -> None :
     """Test updating an instance from gRPC."""
     # Prepare data.
     instance = DbJobExecution()
-    instance.totalItems = 1337
+    instance._state.adding = False  # pylint: disable=protected-access
     grpc = GrpcJobExecution()
-    grpc.totalItems = 9000
+    grpc.executionMetadata.id = 'execution-id'
     # Execute test.
     instance.khaleesiSave(grpc = grpc)
     # Assert result.
     parent.assert_called_once()
-    self.assertNotEqual(grpc.totalItems, instance.totalItems)
+    jobExecution.assert_called_once()
+    self.assertFalse(instance.executionId)
 
-  @patch.object(DbJobExecution, 'jobConfigurationToGrpc')
-  def testToGrpc(self, jobConfiguration: MagicMock) -> None :
+  @patch.object(DbJobExecution, 'jobExecutionToGrpc')
+  def testToGrpc(self, jobExecution: MagicMock) -> None :
     """Test transforming a job execution into a grpc request."""
-    for statusLabel, statusType in GrpcJobExecution.Status.items():
-      with self.subTest(status = statusLabel):
-        # Prepare data.
-        jobConfiguration.reset_mock()
-        jobExecution = DbJobExecution(
-          jobId          = 'job-id',
-          executionId    = 'execution-id',
-          status         = statusLabel,
-          end            = datetime.now().replace(tzinfo = timezone.utc),
-          statusDetails  = 'details',
-          itemsProcessed = 42,
-          totalItems     = 1337,
-        )
-        # Execute test.
-        result = jobExecution.toGrpc()
-        # Assert result.
-        jobConfiguration.assert_called_once()
-        self.assertEqual(jobExecution.jobId         , result.jobMetadata.id)
-        self.assertEqual(jobExecution.executionId   , result.executionMetadata.id)
-        self.assertEqual(statusType                 , result.status)
-        self.assertEqual(jobExecution.end, result.end.ToDatetime().replace(tzinfo = timezone.utc))
-        self.assertEqual(jobExecution.statusDetails , result.statusDetails)
-        self.assertEqual(jobExecution.itemsProcessed, result.itemsProcessed)
-        self.assertEqual(jobExecution.totalItems    , result.totalItems)
+    # Prepare data.
+    instance = DbJobExecution(executionId = 'execution-id')
+    # Execute test.
+    result = instance.toGrpc()
+    # Assert result.
+    jobExecution.assert_called_once()
+    self.assertEqual(instance.executionId   , result.executionMetadata.id)

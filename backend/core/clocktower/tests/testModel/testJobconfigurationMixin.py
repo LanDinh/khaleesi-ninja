@@ -6,7 +6,7 @@ from datetime import timedelta
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import JobActionConfiguration, JobCleanupActionConfiguration
-from tests.models.jobConfiguration import JobConfiguration
+from tests.models import JobConfiguration
 
 
 class JobConfigurationMixinTestCase(SimpleTestCase):

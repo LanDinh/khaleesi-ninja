@@ -21,15 +21,19 @@ class ActuatorTest(SimpleTestCase):
       # Assert result.
       self.assertIn('wrong format', exception.exception.privateMessage)
 
-  def testActuateUnknownAction(self) -> None :
+  @patch('microservice.actuator.actuator.DbJobExecution.objects.khaleesiCreate')
+  def testActuateUnknownAction(self, jobExecution: MagicMock) -> None :
     """Actuating a job should fail if the action name has the wrong format."""
     with self.assertRaises(InvalidArgumentException) as exception:
       # Execute test.
       ACTUATOR.actuate(action = 'unknown.action.name', request = JobExecutionRequest())
       # Assert result.
       self.assertIn('exists', exception.exception.privateMessage)
+      jobExecution.return_value.toObjectMetadata.assert_called_once()
+      jobExecution.return_value.khaleesiSave.assert_called_once()
 
-  def testActuate(self) -> None :
+  @patch('microservice.actuator.actuator.DbJobExecution.objects.khaleesiCreate')
+  def testActuate(self, jobExecution: MagicMock) -> None :
     """Actuating a job should fail if the action name has the wrong format."""
     # Prepare data.
     mock = MagicMock()
@@ -37,7 +41,7 @@ class ActuatorTest(SimpleTestCase):
     request.jobExecution.executionMetadata.id = 'execution-id'
     # Execute test.
     with patch.dict('microservice.actuator.actuator.CORE', { 'some': { 'action': mock } }):
-      result = ACTUATOR.actuate(action = 'core.some.action', request = request)
+      ACTUATOR.actuate(action = 'core.some.action', request = request)
     # Assert result.
     mock.assert_called_once()
-    self.assertEqual(request.jobExecution.executionMetadata, result)
+    jobExecution.return_value.toObjectMetadata.assert_called_once()
