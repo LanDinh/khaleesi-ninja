@@ -9,7 +9,7 @@ jobs:
   matrix:
     runs-on: "ubuntu-latest"
     outputs:
-      all-app: ${{ steps.set-apps.outputs.full-json }}
+      all-apps: ${{ steps.set-apps.outputs.full-json }}
       deploy-apps: ${{ steps.set-apps.outputs.deploy-json }}
       all-environments: ${{ steps.set-environments.outputs.full-json }}
       deploy-environments: ${{ steps.set-environments.outputs.deploy-json }}
