@@ -126,7 +126,7 @@ jobs:
     needs: [ "matrix", "generate-protos", "build-backend-base-images" ]
     strategy:
       matrix:
-        app: ${{ fromJson(needs.matrix.outputs.all-app) }}
+        app: ${{ fromJson(needs.matrix.outputs.all-apps) }}
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
