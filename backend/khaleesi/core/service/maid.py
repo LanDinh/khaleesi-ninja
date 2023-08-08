@@ -9,7 +9,7 @@ from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
 from khaleesi.models.jobExecution import JobExecution
 from khaleesi.proto.core_pb2 import (
-  ObjectMetadata,
+  ObjectMetadataRequest,
   EmptyResponse,
   EmptyRequest,
   DESCRIPTOR,
@@ -23,10 +23,10 @@ from khaleesi.proto.core_pb2_grpc import (
 class Service(Servicer):
   """Maid service to clean up after batch jobs."""
 
-  def AbortBatchJob(self, request: ObjectMetadata, _: grpc.ServicerContext) -> EmptyResponse :
+  def AbortBatchJob(self, request: ObjectMetadataRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Abort the specified job."""
     LOGGER.info(f'Aborting job with ID {request.id}')
-    stopJob(jobs = JobExecution.objects.getJobExecutionsInProgress(job = request))
+    stopJob(jobs = JobExecution.objects.getJobExecutionsInProgress(job = request.object))
     return EmptyResponse()
 
   def AbortAllBatchJobs(self, request: EmptyRequest, _: grpc.ServicerContext) -> EmptyResponse :

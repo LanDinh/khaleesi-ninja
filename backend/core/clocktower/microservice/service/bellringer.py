@@ -6,7 +6,7 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import ObjectMetadata
+from khaleesi.proto.core_pb2 import ObjectMetadataRequest
 from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
@@ -28,10 +28,10 @@ class Service(Servicer):
     response.job.CopyFrom(job.toGrpc())
     return response
 
-  def ExecuteJob(self, request: ObjectMetadata, _: grpc.ServicerContext) -> ObjectMetadata :
+  def ExecuteJob(self, request: ObjectMetadataRequest, _: grpc.ServicerContext) -> ObjectMetadata :
     """Execute a job by ID."""
-    LOGGER.info(f'Executing job "{request.id}".')
-    job = Job.objects.get(khaleesiId = request.id)
+    LOGGER.info(f'Executing job "{request.object.id}".')
+    job = Job.objects.get(khaleesiId = request.object.id)
     action, jobExecutionRequest = job.toGrpcJobExecutionRequest()
     return ACTUATOR.actuate(action = action, request = jobExecutionRequest)
 

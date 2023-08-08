@@ -58,6 +58,11 @@ message ObjectMetadata {
   User                      modifiedBy = 21;
 }
 
+message ObjectMetadataRequest {
+  RequestMetadata metadata = 1;
+  ObjectMetadata object    = 2;
+}
+
 message EmptyRequest {
   RequestMetadata requestMetadata = 1;
 }
@@ -115,17 +120,6 @@ message JobExecutionRequest {
 }
 
 service Maid {
-  rpc AbortBatchJob     (ObjectMetadata) returns (EmptyResponse);
-  rpc AbortAllBatchJobs (EmptyRequest)   returns (EmptyResponse);
-}
-
-/* Legacy: Delete *********************************************************************************/
-
-message IdMessage {
-  string id = 1;
-}
-
-message IdRequest {
-  RequestMetadata requestMetadata = 1;
-  IdMessage       idMessage       = 2;
+  rpc AbortBatchJob     (ObjectMetadataRequest) returns (EmptyResponse);
+  rpc AbortAllBatchJobs (EmptyRequest)          returns (EmptyResponse);
 }

@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.core.service.maid import Service
 from khaleesi.models.jobExecution import JobExecution
-from khaleesi.proto.core_pb2 import ObjectMetadata, EmptyRequest
+from khaleesi.proto.core_pb2 import ObjectMetadataRequest, EmptyRequest
 
 
 @patch('khaleesi.core.service.maid.LOGGER')
@@ -21,7 +21,7 @@ class MaidServiceTestCase(SimpleTestCase):
   def testAbortBatchJob(self, stopJob: MagicMock, jobExecutions: MagicMock, *_: MagicMock) -> None :
     """Test aborting a specific job."""
     # Execute test.
-    self.service.AbortBatchJob(ObjectMetadata(), MagicMock())
+    self.service.AbortBatchJob(ObjectMetadataRequest(), MagicMock())
     # Assert result.
     stopJob.assert_called_once()
     jobExecutions.assert_called_once()
