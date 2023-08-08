@@ -34,7 +34,7 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
   privateDetails = models.TextField(default = '')
   stacktrace     = models.TextField(default = '')
 
-  objects: Manager[Error]
+  objects: Manager[Error]  # type: ignore[assignment]
 
 
   def khaleesiSave(

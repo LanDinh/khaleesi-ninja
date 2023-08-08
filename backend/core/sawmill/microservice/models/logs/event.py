@@ -38,7 +38,7 @@ class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
   actionResult     = models.TextField(default = 'UNKNOWN_RESULT')
   actionDetails    = models.TextField(default = 'UNKNOWN')
 
-  objects: Manager[Event]
+  objects: Manager[Event]  # type: ignore[assignment]
 
 
   def khaleesiSave(

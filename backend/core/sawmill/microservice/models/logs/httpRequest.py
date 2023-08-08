@@ -36,7 +36,7 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
   os             = models.TextField(default = 'UNKNOWN')
   deviceType     = models.TextField(default = 'UNKNOWN')
 
-  objects: Manager[HttpRequest]
+  objects: Manager[HttpRequest]  # type: ignore[assignment]
 
 
   def khaleesiSave(

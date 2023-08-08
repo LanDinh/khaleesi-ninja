@@ -51,7 +51,7 @@ class LumberjackServiceTestCase(SimpleTestCase):
       method        = lambda : self.service.LogEvent(MagicMock(), MagicMock()),
       loggingObject = 'sendLogEvent',
     )
-    siteRegistry.addService.assert_called()
+    siteRegistry.addApp.assert_called()
 
   def testLogError(self, *_: MagicMock) -> None :
     """Test logging events."""

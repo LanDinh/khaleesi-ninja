@@ -26,7 +26,7 @@ class MetricInitializerTestCase(SimpleTestCase):
     # Prepare data & execute test.
     MetricInitializer(httpRequestId = 'http-request')
     # Assert result.
-    siteRegistry.addService.assert_called_once()
+    siteRegistry.addApp.assert_called_once()
 
   def testRequests(self, siteRegistry: MagicMock, *_: MagicMock) -> None :
     """Test the requests are fetched correctly."""

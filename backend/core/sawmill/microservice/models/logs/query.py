@@ -34,7 +34,7 @@ class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
   tables     = models.TextField(default = 'UNKNOWN')
   columns    = models.TextField(default = 'UNKNOWN')
 
-  objects: Manager[Query]
+  objects: Manager[Query]  # type: ignore[assignment]
 
   @property
   def reportedDuration(self) -> timedelta :

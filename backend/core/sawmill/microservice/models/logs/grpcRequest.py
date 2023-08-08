@@ -28,7 +28,7 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
   upstreamRequestMethod  = models.TextField(default = 'UNKNOWN')
   upstreamRequestPodId   = models.TextField(default = 'UNKNOWN')
 
-  objects: Manager[GrpcRequest]
+  objects: Manager[GrpcRequest]  # type: ignore[assignment]
 
 
   def khaleesiSave(
