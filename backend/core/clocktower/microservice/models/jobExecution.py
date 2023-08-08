@@ -15,7 +15,6 @@ from khaleesi.core.models.idModel import Model
 from khaleesi.proto.core_pb2 import (
   JobExecution as GrpcJobExecution,
   ObjectMetadata,
-  Action,
 )
 from microservice.models.jobConfigurationMixin import JobConfigurationMixin
 
