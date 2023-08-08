@@ -23,9 +23,13 @@ from khaleesi.proto.core_pb2_grpc import (
 class Service(Servicer):
   """Maid service to clean up after batch jobs."""
 
-  def AbortBatchJob(self, request: ObjectMetadataRequest, _: grpc.ServicerContext) -> EmptyResponse :
+  def AbortBatchJob(
+      self,
+      request: ObjectMetadataRequest,
+      _      : grpc.ServicerContext,
+  ) -> EmptyResponse :
     """Abort the specified job."""
-    LOGGER.info(f'Aborting job with ID {request.id}')
+    LOGGER.info(f'Aborting job with ID {request.object.id}')
     stopJob(jobs = JobExecution.objects.getJobExecutionsInProgress(job = request.object))
     return EmptyResponse()
 

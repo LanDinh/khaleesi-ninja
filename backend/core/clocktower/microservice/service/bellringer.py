@@ -6,7 +6,7 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
-from khaleesi.proto.core_pb2 import ObjectMetadataRequest
+from khaleesi.proto.core_pb2 import ObjectMetadataRequest, ObjectMetadata
 from khaleesi.proto.core_clocktower_pb2 import DESCRIPTOR, JobRequest
 from khaleesi.proto.core_clocktower_pb2_grpc import (
     BellRingerServicer as Servicer,
