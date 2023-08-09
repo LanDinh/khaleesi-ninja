@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Python.
-from typing import TypeVar, Generic, Any
+from typing import TypeVar, Generic
 
 # Django.
 from django.db import models, transaction
