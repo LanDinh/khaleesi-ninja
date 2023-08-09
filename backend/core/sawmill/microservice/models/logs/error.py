@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Python.
-from typing import Any, List
+from typing import List
 
 # Django.
 from django.db import models
@@ -38,11 +38,10 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
 
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : GrpcErrorRequest,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     errors: List[str] = []
@@ -60,7 +59,7 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
 
     # Needs to be at the end because it saves errors to the model.
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toGrpc(self) -> GrpcErrorRequest :
     """Return a grpc object containing own values."""

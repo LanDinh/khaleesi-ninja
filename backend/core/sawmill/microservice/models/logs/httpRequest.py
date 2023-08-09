@@ -4,7 +4,7 @@
 
 # Python.
 from __future__ import annotations
-from typing import List, Any
+from typing import List
 
 # Django.
 from django.db import models
@@ -40,11 +40,10 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
 
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : GrpcHttpRequest,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     errors: List[str] = []
@@ -74,7 +73,7 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
       errors   = errors,
     )
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toGrpc(self) -> GrpcHttpRequest :
     """Return a grpc object containing own values."""

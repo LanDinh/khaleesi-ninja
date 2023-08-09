@@ -47,7 +47,7 @@ class StructuredLogger(ABC):
     httpRequest = HttpRequestRequest()
     addSystemRequestMetadata(
       metadata      = httpRequest.requestMetadata,
-      method = method,
+      method        = method,
       httpRequestId = httpRequestId,
       grpcRequestId = 'system',
     )
@@ -56,14 +56,14 @@ class StructuredLogger(ABC):
   def logHttpResponse(
       self, *,
       httpRequestId: str,
-      method   : str,
+      method       : str,
       status       : StatusCode,
   ) -> None :
     """Log a microservice system HTTP response."""
     httpResponse = ResponseRequest()
     addSystemRequestMetadata(
       metadata      = httpResponse.requestMetadata,
-      method = method,
+      method        = method,
       httpRequestId = httpRequestId,
       grpcRequestId = 'system',
     )
@@ -96,14 +96,14 @@ class StructuredLogger(ABC):
       self, *,
       httpRequestId: str,
       grpcRequestId: str,
-      method   : str,
+      method       : str,
   ) -> None :
     """Log a microservice request."""
     LOGGER.info(f'System started gRPC request "{grpcRequestId}".')
     grpc = GrpcRequestRequest()
     addSystemRequestMetadata(
       metadata      = grpc.requestMetadata,
-      method = method,
+      method        = method,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
     )
@@ -125,7 +125,7 @@ class StructuredLogger(ABC):
       self, *,
       httpRequestId: str,
       grpcRequestId: str,
-      method   : str,
+      method       : str,
       status       : StatusCode,
   ) -> None :
     """Log a microservice system response."""
@@ -134,7 +134,7 @@ class StructuredLogger(ABC):
       metadata      = grpc.requestMetadata,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
-      method = method,
+      method        = method,
     )
     self._logResponseObject(
       status      = status,
@@ -153,16 +153,16 @@ class StructuredLogger(ABC):
 
   def logSystemEvent(
       self, *,
-      event: Event,
-      httpRequestId   : str,
-      grpcRequestId   : str,
-      method      : str,
+      event        : Event,
+      httpRequestId: str,
+      grpcRequestId: str,
+      method       : str,
   ) -> None :
     """Log a system event."""
     request = EventRequest()
     addSystemRequestMetadata(
       metadata      = request.requestMetadata,
-      method = method,
+      method        = method,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
     )
@@ -180,7 +180,7 @@ class StructuredLogger(ABC):
       exception    : KhaleesiException,
       httpRequestId: str,
       grpcRequestId: str,
-      method   : str,
+      method       : str,
   ) -> None :
     """Log an exception."""
     error = self._logErrorObject(exception = exception)
@@ -188,7 +188,7 @@ class StructuredLogger(ABC):
       metadata      = error.requestMetadata,
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
-      method = method,
+      method        = method,
     )
     self.sendLogError(grpc = error)
 
@@ -238,7 +238,7 @@ class StructuredLogger(ABC):
     error.error.status         = exception.status.name
     error.error.loglevel       = exception.loglevel.name
     error.error.site           = exception.site
-    error.error.app        = exception.app
+    error.error.app            = exception.app
     error.error.publicKey      = exception.publicKey
     error.error.publicDetails  = exception.publicDetails
     error.error.privateMessage = exception.privateMessage

@@ -27,11 +27,10 @@ class ResponseMetadata(MetadataMixin, ResponseMetadataMixin):  # type: ignore[mi
   """Allow instantiation of abstract model."""
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : Any,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
 

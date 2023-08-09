@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-# Python.
-from typing import Any
-
 # Django.
 from django.db import models
 
@@ -27,11 +24,10 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin, JobExecutionM
   objects: Manager[JobExecution]  # type: ignore[assignment]
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : GrpcJobExecution,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     self.jobExecutionFromGrpc(grpc = grpc)
@@ -40,7 +36,7 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin, JobExecutionM
       self.jobConfigurationFromGrpc(action = grpc.action, configuration = grpc.configuration)
       # Override any other state that might have been read from the request - for creation only.
       self.status = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.SCHEDULED)
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toGrpc(self) -> GrpcJobExecution :
     """Return a grpc object containing own values."""

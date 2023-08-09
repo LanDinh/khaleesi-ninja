@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Python.
-from typing import Generic, Any
+from typing import Generic
 from uuid import uuid4
 
 # Django.
@@ -22,16 +22,15 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
   objects: Manager[Model]  # type: ignore[type-arg,assignment]
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : Grpc,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     if self._state.adding:
       self.khaleesiId = str(uuid4())
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toObjectMetadata(self) -> ObjectMetadata :
     """Return the object metadata representing this object."""

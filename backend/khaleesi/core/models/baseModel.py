@@ -23,10 +23,10 @@ M = TypeVar('M', bound = models.Model)
 class Manager(models.Manager[M]):
   """Basic manager for basic models."""
 
-  def khaleesiCreate(self, *args: Any, grpc: Grpc, **kwargs: Any) -> M :
+  def khaleesiCreate(self, grpc: Grpc, dbSave = True) -> M :
     """Create a new object."""
     instance = self.model()
-    instance.khaleesiSave(*args, grpc = grpc, **kwargs)  # type: ignore[attr-defined]
+    instance.khaleesiSave(grpc = grpc, dbSave = dbSave)  # type: ignore[attr-defined]
     return instance
 
 
@@ -38,11 +38,10 @@ class Model(models.Model, Generic[Grpc]):
   objects: Manager[Model] = Manager()  # type: ignore[type-arg]
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : Grpc,  # pylint: disable=unused-argument
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     with transaction.atomic():
@@ -52,7 +51,10 @@ class Model(models.Model, Generic[Grpc]):
       if not (oldVersion == self.khaleesiVersion and self.khaleesiVersion == metadata.version):
         raise DbOutdatedInformationException(objectType = self.modelType(), metadata = metadata)
       self.khaleesiVersion += 1
-      self.save(*args, **kwargs)
+      if dbSave:
+        self.save()
+      else:
+        self.save(update_fields = [])
 
   @classmethod
   def modelType(cls) -> str :

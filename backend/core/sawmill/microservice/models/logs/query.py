@@ -4,7 +4,7 @@ from __future__ import annotations
 
 # Python.
 from datetime import timedelta
-from typing import List, Any
+from typing import List
 
 # Django.
 from django.db import models
@@ -45,11 +45,10 @@ class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
     return self.reportedEnd - self.reportedStart
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : GrpcQueryRequest,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     errors: List[str] = []
@@ -78,7 +77,7 @@ class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
 
     # Needs to be at the end because it saves errors to the model.
     self.metadataFromGrpc(grpc = grpc.requestMetadata, errors = errors)
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toGrpc(self) -> GrpcQueryRequest :
     """Return a grpc object containing own values."""

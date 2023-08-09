@@ -75,7 +75,7 @@ class StructuredDbLogger(StructuredLogger):
       grpcQuery.query.CopyFrom(rawQuery)
       grpcQuery.requestMetadata.CopyFrom(requestMetadata)
       # Don't save it - bulk creation.
-      query = DbQuery.objects.khaleesiCreate(grpc = grpcQuery, update_fields = [])
+      query = DbQuery.objects.khaleesiCreate(grpc = grpcQuery, dbSave = False)
       newQueries.append(query)
       errors += query.metaLoggingErrors
       instance.addChildDuration(duration = query.reportedDuration)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 # Python.
-from typing import List, Any
+from typing import List
 
 # Django.
 from django.db import models
@@ -66,17 +66,16 @@ class JobExecution(Model[GrpcJobExecution], JobExecutionMixin):
     self.khaleesiSave(metadata = metadata, grpc = grpc)
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : GrpcJobExecution,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     if self._state.adding:
       self.executionId = grpc.executionMetadata.id
     self.jobExecutionFromGrpc(grpc = grpc)
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toGrpc(self) -> GrpcJobExecution :
     """Return a grpc object containing own values."""

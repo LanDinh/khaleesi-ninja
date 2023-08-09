@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-# Python.
-from typing import Any
-
 # Django.
 from django.db import models
 
@@ -33,11 +30,10 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
     return result
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : GrpcJob,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     self.name           = grpc.name
@@ -47,7 +43,7 @@ class Job(Model[GrpcJob], JobConfigurationMixin):
 
     self.jobConfigurationFromGrpc(action = grpc.action, configuration = grpc.configuration)
 
-    super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+    super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
   def toGrpc(self) -> GrpcJob :
     """Return a grpc object containing own values."""

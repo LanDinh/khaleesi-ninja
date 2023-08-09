@@ -47,11 +47,10 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
     return user
 
   def khaleesiSave(
-      self,
-      *args   : Any,
+      self, *,
       metadata: ObjectMetadata = ObjectMetadata(),
       grpc    : Grpc,
-      **kwargs: Any,
+      dbSave  : bool = True,
   ) -> None :
     """Change own values according to the grpc object."""
     action  = Event.Action.ActionType.UPDATE
@@ -68,7 +67,7 @@ class Model(BaseModel[Grpc], Generic[Grpc]):
       self.khaleesiModifiedById   = STATE.request.user.id
       self.khaleesiModifiedByType = User.UserType.Name(STATE.request.user.type)
 
-      super().khaleesiSave(*args, metadata = metadata, grpc = grpc, **kwargs)
+      super().khaleesiSave(metadata = metadata, grpc = grpc, dbSave = dbSave)
 
       self._logSuccessEvent(action = action, details = details)
 

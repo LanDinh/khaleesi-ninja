@@ -40,7 +40,25 @@ class ModelTestCase(SimpleTestCase):
         instance.khaleesiSave(metadata = metadata, grpc = MagicMock())
         # Assert result.
         self.assertEqual(version + 1, instance.khaleesiVersion)
-        parent.assert_called_once()
+        parent.assert_called_once_with()
+
+  @patch('khaleesi.core.models.baseModel.transaction')
+  @patch('khaleesi.core.models.baseModel.Model.refresh_from_db')
+  @patch('khaleesi.core.models.baseModel.Model.save')
+  def testKhaleesiSaveNoDbSave(self, parent: MagicMock, *_: MagicMock) -> None :
+    """Test saving the instance."""
+    # Prepare data.
+    parent.reset_mock()
+    version = 1337
+    instance                 = BaseModel()
+    instance.khaleesiVersion = version
+    metadata         = ObjectMetadata()
+    metadata.version = version
+    # Execute test.
+    instance.khaleesiSave(metadata = metadata, grpc = MagicMock(), dbSave = False)
+    # Assert result.
+    self.assertEqual(version + 1, instance.khaleesiVersion)
+    parent.assert_called_once_with(update_fields = [])
 
   @patch('khaleesi.core.models.baseModel.transaction.atomic')
   @patch('khaleesi.core.models.baseModel.models.Model.refresh_from_db')
