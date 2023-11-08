@@ -79,22 +79,23 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     SERVER_METHOD_NAMES = definition.GrpcServerMethodNames(
       SERVICE_NAME = 'grpc-server',
       USER_ID      = 'grpc-server',
-      MIGRATE = definition.GrpcEventMethodNames(
+      MIGRATE = definition.GrpcEventMethodName(
         METHOD = 'migrate',
         TARGET = 'core.core.server'
       ),
-      INITIALIZE = definition.GrpcEventMethodNames(
+      INITIALIZE = definition.GrpcEventMethodName(
         METHOD = 'initialize',
         TARGET = 'core.core.server'
       ),
-      LIFECYCLE = definition.GrpcEventMethodNames(
+      LIFECYCLE = definition.GrpcEventMethodName(
         METHOD = 'lifecycle',
         TARGET = 'core.core.server'
       ),
-      INITIALIZE_REQUEST_METRICS = definition.GrpcEventMethodNames(
+      INITIALIZE_REQUEST_METRICS = definition.GrpcEventMethodName(
         METHOD = 'initialize-request-metrics',
-        TARGET = '',
+        TARGET = 'core.core.metrics.request',
       ),
+      APP_SPECIFIC = {},
     ),
     INTERCEPTORS = definition.GrpcInterceptors(
       STRUCTURED_LOGGER = definition.GrpcServerInterceptor(

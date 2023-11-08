@@ -9,7 +9,7 @@ from .grpc import (
   GrpcInterceptors as GrpcInterceptors,
   GrpcServerInterceptor as GrpcServerInterceptor,
   GrpcServerMethodNames as GrpcServerMethodNames,
-  GrpcEventMethodNames as GrpcEventMethodNames,
+  GrpcEventMethodName as GrpcEventMethodName,
 )
 from .metadata import Metadata as Metadata, AppType as AppType
 from .monitoring import Monitoring as Monitoring

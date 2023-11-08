@@ -1,10 +1,10 @@
 """khaleesi.ninja settings definition."""
 
 # Python.
-from typing import TypedDict, List
+from typing import TypedDict, List, Dict
 
 
-class GrpcEventMethodNames(TypedDict):
+class GrpcEventMethodName(TypedDict):
   """Method names for event-causing gRPC methods."""
 
   METHOD: str
@@ -16,10 +16,11 @@ class GrpcServerMethodNames(TypedDict):
 
   SERVICE_NAME              : str
   USER_ID                   : str
-  MIGRATE                   : GrpcEventMethodNames  # Migrate database changes.
-  INITIALIZE                : GrpcEventMethodNames  # Initialize server.
-  LIFECYCLE                 : GrpcEventMethodNames  # Report changes in lifecycle for logging.
-  INITIALIZE_REQUEST_METRICS: GrpcEventMethodNames  # Fetch gRPC calls for metric initialization.
+  MIGRATE                   : GrpcEventMethodName  # Migrate database changes.
+  INITIALIZE                : GrpcEventMethodName  # Initialize server.
+  LIFECYCLE                 : GrpcEventMethodName  # Report changes in lifecycle for logging.
+  INITIALIZE_REQUEST_METRICS: GrpcEventMethodName  # Fetch gRPC calls for metric initialization.
+  APP_SPECIFIC              : Dict[str, GrpcEventMethodName]  # Enable custom methods for each app.
 
 
 class GrpcServerInterceptor(TypedDict):

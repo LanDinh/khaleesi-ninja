@@ -34,7 +34,10 @@ def addSystemRequestMetadata(
   # gRPC details are specified in the configuration.
   metadata.grpcCaller.requestId = grpcRequestId
   metadata.grpcCaller.service   = systemConfiguration['SERVICE_NAME']
-  metadata.grpcCaller.method    = systemConfiguration[method]['METHOD']  # type: ignore[literal-required]  # pylint: disable=line-too-long
+  if method in systemConfiguration:
+    metadata.grpcCaller.method    = systemConfiguration[method]['METHOD']  # type: ignore[literal-required]  # pylint: disable=line-too-long
+  else:
+    metadata.grpcCaller.method    = systemConfiguration['APP_SPECIFIC'][method]['METHOD']
 
   # User details are specified in the configuration.
   metadata.user.id   = systemConfiguration['USER_ID']
