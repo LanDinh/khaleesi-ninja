@@ -23,7 +23,7 @@ M = TypeVar('M', bound = models.Model)
 class Manager(models.Manager[M]):
   """Basic manager for basic models."""
 
-  def khaleesiCreate(self, grpc: Grpc, dbSave = True) -> M :
+  def khaleesiCreate(self, grpc: Grpc, dbSave: bool = True) -> M :
     """Create a new object."""
     instance = self.model()
     instance.khaleesiSave(grpc = grpc, dbSave = dbSave)  # type: ignore[attr-defined]
