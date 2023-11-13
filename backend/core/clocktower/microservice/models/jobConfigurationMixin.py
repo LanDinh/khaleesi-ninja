@@ -1,7 +1,7 @@
 """Utility for saving job configuration."""
 
 # Python.
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # Django.
 from django.db import models
@@ -23,7 +23,7 @@ class JobConfigurationMixin(models.Model):
 
   # Cleanup configuration.
   cleanupIs    = models.BooleanField(default = False)
-  cleanupDelay = models.DurationField(default = timedelta())
+  cleanupSince = models.DateTimeField(default = datetime.now)
 
   class Meta:
     abstract = True
@@ -43,7 +43,7 @@ class JobConfigurationMixin(models.Model):
 
     # Cleanup configuration.
     self.cleanupIs    = configuration.cleanup.isCleanupJob
-    self.cleanupDelay = configuration.cleanup.cleanupDelay.ToTimedelta()
+    self.cleanupSince = configuration.cleanup.cleanupSince.ToDatetime()
 
   def jobConfigurationToGrpc(self, *, action: Action, configuration: JobConfiguration) -> None :
     """Return a grpc object containing own values."""
@@ -58,4 +58,4 @@ class JobConfigurationMixin(models.Model):
 
     # Cleanup configuration.
     configuration.cleanup.isCleanupJob = self.cleanupIs
-    configuration.cleanup.cleanupDelay.FromTimedelta(self.cleanupDelay)
+    configuration.cleanup.cleanupSince.FromDatetime(self.cleanupSince)

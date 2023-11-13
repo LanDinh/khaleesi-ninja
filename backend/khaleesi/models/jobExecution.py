@@ -63,6 +63,7 @@ class JobExecution(Model[GrpcJobExecution], JobExecutionMixin):
     grpc.status         = status
     grpc.itemsProcessed = itemsProcessed
     grpc.statusDetails  = statusDetails
+    grpc.end.FromDatetime(datetime.now())
     self.khaleesiSave(metadata = metadata, grpc = grpc)
 
   def khaleesiSave(

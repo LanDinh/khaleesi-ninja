@@ -1,7 +1,7 @@
 """Test the mixin for job configuration."""
 
 # Python.
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
@@ -22,7 +22,7 @@ class JobConfigurationMixinTestCase(SimpleTestCase):
         configuration.action.batchSize = 1337
         configuration.action.timelimit.FromTimedelta(timedelta(hours = 42))
         configuration.cleanup.isCleanupJob = cleanupIs
-        configuration.cleanup.cleanupDelay.FromTimedelta(timedelta(minutes = 42))
+        configuration.cleanup.cleanupSince.FromDatetime(datetime.now())
         action = Action()
         action.site   = 'site'
         action.app    = 'app'
@@ -56,7 +56,7 @@ class JobConfigurationMixinTestCase(SimpleTestCase):
         instance.actionBatchSize = 1337
         instance.actionTimelimit = timedelta(hours = 42)
         instance.cleanupIs       = cleanupIs
-        instance.cleanupDelay    = timedelta(minutes = 42)
+        instance.cleanupSince    = datetime.now()
         configuration = GrpcJobConfiguration()
         action = Action()
         # Execute test.
@@ -77,4 +77,4 @@ class JobConfigurationMixinTestCase(SimpleTestCase):
     self.assertEqual(instance.actionTimelimit, configuration.action.timelimit.ToTimedelta())
     self.assertEqual(instance.actionBatchSize, configuration.action.batchSize)
     self.assertEqual(instance.cleanupIs      , configuration.cleanup.isCleanupJob)
-    self.assertEqual(instance.cleanupDelay   , configuration.cleanup.cleanupDelay.ToTimedelta())
+    self.assertEqual(instance.cleanupSince   , configuration.cleanup.cleanupSince.ToDatetime())

@@ -14,7 +14,7 @@ class JobExecutionMixin(models.Model):
 
   # Result.
   status        = models.TextField(default = 'UNKNOWN')
-  end           = models.DateTimeField()
+  end           = models.DateTimeField(blank = True, null = True)
   statusDetails = models.TextField()
 
   # Statistics.

@@ -34,7 +34,7 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up HTTP requests older than '
-      f'{request.jobExecution.configuration.cleanup.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = request))
 
@@ -46,7 +46,7 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up requests older than '
-      f'{request.jobExecution.configuration.cleanup.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbGrpcRequest, request = request))
 
@@ -54,7 +54,7 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up events older than '
-      f'{request.jobExecution.configuration.cleanup.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbEvent, request = request))
 
@@ -62,7 +62,7 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up errors older than '
-      f'{request.jobExecution.configuration.cleanup.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbError, request = request))
 
@@ -70,7 +70,7 @@ class Service(Servicer):
     """Clean up old data."""
     LOGGER.info(
       'Cleaning up queries older than '
-      f'{request.jobExecution.configuration.cleanup.cleanupDelay.ToTimedelta()}.',
+      f'{request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}.',
     )
     return jobExecutor(job = CleanupJob(model = DbQuery, request = request))
 

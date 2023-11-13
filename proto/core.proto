@@ -77,8 +77,8 @@ message JobActionConfiguration {
 }
 
 message JobCleanupActionConfiguration {
-  bool                     isCleanupJob = 1;
-  google.protobuf.Duration cleanupDelay = 2;
+  bool                      isCleanupJob = 1;
+  google.protobuf.Timestamp cleanupSince = 2;
 }
 
 message JobConfiguration {
