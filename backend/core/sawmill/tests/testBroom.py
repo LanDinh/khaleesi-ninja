@@ -13,14 +13,14 @@ from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import JobExecutionRequest, EmptyResponse
 from microservice.broom import Broom
 
-@patch('microservice.service.maid.LOGGER')
+@patch('microservice.broom.LOGGER')
 class MaidServiceTestCase(SimpleTestCase):
   """Test the core-sawmill maid service."""
 
   broom = Broom()
 
-  @patch('microservice.service.maid.CleanupJob')
-  @patch('microservice.service.maid.jobExecutor')
+  @patch('microservice.broom.CleanupJob')
+  @patch('microservice.broom.jobExecutor')
   def testCleanup(self, *_: MagicMock) -> None :
     """Test cleaning up."""
     for action in [ 'events', 'grpc-requests', 'errors', 'http-requests', 'queries' ]:
@@ -41,8 +41,8 @@ class MaidServiceTestCase(SimpleTestCase):
     with self.assertRaises(ProgrammingException):
       self.broom.cleanup(jobExecutionRequest = jobExecutionRequest)
 
-  @patch('microservice.service.maid.CleanupJob')
-  @patch('microservice.service.maid.jobExecutor')
+  @patch('microservice.broom.CleanupJob')
+  @patch('microservice.broom.jobExecutor')
   def _executeCleanupTest(
       self,
       executor: MagicMock,

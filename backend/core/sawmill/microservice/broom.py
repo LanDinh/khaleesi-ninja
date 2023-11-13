@@ -22,16 +22,15 @@ class Broom(BaseBroom):
     """Cleanup stuff."""
     if jobExecutionRequest.jobExecution.action.action == 'cleanup-events':
       return jobExecutor(job = CleanupJob(model = DbEvent, request = jobExecutionRequest))
-    elif jobExecutionRequest.jobExecution.action.action == 'cleanup-grpc-requests':
+    if jobExecutionRequest.jobExecution.action.action == 'cleanup-grpc-requests':
       return jobExecutor(job = CleanupJob(model = DbGrpcRequest, request = jobExecutionRequest))
-    elif jobExecutionRequest.jobExecution.action.action == 'cleanup-errors':
+    if jobExecutionRequest.jobExecution.action.action == 'cleanup-errors':
       return jobExecutor(job = CleanupJob(model = DbError, request = jobExecutionRequest))
-    elif jobExecutionRequest.jobExecution.action.action == 'cleanup-http-requests':
+    if jobExecutionRequest.jobExecution.action.action == 'cleanup-http-requests':
       return jobExecutor(job = CleanupJob(model = DbHttpRequest, request = jobExecutionRequest))
-    elif jobExecutionRequest.jobExecution.action.action == 'cleanup-queries':
+    if jobExecutionRequest.jobExecution.action.action == 'cleanup-queries':
       return jobExecutor(job = CleanupJob(model = DbQuery, request = jobExecutionRequest))
-    else:
-      raise ProgrammingException(
-        privateMessage = 'Cleanup action isn\'t implemented!',
-        privateDetails = jobExecutionRequest.jobExecution.action.action,
-      )
+    raise ProgrammingException(
+      privateMessage = 'Cleanup action isn\'t implemented!',
+      privateDetails = jobExecutionRequest.jobExecution.action.action,
+    )
