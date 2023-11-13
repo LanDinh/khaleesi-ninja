@@ -30,6 +30,7 @@ class Broom(BaseBroom):
 
   def cleanup(self, *, jobExecutionRequest: JobExecutionRequest) -> EmptyResponse :
     """Do nothing."""
+    return EmptyResponse()
 
 
 def instantiateBroom() -> BaseBroom :
