@@ -23,7 +23,7 @@ class MaidServiceTestCase(SimpleTestCase):
       with self.subTest(action = action):
         # Prepare data.
         jobExecutionRequest = JobExecutionRequest()
-        jobExecutionRequest.jobExecution.action.action = f'cleanup-${action}'
+        jobExecutionRequest.jobExecution.action.action = f'cleanup-{action}'
         # Execute test & assert result.
         self.broom.cleanup(jobExecutionRequest = jobExecutionRequest)
 

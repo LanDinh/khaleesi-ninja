@@ -45,8 +45,8 @@ class Service(Servicer):
   def Cleanup(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Cleanup stuff."""
     LOGGER.info(
-      f'Performing cleanup for ${request.jobExecution.action.action} older than'
-      f' ${request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}',
+      f'Performing cleanup for {request.jobExecution.action.action} older than '
+      f'{request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}',
     )
     return SINGLETON.broom.cleanup(jobExecutionRequest = request)
 

@@ -38,12 +38,12 @@ class Actuator:
       return instance.toObjectMetadata()
     except KeyError as exception:
       grpc.status = GrpcJobExecution.Status.FATAL
-      grpc.statusDetails = f'No action "${action.site}.${action.app}.${action.action}"'
+      grpc.statusDetails = f'No action "{action.site}.{action.app}.{action.action}"'
       instance.khaleesiSave(grpc = grpc, metadata = instance.toObjectMetadata())
       raise InvalidArgumentException(
-        publicDetails  = f'site = ${action.site}, app = ${action.app}, action = ${action.action}',
+        publicDetails  = f'site = {action.site}, app = {action.app}, action = {action.action}',
         privateMessage = 'No such action exists.',
-        privateDetails = f'site = ${action.site}, app = ${action.app}, action = ${action.action}',
+        privateDetails = f'site = {action.site}, app = {action.app}, action = {action.action}',
       ) from exception
 
 
