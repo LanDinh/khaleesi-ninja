@@ -1,19 +1,15 @@
 """Test the core-sawmill maid service."""
 
 # Python.
-from typing import Callable
 from unittest.mock import patch, MagicMock
-
-# gRPC.
-from grpc import ServicerContext
 
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import ProgrammingException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import JobExecutionRequest, EmptyResponse
+from khaleesi.proto.core_pb2 import JobExecutionRequest
 from microservice.broom import Broom
 
-@patch('microservice.broom.LOGGER')
+
 class MaidServiceTestCase(SimpleTestCase):
   """Test the core-sawmill maid service."""
 
@@ -32,7 +28,7 @@ class MaidServiceTestCase(SimpleTestCase):
         self.broom.cleanup(jobExecutionRequest = jobExecutionRequest)
 
 
-  def testCleanupFailure(self, *_: MagicMock) -> None :
+  def testCleanupFailure(self) -> None :
     """Test not cleaning up."""
     # Prepare data.
     jobExecutionRequest = JobExecutionRequest()
@@ -40,18 +36,3 @@ class MaidServiceTestCase(SimpleTestCase):
     # Execute test & assert result.
     with self.assertRaises(ProgrammingException):
       self.broom.cleanup(jobExecutionRequest = jobExecutionRequest)
-
-  @patch('microservice.broom.CleanupJob')
-  @patch('microservice.broom.jobExecutor')
-  def _executeCleanupTest(
-      self,
-      executor: MagicMock,
-      cleanup : MagicMock,
-      *,
-      method: Callable[[JobExecutionRequest, ServicerContext], EmptyResponse],
-  ) -> None :
-    """All cleanup methods look the same, so we can have a unified test."""
-    # Execute test.
-    method(JobExecutionRequest(), MagicMock())
-    # Assert result.
-    executor.assert_called_once_with(job = cleanup.return_value)
