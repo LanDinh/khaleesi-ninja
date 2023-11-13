@@ -7,9 +7,9 @@ from typing import Callable, Any
 from grpc import ServicerContext, StatusCode
 
 # khaleesi.ninja.
-from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
 from khaleesi.core.interceptors.server.util import ServerInterceptor
-from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
+from khaleesi.core.singleton.structured_logger import SINGLETON
 
 
 class LoggingServerInterceptor(ServerInterceptor):

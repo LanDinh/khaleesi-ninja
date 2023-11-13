@@ -7,8 +7,8 @@ from unittest.mock import patch, MagicMock
 # gRPC.
 from grpc import ServicerContext
 
-from khaleesi.core.shared.exceptions import ProgrammingException
 # khaleesi.ninja.
+from khaleesi.core.shared.exceptions import ProgrammingException
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import JobExecutionRequest, EmptyResponse
 from microservice.broom import Broom

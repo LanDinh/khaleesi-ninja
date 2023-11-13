@@ -14,8 +14,8 @@ from google.protobuf.json_format import MessageToJson
 
 # khaleesi.ninja.
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
-from khaleesi.core.shared.singleton import SINGLETON
 from khaleesi.core.shared.state import STATE
+from khaleesi.core.singleton.structured_logger import SINGLETON
 from khaleesi.proto.core_pb2 import ObjectMetadata, User
 from khaleesi.proto.core_sawmill_pb2 import Event
 from .baseModel import Grpc, Manager

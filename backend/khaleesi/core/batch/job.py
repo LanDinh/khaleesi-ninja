@@ -22,7 +22,7 @@ from khaleesi.core.shared.exceptions import (
   MaskingInternalServerException,
   InvalidArgumentException,
 )
-from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.core.singleton.structured_logger import SINGLETON
 from khaleesi.models.jobExecution import JobExecution as DbJobExecution
 from khaleesi.proto.core_pb2 import (
   JobExecution as GrpcJobExecution,

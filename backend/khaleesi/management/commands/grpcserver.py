@@ -18,7 +18,7 @@ from prometheus_client import start_http_server
 from khaleesi.core.grpc.server import Server
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
 from khaleesi.core.shared.exceptions import KhaleesiException, MaskingInternalServerException
-from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.core.singleton.structured_logger import SINGLETON
 from khaleesi.management.commands._base import BaseCommand
 
 

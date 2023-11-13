@@ -1,4 +1,4 @@
-"""Maid service."""
+"""Sawmill broom."""
 
 # khaleesi-ninja.
 from khaleesi.core.batch.broom import BaseBroom
@@ -16,7 +16,7 @@ from microservice.models.cleanupJob import CleanupJob
 
 
 class Broom(BaseBroom):
-  """Maid service."""
+  """Sawmill broom."""
 
   def cleanup(self, *, jobExecutionRequest: JobExecutionRequest) -> EmptyResponse :
     """Cleanup stuff."""

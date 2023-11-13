@@ -10,7 +10,7 @@ import grpc
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
-from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.core.singleton.structured_logger import SINGLETON
 from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,

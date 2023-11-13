@@ -32,7 +32,7 @@ from khaleesi.core.shared.exceptions import (
   KhaleesiException,
   TimeoutException,
 )
-from khaleesi.core.shared.singleton import SINGLETON
+from khaleesi.core.singleton.structured_logger import SINGLETON
 from khaleesi.proto.core_pb2 import User
 from khaleesi.proto.core_sawmill_pb2 import Event
 # noinspection PyUnresolvedReferences
