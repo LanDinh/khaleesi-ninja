@@ -11,6 +11,7 @@ KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.lumberjack')
 KHALEESI_NINJA['GRPC']['HANDLERS'].append('microservice.service.sawyer')
 KHALEESI_NINJA['SINGLETONS']['STRUCTURED_LOGGER']['NAME'] = \
   'microservice.structuredLogger.StructuredDbLogger'
+KHALEESI_NINJA['SINGLETONS']['BROOM']['NAME'] = 'microservice.broom.Broom'
 KHALEESI_NINJA['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['REQUIRED']  = True
 KHALEESI_NINJA['STARTUP']['MIGRATIONS_BEFORE_SERVER_START']['MIGRATION'] = '0001'
 

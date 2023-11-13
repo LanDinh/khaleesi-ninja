@@ -73,7 +73,7 @@ class TestStructuredLogger(SimpleTestCase):
     self.logger.sender.reset_mock()
     logger.reset_mock()
     httpRequestId = 'http-request'
-    # Perform test.
+    # Execute test.
     self.logger.logHttpRequest(httpRequestId = httpRequestId, method = 'LIFECYCLE')
     # Assert result.
     self.logger.sender.send.assert_called_once()
@@ -93,7 +93,7 @@ class TestStructuredLogger(SimpleTestCase):
         self.logger.sender.reset_mock()
         logger.reset_mock()
         metadata.reset_mock()
-        # Perform test.
+        # Execute test.
         self.logger.logHttpResponse(
           httpRequestId = 'http-request',
           status        = status,
@@ -112,7 +112,7 @@ class TestStructuredLogger(SimpleTestCase):
     # Prepare data.
     self.logger.sender.reset_mock()
     logger.reset_mock()
-    # Perform test.
+    # Execute test.
     self.logger.logHttpResponse(
       httpRequestId = 'http-request',
       method        = 'method',
@@ -138,7 +138,7 @@ class TestStructuredLogger(SimpleTestCase):
     upstreamRequest.app       = 'app'
     upstreamRequest.service   = 'service'
     upstreamRequest.method    = 'method'
-    # Perform test.
+    # Execute test.
     self.logger.logGrpcRequest(upstreamRequest = upstreamRequest)
     # Assert result.
     self.logger.sender.send.assert_called_once()
@@ -157,7 +157,7 @@ class TestStructuredLogger(SimpleTestCase):
     httpRequestId = 'http-request'
     grpcRequestId = 'grpc-request'
     method        = 'method'
-    # Perform test.
+    # Execute test.
     self.logger.logSystemGrpcRequest(
       httpRequestId = httpRequestId,
       grpcRequestId = grpcRequestId,
@@ -178,7 +178,7 @@ class TestStructuredLogger(SimpleTestCase):
         logger.reset_mock()
         metadata.reset_mock()
         STATE.reset()
-        # Perform test.
+        # Execute test.
         self.logger.logGrpcResponse(status = status)
         # Assert result.
         self.logger.sender.send.assert_called_once()
@@ -201,7 +201,7 @@ class TestStructuredLogger(SimpleTestCase):
       query.raw = 'raw'
       query.start.FromDatetime(datetime.now(tz = timezone.utc))
       STATE.queries.append(query)
-    # Perform test.
+    # Execute test.
     self.logger.logGrpcResponse(status = StatusCode.OK)
     # Assert result.
     self.logger.sender.send.assert_called_once()
@@ -223,7 +223,7 @@ class TestStructuredLogger(SimpleTestCase):
         logger.reset_mock()
         metadata.reset_mock()
         STATE.reset()
-        # Perform test.
+        # Execute test.
         self.logger.logSystemGrpcResponse(
           httpRequestId = 'http-request-id',
           grpcRequestId = 'grpc-request-id',
@@ -251,7 +251,7 @@ class TestStructuredLogger(SimpleTestCase):
       query.raw = 'raw'
       query.start.FromDatetime(datetime.now(tz = timezone.utc))
       STATE.queries.append(query)
-    # Perform test.
+    # Execute test.
     self.logger.logSystemGrpcResponse(
       httpRequestId = 'http-request-id',
       grpcRequestId = 'grpc-request-id',
@@ -292,7 +292,7 @@ class TestStructuredLogger(SimpleTestCase):
             event.action.customType = action
             event.action.result     = resultType
             event.action.details    = details
-            # Perform test.
+            # Execute test.
             self.logger.logEvent(event = event)
             # Assert result.
             requestMetadata.assert_called_once()
@@ -335,7 +335,7 @@ class TestStructuredLogger(SimpleTestCase):
             event.action.crudType   = actionType
             event.action.result     = resultType
             event.action.details    = details
-            # Perform test.
+            # Execute test.
             self.logger.logSystemEvent(
               method    = method,
               httpRequestId = httpRequestId,
@@ -371,7 +371,7 @@ class TestStructuredLogger(SimpleTestCase):
           logger.reset_mock()
           metadata.reset_mock()
           exception = defaultKhaleesiException(status = status, loglevel = loglevel)
-          # Perform test.
+          # Execute test.
           self.logger.logError(exception = exception)
           # Assert result.
           self.logger.sender.send.assert_called_once()
@@ -396,7 +396,7 @@ class TestStructuredLogger(SimpleTestCase):
           logger.reset_mock()
           metadata.reset_mock()
           exception = defaultKhaleesiException(status = status, loglevel = loglevel)
-          # Perform test.
+          # Execute test.
           self.logger.logSystemError(
             exception     = exception,
             httpRequestId = httpRequestId,
@@ -431,7 +431,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogHttpRequest = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogHttpRequest(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogHttpRequest.assert_called_once()
@@ -440,7 +440,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogHttpRequestResponse = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogHttpResponse(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogHttpRequestResponse.assert_called_once()
@@ -449,7 +449,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogGrpcRequest = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogGrpcRequest(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogGrpcRequest.assert_called_once()
@@ -458,7 +458,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogGrpcResponse = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogGrpcResponse(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogGrpcResponse.assert_called_once()
@@ -467,7 +467,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogEvent = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogEvent(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogEvent.assert_called_once()
@@ -476,7 +476,7 @@ class TestStructuredGrpcLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     self.logger.stub.LogError = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogError(grpc = MagicMock())
     # Assert result.
     self.logger.stub.LogError.assert_called_once()

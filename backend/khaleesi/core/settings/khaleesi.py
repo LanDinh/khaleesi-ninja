@@ -106,6 +106,9 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
     STRUCTURED_LOGGER = definition.Singleton(
       NAME = 'khaleesi.core.logging.structuredLogger.StructuredGrpcLogger',
     ),
+    BROOM = definition.Singleton(
+      NAME = 'khaleesi.core.batch.broom.Broom',
+    ),
   ),
   STARTUP = definition.Startup(
     MIGRATIONS_BEFORE_SERVER_START = definition.MigrationsBeforeServerStart(

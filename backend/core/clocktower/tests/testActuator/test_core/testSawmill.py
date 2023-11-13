@@ -6,60 +6,18 @@ from unittest.mock import patch, MagicMock
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.proto.core_pb2 import JobExecutionRequest
-from microservice.actuator.core.sawmill import (
-  cleanupEvents,
-  cleanupGrpcRequests,
-  cleanupErrors,
-  cleanupHttpRequests,
-  cleanupQueries,
-)
+from microservice.actuator.core.sawmill import cleanup
 
 
-@patch('microservice.actuator.core.sawmill.STUB')
+@patch('microservice.actuator.core.sawmill.CLEANUP_STUB')
 class SawmillJobTestCase(SimpleTestCase):
   """Test core-sawmill batch jobs."""
 
-  def testCleanupEvents(self, stub: MagicMock) -> None :
+  def testCleanup(self, cleanupStub: MagicMock) -> None :
     """Test cleaning up requests."""
     # Prepare data.
     request = JobExecutionRequest()
     # Execute test.
-    cleanupEvents(request)
+    cleanup(request)
     # Assert result.
-    stub.CleanupEvents.assert_called_once_with(request)
-
-  def testCleanupGrpcRequests(self, stub: MagicMock) -> None :
-    """Test cleaning up requests."""
-    # Prepare data.
-    request = JobExecutionRequest()
-    # Execute test.
-    cleanupGrpcRequests(request)
-    # Assert result.
-    stub.CleanupGrpcRequests.assert_called_once_with(request)
-
-  def testCleanupErrors(self, stub: MagicMock) -> None :
-    """Test cleaning up requests."""
-    # Prepare data.
-    request = JobExecutionRequest()
-    # Execute test.
-    cleanupErrors(request)
-    # Assert result.
-    stub.CleanupErrors.assert_called_once_with(request)
-
-  def testCleanupHttpRequests(self, stub: MagicMock) -> None :
-    """Test cleaning up requests."""
-    # Prepare data.
-    request = JobExecutionRequest()
-    # Execute test.
-    cleanupHttpRequests(request)
-    # Assert result.
-    stub.CleanupHttpRequests.assert_called_once_with(request)
-
-  def testCleanupQueries(self, stub: MagicMock) -> None :
-    """Test cleaning up requests."""
-    # Prepare data.
-    request = JobExecutionRequest()
-    # Execute test.
-    cleanupQueries(request)
-    # Assert result.
-    stub.CleanupQueries.assert_called_once_with(request)
+    cleanupStub.Cleanup.assert_called_once_with(request)

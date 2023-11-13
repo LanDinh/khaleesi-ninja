@@ -7,7 +7,7 @@ from unittest.mock import patch, MagicMock
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.core.service.maid import Service
 from khaleesi.models.jobExecution import JobExecution
-from khaleesi.proto.core_pb2 import ObjectMetadataRequest, EmptyRequest
+from khaleesi.proto.core_pb2 import ObjectMetadataRequest, EmptyRequest, JobExecutionRequest
 
 
 @patch('khaleesi.core.service.maid.LOGGER')
@@ -33,3 +33,11 @@ class MaidServiceTestCase(SimpleTestCase):
     self.service.AbortAllBatchJobs(EmptyRequest(), MagicMock())
     # Assert result.
     stopAllJobs.assert_called_once()
+
+  @patch('khaleesi.core.service.maid.SINGLETON')
+  def testCleanup(self, singleton: MagicMock, *_: MagicMock) -> None :
+    """Test cleanup."""
+    # Execute test.
+    self.service.Cleanup(JobExecutionRequest(), MagicMock())
+    # Assert result.
+    singleton.broom.cleanup.assert_called_once()

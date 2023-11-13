@@ -131,6 +131,7 @@ message JobExecutionRequest {
 }
 
 service Maid {
-  rpc AbortBatchJob     (ObjectMetadataRequest) returns (EmptyResponse);
-  rpc AbortAllBatchJobs (EmptyRequest)          returns (EmptyResponse);
+  rpc AbortBatchJob       (ObjectMetadataRequest)     returns (EmptyResponse);
+  rpc AbortAllBatchJobs   (EmptyRequest)              returns (EmptyResponse);
+  rpc Cleanup             (JobExecutionRequest)       returns (EmptyResponse);
 }

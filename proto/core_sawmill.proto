@@ -225,17 +225,6 @@ service Sawyer {
   rpc GetQueries          (LogFilter) returns (QueryList);
 }
 
-/* MAID *******************************************************************************************/
-
-
-service Maid {
-  rpc CleanupEvents       (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupGrpcRequests (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupErrors       (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupHttpRequests (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
-  rpc CleanupQueries      (khaleesi.core.JobExecutionRequest) returns (khaleesi.core.EmptyResponse);
-}
-
 
 /* FORESTER ***************************************************************************************/
 

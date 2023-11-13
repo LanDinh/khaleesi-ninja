@@ -7,9 +7,11 @@ import grpc
 from khaleesi.core.batch.thread import stopAllJobs, stopJob
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
+from khaleesi.core.shared.singleton import SINGLETON
 from khaleesi.models.jobExecution import JobExecution
 from khaleesi.proto.core_pb2 import (
   ObjectMetadataRequest,
+  JobExecutionRequest,
   EmptyResponse,
   EmptyRequest,
   DESCRIPTOR,
@@ -38,6 +40,15 @@ class Service(Servicer):
     LOGGER.info('Aborting all jobs.')
     stopAllJobs()
     return EmptyResponse()
+
+
+  def Cleanup(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
+    """Cleanup stuff."""
+    LOGGER.info(
+      f'Performing cleanup for ${request.jobExecution.action.action} older than'
+      f' ${request.jobExecution.configuration.cleanup.cleanupSince.ToDatetime()}',
+    )
+    return SINGLETON.broom.cleanup(jobExecutionRequest = request)
 
 
 serviceConfiguration = ServiceConfiguration[Service](

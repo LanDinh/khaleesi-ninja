@@ -19,7 +19,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     request = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogHttpRequest(grpc = request)
     # Assert result.
     dbHttpRequest.assert_called_once()
@@ -29,7 +29,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     """Test sending a log response."""
     # Prepare data.
     response = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogHttpResponse(grpc = response)
     # Assert result.
     dbHttpRequest.objects.get.return_value.finish.assert_called_once()
@@ -45,7 +45,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     """Test sending a log request."""
     # Prepare data.
     grpcRequest = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogGrpcRequest(grpc = grpcRequest)
     # Assert result.
     dbGrpcRequest.assert_called_once_with(grpc = grpcRequest)
@@ -66,7 +66,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     response = ResponseRequest()
     response.queries.append(Query())
     dbGrpcRequest.objects.get.return_value.toGrpc.return_value = GrpcRequestRequest()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogGrpcResponse(grpc = response)
     # Assert result.
     dbHttpRequest.objects.get.return_value.addChildDuration.assert_called_once()
@@ -81,7 +81,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     """Test sending a log event."""
     # Prepare data.
     event = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogEvent(grpc = event)
     # Assert result.
     dbEvent.assert_called_once()
@@ -91,7 +91,7 @@ class TestStructuredDbLogger(SimpleTestCase):
     """Test sending a log error."""
     # Prepare data.
     error = MagicMock()
-    # Perform test.
+    # Execute test.
     self.logger.sendLogError(grpc = error)
     # Assert result.
     dbError.assert_called_once()
