@@ -22,8 +22,8 @@ class TestBroom(SimpleTestCase):
 class BroomInstantiationTest(SimpleTestCase):
   """Test instantiation."""
 
-  @patch('khaleesi.core.logging.structuredLogger.LOGGER')
-  @patch('khaleesi.core.logging.structuredLogger.importSetting')
+  @patch('khaleesi.core.batch.broom.LOGGER')
+  @patch('khaleesi.core.batch.broom.importSetting')
   def testInstantiation(self, importSetting: MagicMock, *_: MagicMock) -> None :
     """Test instantiation."""
     # Execute test.
