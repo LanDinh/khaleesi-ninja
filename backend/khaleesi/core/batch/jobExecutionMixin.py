@@ -7,6 +7,12 @@ from django.db import models
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution
 
 
+IN_PROGRESS = [
+    GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS),
+    GrpcJobExecution.Status.Name(GrpcJobExecution.Status.SCHEDULED),
+]
+
+
 class JobExecutionMixin(models.Model):
   """Mixin for job configuration."""
   # Metadata.
@@ -27,10 +33,7 @@ class JobExecutionMixin(models.Model):
   @property
   def inProgress(self) -> bool :
     """Specify if the job is in progress."""
-    return GrpcJobExecution.Status.Value(self.status) in [
-        GrpcJobExecution.Status.IN_PROGRESS,
-        GrpcJobExecution.Status.SCHEDULED,
-    ]
+    return self.status in IN_PROGRESS
 
   def jobExecutionFromGrpc(self, *, grpc: GrpcJobExecution) -> None :
     """Change own values according to the grpc object."""
@@ -46,6 +49,8 @@ class JobExecutionMixin(models.Model):
       self.itemsProcessed = grpc.itemsProcessed
       self.statusDetails  = grpc.statusDetails
       self.status         = GrpcJobExecution.Status.Name(grpc.status)
+      if grpc.end.ToDatetime():
+        self.end = grpc.end.ToDatetime()
 
     # This can be set only once.
     if not self.totalItems:

@@ -10,12 +10,11 @@ from typing import List
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.batch.jobExecutionMixin import JobExecutionMixin
+from khaleesi.core.batch.jobExecutionMixin import JobExecutionMixin, IN_PROGRESS
 from khaleesi.core.models.baseModel import Model, Manager
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, ObjectMetadata
 
 
-IN_PROGRESS = GrpcJobExecution.Status.Name(GrpcJobExecution.Status.IN_PROGRESS)
 
 
 class JobExecutionManager(Manager['JobExecution']):
@@ -23,11 +22,11 @@ class JobExecutionManager(Manager['JobExecution']):
 
   def countJobExecutionsInProgress(self, *, job: ObjectMetadata) -> int :
     """Count how many jobs are in progress."""
-    return self.filter(jobId = job.id, status = IN_PROGRESS).count()
+    return self.filter(jobId = job.id, status__in = IN_PROGRESS).count()
 
   def getJobExecutionsInProgress(self, *, job: ObjectMetadata) -> List[GrpcJobExecution] :
     """Stop the job with the given job ID."""
-    jobObjects = self.filter(jobId = job.id, status = IN_PROGRESS)
+    jobObjects = self.filter(jobId = job.id, status__in = IN_PROGRESS)
     jobs: List[GrpcJobExecution] = []
     for jobObject in jobObjects:
       grpc = GrpcJobExecution()
