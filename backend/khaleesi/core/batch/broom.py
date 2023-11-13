@@ -11,7 +11,7 @@ from django.conf import settings
 from khaleesi.core.grpc.importUtil import importSetting
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.settings.definition import KhaleesiNinjaSettings
-from proto.core_pb2 import JobExecutionRequest, EmptyResponse
+from khaleesi.proto.core_pb2 import JobExecutionRequest, EmptyResponse
 
 
 khaleesiSettings: KhaleesiNinjaSettings = settings.KHALEESI_NINJA
