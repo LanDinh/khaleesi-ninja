@@ -313,10 +313,10 @@ class StructuredGrpcLogger(StructuredLogger):
     self.stub.LogError(grpc)
 
 
-def instantiateStructuredLogger() -> StructuredLogger:
+def instantiateStructuredLogger() -> StructuredLogger :
   """Instantiate the structured logger."""
   LOGGER.info('Importing structured logger...')
   return cast(StructuredLogger, importSetting(
     name               = 'structured logger',
-    fullyQualifiedName = khaleesiSettings['GRPC']['INTERCEPTORS']['STRUCTURED_LOGGER']['NAME'],
+    fullyQualifiedName = khaleesiSettings['SINGLETONS']['STRUCTURED_LOGGER']['NAME'],
   ))

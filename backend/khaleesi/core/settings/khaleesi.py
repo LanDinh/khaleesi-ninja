@@ -97,15 +97,15 @@ KHALEESI_NINJA: definition.KhaleesiNinjaSettings = definition.KhaleesiNinjaSetti
       ),
       APP_SPECIFIC = {},
     ),
-    INTERCEPTORS = definition.GrpcInterceptors(
-      STRUCTURED_LOGGER = definition.GrpcServerInterceptor(
-        NAME = 'khaleesi.core.logging.structuredLogger.StructuredGrpcLogger',
-      ),
-    ),
     HANDLERS = [ 'khaleesi.core.service.maid' ],
   ),
   MONITORING = definition.Monitoring(
     PORT = cast(int, environ.get('KHALEESI_METRICS_PORT', 8020)),
+  ),
+  SINGLETONS = definition.Singletons(
+    STRUCTURED_LOGGER = definition.Singleton(
+      NAME = 'khaleesi.core.logging.structuredLogger.StructuredGrpcLogger',
+    ),
   ),
   STARTUP = definition.Startup(
     MIGRATIONS_BEFORE_SERVER_START = definition.MigrationsBeforeServerStart(

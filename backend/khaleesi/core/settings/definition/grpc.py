@@ -23,17 +23,6 @@ class GrpcServerMethodNames(TypedDict):
   APP_SPECIFIC              : Dict[str, GrpcEventMethodName]  # Enable custom methods for each app.
 
 
-class GrpcServerInterceptor(TypedDict):
-  """Configuration for the logging server interceptor."""
-
-  NAME: str
-
-class GrpcInterceptors(TypedDict):
-  """Interceptor configuration."""
-
-  STRUCTURED_LOGGER: GrpcServerInterceptor
-
-
 class Grpc(TypedDict):
   """gRPC configuration for khaleesi.ninja apps."""
 
@@ -42,4 +31,3 @@ class Grpc(TypedDict):
   SHUTDOWN_GRACE_SECS: int
   SERVER_METHOD_NAMES: GrpcServerMethodNames
   HANDLERS           : List[str]
-  INTERCEPTORS       : GrpcInterceptors
