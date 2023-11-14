@@ -30,6 +30,10 @@ class Job(BaseJob[DbJobExecution]):
     """Return the full queryset to be iterated over."""
     return self.mock.getQueryset()  # type: ignore[no-any-return]
 
+  def finishJob(self) -> None :
+    """Finish up."""
+    self.mock.finish()  # pylint: disable=no-value-for-parameter
+
 
 class CleanupJob(BaseCleanupJob[DbJobExecution]):
   """Test job for testing."""
@@ -126,6 +130,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Assert result.
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
     singleton.structuredLogger.logError.assert_called_once()
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
   # noinspection PyUnusedLocal
   def testJobIsSkipped(self, start: MagicMock, singleton: MagicMock, *_: MagicMock) -> None :
@@ -141,6 +146,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Assert result.
     self.assertEqual(GrpcJobExecution.Status.SKIPPED, self.job.request.status)
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
   def testJobFailedToGetCount(self,
       start    : MagicMock,
@@ -164,6 +170,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertIn('total amount of affected items', self.job.jobExecution.statusDetails)
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
     singleton.structuredLogger.logError.assert_called_once()
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
   def testJobAbort(
       self,
@@ -189,6 +196,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertEqual(0, self.job.jobExecution.itemsProcessed)
     self.assertEqual(6, self.job.jobExecution.totalItems)
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
   def testJobTimeout(
       self,
@@ -213,6 +221,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertEqual(0, self.job.jobExecution.itemsProcessed)
     self.assertEqual(6, self.job.jobExecution.totalItems)
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
   def testJobError(
       self,
@@ -239,6 +248,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertEqual(2, singleton.structuredLogger.logEvent.call_count)
     singleton.structuredLogger.logError.assert_called_once()
     self.job.mock.executeBatch.assert_called_once_with()
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
   def testJobSuccess(
       self,
@@ -264,6 +274,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     self.assertEqual(2          , singleton.structuredLogger.logEvent.call_count)
     self.assertEqual(3          , self.job.mock.executeBatch.call_count)
     self.assertNotEqual(1       , paginator.return_value.get_page.call_args.args[0])
+    self.job.mock.finish.assert_called_once()  # pylint: disable=no-member
 
 
 @patch('khaleesi.core.models.baseModel.transaction')

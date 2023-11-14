@@ -121,6 +121,9 @@ class BaseJob(ABC, Generic[M]):
   def getQueryset(self) -> models.QuerySet[M] :
     """Return the full queryset to be iterated over."""
 
+  def finishJob(self) -> None :
+    """Any work needed to finish the job."""
+
   def target(self) -> str :
     """Return the target resource. By default, this is should be the affected model name."""
     return self.model.__name__
@@ -177,6 +180,7 @@ class BaseJob(ABC, Generic[M]):
     elif eventResult == Event.Action.ResultType.FATAL:
       LOGGER.fatal(f'{self._loggingPrefix()} {details}')
 
+    self.finishJob()
     self.jobExecution.finish(
       status         = executionStatus,
       itemsProcessed = self.itemsProcessed,
