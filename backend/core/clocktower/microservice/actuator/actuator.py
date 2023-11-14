@@ -31,7 +31,7 @@ class Actuator:
       # Execute actuator.
       request = JobExecutionRequest()
       addRequestMetadata(metadata = request.requestMetadata)
-      request.jobExecution.CopyFrom(grpc)
+      request.jobExecution.CopyFrom(instance.toGrpc())
       method = self.actions[action.site][action.app][action.action]
       method(request)
       # Return execution metadata.
