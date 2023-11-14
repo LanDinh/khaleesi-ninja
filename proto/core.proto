@@ -60,7 +60,16 @@ message ObjectMetadata {
 
 message ObjectMetadataRequest {
   RequestMetadata metadata = 1;
-  ObjectMetadata object    = 2;
+  ObjectMetadata  object   = 2;
+}
+
+message ObjectMetadataList {
+  repeated ObjectMetadata objects = 1;
+}
+
+message ObjectMetadataListRequest {
+  RequestMetadata    metadata = 1;
+  ObjectMetadataList objects = 2;
 }
 
 message EmptyRequest {
@@ -130,8 +139,13 @@ message JobExecutionRequest {
   JobExecution jobExecution = 10;
 }
 
+message JobExecutionList {
+  repeated JobExecution jobExecutions = 1;
+}
+
 service Maid {
   rpc AbortBatchJob       (ObjectMetadataRequest)     returns (EmptyResponse);
   rpc AbortAllBatchJobs   (EmptyRequest)              returns (EmptyResponse);
+  rpc FetchExecutionState (ObjectMetadataListRequest) returns (JobExecutionList);
   rpc Cleanup             (JobExecutionRequest)       returns (EmptyResponse);
 }

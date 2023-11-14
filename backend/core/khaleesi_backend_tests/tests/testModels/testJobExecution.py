@@ -25,14 +25,26 @@ class JobExecutionManagerTestCase(SimpleTestCase):
   def testGetJobExecutionsInProgress(self, filterData: MagicMock) -> None :
     """Test getting all executions that are in progress for the job in question."""
     # Prepare data.
-    job = MagicMock()
-    job.jobId       = 'job-id'
-    job.executionId = 'execution-id'
-    filterData.return_value = [ job, job ]
+    jobExecution = MagicMock()
+    jobExecution.jobId       = 'jobExecution-id'
+    jobExecution.executionId = 'execution-id'
+    filterData.return_value = [ jobExecution, jobExecution ]
     # Execute test.
     result = DbJobExecution.objects.getJobExecutionsInProgress(job = MagicMock())
     # Assert result.
     self.assertEqual(2, len(result))
+
+  @patch.object(DbJobExecution.objects, 'filter')
+  def testGetJobExecutions(self, filterData: MagicMock) -> None :
+    """Test getting all specified job executions."""
+    # Prepare data.
+    jobExecution = MagicMock()
+    jobExecution.toGrpc.return_value = GrpcJobExecution()
+    filterData.return_value = [ jobExecution, jobExecution ]
+    # Execute test.
+    result = DbJobExecution.objects.getJobExecutions(jobExecutions = MagicMock())
+    # Assert result.
+    self.assertEqual(2, len(result.jobExecutions))
 
 
 class JobExecutionTestCase(SimpleTestCase):

@@ -12,9 +12,10 @@ from django.db import models
 # khaleesi.ninja.
 from khaleesi.core.batch.jobExecutionMixin import JobExecutionMixin, IN_PROGRESS
 from khaleesi.core.models.baseModel import Model, Manager
-from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, ObjectMetadata
-
-
+from khaleesi.proto.core_pb2 import (
+  JobExecution as GrpcJobExecution, JobExecutionList, ObjectMetadata,
+  ObjectMetadataListRequest,
+)
 
 
 class JobExecutionManager(Manager['JobExecution']):
@@ -26,15 +27,24 @@ class JobExecutionManager(Manager['JobExecution']):
 
   def getJobExecutionsInProgress(self, *, job: ObjectMetadata) -> List[GrpcJobExecution] :
     """Stop the job with the given job ID."""
-    jobObjects = self.filter(jobId = job.id, status__in = IN_PROGRESS)
-    jobs: List[GrpcJobExecution] = []
-    for jobObject in jobObjects:
+    jobExecutions = self.filter(jobId = job.id, status__in = IN_PROGRESS)
+    result: List[GrpcJobExecution] = []
+    for jobExecution in jobExecutions:
       grpc = GrpcJobExecution()
-      grpc.jobMetadata.id       = jobObject.jobId
-      grpc.executionMetadata.id = jobObject.executionId
-      jobs.append(grpc)
+      grpc.jobMetadata.id       = jobExecution.jobId
+      grpc.executionMetadata.id = jobExecution.executionId
+      result.append(grpc)
 
-    return jobs
+    return result
+
+  def getJobExecutions(self, *, jobExecutions: ObjectMetadataListRequest) -> JobExecutionList:
+    """Return the status of the requested job executions."""
+    ids = [execution.id for execution in jobExecutions.objects.objects]
+    result = JobExecutionList()
+    for jobExecution in self.filter(executionId__in = ids):
+      result.jobExecutions.append(jobExecution.toGrpc())
+    return result
+
 
 
 class JobExecution(Model[GrpcJobExecution], JobExecutionMixin):

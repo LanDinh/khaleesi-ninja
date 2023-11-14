@@ -10,7 +10,7 @@ from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
 from khaleesi.core.singleton.broom import SINGLETON
 from khaleesi.models.jobExecution import JobExecution
 from khaleesi.proto.core_pb2 import (
-  ObjectMetadataRequest,
+  JobExecutionList, ObjectMetadataListRequest, ObjectMetadataRequest,
   JobExecutionRequest,
   EmptyResponse,
   EmptyRequest,
@@ -41,6 +41,14 @@ class Service(Servicer):
     stopAllJobs()
     return EmptyResponse()
 
+  def FetchExecutionState(
+      self,
+      request: ObjectMetadataListRequest,
+      _: grpc.ServicerContext,
+  ) -> JobExecutionList:
+    """Return the status of the requested job executions."""
+    LOGGER.info('Getting requested job executions.')
+    return JobExecution.objects.getJobExecutions(jobExecutions = request)
 
   def Cleanup(self, request: JobExecutionRequest, _: grpc.ServicerContext) -> EmptyResponse :
     """Cleanup stuff."""
