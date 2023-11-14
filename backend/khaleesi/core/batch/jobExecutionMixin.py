@@ -49,6 +49,8 @@ class JobExecutionMixin(models.Model):
       self.itemsProcessed = grpc.itemsProcessed
       self.statusDetails  = grpc.statusDetails
       self.status         = GrpcJobExecution.Status.Name(grpc.status)
+
+    if not self.inProgress:
       if grpc.end.ToDatetime():
         self.end = grpc.end.ToDatetime()
 

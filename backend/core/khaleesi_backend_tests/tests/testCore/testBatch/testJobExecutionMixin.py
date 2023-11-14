@@ -61,7 +61,10 @@ class JobExecutionMixinTestCase(SimpleTestCase):
         # Assert result.
         self.assertEqual(grpc.jobMetadata.id, instance.jobId)
         self.assertEqual(statusLabel        , instance.status)
-        self.assertFalse(instance.end)
+        if instance.inProgress:
+          self.assertFalse(instance.end)
+        else:
+          self.assertTrue(instance.end)
         self.assertFalse(instance.statusDetails)
         self.assertFalse(instance.totalItems)
         self.assertFalse(instance.itemsProcessed)
@@ -86,7 +89,10 @@ class JobExecutionMixinTestCase(SimpleTestCase):
         instance.jobExecutionFromGrpc(grpc = grpc)
         # Assert result.
         self.assertFalse(instance.jobId)
-        self.assertFalse(instance.end)
+        if instance.inProgress:
+          self.assertFalse(instance.end)
+        else:
+          self.assertTrue(instance.end)
         self.assertEqual(statusLabel        , instance.status)
         self.assertEqual(grpc.statusDetails , instance.statusDetails)
         self.assertEqual(grpc.itemsProcessed, instance.itemsProcessed)

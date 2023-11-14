@@ -29,10 +29,10 @@ class Actuator:
     instance = DbJobExecution.objects.khaleesiCreate(grpc = grpc)
     try:
       # Execute actuator.
+      method = self.actions[action.site][action.app][action.action]
       request = JobExecutionRequest()
       addRequestMetadata(metadata = request.requestMetadata)
       request.jobExecution.CopyFrom(instance.toGrpc())
-      method = self.actions[action.site][action.app][action.action]
       method(request)
       # Return execution metadata.
       return instance.toObjectMetadata()

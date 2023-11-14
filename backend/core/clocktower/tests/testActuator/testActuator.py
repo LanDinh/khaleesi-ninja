@@ -50,6 +50,7 @@ class ActuatorTest(SimpleTestCase):
     grpc.action.action = 'action'
     job.return_value.toGrpcJobExecutionRequest.return_value = grpc
     mock = MagicMock()
+    execution.return_value.toGrpc.return_value = grpc
     # Execute test.
     with patch.dict('microservice.actuator.actuator.CORE', { 'app': { 'action': mock } }):
       ACTUATOR.actuate(jobId = 'job-id')
