@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { NavigationElement } from '../../../app/khaleesi/navigation/navigationElement'
-import { breadcrumb, BreadCrumbs } from '../../../app/khaleesi/navigation/breadcrumb'
+import { NavigationElement } from '../../app/khaleesi/navigation/navigationElement'
+import { breadcrumb, BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
 
 
-jest.mock('../../../app/khaleesi/navigation/navigationElement')
+jest.mock('../../app/khaleesi/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),

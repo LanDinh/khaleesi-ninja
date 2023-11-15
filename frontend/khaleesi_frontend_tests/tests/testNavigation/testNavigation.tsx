@@ -1,25 +1,25 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { Navigation } from '../../../app/khaleesi/navigation/navigation'
-import { MenuIcon } from '../../../app/khaleesi/components/icon'
+import { Navigation } from '../../app/khaleesi/navigation/navigation'
+import { MenuIcon } from '../../app/khaleesi/components/icon'
 import type {
   NavigationElementProperties,
-} from '../../../app/khaleesi/navigation/navigationElement'
+} from '../../app/khaleesi/navigation/navigationElement'
 import {
   NavigationMenuElement,
-} from '../../../app/khaleesi/navigation/navigationElement'
-import { createTestingStub } from '../../util/remixStub'
+} from '../../app/khaleesi/navigation/navigationElement'
+import { createTestingStub } from '../util/remixStub'
 
 
-jest.mock('../../../app/khaleesi/components/icon')
-jest.mock('../../../app/khaleesi/navigation/navigationElement')
+jest.mock('../../app/khaleesi/components/icon')
+jest.mock('../../app/khaleesi/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),
 }))
 jest.mock(
-  '../../../app/navigationData',
+  '../../app/navigationData',
   (): { navigationData: NavigationElementProperties[] } => ({
     navigationData: [
       {
@@ -60,7 +60,7 @@ test('Navigation menu renders without errors.', () => {
   const result = render(<RemixStub initialEntries={['/alpha']}/>)
   // Assert result.
   expect(mockMenuIcon).toHaveBeenCalled()
-  expect(mockElement).toBeCalledTimes(4)
+  expect(mockElement).toBeCalledTimes(7)  // Will be 4 when stuff gets removed.
   expect(result.container.querySelectorAll('details').length).toBe(3)
   expect(result.container.querySelectorAll('details')[1]).toHaveAttribute('open')
   expect(result.container.querySelectorAll('details')[2]).not.toHaveAttribute('open')

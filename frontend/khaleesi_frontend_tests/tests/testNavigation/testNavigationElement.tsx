@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react'
 import {
   NavigationElement,
   NavigationMenuElement,
-} from '../../../app/khaleesi/navigation/navigationElement'
-import { createTestingStub } from '../../util/remixStub'
+} from '../../app/khaleesi/navigation/navigationElement'
+import { createTestingStub } from '../util/remixStub'
 
 
 test('NavigationElement renders without error.', () => {
