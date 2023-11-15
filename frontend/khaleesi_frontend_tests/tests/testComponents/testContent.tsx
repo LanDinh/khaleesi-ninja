@@ -4,7 +4,7 @@ import { BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
 import { Content } from '../../app/khaleesi/components/content'
 
 
-jest.mock('../../app/khaleesi/components/navigation/breadcrumb')
+jest.mock('../../app/khaleesi/navigation/breadcrumb')
 
 
 test('Content gets rendered without errors.', () => {

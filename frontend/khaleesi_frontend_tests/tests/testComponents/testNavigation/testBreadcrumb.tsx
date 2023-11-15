@@ -5,7 +5,7 @@ import { NavigationElement } from '../../../app/khaleesi/navigation/navigationEl
 import { breadcrumb, BreadCrumbs } from '../../../app/khaleesi/navigation/breadcrumb'
 
 
-jest.mock('../../../app/khaleesi/components/navigation/navigationElement')
+jest.mock('../../../app/khaleesi/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),

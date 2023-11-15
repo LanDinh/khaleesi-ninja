@@ -13,7 +13,7 @@ import { createTestingStub } from '../../util/remixStub'
 
 
 jest.mock('../../../app/khaleesi/components/icon')
-jest.mock('../../../app/khaleesi/components/navigation/navigationElement')
+jest.mock('../../../app/khaleesi/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),

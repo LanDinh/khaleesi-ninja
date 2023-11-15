@@ -8,7 +8,7 @@ import { createTestingStub } from '../util/remixStub'
 
 
 const originalError = console.error.bind(console.error)
-jest.mock('../../app/khaleesi/components/navigation/navigation')
+jest.mock('../../app/khaleesi/navigation/navigation')
 jest.mock('../../app/khaleesi/components/content')
 
 beforeAll(() => {
