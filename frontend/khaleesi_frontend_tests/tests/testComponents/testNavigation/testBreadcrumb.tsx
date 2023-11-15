@@ -1,8 +1,8 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { NavigationElement } from '../../../app/khaleesi/components/navigation/navigationElement'
-import { breadcrumb, BreadCrumbs } from '../../../app/khaleesi/components/navigation/breadcrumb'
+import { NavigationElement } from '../../../app/khaleesi/navigation/navigationElement'
+import { breadcrumb, BreadCrumbs } from '../../../app/khaleesi/navigation/breadcrumb'
 
 
 jest.mock('../../../app/khaleesi/components/navigation/navigationElement')

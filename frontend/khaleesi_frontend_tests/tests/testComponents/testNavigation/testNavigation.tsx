@@ -1,14 +1,14 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { Navigation } from '../../../app/khaleesi/components/navigation/navigation'
+import { Navigation } from '../../../app/khaleesi/navigation/navigation'
 import { MenuIcon } from '../../../app/khaleesi/components/icon'
 import type {
   NavigationElementProperties,
-} from '../../../app/khaleesi/components/navigation/navigationElement'
+} from '../../../app/khaleesi/navigation/navigationElement'
 import {
   NavigationMenuElement,
-} from '../../../app/khaleesi/components/navigation/navigationElement'
+} from '../../../app/khaleesi/navigation/navigationElement'
 import { createTestingStub } from '../../util/remixStub'
 
 

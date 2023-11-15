@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { BreadCrumbs } from '../../app/khaleesi/components/navigation/breadcrumb'
+import { BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
 import { Content } from '../../app/khaleesi/components/content'
 
 

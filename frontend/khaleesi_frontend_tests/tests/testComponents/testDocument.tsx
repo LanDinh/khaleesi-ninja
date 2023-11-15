@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render } from '@testing-library/react'
 import { App, ErrorBoundary, links } from '../../app/khaleesi/components/document'
-import { Navigation } from '../../app/khaleesi/components/navigation/navigation'
+import { Navigation } from '../../app/khaleesi/navigation/navigation'
 import { Content } from '../../app/khaleesi/components/content'
 import { suppressConsoleFunction } from '../util/consoleLogging'
 import { createTestingStub } from '../util/remixStub'
@@ -27,7 +27,7 @@ test('App gets rendered without errors.', () => {
   mockNavigationBar.mockImplementation(() => <></>)
   const mockContent = Content as jest.MockedFunction<typeof  Content>
   mockContent.mockImplementation(() => <></>)
-  let RemixStub = createTestingStub(App)
+  let RemixStub = createTestingStub(() => <App title="Test App" />)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -41,7 +41,7 @@ test('ErrorBoundary gets rendered without errors.', () => {
   mockNavigationBar.mockImplementation(() => <></>)
   const mockContent = Content as jest.MockedFunction<typeof  Content>
   mockContent.mockImplementation(() => <></>)
-  let RemixStub = createTestingStub(ErrorBoundary)
+  let RemixStub = createTestingStub(() => <ErrorBoundary title="Test App" />)
   // Execute test.
   render(<RemixStub />)
   // Assert result.

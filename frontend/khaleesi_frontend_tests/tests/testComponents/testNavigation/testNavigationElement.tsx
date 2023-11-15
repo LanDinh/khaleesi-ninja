@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import {
   NavigationElement,
   NavigationMenuElement,
-} from '../../../app/khaleesi/components/navigation/navigationElement'
+} from '../../../app/khaleesi/navigation/navigationElement'
 import { createTestingStub } from '../../util/remixStub'
 
 
