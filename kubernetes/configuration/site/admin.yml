@@ -1,0 +1,5 @@
+site:
+  name: "admin"
+kubegres:
+  replicas: 1
+  size: "200Mi"
