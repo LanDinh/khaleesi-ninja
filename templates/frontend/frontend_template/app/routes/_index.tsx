@@ -1,9 +1,13 @@
 import type { MetaFunction, LinksFunction } from '@remix-run/node'
+import { useContext } from 'react'
+import { AppContext } from '../khaleesi/components/document'
 import styles from '../khaleesi/styles/index.css'
 
 export const meta: MetaFunction = () => {
+  const appContext = useContext(AppContext)
+
   return [
-    { title: 'khaleesi.ninja | New Frontend' },
+    { title: appContext.title },
     { name: 'description', content: 'Khaleesi\'s New Frontend.' },
   ]
 }

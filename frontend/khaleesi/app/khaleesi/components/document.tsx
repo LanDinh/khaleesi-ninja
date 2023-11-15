@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react'
+import { createContext, useContext, type Context, type PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
 import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
 import { breadcrumb } from '../navigation/breadcrumb'
@@ -16,7 +16,17 @@ export const handle = {
   ...breadcrumb(topNavigationData[0]),
 }
 
-function Document({ children, title }: PropsWithChildren<{ title: string }>): JSX.Element {
+
+export type AppContextType = {
+  title: string,
+}
+export const AppContext: Context<AppContextType> = createContext({
+  title: 'Change your title!'
+})
+
+function Document({ children }: PropsWithChildren<{}>): JSX.Element {
+  const appContext: AppContextType = useContext(AppContext)
+
   return <html lang="en">
     <head>
       <meta charSet="utf-8" />
@@ -26,7 +36,7 @@ function Document({ children, title }: PropsWithChildren<{ title: string }>): JS
     </head>
     <body>
       <div id="khaleesi-app">
-        <div id="khaleesi-title" className="khaleesi-bar">{title}</div>
+        <div id="khaleesi-title" className="khaleesi-bar">{appContext.title}</div>
         <Navigation />
         <Content>
           {children}
@@ -47,13 +57,17 @@ export const links: LinksFunction = () => [
 ]
 
 export function ErrorBoundary({ title }: { title: string }): JSX.Element {
-  return <Document title={title}>
-    <ErrorPage />
-  </Document>
+  return <AppContext.Provider value={{ title: title }}>
+    <Document>
+      <ErrorPage />
+    </Document>
+  </AppContext.Provider>
 }
 
 export function App({ title }: { title: string }): JSX.Element {
-  return <Document title={title}>
-    <Outlet />
-  </Document>
+  return <AppContext.Provider value={{ title: title }}>
+    <Document>
+      <Outlet />
+    </Document>
+  </AppContext.Provider>
 }
