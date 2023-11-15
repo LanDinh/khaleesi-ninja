@@ -11,6 +11,7 @@ from django.db.models import QuerySet
 # khaleesi.ninja.
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.core.batch.job import Job as BaseJob, CleanupJob as BaseCleanupJob
+from khaleesi.core.testUtil.job import JobTestMixin
 from khaleesi.core.testUtil.testCase import SimpleTestCase
 from khaleesi.models.jobExecution import JobExecution as DbJobExecution
 from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, JobExecutionRequest
@@ -45,7 +46,7 @@ class CleanupJob(BaseCleanupJob[DbJobExecution]):
     return self.mock.getQueryset()  # type: ignore[no-any-return]
 
 
-class JobTestMixin:
+class JobTestInternalMixin(JobTestMixin):
   """Common methods for all job tests."""
 
   def _successfullyStartJob(
@@ -72,10 +73,7 @@ class JobTestMixin:
     start.objects.countJobExecutionsInProgress.return_value = 0
     paginator.return_value.count = 6
     paginator.return_value.page_range = [ 1, 2, 3 ]
-    request = JobExecutionRequest()
-    request.jobExecution.configuration.action.batchSize = 2
-    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
-    return request
+    return self.buildRequest()
 
 
 @patch('khaleesi.core.models.baseModel.transaction')
@@ -84,7 +82,7 @@ class JobTestMixin:
 @patch('khaleesi.core.batch.job.Paginator')
 @patch('khaleesi.core.batch.job.SINGLETON')
 @patch('khaleesi.core.batch.job.DbJobExecution')
-class JobTestCase(SimpleTestCase, JobTestMixin):
+class JobTestCase(SimpleTestCase, JobTestInternalMixin):
   """Test job execution."""
 
   job: Job
@@ -120,10 +118,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     # Prepare data.
     start.objects.countJobExecutionsInProgress.side_effect = Exception('start failure')
     start.return_value = MagicMock()
-    request = JobExecutionRequest()
-    request.jobExecution.configuration.action.batchSize = 2
-    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
-    self._setJob(request = request)
+    self._setJob(request = self.buildRequest())
     # Execute test.
     with self.assertRaises(Exception):
       self.job.execute(stopEvent = Event())
@@ -137,10 +132,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
     """Test job getting skipped."""
     # Prepare data.
     start.objects.countJobExecutionsInProgress.return_value = 1337
-    request = JobExecutionRequest()
-    request.jobExecution.configuration.action.batchSize = 2
-    request.jobExecution.configuration.action.timelimit.FromSeconds(60)
-    self._setJob(request = request)
+    self._setJob(request = self.buildRequest())
     # Execute test.
     self.job.execute(stopEvent = Event())
     # Assert result.
@@ -283,7 +275,7 @@ class JobTestCase(SimpleTestCase, JobTestMixin):
 @patch('khaleesi.core.batch.job.Paginator')
 @patch('khaleesi.core.batch.job.SINGLETON')
 @patch('khaleesi.core.batch.job.DbJobExecution')
-class CleanupJobTestCase(SimpleTestCase, JobTestMixin):
+class CleanupJobTestCase(SimpleTestCase, JobTestInternalMixin):
   """Test job execution."""
 
   job: CleanupJob

@@ -35,6 +35,10 @@ class JobExecutionMixin(models.Model):
     """Specify if the job is in progress."""
     return self.status in IN_PROGRESS
 
+  def hasStatus(self, *, grpc: 'GrpcJobExecution.Status.V') -> bool :
+    """Check if the job execution status matches the given gRPC status."""
+    return self.status == GrpcJobExecution.Status.Name(grpc)
+
   def jobExecutionFromGrpc(self, *, grpc: GrpcJobExecution) -> None :
     """Change own values according to the grpc object."""
     if self._state.adding:

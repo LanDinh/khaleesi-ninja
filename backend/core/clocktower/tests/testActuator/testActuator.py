@@ -13,6 +13,18 @@ from microservice.actuator.actuator import ACTUATOR
 class ActuatorTest(SimpleTestCase):
   """Test the actuator."""
 
+  def testInit(self) -> None :
+    """Test initialization of the actuator."""
+    # Assert result.
+    self.assertIn('core', ACTUATOR.actions)
+    self.assertIn('sawmill', ACTUATOR.actions['core'])
+    self.assertIn('clocktower', ACTUATOR.actions['core'])
+    self.assertIn('update-job-execution-state-core-sawmill', ACTUATOR.actions['core']['clocktower'])
+    self.assertIn(
+      'update-job-execution-state-core-clocktower',
+      ACTUATOR.actions['core']['clocktower'],
+    )
+
   @patch('microservice.actuator.actuator.addRequestMetadata')
   @patch('microservice.actuator.actuator.DbJobExecution.objects.khaleesiCreate')
   @patch('microservice.actuator.actuator.Job.objects.get')

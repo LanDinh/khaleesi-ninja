@@ -6,14 +6,19 @@ from __future__ import annotations
 from django.db import models
 
 # khaleesi.ninja.
-from khaleesi.core.batch.jobExecutionMixin import JobExecutionMixin
+from khaleesi.core.batch.jobExecutionMixin import JobExecutionMixin, IN_PROGRESS
 from khaleesi.core.models.baseModel import Manager
 from khaleesi.core.models.idModel import Model
-from khaleesi.proto.core_pb2 import (
-  JobExecution as GrpcJobExecution,
-  ObjectMetadata,
-)
+from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution, ObjectMetadata, Action
 from microservice.models.jobConfigurationMixin import JobConfigurationMixin
+
+
+class JobExecutionManager(Manager['JobExecution']):
+  """Basic job execution manager."""
+
+  def getJobExecutionsInProgress(self, *, action: Action) -> models.QuerySet[JobExecution] :
+    """Stop the job with the given job ID."""
+    return self.filter(site = action.site, app = action.app, status__in = IN_PROGRESS)
 
 
 class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin, JobExecutionMixin):
@@ -21,7 +26,7 @@ class JobExecution(Model[GrpcJobExecution], JobConfigurationMixin, JobExecutionM
 
   start = models.DateTimeField(auto_now_add = True)
 
-  objects: Manager[JobExecution]  # type: ignore[assignment]
+  objects = JobExecutionManager()  # type: ignore[assignment]
 
   def khaleesiSave(
       self, *,

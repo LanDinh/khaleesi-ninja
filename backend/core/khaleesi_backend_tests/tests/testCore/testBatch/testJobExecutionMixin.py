@@ -41,6 +41,28 @@ class JobExecutionMixinTestCase(SimpleTestCase):
         # Assert result.
         self.assertFalse(result)
 
+  def testHasStatus(self) -> None :
+    """Test if a job execution status matches."""
+    for statusLabel, statusType in GrpcJobExecution.Status.items():
+      with self.subTest(status = statusLabel):
+        # Prepare data.
+        jobExecution = DbJobExecution(status = statusLabel)
+        # Execute test.
+        result = jobExecution.hasStatus(grpc = statusType)
+        # Assert result.
+        self.assertTrue(result)
+
+  def testDoesNotHaveStatus(self) -> None :
+    """Test if a job execution status matches."""
+    for statusLabel, statusType in GrpcJobExecution.Status.items():
+      with self.subTest(status = statusLabel):
+        # Prepare data.
+        jobExecution = DbJobExecution(status = 'some-other-status')
+        # Execute test.
+        result = jobExecution.hasStatus(grpc = statusType)
+        # Assert result.
+        self.assertFalse(result)
+
   def testJobExecutionFromGrpcNew(self) -> None :
     """Test creating an instance from gRPC."""
     for statusLabel, statusType in GrpcJobExecution.Status.items():

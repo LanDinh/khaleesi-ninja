@@ -2,13 +2,16 @@
 
 # khaleesi.ninja.
 from khaleesi.core.grpc.requestMetadata import addRequestMetadata
+from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.exceptions import InvalidArgumentException
 from khaleesi.proto.core_pb2 import (
   ObjectMetadata,
   JobExecutionRequest,
   JobExecution as GrpcJobExecution,
+  Action,
 )
 from microservice.actuator.core import CORE
+from microservice.actuator.core.clocktower import addAppForUpdateJobExecutionStateGenerator
 from microservice.models.job import Job
 from microservice.models.jobExecution import JobExecution as DbJobExecution
 
@@ -19,6 +22,17 @@ class Actuator:
   actions = {
       'core': CORE
   }
+
+  def __init__(self) -> None :
+    """Initiate the actions that affect all apps."""
+    LOGGER.debug('Adding actions that exist for all apps...')
+    for siteName, siteObject in self.actions.items():
+      for app in siteObject:
+        action = Action()
+        action.site = siteName
+        action.app = app
+        addAppForUpdateJobExecutionStateGenerator(action = action)
+
 
   def actuate(self, *, jobId: str) -> ObjectMetadata :
     """Actuate a batch job request."""

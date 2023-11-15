@@ -10,6 +10,19 @@ from khaleesi.proto.core_pb2 import JobExecution as GrpcJobExecution
 from microservice.models.jobExecution import JobExecution as DbJobExecution
 
 
+class JobExecutionManagerTestCase(SimpleTestCase):
+  """Test the job execution manager."""
+
+  @patch.object(DbJobExecution.objects, 'filter')
+  def testGetJobExecutionsInProgress(self, filterData: MagicMock) -> None :
+    """Test getting all job executions that are still in progress for a specific app."""
+    # Execute test.
+    DbJobExecution.objects.getJobExecutionsInProgress(action = MagicMock())
+    # Assert result.
+    filterData.assert_called_once()
+
+
+
 class JobExecutionTestCase(SimpleTestCase):
   """Test job executions."""
 

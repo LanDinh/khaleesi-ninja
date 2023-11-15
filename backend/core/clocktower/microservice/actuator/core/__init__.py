@@ -1,9 +1,11 @@
 """Core """
 
 # khaleesi.ninja.
+from .clocktower import CLOCKTOWER
 from .sawmill import SAWMILL
 
 
 CORE = {
-    'sawmill': SAWMILL,
+    'clocktower': CLOCKTOWER,
+    'sawmill'   : SAWMILL,
 }
