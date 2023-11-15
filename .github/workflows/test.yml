@@ -220,7 +220,7 @@ jobs:
         run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} get pod
       - name: "DEBUG"
         if: always()
-        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} logs --tail 100 -l name=sawmill
+        run: kubectl -n khaleesi-ninja-${{ matrix.environment.name }} logs --tail 100 -l site=admin -l name=frontend
 
   # Clean up cache.
   clean-cache:
