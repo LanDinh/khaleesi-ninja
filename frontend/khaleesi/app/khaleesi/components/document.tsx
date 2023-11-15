@@ -1,13 +1,13 @@
 import type { PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
 import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
-import { breadcrumb } from './navigation/breadcrumb'
-import { Navigation } from './navigation/navigation'
+import { breadcrumb } from '../navigation/breadcrumb'
+import { Navigation } from '../navigation/navigation'
 import { Content } from './content'
 import { ErrorPage } from './error'
 import rootStyles from '../styles/index.css'
 import navigationBarStyles from '../styles/navigation.css'
-import { navigationProperties } from './navigation/navigationData'
+import { navigationProperties } from '../navigation/navigationData'
 
 
 export const handle = {

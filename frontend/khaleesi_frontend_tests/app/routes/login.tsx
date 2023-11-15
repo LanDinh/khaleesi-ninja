@@ -1,7 +1,7 @@
 import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
 import { json } from '@remix-run/node'
 import { Form } from '@remix-run/react'
-import { createUserSession } from '../khaleesi/auth'
+import { createUserSession } from '../khaleesi/auth/auth'
 
 
 export const meta: MetaFunction = () => {

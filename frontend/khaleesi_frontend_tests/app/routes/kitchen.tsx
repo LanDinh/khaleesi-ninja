@@ -1,8 +1,8 @@
 import { Outlet } from '@remix-run/react'
 import type {
   NavigationElementProperties,
-} from '../khaleesi/components/navigation/navigationElement'
-import { breadcrumb } from '../khaleesi/components/navigation/breadcrumb'
+} from '../khaleesi/navigation/navigationElement'
+import { breadcrumb } from '../khaleesi/navigation/breadcrumb'
 import { KitchenIcon } from '../components/icon'
 
 
