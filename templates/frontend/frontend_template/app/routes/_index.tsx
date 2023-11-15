@@ -1,4 +1,4 @@
-import type { MetaFunction, LinksFunction } from "@remix-run/node"
+import type { MetaFunction, LinksFunction } from '@remix-run/node'
 import styles from '../khaleesi/styles/index.css'
 
 export const meta: MetaFunction = () => {
