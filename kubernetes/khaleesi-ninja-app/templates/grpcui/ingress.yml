@@ -7,7 +7,7 @@ metadata:
   labels:
     khaleesi-ninja: "app"
     site: "{{ .Values.site.name }}"
-    name: "{{ .Values.app.name }}"
+    app: "{{ .Values.app.name }}"
     type: "grpcui"
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: "/$1"

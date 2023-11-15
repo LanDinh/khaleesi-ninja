@@ -7,13 +7,13 @@ metadata:
   labels:
     khaleesi-ninja: "app"
     site: "{{ .Values.site.name }}"
-    name: "{{ .Values.app.name }}"
+    app: "{{ .Values.app.name }}"
     type: "grpcui"
 spec:
   selector:
     khaleesi-ninja: "app"
     site: "{{ .Values.site.name }}"
-    name: "{{ .Values.app.name }}"
+    app: "{{ .Values.app.name }}"
     type: "grpcui"
   ports:
     - name: "grpcui"

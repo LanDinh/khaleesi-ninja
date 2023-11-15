@@ -6,7 +6,7 @@ metadata:
   labels:
     khaleesi-ninja: "app"
     site: "{{ .Values.site.name }}"
-    name: "{{ .Values.app.name }}"
+    app: "{{ .Values.app.name }}"
     type: "{{ .Values.type.name }}"
 spec:
   replicas: {{ .Values.app.replicas }}
@@ -14,14 +14,14 @@ spec:
     matchLabels:
       khaleesi-ninja: "app"
       site: "{{ .Values.site.name }}"
-      name: "{{ .Values.app.name }}"
+      app: "{{ .Values.app.name }}"
       type: "{{ .Values.type.name }}"
   template:
     metadata:
       labels:
         khaleesi-ninja: "app"
         site: "{{ .Values.site.name }}"
-        name: "{{ .Values.app.name }}"
+        app: "{{ .Values.app.name }}"
         type: "{{ .Values.type.name }}"
     spec:
       containers:
