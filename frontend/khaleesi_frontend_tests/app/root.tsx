@@ -1,5 +1,5 @@
 import { links, ErrorBoundary, App, handle } from './khaleesi/components/document'
-import { navigationProperties } from './khaleesi/components/navigation/navigationData'
+import { navigationProperties } from './khaleesi/navigation/navigationData'
 
 
 export default App
