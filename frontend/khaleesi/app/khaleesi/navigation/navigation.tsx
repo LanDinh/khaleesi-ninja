@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useMatches } from '@remix-run/react'
 import { navigationData } from '../../navigationData'
+import { topNavigationData, bottomNavigationData } from './commonNavigationData'
 import { MenuIcon } from '../components/icon'
 import type { RouteMatch } from './breadcrumb'
 import type { NavigationElementProperties } from './navigationElement'
@@ -50,6 +51,14 @@ export function Navigation(): JSX.Element {
       <MenuIcon />
     </summary>
     <nav id="khaleesi-navigation-list">
+      {topNavigationData.map((element) => (
+        <NavigationMenuElementWithChildren
+          element={element}
+          matches={matches}
+          closeMenu={closeMenu}
+          key={element.path}
+        />
+      ))}
       {navigationData.map((element) => (
         <NavigationMenuElementWithChildren
           element={element}
@@ -57,7 +66,15 @@ export function Navigation(): JSX.Element {
           closeMenu={closeMenu}
           key={element.path}
         />
-       ))}
+      ))}
+      {bottomNavigationData.map((element) => (
+        <NavigationMenuElementWithChildren
+          element={element}
+          matches={matches}
+          closeMenu={closeMenu}
+          key={element.path}
+        />
+      ))}
     </nav>
   </details>
 }
