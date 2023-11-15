@@ -5,16 +5,18 @@ import { breadcrumb } from '../navigation/breadcrumb'
 import { Navigation } from '../navigation/navigation'
 import { Content } from './content'
 import { ErrorPage } from './error'
+// @ts-ignore: styles have no types
 import rootStyles from '../styles/index.css'
+// @ts-ignore: styles have no types
 import navigationBarStyles from '../styles/navigation.css'
-import { navigationProperties } from '../navigation/navigationData'
+import { topNavigationData } from '../navigation/commonNavigationData'
 
 
 export const handle = {
-  ...breadcrumb(navigationProperties),
+  ...breadcrumb(topNavigationData[0]),
 }
 
-function Document({ children }: PropsWithChildren<{}>): JSX.Element {
+function Document({ children, title }: PropsWithChildren<{ title: string }>): JSX.Element {
   return <html lang="en">
     <head>
       <meta charSet="utf-8" />
@@ -24,7 +26,7 @@ function Document({ children }: PropsWithChildren<{}>): JSX.Element {
     </head>
     <body>
       <div id="khaleesi-app">
-        <div id="khaleesi-title" className="khaleesi-bar">Title</div>
+        <div id="khaleesi-title" className="khaleesi-bar">{title}</div>
         <Navigation />
         <Content>
           {children}
@@ -44,14 +46,14 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: navigationBarStyles },
 ]
 
-export function ErrorBoundary(): JSX.Element {
-  return <Document>
+export function ErrorBoundary({ title }: { title: string }): JSX.Element {
+  return <Document title={title}>
     <ErrorPage />
   </Document>
 }
 
-export function App(): JSX.Element {
-  return <Document>
+export function App({ title }: { title: string }): JSX.Element {
+  return <Document title={title}>
     <Outlet />
   </Document>
 }
