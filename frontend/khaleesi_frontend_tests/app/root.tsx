@@ -2,7 +2,7 @@ import { links, ErrorBoundary, App, handle } from './khaleesi/components/documen
 import { topNavigationData } from './khaleesi/navigation/commonNavigationData'
 
 
-const TestApp = () => <App title="Test App" />
+const TestApp: () => JSX.Element = () => <App title="Test App" />
 export default TestApp
 export { links, ErrorBoundary, handle }
 export const navigationProperties = topNavigationData[0]
