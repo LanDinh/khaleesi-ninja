@@ -1,6 +1,6 @@
-import type { V2_MetaFunction } from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node'
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     { title: 'khaleesi.ninja | Kitchen' },
     { name: 'description', content: 'Khaleesi\'s Dragonpit: the kitchen for hungry dragons.' },

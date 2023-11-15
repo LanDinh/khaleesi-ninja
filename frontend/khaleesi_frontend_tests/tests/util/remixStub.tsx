@@ -1,6 +1,7 @@
 import type { HydrationState, InitialEntry } from '@remix-run/router'
 import type { UNSAFE_FutureConfig as FutureConfig } from '@remix-run/react'
-import { unstable_createRemixStub } from '@remix-run/testing'
+import { createRemixStub } from '@remix-run/testing'
+import type React from 'react'
 
 
 type RemixStubOptions = {
@@ -9,9 +10,9 @@ type RemixStubOptions = {
   initialIndex?     : number
   remixConfigFuture?: Partial<FutureConfig>
 }
-export function createRemixStub(
-  element: JSX.Element,
+export function createTestingStub(
+  element: React.ComponentType,
   path   : string = '/',
 ): (options: RemixStubOptions) => JSX.Element {
-  return unstable_createRemixStub([{ path: path, element: element }])
+  return createRemixStub([{ path: path, Component: element }])
 }

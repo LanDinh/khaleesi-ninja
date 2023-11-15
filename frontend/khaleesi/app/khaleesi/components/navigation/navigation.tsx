@@ -36,7 +36,7 @@ function NavigationMenuElementWithChildren({
 
 
 export function Navigation(): JSX.Element {
-  const matches = useMatches()
+  const matches: RouteMatch[] = useMatches() as RouteMatch[]
   const [ open , setOpen ] = useState(false)
   const closeMenu = (): void => setOpen(!open)
 

@@ -2,7 +2,7 @@
 ################################################################################
 #                                 Construction                                 #
 ################################################################################
-FROM python:3.10-slim as construction
+FROM python:3.12-slim as construction
 
 # Install tooling.
 RUN apt-get update && apt-get install -y python3-dev libpq-dev gcc
@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ./.venv/bin/pip in
 ################################################################################
 #                                    Image                                     #
 ################################################################################
-FROM python:3.10-slim as image
+FROM python:3.12-slim as image
 
 # Install tooling.
 RUN apt-get update && apt-get install -y postgresql

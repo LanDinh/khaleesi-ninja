@@ -4,7 +4,7 @@ import {
   NavigationElement,
   NavigationMenuElement,
 } from '../../../app/khaleesi/components/navigation/navigationElement'
-import { createRemixStub } from '../../util/remixStub'
+import { createTestingStub } from '../../util/remixStub'
 
 
 test('NavigationElement renders without error.', () => {
@@ -14,7 +14,9 @@ test('NavigationElement renders without error.', () => {
     label: 'TEST',
     icon: <div>Icon</div>,
   }
-  let RemixStub = createRemixStub(<NavigationElement element={navigationElementProperties} />)
+  let RemixStub = createTestingStub(
+    () => <NavigationElement element={navigationElementProperties} />,
+  )
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -29,8 +31,8 @@ test('NavigationMenuElement renders without error.', () => {
     label: 'TEST',
     icon: <div>Icon</div>,
   }
-  let RemixStub = createRemixStub(
-    <NavigationMenuElement element={navigationElementProperties} onClick={(): void => {}} />,
+  let RemixStub = createTestingStub(
+    () => <NavigationMenuElement element={navigationElementProperties} onClick={(): void => {}} />,
   )
   // Execute test.
   render(<RemixStub />)

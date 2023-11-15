@@ -36,7 +36,7 @@ jobs:
       - name: "Setup python cache"
         uses: "actions/setup-python@v4"
         with:
-          python-version: "3.10"
+          python-version: "3.12"
           cache: "pip"
       - name: "Fill python cache"
         run: "pip install -r ./backend/requirements.txt -r ./backend/requirements-develop.txt"
@@ -51,7 +51,7 @@ jobs:
       - name: "Setup python cache"
         uses: "actions/setup-python@v4"
         with:
-          python-version: "3.10"
+          python-version: "3.12"
           cache: "pip"
       - name: "Generate protos"
         run: "./scripts/generate_protos.sh"
@@ -81,7 +81,7 @@ jobs:
       - name: "Setup python cache"
         uses: "actions/setup-python@v4"
         with:
-          python-version: "3.10"
+          python-version: "3.12"
           cache: "pip"
       - name: "Build image"
         run: ./scripts/util/build-backend-base.sh ${{ env.base-image-version }} ${{ matrix.image }}

@@ -1,7 +1,7 @@
-import type { V2_MetaFunction, LinksFunction } from '@remix-run/node'
+import type { MetaFunction, LinksFunction } from '@remix-run/node'
 import styles from '../khaleesi/styles/index.css'
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     { title: 'khaleesi.ninja' },
     { name: 'description', content: 'Khaleesi\'s Dragonpit.' },

@@ -9,7 +9,7 @@ import type {
 import {
   NavigationMenuElement,
 } from '../../../app/khaleesi/components/navigation/navigationElement'
-import { createRemixStub } from '../../util/remixStub'
+import { createTestingStub } from '../../util/remixStub'
 
 
 jest.mock('../../../app/khaleesi/components/icon')
@@ -55,7 +55,7 @@ test('Navigation menu renders without errors.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(() => <></>)
-  let RemixStub = createRemixStub(<Navigation />, '/alpha')
+  let RemixStub = createTestingStub(Navigation, '/alpha')
   // Execute test.
   const result = render(<RemixStub initialEntries={['/alpha']}/>)
   // Assert result.
@@ -73,7 +73,7 @@ test('NavigationMenu closes when link is clicked.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)
-  let RemixStub = createRemixStub(<Navigation />, '/alpha')
+  let RemixStub = createTestingStub(Navigation, '/alpha')
   // Execute test.
   const result = render(<RemixStub initialEntries={['/alpha']}/>)
   fireEvent.click(screen.getAllByText('TEST')[0])
@@ -88,7 +88,7 @@ test('NavigationMenu closes when clicking outside the menu.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)
-  let RemixStub = createRemixStub(<Navigation />, '/alpha')
+  let RemixStub = createTestingStub(Navigation, '/alpha')
   // Execute test.
   const result = render(<RemixStub initialEntries={['/alpha']}/>)
   fireEvent.click(result.container.querySelector('#khaleesi-navigation-background')!)

@@ -17,9 +17,9 @@ The following environments are ready to use.
 | `staging`     | quality assurance | upstream         | :x:                | selected few users |
 | `production`  | production        | upstream         | :x:                | real users         |
 
-The following apps are ready to use.
+The following sites are ready to use.
 
-| App    | Domain | `production` | `staging`    | Use                                     |
+| Site   | Domain | `production` | `staging`    | Use                                     |
 |--------|--------|--------------|--------------|-----------------------------------------|
 | `core` | -      | not deployed | not deployed | Code shared by all apps & home frontend |
 
@@ -47,12 +47,11 @@ The general deployment is done with:
 Other infrastructure consists of:
 
 ![kube-prometheus badge](https://img.shields.io/badge/kube--prometheus-latest-informational)
-![protoc badge](https://img.shields.io/badge/protoc-3.19.4-informational)
 
-| App Type | General                                                                                                                                                                                                                                     | Infrastructure                                                               | Development                                                                                                                                                                                                                            |
-|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Frontend | ![typescript badge](https://img.shields.io/badge/typescript-v5.0-informational) <br /> ![react badge](https://img.shields.io/badge/react-v18.0-informational) <br /> ![remix badge](https://img.shields.io/badge/remix-v1.17-informational) |                                                                              | ![jest badge](https://img.shields.io/badge/jest-v29.5-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational)                                                                                  |
-| Micro    | ![python badge](https://img.shields.io/badge/python-v3.10-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.48-informational) <br /> ![django badge](https://img.shields.io/badge/django-v4.0-informational)     | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.16-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v2.14-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v0.961-informational) |
+| App Type | General                                                                                                                                                                                                                                    | Infrastructure                                                               | Development                                                                                                                                                                                                                         |
+|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Frontend | ![typescript badge](https://img.shields.io/badge/typescript-v5.2-informational) <br /> ![react badge](https://img.shields.io/badge/react-v18.2-informational) <br /> ![remix badge](https://img.shields.io/badge/remix-v2.2-informational) |                                                                              | ![jest badge](https://img.shields.io/badge/jest-v29.7-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational)                                                                               |
+| Micro    | ![python badge](https://img.shields.io/badge/python-v3.12-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.59-informational) <br /> ![django badge](https://img.shields.io/badge/django-v4.2-informational)    | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.17-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v3.0-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v1.7-informational) |
 
 ### Structure
 
@@ -109,29 +108,20 @@ Execute the tests by running `./scripts/local/test.sh`
   
 ### Upgrading dependencies
 
-#### Shared
-
-##### Protobuf
-
-Upgrading `protobuf` is more complicated than upgrading anything else.
-Follow the instructions in order:
-
-1. Check the available versions for [protobuf-javascript](https://github.com/protocolbuffers/protobuf-javascript/releases).
-   Note that up to v3.21.2, there is a bug which breaks `protobuf` in `node`.
-   Update the `protobuf` version in `proto/python/requirments.txt` and `.github/workflows/test.yml`.
-1. Check the newest compatible version of [grpc](https://github.com/grpc/grpc/releases).
-   Update the `grpc` version in `proto/python/requirments.txt` and `backend/requirements.txt`.
-1. Install the corresponding version of [protoc](https://github.com/protocolbuffers/protobuf/releases).
-
 #### Frontend
 
 ##### Node
+
+The `node` version is referenced in
+
+* `frontend/Dockerfile`
 
 ##### General frontend dependencies
 
 Upgrade the versions in
 
 * `frontend/package.json`
+* `frontend/requirements-proto.txt`
 
 #### Backend
 
@@ -146,14 +136,11 @@ The `python` version is referenced in
 
 The kubegres version is defined in `scripts/operations/setup_cluster.sh`.
 
-##### gRPC Web
-
-The `gRPC Web` version is defined in `kubernetes/environment/`
-
 ##### General backend dependencies
 
 Upgrade the versions in
 
 * `backend/requirements.txt`
 * `backend/requirements-development.txt`
+* `backend/requirements-proto.txt`
 * `backend/{site}/{app}/requirements-app.txt`

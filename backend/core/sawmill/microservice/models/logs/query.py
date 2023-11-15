@@ -10,7 +10,7 @@ from typing import List
 from django.db import models
 
 # 3rd party.
-from sql_metadata import Parser  # type: ignore[import]
+from sql_metadata import Parser  # type: ignore[import-untyped]
 
 # khaleesi.ninja.
 from khaleesi.core.logging.textLogger import LOGGER

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as hooks from '@remix-run/react'
 import { ErrorPage } from '../../app/khaleesi/components/error'
-import { createRemixStub } from '../util/remixStub'
+import { createTestingStub } from '../util/remixStub'
 
 
 jest.mock('@remix-run/react', () => ({
@@ -20,7 +20,7 @@ test('ErrorPage renders route errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(true)
   jest.spyOn(hooks, 'useRouteError').mockReturnValue({ status: 1337, statusText: 'FooBar' })
-  let RemixStub = createRemixStub(<ErrorPage />)
+  let RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -34,7 +34,7 @@ test('ErrorPage renders unknown errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(false)
   jest.spyOn(hooks, 'useRouteError').mockReturnValue(Error('message'))
-  let RemixStub = createRemixStub(<ErrorPage />)
+  let RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -47,7 +47,7 @@ test('ErrorPage renders unknown non-errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(false)
   jest.spyOn(hooks, 'useRouteError').mockReturnValue({ message: 'message' })
-  let RemixStub = createRemixStub(<ErrorPage />)
+  let RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)
   // Assert result.

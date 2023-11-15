@@ -25,7 +25,7 @@ helm upgrade --install ingress-nginx ingress-nginx \
 
 
 echo -e "${magenta}Deploying kubegres...${clear_color}"
-kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.16/kubegres.yaml
+kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
 
 echo -e "${magenta}Deploying kube-prometheus...${clear_color}"
 helm upgrade --install kube-prometheus kube-prometheus-stack \
