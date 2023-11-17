@@ -3,6 +3,8 @@ import { useContext } from 'react'
 import { AppContext } from '../khaleesi/components/document'
 import styles from '../khaleesi/styles/index.css'
 
+
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const meta: MetaFunction = () => {
   const appContext = useContext(AppContext)
 

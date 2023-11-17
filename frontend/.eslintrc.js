@@ -4,7 +4,7 @@ module.exports = {
   extends: [ "@remix-run/eslint-config", "@remix-run/eslint-config/node" ],
   ignorePatterns: [ "/app/khaleesi/proto/*.d.ts" ],
   rules: {
-    "max-len": [2, { code: 100, tabWidth: 2, ignorePattern: "\\s*<path" }],
+    "max-len": [2, { code: 100, tabWidth: 2, ignorePattern: "\\s*<path", ignoreUrls: true }],
     "object-curly-spacing": [ 2, "always" ],
     "quotes": [ 2, "single" ],
     "semi": [ 2, "never" ],

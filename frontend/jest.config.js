@@ -1,7 +1,7 @@
 // noinspection JSUnresolvedReference
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'jsdom',
+  testEnvironment: './app/khaleesi/testUtil/attachFetchApi.ts',
   transform: {
     '^.+\\.tsx?$': 'ts-jest',
   },
