@@ -62,6 +62,7 @@ class UpdateExecutionStateJob(CleanupJob[JobExecution]):
         instance = instances[grpc.executionMetadata.id]
         instance.khaleesiSave(grpc = grpc, metadata = instance.toObjectMetadata(), dbSave = False)
         instancesForSaving.append(instance)
+      # noinspection PyProtectedMember
       fields = [field.name for field in JobExecution._meta.get_fields()]
       return JobExecution.objects.bulk_update(instancesForSaving, fields = fields)
 

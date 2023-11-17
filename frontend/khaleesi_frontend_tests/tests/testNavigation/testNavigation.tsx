@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import * as router from '@remix-run/react'
-import { Navigation } from '../../app/khaleesi/navigation/navigation'
+import { links, Navigation } from '../../app/khaleesi/navigation/navigation'
 import { MenuIcon } from '../../app/khaleesi/components/icon'
 import type {
   NavigationElementProperties,
@@ -94,4 +94,10 @@ test('NavigationMenu closes when clicking outside the menu.', () => {
   fireEvent.click(result.container.querySelector('#khaleesi-navigation-background')!)
   // Assert result.
   expect(result.container.querySelectorAll('details')[0]).not.toHaveAttribute('open')
+})
+
+test('links contain all links.', () => {
+  // Execute test & assert result.
+  // Styles.
+  expect(links().length).toBe(1)
 })

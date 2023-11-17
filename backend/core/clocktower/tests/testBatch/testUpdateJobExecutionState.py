@@ -51,6 +51,7 @@ class UpdateJobExecutionStateTestCase(JobTestMixin, SimpleTestCase):
     # Assert result.
     bulkUpdate.assert_called_once()
 
+  # noinspection PyUnusedLocal
   @patch(
     'microservice.batch.updateJobExecutionState.JobExecution.objects.getJobExecutionsInProgress',
   )
