@@ -1,7 +1,7 @@
 import { createContext, useContext, type Context, type PropsWithChildren } from 'react'
 import type { LinksFunction } from '@remix-run/node'
 import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
-import { breadcrumb } from '../navigation/breadcrumb'
+import { breadcrumb, BreadCrumbs } from '../navigation/breadcrumb'
 import { Navigation } from '../navigation/navigation'
 import { Content } from './content'
 import { ErrorPage } from './error'
@@ -38,6 +38,7 @@ function Document({ children }: PropsWithChildren<{}>): JSX.Element {
       <div id="khaleesi-app">
         <div id="khaleesi-title" className="khaleesi-bar">{appContext.title}</div>
         <Navigation />
+        <BreadCrumbs />
         <Content>
           {children}
         </Content>

@@ -10,7 +10,8 @@
   --spacing   : 8px;
   --outer-size: 72px;
   --inner-size: calc(var(--outer-size) - 2 * var(--spacing));
-  --font-size: 16px;
+  --font-size-text   : 16px;
+  --font-size-heading: 24px;
 }
 
 html {
@@ -54,18 +55,19 @@ details > summary {
 
 .icon {
   /* Size & Positioning. */
-  height: var(--font-size);
-  width : var(--font-size);
+  height: var(--font-size-text);
+  width : var(--font-size-text);
 }
 
 #khaleesi-app {
   /* Grid. */
   display              : grid;
   grid-template-columns: var(--outer-size) auto;
-  grid-template-rows   : var(--outer-size) auto;
+  grid-template-rows   : var(--outer-size) var(--outer-size) auto;
   grid-template-areas  :
     "navigation title"
-    "content    content";
+    "empty      breadcrumbs"
+    "empty      content";
 
   /* Size & Positioning. */
   height: 100%;
@@ -80,9 +82,21 @@ details > summary {
 #khaleesi-title {
   /* Grid. */
   grid-area: title;
+
+  /* Size & Positioning */
+  line-height  : var(--outer-size);
+  padding-left : var(--spacing);
+  padding-right: var(--spacing);
+
+  /* Text */
+  text-overflow: ellipsis;
+  font-size    : var(--font-size-heading);
 }
 
 #khaleesi-content {
   /* Grid. */
   grid-area: content;
+
+  /* Size & Positioning */
+  padding: var(--spacing);
 }

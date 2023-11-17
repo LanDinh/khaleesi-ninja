@@ -92,13 +92,18 @@
   color: var(--theme-light-color);
 }
 
+#khaleesi-navigation-breadcrumbs {
+  /* Grid. */
+  grid-area: breadcrumbs;
+}
+
 #khaleesi-navigation-breadcrumbs span {
   /* Size & Positioning. */
   display       : inline-flex;
   gap           : var(--spacing);
   padding-left  : var(--spacing);
-  padding-top   : var(--spacing);
-  padding-bottom: var(--spacing);
+  padding-right : var(--spacing);
+  line-height   : var(--outer-size);
 }
 
 #khaleesi-navigation-breadcrumbs a {
