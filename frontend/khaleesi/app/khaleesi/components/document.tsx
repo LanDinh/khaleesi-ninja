@@ -6,7 +6,9 @@ import { Navigation } from '../navigation/navigation'
 import { Content } from './content'
 import { ErrorPage } from './error'
 // @ts-ignore: styles have no types
-import styles from './index.css'
+import rootStyles from '../styles/root.css'
+// @ts-ignore: styles have no types
+import navigationStyles from '../styles/navigation.css'
 import { topNavigationData } from '../navigation/commonNavigationData'
 
 
@@ -50,7 +52,8 @@ export const links: LinksFunction = () => [
   // Font.
   { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto&display=swap' },
   // Style.
-  { rel: 'stylesheet', href: styles },
+  { rel: 'stylesheet', href: rootStyles },
+  { rel: 'stylesheet', href: navigationStyles },
 ]
 
 export function ErrorBoundary({ title }: { title: string }): JSX.Element {

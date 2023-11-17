@@ -1,20 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useMatches } from '@remix-run/react'
-import type { LinksFunction } from '@remix-run/node'
 import { navigationData } from '../../navigationData'
-// @ts-ignore: styles have no types
-import styles from './navigation.css'
 import { topNavigationData, bottomNavigationData } from './commonNavigationData'
 import { MenuIcon } from '../components/icon'
 import type { RouteMatch } from './breadcrumb'
 import type { NavigationElementProperties } from './navigationElement'
 import { NavigationMenuElement } from './navigationElement'
-
-
-export const links: LinksFunction = () => [
-  // Style.
-  { rel: 'stylesheet', href: styles },
-]
 
 function NavigationMenuElementWithChildren({
   element,
