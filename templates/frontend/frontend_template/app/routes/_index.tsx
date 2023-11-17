@@ -1,4 +1,4 @@
-import type { MetaFunction, LinksFunction } from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node'
 import { useContext } from 'react'
 import { AppContext } from '../khaleesi/components/document'
 
