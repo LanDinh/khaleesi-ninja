@@ -1,5 +1,5 @@
-import { meta, action, LoginRoute } from '../khaleesi/auth/login'
+import { meta, handle, action, LoginRoute } from '../khaleesi/auth/login'
 
 
 export default LoginRoute
-export { meta, action }
+export { meta, handle, action }

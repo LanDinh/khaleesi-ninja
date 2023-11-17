@@ -2,22 +2,27 @@ import { HomeIcon } from '../components/icon'
 import type { NavigationElementProperties } from './navigationElement'
 
 
+export const homeNavigationData: NavigationElementProperties = {
+  path : '/',
+  label: 'Home',
+  icon : <HomeIcon />,
+}
+export const loginNavigationData: NavigationElementProperties = {
+  path : '/login',
+  label: 'Login',
+  icon : <HomeIcon />,
+}
+export const profileNavigationData: NavigationElementProperties = {
+  path : '/profile',
+  label: 'Profile',
+  icon : <HomeIcon />,
+}
+
+
 export const topNavigationData: NavigationElementProperties[] = [
-  {
-    path : '/',
-    label: 'Home',
-    icon : <HomeIcon />,
-  }
+  homeNavigationData
 ]
 export const bottomNavigationData: NavigationElementProperties[] = [
-  {
-    path : '/profile',
-    label: 'Profile',
-    icon : <HomeIcon />,
-  },
-  {
-    path : '/login',
-    label: 'Login',
-    icon : <HomeIcon />,
-  }
+  loginNavigationData,
+  profileNavigationData,
 ]

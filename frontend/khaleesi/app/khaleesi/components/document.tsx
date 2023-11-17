@@ -9,11 +9,11 @@ import { ErrorPage } from './error'
 import rootStyles from '../styles/root.css'
 // @ts-ignore: styles have no types
 import navigationStyles from '../styles/navigation.css'
-import { topNavigationData } from '../navigation/commonNavigationData'
+import { homeNavigationData } from '../navigation/commonNavigationData'
 
 
 export const handle = {
-  ...breadcrumb(topNavigationData[0]),
+  ...breadcrumb(homeNavigationData),
 }
 
 

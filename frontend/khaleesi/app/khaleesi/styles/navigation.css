@@ -102,7 +102,6 @@
   display       : inline-flex;
   gap           : var(--spacing);
   padding-left  : var(--spacing);
-  padding-right : var(--spacing);
   line-height   : var(--outer-size);
 }
 
