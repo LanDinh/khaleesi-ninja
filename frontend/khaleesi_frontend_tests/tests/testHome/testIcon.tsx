@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { MenuIcon, SettingsIcon, LoginIcon, HomeIcon } from '../../app/khaleesi/components/icon'
+import { MenuIcon, SettingsIcon, LoginIcon, HomeIcon } from '../../app/khaleesi/home/icon'
 
 
 test('Menu Icon gets rendered without errors.', () => {

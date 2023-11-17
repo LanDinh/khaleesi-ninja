@@ -1,6 +1,6 @@
 import type { MetaFunction } from '@remix-run/node'
 import { useContext } from 'react'
-import { AppContext } from '../khaleesi/components/document'
+import { AppContext } from '../khaleesi/home/document'
 
 
 export const meta: MetaFunction = () => {

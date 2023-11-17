@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as hooks from '@remix-run/react'
-import { ErrorPage } from '../../app/khaleesi/components/error'
+import { ErrorPage } from '../../app/khaleesi/home/error'
 import { createTestingStub } from '../util/remixStub'
 
 

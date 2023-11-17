@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { Content } from '../../app/khaleesi/components/content'
+import { Content } from '../../app/khaleesi/home/content'
 
 
 test('Content gets rendered without errors.', () => {

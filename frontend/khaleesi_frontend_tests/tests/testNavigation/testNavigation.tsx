@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import * as router from '@remix-run/react'
 import { Navigation } from '../../app/khaleesi/navigation/navigation'
-import { MenuIcon } from '../../app/khaleesi/components/icon'
+import { MenuIcon } from '../../app/khaleesi/home/icon'
 import type {
   NavigationElementProperties,
 } from '../../app/khaleesi/navigation/navigationElement'
@@ -12,7 +12,7 @@ import {
 import { createTestingStub } from '../util/remixStub'
 
 
-jest.mock('../../app/khaleesi/components/icon')
+jest.mock('../../app/khaleesi/home/icon')
 jest.mock('../../app/khaleesi/navigation/navigationElement')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),

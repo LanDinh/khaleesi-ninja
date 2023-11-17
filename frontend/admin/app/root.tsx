@@ -1,4 +1,4 @@
-import { links, ErrorBoundary, App, handle } from './khaleesi/components/document'
+import { links, ErrorBoundary, App, handle } from './khaleesi/home/document'
 
 
 const AdminApp: () => JSX.Element = () => <App title="Admin Console" />

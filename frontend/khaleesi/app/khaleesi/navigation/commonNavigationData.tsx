@@ -1,4 +1,4 @@
-import { HomeIcon } from '../components/icon'
+import { HomeIcon } from '../home/icon'
 import type { NavigationElementProperties } from './navigationElement'
 
 

@@ -2,7 +2,7 @@ import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run
 import { json, redirect } from '@remix-run/node'
 import { Form } from '@remix-run/react'
 import { useContext } from 'react'
-import { AppContext } from '../components/document'
+import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'
 import { loginNavigationData } from '../navigation/commonNavigationData'
 import { createUserSession, destroySession, getSessionData } from './session'
