@@ -1,5 +1,4 @@
-import type { IconProperties } from '../khaleesi/home/icon'
-import { Icon } from '../khaleesi/home/icon'
+import { Icon, type IconProperties } from '../khaleesi/components/icon'
 
 export function KitchenIcon(props: IconProperties): JSX.Element {
   return <Icon {...props}>
