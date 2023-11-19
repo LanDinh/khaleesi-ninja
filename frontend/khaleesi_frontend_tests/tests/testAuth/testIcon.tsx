@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { LoginIcon, ProfileIcon } from '../../app/khaleesi/auth/icon'
+import { LoginIcon, LogoutIcon } from '../../app/khaleesi/auth/icon'
 
 
 test('Menu Icon gets rendered without errors.', () => {
@@ -12,7 +12,7 @@ test('Menu Icon gets rendered without errors.', () => {
 
 test('Setting Icon gets rendered without errors.', () => {
   // Execute test.
-  render(<ProfileIcon />)
+  render(<LogoutIcon />)
   // Assert result.
   expect(screen.getByRole('icon')).toBeInTheDocument()
 })
