@@ -1,5 +1,5 @@
 import { HomeIcon } from '../home/icon'
-import { LoginIcon, ProfileIcon } from '../auth/icon'
+import { LoginIcon, LogoutIcon } from '../auth/icon'
 import type { NavigationElementProperties } from './navigationElement'
 
 
@@ -13,10 +13,10 @@ export const loginNavigationData: NavigationElementProperties = {
   label: 'Login',
   icon : <LoginIcon />,
 }
-export const profileNavigationData: NavigationElementProperties = {
-  path : '/profile',
-  label: 'Profile',
-  icon : <ProfileIcon />,
+export const logoutNavigationData: NavigationElementProperties = {
+  path      : '/logout',
+  label     : 'Logout',
+  icon      : <LogoutIcon />,
 }
 
 
@@ -25,5 +25,5 @@ export const topNavigationData: NavigationElementProperties[] = [
 ]
 export const bottomNavigationData: NavigationElementProperties[] = [
   loginNavigationData,
-  profileNavigationData,
+  logoutNavigationData,
 ]
