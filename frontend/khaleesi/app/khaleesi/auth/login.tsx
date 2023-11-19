@@ -1,11 +1,11 @@
 import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
-import { json, redirect } from '@remix-run/node'
+import { json } from '@remix-run/node'
 import { Form } from '@remix-run/react'
 import { useContext } from 'react'
 import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'
 import { loginNavigationData } from '../navigation/commonNavigationData'
-import { createUserSession, destroySession, getSessionData } from './session'
+import { Session } from './session.server'
 
 
 export const handle = {
@@ -23,26 +23,16 @@ export const meta: MetaFunction = () => {
 }
 
 export const action = async ({ request }: ActionFunctionArgs): Promise<TypedResponse<any>> => {
-  const { session } = await getSessionData(request).then(value => value.json())
+  const session = new Session()
+  await session.init(request)
   const form = await request.formData()
-  const action = form.get('action')
   const user = form.get('user')
-
-  switch(action) {
-    case 'login':
-      break
-    case 'logout':
-      destroySession(session)
-      return redirect('/')
-    default:
-      return json({ fieldErrors: null, fields: null, formError: 'unknown action' }, { status: 400 })
-  }
 
   if ('string' !== typeof user) {
     return json({ fieldErrors: { user: 'wrong type' }, formError: null }, { status: 400 })
   }
 
-  return createUserSession(user, '/')
+  return session.create(user, '/')
 }
 
 
@@ -59,8 +49,7 @@ export function LoginRoute(): JSX.Element {
           <input type="radio" name="user" value="admin" />
           admin
         </label>
-        <button type="submit" className="button" name="action" value="login">Login</button>
-        <button type="submit" className="button" name="action" value="logout">Logout</button>
+        <button type="submit" className="button" name="action">Login</button>
       </Form></section>
     </div>
   )

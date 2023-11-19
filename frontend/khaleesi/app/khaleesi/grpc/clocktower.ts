@@ -8,10 +8,9 @@ class Sawyer extends Client<khaleesi.core.sawmill.Sawyer> {
   }
 
   async getEvents(): Promise<khaleesi.core.sawmill.EventsList> {
-    return this.stub.getEvents({}).then((response) => {
-      console.log(response)
-      return response
-    })
+    const response = await this.stub.getEvents({})
+    console.log(response)
+    return response
   }
 }
 

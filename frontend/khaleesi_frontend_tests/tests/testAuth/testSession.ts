@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom'
-import { createUserSession, getSessionData } from '../../app/khaleesi/auth/session'
+import * as nodeMock from '@remix-run/node'
+import { Session } from '../../app/khaleesi/auth/session.server'
 
 
 // Need to mock everything instead of using jest.requireActual because of errors...
@@ -13,30 +14,119 @@ jest.mock('@remix-run/node', () => ({
     commitSession : jest.fn(),
     destroySession: jest.fn(),
   })),
-  redirect: jest.fn(),
+  redirectDocument: jest.fn(),
   json: jest.fn((json) => ({ json: jest.fn(() => json) })),
 }))
 
 
-test('Creating user session.', async () => {
-  // Execute test.
-  await createUserSession('session', '/redirect')
+const REMIX_SESSION_MOCK = {
+  id: '',
+  data: {},
+  has: (): boolean => true,
+  get: (): undefined => 'permission' as unknown as undefined,
+  set: (): void => {},
+  flash: (): void => {},
+  unset: (): void => {},
+}
+
+
+describe('hasPermission', () => {
+  test('Check permission if none is required.', () => {
+    // Prepare data.
+    const session = new Session()
+    // Execute test.
+    const result = session.hasPermission()
+    // Assert result.
+    expect(result).toBe(true)
+  })
+
+  test('Check permission if session isn\'t initialized yet.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = false
+    // Execute test.
+    const result = session.hasPermission('permission')
+    // Assert result.
+    expect(result).toBe(false)
+  })
+
+  test('Check permission if user isn\'t authenticated.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = true
+    // Execute test.
+    const result = session.hasPermission('anonymous')
+    // Assert result.
+    expect(result).toBe(true)
+  })
+
+  test('Check permission if user has no permissions.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = true
+    session.remixSession = { ...REMIX_SESSION_MOCK, has: (): boolean => false }
+    // Execute test.
+    const result = session.hasPermission('permission')
+    // Assert result.
+    expect(result).toBe(false)
+  })
+
+  test('Check permission if user has permission.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = true
+    session.remixSession = { ...REMIX_SESSION_MOCK, has: (): boolean => true }
+    // Execute test.
+    const result = session.hasPermission('permission')
+    // Assert result.
+    expect(result).toBe(false)
+  })
 })
 
-test('Getting session data with permission.', async () => {
+test('Initialize user session.', async () => {
+  // Prepare data.
+  const session = new Session()
+  expect(session.remixSession).toBeFalsy()
   // Execute test.
-  const result =
-    await getSessionData(new Request('http://example.com'), 'permission')
-    .then((response) => response.json())
+  await session.init(new Request('http:example.com', { method: 'POST' }))
   // Assert result.
-  expect(result.permission).toBe(true)
+  expect(session.remixSession).toBeTruthy()
+  expect(session.initialized).toBe(true)
+  expect(session.authenticated).toBe(true)
 })
 
-test('Getting session data without permission.', async () => {
+test('Create user session without initializing.', async () => {
+  // Prepare data.
+  const session = new Session()
+  const jsonSpy = jest.spyOn(nodeMock, 'json')
   // Execute test.
-  const result =
-    await getSessionData(new Request('http://example.com'))
-    .then((response) => response.json())
+  await session.create('id', 'redirect')
   // Assert result.
-  expect(result.permission).toBe(false)
+  expect(jsonSpy).toHaveBeenCalled()
+})
+
+test('Create user session.', async () => {
+  // Prepare data.
+  const session = new Session()
+  session.initialized = true
+  session.remixSession = { ...REMIX_SESSION_MOCK }
+  const redirectSpy = jest.spyOn(nodeMock, 'redirectDocument')
+  // Execute test.
+  await session.create('id', 'redirect')
+  // Assert result.
+  expect(redirectSpy).toHaveBeenCalled()
+})
+
+test('Destroy user session.', async () => {
+  // Prepare data.
+  const session = new Session()
+  session.initialized = true
+  session.remixSession = { ...REMIX_SESSION_MOCK }
+  const redirectSpy = jest.spyOn(nodeMock, 'redirectDocument')
+  // Execute test.
+  await session.destroy('redirect')
+  // Assert result.
+  expect(redirectSpy).toHaveBeenCalled()
+  expect(session.initialized).toBe(false)
+  expect(session.authenticated).toBe(false)
 })

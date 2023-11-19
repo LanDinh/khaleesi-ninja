@@ -1,30 +1,29 @@
 import '@testing-library/jest-dom'
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { render, screen } from '@testing-library/react'
-import * as sessionMock from '../../app/khaleesi/auth/session'
 import * as nodeMock from '@remix-run/node'
 import { LoginRoute, action } from '../../app/khaleesi/auth/login'
 import { createTestingStub } from '../util/remixStub'
 
 
-jest.mock('../../app/khaleesi/auth/session', () => ({
-  createUserSession: jest.fn(),
-  getSessionData: jest.fn(() => Promise.resolve({ json: jest.fn(() => ({ session: jest.fn() })) })),
-  destroySession: jest.fn(),
-}))
 jest.mock('@remix-run/node', () => ({
   json: jest.fn(),
-  redirect: jest.fn(),
+}))
+const sessionMock = jest.fn()
+jest.mock('../../app/khaleesi/auth/session.server', () => ({
+  Session: jest.fn(() => ({
+    init  : jest.fn(),
+    create: sessionMock,
+  }))
 }))
 
 
-const buildActionArguments = (action: string, user?: Blob): ActionFunctionArgs => {
+const buildActionArguments = (user: string | Blob): ActionFunctionArgs => {
   const formData = new FormData()
-  formData.append('action', action)
-  if (user) {
-    formData.append('user', user, 'filename')
+  if ('string' === typeof user) {
+    formData.append('user', user)
   } else {
-    formData.append('user', 'user')
+    formData.append('user', user, 'filename')
   }
   return {
     request: new Request('http:example.com', { method: 'POST', body: formData }),
@@ -45,40 +44,17 @@ test('Rendering the login form.', () => {
 
 test('Logging in with invalid user type.', async () => {
   // Prepare data.
-  const createUserSessionSpy = jest.spyOn(sessionMock, 'createUserSession')
-  const jsonSpy               = jest.spyOn(nodeMock   , 'json')
+  const jsonSpy = jest.spyOn(nodeMock, 'json')
   // Execute test.
-  await action(buildActionArguments('login', new Blob()))
+  await action(buildActionArguments(new Blob()))
   // Assert result.
-  expect(createUserSessionSpy).not.toHaveBeenCalled()
+  expect(sessionMock).not.toHaveBeenCalled()
   expect(jsonSpy).toHaveBeenCalled()
 })
 
 test('Logging in.', async () => {
-  // Prepare data.
-  const createUserSessionSpy = jest.spyOn(sessionMock, 'createUserSession')
   // Execute test.
-  await action(buildActionArguments('login'))
+  await action(buildActionArguments('user'))
   // Assert result.
-  expect(createUserSessionSpy).toHaveBeenCalled()
-})
-
-test('Logging out.', async () => {
-  // Prepare data.
-  const destroySessionSpy = jest.spyOn(sessionMock, 'destroySession')
-  const redirectSpy      = jest.spyOn(nodeMock   , 'redirect')
-  // Execute test.
-  await action(buildActionArguments('logout'))
-  // Assert result.
-  expect(destroySessionSpy).toHaveBeenCalled()
-  expect(redirectSpy).toHaveBeenCalled()
-})
-
-test('Unknown action.', async () => {
-  // Prepare data.
-  const jsonSpy = jest.spyOn(nodeMock, 'json')
-  // Execute test.
-  await action(buildActionArguments('unknown'))
-  // Assert result.
-  expect(jsonSpy).toHaveBeenCalled()
+  expect(sessionMock).toHaveBeenCalled()
 })
