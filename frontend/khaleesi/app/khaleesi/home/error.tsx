@@ -5,7 +5,13 @@ export function ErrorPage(): JSX.Element {
   const error = useRouteError()
 
   let errorTitle = 'Woops! Some dragon went crazy...'
-  let errorMessage = error instanceof Error ? error.message : 'Try again later.'
+  let errorMessage = 'Try again later.'
+  if (error instanceof Error) {
+    errorMessage = error.message
+    if (process.env.NODE_ENV && error.stack) {
+      errorMessage = error.stack
+    }
+  }
 
   if (isRouteErrorResponse(error)) {
     errorTitle = `HTTP ${error.status}`

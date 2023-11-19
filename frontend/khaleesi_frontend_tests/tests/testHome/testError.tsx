@@ -40,7 +40,7 @@ test('ErrorPage renders unknown errors.', (): void => {
   // Assert result.
   expect(screen.getByText('Woops!', { exact: false })).toBeInTheDocument()
   expect(screen.queryByText('again', { exact: false })).toBeNull()
-  expect(screen.getByText('message')).toBeInTheDocument()
+  expect(screen.getByText('message', { exact: false })).toBeInTheDocument()
 })
 
 test('ErrorPage renders unknown non-errors.', (): void => {
