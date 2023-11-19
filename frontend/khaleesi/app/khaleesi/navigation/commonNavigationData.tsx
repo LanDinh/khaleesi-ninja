@@ -27,3 +27,10 @@ export const bottomNavigationData: NavigationElementProperties[] = [
   loginNavigationData,
   logoutNavigationData,
 ]
+
+
+export const iconLookup: { [id: string]: JSX.Element } = {
+  'Home'  : <HomeIcon />,
+  'Login' : <LoginIcon />,
+  'Logout': <LogoutIcon />,
+}

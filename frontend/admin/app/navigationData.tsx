@@ -2,3 +2,5 @@ import type { NavigationElementProperties } from './khaleesi/navigation/navigati
 
 
 export const navigationData: NavigationElementProperties[] = []
+
+export const iconLookup: { [id: string]: JSX.Element } = {}
