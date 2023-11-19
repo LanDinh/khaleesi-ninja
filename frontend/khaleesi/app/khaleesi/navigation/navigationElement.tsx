@@ -7,6 +7,7 @@ export type NavigationElementProperties = {
   path       : string,
   label      : string,
   icon       : JSX.Element,
+  permission?: string,
   children?  : NavigationElementProperties[]
 }
 

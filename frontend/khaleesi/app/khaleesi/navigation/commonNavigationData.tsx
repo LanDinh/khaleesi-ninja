@@ -9,13 +9,15 @@ export const homeNavigationData: NavigationElementProperties = {
   icon : <HomeIcon />,
 }
 export const loginNavigationData: NavigationElementProperties = {
-  path : '/login',
-  label: 'Login',
-  icon : <LoginIcon />,
+  path      : '/login',
+  label     : 'Login',
+  permission: 'anonymous',
+  icon      : <LoginIcon />,
 }
 export const logoutNavigationData: NavigationElementProperties = {
   path      : '/logout',
   label     : 'Logout',
+  permission: 'user',
   icon      : <LogoutIcon />,
 }
 

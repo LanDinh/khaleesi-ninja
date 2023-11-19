@@ -1,15 +1,29 @@
-import { createContext, useContext, type Context, type PropsWithChildren } from 'react'
-import type { LinksFunction } from '@remix-run/node'
-import { Meta, Links as RemixLinks, Scripts, ScrollRestoration, Outlet } from '@remix-run/react'
+import { createContext, type Context, type PropsWithChildren } from 'react'
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
+import {
+  Meta,
+  Links as RemixLinks,
+  Scripts,
+  ScrollRestoration,
+  Outlet,
+  useLoaderData,
+} from '@remix-run/react'
+import { navigationData } from '../../navigationData'
 import { breadcrumb, BreadCrumbs } from '../navigation/breadcrumb'
 import { Navigation } from '../navigation/navigation'
+import type { NavigationElementProperties } from '../navigation/navigationElement'
 import { Content } from './content'
 import { ErrorPage } from './error'
 // @ts-ignore: styles have no types
 import rootStyles from '../styles/root.css'
 // @ts-ignore: styles have no types
 import navigationStyles from '../styles/navigation.css'
-import { homeNavigationData } from '../navigation/commonNavigationData'
+import {
+  homeNavigationData,
+  topNavigationData,
+  bottomNavigationData,
+} from '../navigation/commonNavigationData'
+import { Session } from '../auth/session.server'
 
 
 export const handle = {
@@ -18,15 +32,41 @@ export const handle = {
 
 
 export type AppContextType = {
-  title: string,
+  title     : string,
 }
 export const AppContext: Context<AppContextType> = createContext({
-  title: 'Change your title!'
+  title     : 'Change your title!',
 })
 
-function Document({ children }: PropsWithChildren<{}>): JSX.Element {
-  const appContext: AppContextType = useContext(AppContext)
 
+type LoaderType = {
+  top    : NavigationElementProperties[],
+  middle : NavigationElementProperties[],
+  bottom : NavigationElementProperties[],
+}
+
+export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderType> => {
+  const session = new Session()
+  await session.init(request)
+  return {
+    top    : topNavigationData.filter((data) => session.hasPermission(data.permission)),
+    middle : navigationData.filter((data) => session.hasPermission(data.permission)),
+    bottom : bottomNavigationData.filter((data) => session.hasPermission(data.permission)),
+  }
+}
+
+function Document({
+  children,
+  title,
+  topNavigationData,
+  middleNavigationData,
+  bottomNavigationData,
+}: PropsWithChildren<{
+  title               : string,
+  topNavigationData   : NavigationElementProperties[],
+  middleNavigationData: NavigationElementProperties[],
+  bottomNavigationData: NavigationElementProperties[],
+}>): JSX.Element {
   return <html lang="en">
     <head>
       <meta charSet="utf-8" />
@@ -35,14 +75,18 @@ function Document({ children }: PropsWithChildren<{}>): JSX.Element {
       <RemixLinks />
     </head>
     <body>
-      <div id="khaleesi-app">
-        <div id="khaleesi-title" className="khaleesi-bar">{appContext.title}</div>
-        <Navigation />
-        <BreadCrumbs />
-        <Content>
-          {children}
-        </Content>
-      </div>
+    <div id="khaleesi-app">
+      <div id="khaleesi-title" className="khaleesi-bar">{title}</div>
+      <Navigation
+        top={topNavigationData}
+        middle={middleNavigationData}
+        bottom={bottomNavigationData}
+      />
+      <BreadCrumbs />
+      <Content>
+        {children}
+      </Content>
+    </div>
       <ScrollRestoration />
       <Scripts />
     </body>
@@ -59,15 +103,27 @@ export const links: LinksFunction = () => [
 
 export function ErrorBoundary({ title }: { title: string }): JSX.Element {
   return <AppContext.Provider value={{ title: title }}>
-    <Document>
+    <Document
+      title={title}
+      topNavigationData={topNavigationData.filter((data) => 'anonymous' === data.permission)}
+      middleNavigationData={navigationData.filter((data) => 'anonymous' === data.permission)}
+      bottomNavigationData={bottomNavigationData.filter((data) => 'anonymous' === data.permission)}
+    >
       <ErrorPage />
     </Document>
   </AppContext.Provider>
 }
 
 export function App({ title }: { title: string }): JSX.Element {
+  const loaderData = useLoaderData() as LoaderType
+
   return <AppContext.Provider value={{ title: title }}>
-    <Document>
+    <Document
+      title={title}
+      topNavigationData={loaderData.top}
+      middleNavigationData={loaderData.middle}
+      bottomNavigationData={loaderData.bottom}
+    >
       <Outlet />
     </Document>
   </AppContext.Provider>

@@ -18,32 +18,32 @@ jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),
 }))
-jest.mock(
-  '../../app/navigationData',
-  (): { navigationData: NavigationElementProperties[] } => ({
-    navigationData: [
-      {
-        path: '/alpha',
-        label: 'ALPHA',
-        icon: <>a</>,
-        children: [ { path: '/alpha/1', label: 'ONE', icon: <>1</> } ],
-      },
-      {
-        path: '/beta',
-        label: 'BETA',
-        icon: <>b</>,
-        children: [ { path: '/beta/2', label: 'TWO', icon: <>2</> } ],
-      },
-    ],
-  }),
-)
+
+
+const navigationDataElement = (name: string): NavigationElementProperties => {
+  return {
+    path: '/' + name,
+    label: name.toUpperCase(),
+    icon: <div>{name}</div>
+  }
+}
+
+const navigationData = (area: string): NavigationElementProperties[] => {
+  const parent  = navigationDataElement('parent-' + area)
+  const sibling = navigationDataElement('sibling-' + area)
+  const child   = navigationDataElement('child-' + area)
+  return [
+    { ...parent, children: [{ ...child }] },
+    { ...sibling },
+  ]
+}
 
 test('Navigation menu renders without errors.', () => {
   // Prepare data.
   // noinspection JSUnusedLocalSymbols
   const match = {
-    id: 'test',
-    pathname: '/alpha',
+    id: '/parent-top',
+    pathname: '/parent-top',
     params  : {},
     data    : null,
     handle  : {
@@ -55,15 +55,23 @@ test('Navigation menu renders without errors.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(() => <></>)
-  let RemixStub = createTestingStub(Navigation, '/alpha')
+  let RemixStub = createTestingStub(
+    () => <Navigation
+      top={navigationData('top')}
+      middle={navigationData('middle')}
+      bottom={navigationData('bottom')}
+    />,
+    '/parent-top/child-top',
+    )
   // Execute test.
-  const result = render(<RemixStub initialEntries={['/alpha']}/>)
+  const result = render(<RemixStub initialEntries={['/parent-top/child-top']}/>)
   // Assert result.
   expect(mockMenuIcon).toHaveBeenCalled()
-  expect(mockElement).toBeCalledTimes(7)  // Will be 4 when stuff gets removed.
-  expect(result.container.querySelectorAll('details').length).toBe(3)
+  expect(mockElement).toBeCalledTimes(9)
+  expect(result.container.querySelectorAll('details').length).toBe(4)
   expect(result.container.querySelectorAll('details')[1]).toHaveAttribute('open')
   expect(result.container.querySelectorAll('details')[2]).not.toHaveAttribute('open')
+  expect(result.container.querySelectorAll('details')[3]).not.toHaveAttribute('open')
 })
 
 test('NavigationMenu closes when link is clicked.', () => {
@@ -73,9 +81,16 @@ test('NavigationMenu closes when link is clicked.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)
-  let RemixStub = createTestingStub(Navigation, '/alpha')
+  let RemixStub = createTestingStub(
+    () => <Navigation
+      top={navigationData('top')}
+      middle={navigationData('middle')}
+      bottom={navigationData('bottom')}
+    />,
+    '/parent-top/child-top',
+  )
   // Execute test.
-  const result = render(<RemixStub initialEntries={['/alpha']}/>)
+  const result = render(<RemixStub initialEntries={['/parent-top/child-top']}/>)
   fireEvent.click(screen.getAllByText('TEST')[0])
   // Assert result.
   expect(result.container.querySelectorAll('details')[0]).not.toHaveAttribute('open')
@@ -88,9 +103,16 @@ test('NavigationMenu closes when clicking outside the menu.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)
-  let RemixStub = createTestingStub(Navigation, '/alpha')
+  let RemixStub = createTestingStub(
+    () => <Navigation
+      top={navigationData('top')}
+      middle={navigationData('middle')}
+      bottom={navigationData('bottom')}
+    />,
+    '/parent-top/child-top',
+  )
   // Execute test.
-  const result = render(<RemixStub initialEntries={['/alpha']}/>)
+  const result = render(<RemixStub initialEntries={['/parent-top/child-top']}/>)
   fireEvent.click(result.container.querySelector('#khaleesi-navigation-background')!)
   // Assert result.
   expect(result.container.querySelectorAll('details')[0]).not.toHaveAttribute('open')
