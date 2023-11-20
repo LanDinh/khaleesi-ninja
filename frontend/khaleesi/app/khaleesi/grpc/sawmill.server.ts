@@ -1,5 +1,5 @@
 import type { khaleesi } from '../proto/proto'
-import { Client } from './util'
+import { Singleton, Client } from './util.server'
 
 
 class Sawyer extends Client<khaleesi.core.sawmill.Sawyer> {
@@ -8,10 +8,8 @@ class Sawyer extends Client<khaleesi.core.sawmill.Sawyer> {
   }
 
   async getEvents(): Promise<khaleesi.core.sawmill.EventsList> {
-    const response = await this.stub.getEvents({})
-    console.log(response)
-    return response
+    return await this.stub.getEvents({})
   }
 }
 
-export const SAWYER = new Sawyer()
+export const SAWYER = Singleton('core', 'sawmill', () => new Sawyer())

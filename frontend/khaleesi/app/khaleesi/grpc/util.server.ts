@@ -33,3 +33,12 @@ export class Client<Type extends $protobuf.rpc.Service> {
     )
   }
 }
+
+export const Singleton = <Value>(site: string, app: string, valueFactory: () => Value): Value => {
+  const g = global as any
+  g.__singletons ??= {}
+  g.__singletons['grpc'] ??= {}
+  g.__singletons['grpc'][site] ??= valueFactory()
+  g.__singletons['grpc'][site][app] ??= valueFactory()
+  return g.__singletons['grpc'][site][app]
+}
