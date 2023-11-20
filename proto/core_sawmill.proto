@@ -190,12 +190,6 @@ service Lumberjack {
 
 /* SAWYER *****************************************************************************************/
 
-
-message LogFilter {
-  khaleesi.core.RequestMetadata requestMetadata = 1;
-}
-
-
 message HttpRequestList {
   repeated HttpRequestRequest requests = 1;
 }
@@ -218,11 +212,11 @@ message QueryList{
 
 
 service Sawyer {
-  rpc GetEvents           (LogFilter) returns (EventsList);
-  rpc GetGrpcRequests     (LogFilter) returns (GrpcRequestList);
-  rpc GetErrors           (LogFilter) returns (ErrorList);
-  rpc GetHttpRequests     (LogFilter) returns (HttpRequestList);
-  rpc GetQueries          (LogFilter) returns (QueryList);
+  rpc GetEvents           (khaleesi.core.PageRequest) returns (EventsList);
+  rpc GetGrpcRequests     (khaleesi.core.PageRequest) returns (GrpcRequestList);
+  rpc GetErrors           (khaleesi.core.PageRequest) returns (ErrorList);
+  rpc GetHttpRequests     (khaleesi.core.PageRequest) returns (HttpRequestList);
+  rpc GetQueries          (khaleesi.core.PageRequest) returns (QueryList);
 }
 
 

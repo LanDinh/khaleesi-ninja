@@ -5,8 +5,8 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_pb2 import PageRequest
 from khaleesi.proto.core_sawmill_pb2 import (
-  LogFilter,
   EventRequest as GrpcEventRequest,
   GrpcRequestRequest as GrpcGrpcRequest,
   ErrorRequest as GrpcErrorRequest,
@@ -30,7 +30,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     dbEvent.toGrpc.return_value = GrpcEventRequest()
     dbEvents.return_value       = [ dbEvent]
     # Execute test.
-    result = self.service.GetEvents(LogFilter(), MagicMock())
+    result = self.service.GetEvents(PageRequest(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.events))
     dbEvents.assert_called_once_with()
@@ -44,7 +44,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     dbRequest.toGrpc.return_value = GrpcHttpRequest()
     dbRequests.return_value       = [ dbRequest ]
     # Execute test.
-    result = self.service.GetHttpRequests(LogFilter(), MagicMock())
+    result = self.service.GetHttpRequests(PageRequest(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.requests))
     dbRequests.assert_called_once_with()
@@ -58,7 +58,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     dbRequest.toGrpc.return_value = GrpcGrpcRequest()
     dbRequests.return_value       = [ dbRequest ]
     # Execute test.
-    result = self.service.GetGrpcRequests(LogFilter(), MagicMock())
+    result = self.service.GetGrpcRequests(PageRequest(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.requests))
     dbRequests.assert_called_once_with()
@@ -72,7 +72,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     dbQuery.toGrpc.return_value = GrpcQueryRequest()
     dbQueries.return_value      = [ dbQuery ]
     # Execute test.
-    result = self.service.GetQueries(LogFilter(), MagicMock())
+    result = self.service.GetQueries(PageRequest(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.queries))
     dbQueries.assert_called_once_with()
@@ -86,7 +86,7 @@ class SawyerServiceTestCase(SimpleTestCase):
     dbError.toGrpc.return_value = GrpcErrorRequest()
     dbErrors.return_value       = [ dbError ]
     # Execute test.
-    result = self.service.GetErrors(LogFilter(), MagicMock())
+    result = self.service.GetErrors(PageRequest(), MagicMock())
     # Assert result.
     self.assertEqual(1, len(result.errors))
     dbErrors.assert_called_once_with()

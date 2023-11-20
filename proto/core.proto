@@ -149,3 +149,33 @@ service Maid {
   rpc FetchExecutionState (ObjectMetadataListRequest) returns (JobExecutionList);
   rpc Cleanup             (JobExecutionRequest)       returns (EmptyResponse);
 }
+
+/* UTILITY ****************************************************************************************/
+
+message Filter {
+  string field = 1;
+  oneof value {
+    string stringValue  = 10;
+    int64  numberValue  = 11;
+    bool   booleanValue = 12;
+  }
+}
+
+message Sort {
+  string field = 1;
+  oneof value {
+    string stringValue  = 10;
+    int64  numberValue  = 11;
+    bool   booleanValue = 12;
+  }
+  bool ascending = 20;
+}
+
+message PageRequest {
+  RequestMetadata requestMetadata = 1;
+
+  int64           size    = 10;
+  int64           page    = 11;
+  repeated Filter filters = 12;
+  repeated Sort   sort    = 13;
+}

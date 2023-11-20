@@ -6,9 +6,9 @@ import grpc
 # khaleesi-ninja.
 from khaleesi.core.logging.textLogger import LOGGER
 from khaleesi.core.shared.serviceConfiguration import ServiceConfiguration
+from khaleesi.proto.core_pb2 import PageRequest
 from khaleesi.proto.core_sawmill_pb2 import (
   DESCRIPTOR,
-  LogFilter,
   EventsList,
   GrpcRequestList,
   ErrorList,
@@ -31,7 +31,7 @@ from microservice.models import (
 class Service(Servicer):
   """Sawyer service."""
 
-  def GetHttpRequests(self, request: LogFilter, _: grpc.ServicerContext) -> HttpRequestList:
+  def GetHttpRequests(self, request: PageRequest, _: grpc.ServicerContext) -> HttpRequestList:
     """Get logged requests."""
     result = HttpRequestList()
     LOGGER.info('Getting all HTTP requests.')
@@ -39,7 +39,7 @@ class Service(Servicer):
       result.requests.append(dbHttpRequest.toGrpc())
     return result
 
-  def GetEvents(self, request: LogFilter, _: grpc.ServicerContext) -> EventsList :
+  def GetEvents(self, request: PageRequest, _: grpc.ServicerContext) -> EventsList :
     """Get logged events."""
     result = EventsList()
     LOGGER.info('Getting all events.')
@@ -47,7 +47,7 @@ class Service(Servicer):
       result.events.append(event.toGrpc())
     return result
 
-  def GetErrors(self, request: LogFilter, _: grpc.ServicerContext) -> ErrorList :
+  def GetErrors(self, request: PageRequest, _: grpc.ServicerContext) -> ErrorList :
     """Get logged errors."""
     result = ErrorList()
     LOGGER.info('Getting all errors.')
@@ -55,7 +55,7 @@ class Service(Servicer):
       result.errors.append(dbError.toGrpc())
     return result
 
-  def GetGrpcRequests(self, request: LogFilter, _: grpc.ServicerContext) -> GrpcRequestList :
+  def GetGrpcRequests(self, request: PageRequest, _: grpc.ServicerContext) -> GrpcRequestList :
     """Get logged requests."""
     result = GrpcRequestList()
     LOGGER.info('Getting all requests.')
@@ -63,7 +63,7 @@ class Service(Servicer):
       result.requests.append(dbRequest.toGrpc())
     return result
 
-  def GetQueries(self, request: LogFilter, _: grpc.ServicerContext) -> QueryList :
+  def GetQueries(self, request: PageRequest, _: grpc.ServicerContext) -> QueryList :
     """Get logged queries."""
     result = QueryList()
     LOGGER.info('Getting all queries.')
