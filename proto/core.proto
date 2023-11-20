@@ -162,13 +162,12 @@ message Filter {
 }
 
 message Sort {
-  string field = 1;
-  oneof value {
-    string stringValue  = 10;
-    int64  numberValue  = 11;
-    bool   booleanValue = 12;
+  enum Sorting {
+    ASCENDING  = 0;
+    DESCENDING = 1;
   }
-  bool ascending = 20;
+  string  field   = 1;
+  Sorting sorting = 2;
 }
 
 message PageRequest {
