@@ -7,6 +7,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import GrpcRequestRequest as GrpcGrpcRequest
 from microservice.models import GrpcRequest
 
@@ -109,6 +110,7 @@ class GrpcRequestTestCase(SimpleTestCase):
     upstreamRequestMethod  = 'upstream-method',
     upstreamRequestPodId   = 'upstream-pod-id',
     )
+    objectMetadata.return_value = ObjectMetadata()
     # Execute test.
     grpc = instance.toGrpc()
     # Assert result.
@@ -136,6 +138,7 @@ class GrpcRequestTestCase(SimpleTestCase):
     """Test that mapping to gRPC for empty requests works."""
     # Prepare data.
     instance = GrpcRequest()
+    objectMetadata.return_value = ObjectMetadata()
     # Execute test.
     grpc = instance.toGrpc()
     # Assert result.

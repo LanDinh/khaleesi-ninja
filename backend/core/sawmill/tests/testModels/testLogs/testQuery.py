@@ -6,6 +6,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import QueryRequest as GrpcQueryRequest
 from microservice.models import Query
 from microservice.models.logs.metadataMixin import MIN_TIMESTAMP
@@ -176,6 +177,7 @@ class QueryTestCase(SimpleTestCase):
       tables        = 'table1',
       columns       = 'column1,column2',
     )
+    objectMetadata.return_value = ObjectMetadata()
     # Execute test.
     result = instance.toGrpc()
     # Assert result.
@@ -203,6 +205,7 @@ class QueryTestCase(SimpleTestCase):
     """Test that mapping to gRPC for empty queries works."""
     # Prepare data.
     query = Query()
+    objectMetadata.return_value = ObjectMetadata()
     # Execute test.
     query.toGrpc()
     # Assert result.

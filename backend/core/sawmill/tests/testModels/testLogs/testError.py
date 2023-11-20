@@ -9,6 +9,7 @@ from grpc import StatusCode
 # khaleesi.ninja.
 from khaleesi.core.logging.textLogger import LogLevel
 from khaleesi.core.testUtil.testCase import SimpleTestCase
+from khaleesi.proto.core_pb2 import ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import ErrorRequest as GrpcErrorRequest
 from microservice.models import Error
 
@@ -107,6 +108,7 @@ class ErrorTestCase(SimpleTestCase):
           # Prepare data.
           metadata.reset_mock()
           objectMetadata.reset_mock()
+          objectMetadata.return_value = ObjectMetadata()
           instance = Error(
             status         = status.name,
             loglevel       = loglevel.name,
@@ -139,6 +141,7 @@ class ErrorTestCase(SimpleTestCase):
     """Test that mapping to gRPC for empty errors works."""
     # Prepare data.
     error = Error()
+    objectMetadata.return_value = ObjectMetadata()
     # Execute test.
     error.toGrpc()
     # Assert result.

@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 # khaleesi.ninja.
 from khaleesi.core.testUtil.testCase import SimpleTestCase
-from khaleesi.proto.core_pb2 import User
+from khaleesi.proto.core_pb2 import User, ObjectMetadata
 from khaleesi.proto.core_sawmill_pb2 import Event as GrpcEvent, EventRequest as GrpcEventRequest
 from microservice.models import Event
 
@@ -127,6 +127,7 @@ class EventTestCase(SimpleTestCase):
             # Prepare data.
             metadata.reset_mock()
             objectMetadata.reset_mock()
+            objectMetadata.return_value = ObjectMetadata()
             instance = Event(
               targetType       = 'target-type',
               targetId         = 'target-id',
@@ -157,6 +158,7 @@ class EventTestCase(SimpleTestCase):
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
     event = Event()
+    objectMetadata.return_value = ObjectMetadata()
     # Execute test.
     event.toGrpc()
     # Assert result.
