@@ -116,8 +116,9 @@ class EventTestCase(SimpleTestCase):
     metadata.assert_called_once()
     parent.assert_called_once()
 
+  @patch('microservice.models.logs.event.Event.toObjectMetadata')
   @patch('microservice.models.logs.event.Event.metadataToGrpc')
-  def testToGrpc(self, metadata: MagicMock) -> None :
+  def testToGrpc(self, metadata: MagicMock, objectMetadata: MagicMock) -> None :
     """Test returning a gRPC object."""
     for actionLabel, actionType in GrpcEvent.Action.ActionType.items():
       for resultLabel, resultType in GrpcEvent.Action.ResultType.items():
@@ -125,6 +126,7 @@ class EventTestCase(SimpleTestCase):
           with self.subTest(action = actionLabel, result = resultLabel, owner = ownerLabel):
             # Prepare data.
             metadata.reset_mock()
+            objectMetadata.reset_mock()
             instance = Event(
               targetType       = 'target-type',
               targetId         = 'target-id',
@@ -139,6 +141,7 @@ class EventTestCase(SimpleTestCase):
             result = instance.toGrpc()
             # Assert result.
             metadata.assert_called_once()
+            objectMetadata.assert_called_once()
             self.assertEqual(instance.targetType      , result.event.target.type)
             self.assertEqual(instance.targetId        , result.event.target.id)
             self.assertEqual(instance.targetOwnerId   , result.event.target.owner.id)
@@ -148,8 +151,9 @@ class EventTestCase(SimpleTestCase):
             self.assertEqual(resultType               , result.event.action.result)
             self.assertEqual(instance.actionDetails   , result.event.action.details)
 
+  @patch('microservice.models.logs.event.Event.toObjectMetadata')
   @patch('microservice.models.logs.event.Event.metadataToGrpc')
-  def testToGrpcEmpty(self, metadata: MagicMock) -> None :
+  def testToGrpcEmpty(self, metadata: MagicMock, objectMetadata: MagicMock) -> None :
     """Test that mapping to gRPC for empty events works."""
     # Prepare data.
     event = Event()
@@ -157,6 +161,7 @@ class EventTestCase(SimpleTestCase):
     event.toGrpc()
     # Assert result.
     metadata.assert_called_once()
+    objectMetadata.assert_called_once()
 
   def _createGrpcEvent(
       self, *,

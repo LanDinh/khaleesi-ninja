@@ -83,6 +83,7 @@ class Query(Model[GrpcQueryRequest], GrpcMetadataMixin):
     """Return a grpc object containing own values."""
     grpc = GrpcQueryRequest()
     self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+    grpc.objectMetadata.CopyFrom(self.toObjectMetadata())
 
     if self.reportedStart:
       grpc.query.start.FromDatetime(self.reportedStart)

@@ -65,6 +65,7 @@ class Error(Model[GrpcErrorRequest], GrpcMetadataMixin):
     """Return a grpc object containing own values."""
     grpc = GrpcErrorRequest()
     self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+    grpc.objectMetadata.CopyFrom(self.toObjectMetadata())
 
     # Error.
     grpc.error.status         = self.status

@@ -84,9 +84,15 @@ class HttpRequestTestCase(SimpleTestCase):
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
 
+  @patch('microservice.models.logs.httpRequest.HttpRequest.toObjectMetadata')
   @patch('microservice.models.logs.httpRequest.HttpRequest.metadataToGrpc')
   @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataToGrpc')
-  def testToGrpc(self, responseMetadata: MagicMock, metadata: MagicMock) -> None :
+  def testToGrpc(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      objectMetadata  : MagicMock,
+  ) -> None :
     """Test that general mapping to gRPC works."""
     # Prepare data.
     instance = HttpRequest(
@@ -105,6 +111,7 @@ class HttpRequestTestCase(SimpleTestCase):
     grpc = instance.toGrpc()
     # Assert result.
     metadata.assert_called_once()
+    objectMetadata.assert_called_once()
     responseMetadata.assert_called_once()
     self.assertEqual(instance.language      , grpc.request.language)
     self.assertEqual(instance.deviceId      , grpc.request.deviceId)
@@ -118,9 +125,15 @@ class HttpRequestTestCase(SimpleTestCase):
     self.assertEqual(instance.deviceType    , grpc.request.deviceType)
 
 
+  @patch('microservice.models.logs.httpRequest.HttpRequest.toObjectMetadata')
   @patch('microservice.models.logs.httpRequest.HttpRequest.metadataToGrpc')
   @patch('microservice.models.logs.httpRequest.HttpRequest.responseMetadataToGrpc')
-  def testToGrpcEmpty(self, responseMetadata: MagicMock, metadata: MagicMock) -> None :
+  def testToGrpcEmpty(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      objectMetadata  : MagicMock,
+  ) -> None :
     """Test that mapping to gRPC for empty requests works."""
     # Prepare data.
     instance = HttpRequest()
@@ -129,6 +142,7 @@ class HttpRequestTestCase(SimpleTestCase):
     # Assert result.
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
+    objectMetadata.assert_called_once()
     self.assertIsNotNone(grpc)
 
   @patch('microservice.models.logs.grpcRequest.Model.toObjectMetadata')

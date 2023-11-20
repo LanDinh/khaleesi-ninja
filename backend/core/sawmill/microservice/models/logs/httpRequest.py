@@ -84,6 +84,7 @@ class HttpRequest(Model[GrpcHttpRequest], MetadataMixin, ResponseMetadataMixin):
       processed   = grpc.processedResponse,
       response    = grpc.response,
     )
+    grpc.objectMetadata.CopyFrom(self.toObjectMetadata())
 
     # khaleesi.ninja.
     grpc.request.language = self.language

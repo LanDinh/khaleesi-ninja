@@ -163,8 +163,9 @@ class QueryTestCase(SimpleTestCase):
     metadata.assert_called_once()
     parent.assert_called_once()
 
+  @patch('microservice.models.logs.query.Query.toObjectMetadata')
   @patch('microservice.models.logs.query.Query.metadataToGrpc')
-  def testToGrpc(self, metadata: MagicMock) -> None :
+  def testToGrpc(self, metadata: MagicMock, objectMetadata: MagicMock) -> None :
     """Test that general mapping to gRPC works."""
     # Prepare data.
     instance = Query(
@@ -179,6 +180,7 @@ class QueryTestCase(SimpleTestCase):
     result = instance.toGrpc()
     # Assert result.
     metadata.assert_called_once()
+    objectMetadata.assert_called_once()
     self.assertEqual(
       instance.reportedStart,
       result.query.start.ToDatetime().replace(tzinfo = timezone.utc),
@@ -195,8 +197,9 @@ class QueryTestCase(SimpleTestCase):
     self.assertEqual('column1'          , result.query.columns[0])
     self.assertEqual('column2'          , result.query.columns[1])
 
+  @patch('microservice.models.logs.query.Query.toObjectMetadata')
   @patch('microservice.models.logs.query.Query.metadataToGrpc')
-  def testToGrpcEmpty(self, metadata: MagicMock) -> None :
+  def testToGrpcEmpty(self, metadata: MagicMock, objectMetadata: MagicMock) -> None :
     """Test that mapping to gRPC for empty queries works."""
     # Prepare data.
     query = Query()
@@ -204,6 +207,7 @@ class QueryTestCase(SimpleTestCase):
     query.toGrpc()
     # Assert result.
     metadata.assert_called_once()
+    objectMetadata.assert_called_once()
 
   def _createGrpcQuery(self, *, string: MagicMock, timestamp: MagicMock) -> GrpcQueryRequest :
     """Utility method for creating gRPC Queries."""

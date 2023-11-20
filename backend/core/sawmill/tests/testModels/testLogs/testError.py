@@ -97,14 +97,16 @@ class ErrorTestCase(SimpleTestCase):
     metadata.assert_called_once()
     parent.assert_called_once()
 
+  @patch('microservice.models.logs.error.Error.toObjectMetadata')
   @patch('microservice.models.logs.error.Error.metadataToGrpc')
-  def testToGrpc(self, metadata: MagicMock) -> None :
+  def testToGrpc(self, metadata: MagicMock, objectMetadata: MagicMock) -> None :
     """Test that general mapping to gRPC works."""
     for status in StatusCode:
       for loglevel in LogLevel:
         with self.subTest(status = status.name):
           # Prepare data.
           metadata.reset_mock()
+          objectMetadata.reset_mock()
           instance = Error(
             status         = status.name,
             loglevel       = loglevel.name,
@@ -119,6 +121,8 @@ class ErrorTestCase(SimpleTestCase):
           # Execute test.
           result = instance.toGrpc()
           # Assert result.
+          metadata.assert_called_once()
+          objectMetadata.assert_called_once()
           self.assertEqual(instance.status        , result.error.status)
           self.assertEqual(instance.loglevel      , result.error.loglevel)
           self.assertEqual(instance.site          , result.error.site)
@@ -129,8 +133,9 @@ class ErrorTestCase(SimpleTestCase):
           self.assertEqual(instance.privateDetails, result.error.privateDetails)
           self.assertEqual(instance.stacktrace    , result.error.stacktrace)
 
+  @patch('microservice.models.logs.error.Error.toObjectMetadata')
   @patch('microservice.models.logs.error.Error.metadataToGrpc')
-  def testToGrpcEmpty(self, metadata: MagicMock) -> None :
+  def testToGrpcEmpty(self, metadata: MagicMock, objectMetadata: MagicMock) -> None :
     """Test that mapping to gRPC for empty errors works."""
     # Prepare data.
     error = Error()
@@ -138,6 +143,7 @@ class ErrorTestCase(SimpleTestCase):
     error.toGrpc()
     # Assert result.
     metadata.assert_called_once()
+    objectMetadata.assert_called_once()
 
   def _createGrpcError(self, *, status: StatusCode, loglevel: LogLevel) -> GrpcErrorRequest :
     """Utility method for creating gRPC Errors."""

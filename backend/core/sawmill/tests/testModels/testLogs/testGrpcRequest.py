@@ -90,9 +90,15 @@ class GrpcRequestTestCase(SimpleTestCase):
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
 
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.toObjectMetadata')
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataToGrpc')
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataToGrpc')
-  def testToGrpc(self, responseMetadata: MagicMock, metadata: MagicMock) -> None :
+  def testToGrpc(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      objectMetadata  : MagicMock,
+  ) -> None :
     """Test that general mapping to gRPC works."""
     # Prepare data.
     instance = GrpcRequest(
@@ -108,6 +114,7 @@ class GrpcRequestTestCase(SimpleTestCase):
     # Assert result.
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
+    objectMetadata.assert_called_once()
     upstream = grpc.request.upstreamRequest
     self.assertEqual(instance.upstreamRequestId     , upstream.requestId)
     self.assertEqual(instance.upstreamRequestSite   , upstream.site)
@@ -117,9 +124,15 @@ class GrpcRequestTestCase(SimpleTestCase):
     self.assertEqual(instance.upstreamRequestPodId  , upstream.podId)
 
 
+  @patch('microservice.models.logs.grpcRequest.GrpcRequest.toObjectMetadata')
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.metadataToGrpc')
   @patch('microservice.models.logs.grpcRequest.GrpcRequest.responseMetadataToGrpc')
-  def testToGrpcEmpty(self, responseMetadata: MagicMock, metadata: MagicMock) -> None :
+  def testToGrpcEmpty(
+      self,
+      responseMetadata: MagicMock,
+      metadata        : MagicMock,
+      objectMetadata  : MagicMock,
+  ) -> None :
     """Test that mapping to gRPC for empty requests works."""
     # Prepare data.
     instance = GrpcRequest()
@@ -128,6 +141,7 @@ class GrpcRequestTestCase(SimpleTestCase):
     # Assert result.
     metadata.assert_called_once()
     responseMetadata.assert_called_once()
+    objectMetadata.assert_called_once()
     self.assertIsNotNone(grpc)
 
   @patch('microservice.models.logs.grpcRequest.Model.toObjectMetadata')

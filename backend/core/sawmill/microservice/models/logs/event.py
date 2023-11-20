@@ -79,6 +79,7 @@ class Event(Model[GrpcEventRequest], GrpcMetadataMixin):
     """Return a grpc object containing own values."""
     grpc = GrpcEventRequest()
     self.metadataToGrpc(logMetadata = grpc.logMetadata, requestMetadata = grpc.requestMetadata)
+    grpc.objectMetadata.CopyFrom(self.toObjectMetadata())
 
     # Target.
     grpc.event.target.type       = self.targetType

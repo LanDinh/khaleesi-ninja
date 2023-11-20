@@ -90,6 +90,7 @@ class GrpcRequest(Model[GrpcGrpcRequest], GrpcMetadataMixin, ResponseMetadataMix
       processed   = grpc.processedResponse,
       response    = grpc.response,
     )
+    grpc.objectMetadata.CopyFrom(self.toObjectMetadata())
 
     # Upstream request.
     grpc.request.upstreamRequest.requestId = self.upstreamRequestId
