@@ -25,19 +25,19 @@ message User {
 }
 
 message HttpCallerDetails {
-  string requestId    = 1;
-  string site = 2;
-  string path         = 3;
-  string podId        = 4;
+  string requestId = 1;
+  string site      = 2;
+  string path      = 3;
+  string podId     = 4;
 }
 
 message GrpcCallerDetails {
-  string requestId       = 1;
-  string site    = 2;
-  string app = 3;
-  string service     = 4;
-  string method      = 5;
-  string podId           = 6;
+  string requestId = 1;
+  string site      = 2;
+  string app       = 3;
+  string service   = 4;
+  string method    = 5;
+  string podId     = 6;
 }
 
 message RequestMetadata {
