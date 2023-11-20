@@ -19,7 +19,7 @@ afterAll(() => {
 test('ErrorPage renders route errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(true)
-  jest.spyOn(hooks, 'useRouteError').mockReturnValue({ status: 1337, statusText: 'FooBar' })
+  jest.spyOn(hooks, 'useRouteError').mockReturnValue({ status: 1337, data: { message: 'FooBar' } })
   let RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)

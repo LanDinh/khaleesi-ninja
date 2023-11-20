@@ -15,11 +15,11 @@ export function ErrorPage(): JSX.Element {
 
   if (isRouteErrorResponse(error)) {
     errorTitle = `HTTP ${error.status}`
-    errorMessage = error.statusText
+    errorMessage = error.data.message
   }
 
   return <>
-    <h1>{ errorTitle }</h1>,
-    <div>{ errorMessage }</div>,
+    <h1>{ errorTitle }</h1>
+    <div>{ errorMessage }</div>
   </>
 }

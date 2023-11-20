@@ -101,13 +101,23 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: navigationStyles },
 ]
 
+const filterAnonymous = (data: NavigationElementProperties): boolean => {
+  if (!data) {
+    return false
+  }
+  if (!data.permission) {
+    return true
+  }
+  return 'anonymous' === data.permission
+}
+
 export function ErrorBoundary({ title }: { title: string }): JSX.Element {
   return <AppContext.Provider value={{ title: title }}>
     <Document
       title={title}
-      topNavigationData={topNavigationData.filter((data) => 'anonymous' === data.permission)}
-      middleNavigationData={navigationData.filter((data) => 'anonymous' === data.permission)}
-      bottomNavigationData={bottomNavigationData.filter((data) => 'anonymous' === data.permission)}
+      topNavigationData={topNavigationData.filter(filterAnonymous)}
+      middleNavigationData={navigationData.filter(filterAnonymous)}
+      bottomNavigationData={bottomNavigationData.filter(filterAnonymous)}
     >
       <ErrorPage />
     </Document>

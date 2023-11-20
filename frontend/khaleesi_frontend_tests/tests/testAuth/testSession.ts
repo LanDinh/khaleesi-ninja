@@ -15,6 +15,7 @@ jest.mock('@remix-run/node', () => ({
     destroySession: jest.fn(),
   })),
   redirectDocument: jest.fn(),
+  redirect: jest.fn(),
   json: jest.fn((json) => ({ json: jest.fn(() => json) })),
 }))
 
@@ -80,6 +81,50 @@ describe('hasPermission', () => {
     const result = session.hasPermission('permission')
     // Assert result.
     expect(result).toBe(false)
+  })
+})
+
+describe('requirePermission', () => {
+  test('Check permission if none is required.', () => {
+    // Prepare data.
+    const session = new Session()
+    // Execute test & assert result.
+    expect(() => session.requirePermission()).not.toThrow()
+  })
+
+  test('Check permission if session isn\'t initialized yet.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = false
+    // Execute test & assert result.
+    expect(() => session.requirePermission('permission')).toThrow()
+  })
+
+  test('Check permission if user isn\'t authenticated.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = true
+    // Execute test & assert result.
+    expect(() => session.requirePermission('permission')).toThrow()
+  })
+
+  test('Check permission if user has no permissions.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = true
+    session.remixSession = { ...REMIX_SESSION_MOCK, has: (): boolean => false }
+    // Execute test & assert result.
+    expect(() => session.requirePermission('permission')).toThrow()
+  })
+
+  test('Check permission if user has permission.', () => {
+    // Prepare data.
+    const session = new Session()
+    session.initialized = true
+    session.authenticated = true
+    session.remixSession = { ...REMIX_SESSION_MOCK, has: (): boolean => true }
+    // Execute test & assert result.
+    expect(() => session.requirePermission('permission')).not.toThrow()
   })
 })
 

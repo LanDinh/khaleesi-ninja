@@ -1,6 +1,7 @@
 import {
   createCookieSessionStorage,
   redirectDocument,
+  redirect,
   json,
   type Session as RemixSession,
   type TypedResponse,
@@ -83,5 +84,14 @@ export class Session {
       return false
     }
     return this.remixSession!.get('permission') === permission
+  }
+
+  requirePermission(permission: string = ''): void {
+    if (!this.hasPermission(permission)) {
+      if (!this.authenticated) {
+        throw redirect('/login')
+      }
+      throw json({ message: 'Permission denied.' }, { status: 403 })
+    }
   }
 }

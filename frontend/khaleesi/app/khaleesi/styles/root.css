@@ -59,6 +59,11 @@ details > summary {
   width : var(--font-size-text);
 }
 
+h1 {
+  margin: 0;
+  padding-bottom: var(--spacing);
+}
+
 #khaleesi-app {
   /* Grid. */
   display              : grid;
