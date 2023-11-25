@@ -1,12 +1,13 @@
 :root {
   /* Theme. */
-  --background-dark-color : #2F2F2F;
-  --background-light-color: #D0D0D0;
-  --theme-dark-color      : #341F3F;
-  --theme-light-color     : #D07FFF;
-  --bad-color             : #FF2F00;
-  --average-color         : #FFD000;
-  --good-color            : #00FF2F;
+  --background-dark-color  : #282828;
+  --background-medium-color: #2F2F2F;
+  --background-light-color : #D0D0D0;
+  --theme-dark-color       : #341F3F;
+  --theme-light-color      : #D07FFF;
+  --bad-color              : #FF2F00;
+  --average-color          : #FFD000;
+  --good-color             : #00FF2F;
   --spacing   : 8px;
   --outer-size: 72px;
   --inner-size: calc(var(--outer-size) - 2 * var(--spacing));
@@ -24,7 +25,7 @@ html {
 body {
   /* Colors. */
   color           : var(--background-light-color);
-  background-color: var(--background-dark-color);
+  background-color: var(--background-medium-color);
 
   /* Text. */
   font-family: Roboto, sans-serif;
@@ -62,6 +63,14 @@ details > summary {
 h1 {
   margin: 0;
   padding-bottom: var(--spacing);
+}
+
+select,
+button {
+  /* Border */
+  border: none;
+  border-radius: var(--spacing);
+  padding: 0;
 }
 
 #khaleesi-app {

@@ -119,6 +119,6 @@
   width   : 100vw;
   top     : 0;
   /* Colors. */
-  background-color: var(--background-dark-color);
+  background-color: var(--background-medium-color);
   opacity         : 0.5;
 }
