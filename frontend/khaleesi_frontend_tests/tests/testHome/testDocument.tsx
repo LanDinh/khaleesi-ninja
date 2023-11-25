@@ -84,5 +84,5 @@ test('ErrorBoundary gets rendered without errors.', () => {
 test('links contain all links.', () => {
   // Execute test & assert result.
   // Font, rootStyles, navigationStyles.
-  expect(links().length).toBe(3)
+  expect(links().length).toBe(4)
 })

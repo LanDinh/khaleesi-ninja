@@ -7,8 +7,8 @@ import { createTestingStub } from '../../util/remixStub'
 test('Table renders as expected.', async () => {
   // Prepare data.
   type Data = { label: string, id: string }
-  const columns = [{ label: 'header', value: (data: Data) => data.label }]
-  const rowId = (data: Data) => data.id
+  const columns = [{ label: 'header', value: (data: Data): string => data.label }]
+  const rowId = (data: Data): string => data.id
   const data = [{ label: 'one', id: '1' }, { label: 'two', id: '2' }]
   let RemixStub = createTestingStub(() => <Table<Data>
     columns={columns}
