@@ -1,4 +1,4 @@
-import { TableColumn, DataMapper } from './types'
+import type { TableColumn, DataMapper } from './types'
 
 
 export function Table<Data>(
