@@ -1,18 +1,18 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { LoginIcon, LogoutIcon } from '../../app/khaleesi/auth/icon'
+import { LogsIcon, EventsIcon } from '../../app/logs/icon'
 
 
-test('Login Icon gets rendered without errors.', () => {
+test('Logs Icon gets rendered without errors.', () => {
   // Execute test.
-  render(<LoginIcon />)
+  render(<LogsIcon />)
   // Assert result.
   expect(screen.getByRole('icon')).toBeInTheDocument()
 })
 
-test('Logout Icon gets rendered without errors.', () => {
+test('Events Icon gets rendered without errors.', () => {
   // Execute test.
-  render(<LogoutIcon />)
+  render(<EventsIcon />)
   // Assert result.
   expect(screen.getByRole('icon')).toBeInTheDocument()
 })
