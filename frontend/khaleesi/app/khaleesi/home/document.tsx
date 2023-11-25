@@ -18,6 +18,8 @@ import { ErrorPage } from './error'
 import rootStyles from '../styles/root.css'
 // @ts-ignore: styles have no types
 import navigationStyles from '../styles/navigation.css'
+// @ts-ignore: styles have no types
+import tableStyles from '../styles/table.css'
 import {
   homeNavigationData,
   topNavigationData,
@@ -99,6 +101,7 @@ export const links: LinksFunction = () => [
   // Style.
   { rel: 'stylesheet', href: rootStyles },
   { rel: 'stylesheet', href: navigationStyles },
+  { rel: 'stylesheet', href: tableStyles },
 ]
 
 const filterAnonymous = (data: NavigationElementProperties): boolean => {
