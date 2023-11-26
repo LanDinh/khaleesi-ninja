@@ -3,7 +3,7 @@ import type { ActionFunctionArgs } from '@remix-run/node'
 import { render, screen } from '@testing-library/react'
 import * as nodeMock from '@remix-run/node'
 import { LoginRoute, action } from '../../app/khaleesi/auth/login'
-import { createTestingStub } from '../util/remixStub'
+import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
 jest.mock('@remix-run/node', () => ({

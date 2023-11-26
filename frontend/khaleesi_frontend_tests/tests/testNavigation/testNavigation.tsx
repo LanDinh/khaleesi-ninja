@@ -9,7 +9,7 @@ import type {
 import {
   NavigationMenuElement,
 } from '../../app/khaleesi/navigation/navigationElement'
-import { createTestingStub } from '../util/remixStub'
+import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
 jest.mock('../../app/khaleesi/home/icon')

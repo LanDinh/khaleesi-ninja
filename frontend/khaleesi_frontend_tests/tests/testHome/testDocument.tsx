@@ -5,8 +5,8 @@ import { App, ErrorBoundary, links, loader } from '../../app/khaleesi/home/docum
 import { Navigation } from '../../app/khaleesi/navigation/navigation'
 import { BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
 import { Content } from '../../app/khaleesi/home/content'
-import { suppressConsoleFunction } from '../util/consoleLogging'
-import { createTestingStub } from '../util/remixStub'
+import { suppressConsoleFunction } from '../../app/khaleesi/testUtil/consoleLogging'
+import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
 const originalError = console.error.bind(console.error)

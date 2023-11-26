@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as hooks from '@remix-run/react'
 import { ErrorPage } from '../../app/khaleesi/home/error'
-import { createTestingStub } from '../util/remixStub'
+import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
 jest.mock('@remix-run/react', () => ({

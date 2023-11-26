@@ -47,6 +47,7 @@ export function Paginator(
     </button>
     <button
       onClick={handlePageChange}
+      value={maxPage}
       disabled={maxPage === page}
     >
       <LastIcon />

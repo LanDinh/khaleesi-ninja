@@ -7,7 +7,7 @@ import {
   handlePageChange,
 } from '../../../app/khaleesi/components/table/table'
 import { Paginator } from '../../../app/khaleesi/components/table/paginator'
-import { createTestingStub } from '../../util/remixStub'
+import { createTestingStub } from '../../../app/khaleesi/testUtil/remixStub'
 import type { ChangeEvent, MouseEvent } from 'react'
 import type { SetURLSearchParams, URLSearchParamsInit } from 'react-router-dom'
 

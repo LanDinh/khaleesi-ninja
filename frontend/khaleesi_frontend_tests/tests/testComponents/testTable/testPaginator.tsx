@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Paginator } from '../../../app/khaleesi/components/table/paginator'
-import { createTestingStub } from '../../util/remixStub'
+import { createTestingStub } from '../../../app/khaleesi/testUtil/remixStub'
 
 
 describe('Rendering.', () => {
@@ -20,7 +20,7 @@ describe('Rendering.', () => {
       handlePageChange={handlePageChange}
     />)
     // Execute test.
-    render(<RemixStub/>)
+    const result = render(<RemixStub/>)
     // Assert result.
     expect(screen.getByRole('option', { name: '5' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: '25' })).toBeInTheDocument()
@@ -29,9 +29,47 @@ describe('Rendering.', () => {
     expect(screen.getByText('31 ', { exact: false })).toBeInTheDocument()
     expect(screen.getByText('35 ', { exact: false })).toBeInTheDocument()
     expect(screen.getByText(`/ ${total}`, { exact: false })).toBeInTheDocument()
+    expect(result.container.querySelectorAll('button')[0].value).toBe('1')
+    expect(result.container.querySelectorAll('button')[1].value).toBe('6')
+    expect(result.container.querySelectorAll('button')[2].value).toBe('8')
+    expect(result.container.querySelectorAll('button')[3].value).toBe('9')
+    expect(result.container.querySelectorAll('button')[0]).not.toBeDisabled()
+    expect(result.container.querySelectorAll('button')[1]).not.toBeDisabled()
+    expect(result.container.querySelectorAll('button')[2]).not.toBeDisabled()
+    expect(result.container.querySelectorAll('button')[3]).not.toBeDisabled()
   })
 
-  test('Paginator renders as expected for the last page and default size.', () => {
+  test('Paginator renders as expected for the last page', () => {
+    // Prepare data.
+    const total = 42
+    const page = 2
+    const size = 25
+    const handleSizeChange = jest.fn()
+    const handlePageChange = jest.fn()
+    let RemixStub = createTestingStub(() => <Paginator
+      total={total}
+      page={page}
+      size={size}
+      handleSizeChange={handleSizeChange}
+      handlePageChange={handlePageChange}
+    />)
+    // Execute test.
+    const result = render(<RemixStub/>)
+    // Assert result.
+    expect(screen.getByText('26 ', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText('42 ', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText(`/ ${total}`, { exact: false })).toBeInTheDocument()
+    expect(result.container.querySelectorAll('button')[0].value).toBe('1')
+    expect(result.container.querySelectorAll('button')[1].value).toBe('1')
+    expect(result.container.querySelectorAll('button')[2].value).toBe('2')
+    expect(result.container.querySelectorAll('button')[3].value).toBe('2')
+    expect(result.container.querySelectorAll('button')[0]).not.toBeDisabled()
+    expect(result.container.querySelectorAll('button')[1]).not.toBeDisabled()
+    expect(result.container.querySelectorAll('button')[2]).toBeDisabled()
+    expect(result.container.querySelectorAll('button')[3]).toBeDisabled()
+  })
+
+  test('Paginator renders as expected for a default size.', () => {
     // Prepare data.
     const total = 42
     const page = 2
@@ -52,9 +90,40 @@ describe('Rendering.', () => {
     expect(screen.getByRole('option', { name: '25' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: '50' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: '100' })).toBeInTheDocument()
-    expect(screen.getByText('26 ', { exact: false })).toBeInTheDocument()
-    expect(screen.getByText('42 ', { exact: false })).toBeInTheDocument()
+  })
+
+  test('Paginator renders as expected for the first page.', () => {
+    // Prepare data.
+    const total = 42
+    const page = 1
+    const size = 5
+    const handleSizeChange = jest.fn()
+    const handlePageChange = jest.fn()
+    let RemixStub = createTestingStub(() => <Paginator
+      total={total}
+      page={page}
+      size={size}
+      handleSizeChange={handleSizeChange}
+      handlePageChange={handlePageChange}
+    />)
+    // Execute test.
+    const result = render(<RemixStub/>)
+    // Assert result.
+    expect(screen.getByRole('option', { name: '5' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '25' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '50' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: '100' })).toBeInTheDocument()
+    expect(screen.getByText('1 ', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText('5 ', { exact: false })).toBeInTheDocument()
     expect(screen.getByText(`/ ${total}`, { exact: false })).toBeInTheDocument()
+    expect(result.container.querySelectorAll('button')[0].value).toBe('1')
+    expect(result.container.querySelectorAll('button')[1].value).toBe('1')
+    expect(result.container.querySelectorAll('button')[2].value).toBe('2')
+    expect(result.container.querySelectorAll('button')[3].value).toBe('9')
+    expect(result.container.querySelectorAll('button')[0]).toBeDisabled()
+    expect(result.container.querySelectorAll('button')[1]).toBeDisabled()
+    expect(result.container.querySelectorAll('button')[2]).not.toBeDisabled()
+    expect(result.container.querySelectorAll('button')[3]).not.toBeDisabled()
   })
 })
 
@@ -75,7 +144,7 @@ describe('Size changing', () => {
     />)
     // Execute test.
     const result = render(<RemixStub />)
-    fireEvent.change(result.container.querySelectorAll('select')[0], { target: { value: 25 } })
+    fireEvent.change(result.container.querySelectorAll('select')[0])
     // Assert result.
     expect(handleSizeChange).toHaveBeenCalled()
     expect(handlePageChange).not.toHaveBeenCalled()

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { render, screen } from '@testing-library/react'
 import { LogoutRoute, action } from '../../app/khaleesi/auth/logout'
-import { createTestingStub } from '../util/remixStub'
+import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
 jest.mock('@remix-run/node', () => ({
