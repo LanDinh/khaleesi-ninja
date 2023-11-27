@@ -9,8 +9,8 @@ export function Paginator(
     total           : number,
     page            : number,
     size            : number,
-    handleSizeChange: (event: ChangeEvent) => void,
-    handlePageChange: (event: MouseEvent) => void,
+    handleSizeChange: (event: ChangeEvent<HTMLSelectElement>) => void,
+    handlePageChange: (event: MouseEvent<HTMLButtonElement>) => void,
   },
 ): JSX.Element {
   const sizes = new Set([size, ...DEFAULT_SIZES])
