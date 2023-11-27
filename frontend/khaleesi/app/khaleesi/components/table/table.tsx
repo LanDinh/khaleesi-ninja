@@ -17,9 +17,9 @@ export const searchParamAsNumber = (
 }
 
 export const handleSizeChange = (setSearchParams: SetURLSearchParams) => {
-  return (event: ChangeEvent): void => {
+  return (event: ChangeEvent<HTMLSelectElement>): void => {
     setSearchParams((prev: URLSearchParams) => {
-      const value = event.currentTarget.getAttribute('value')
+      const value = event.currentTarget.value
       if (null !== value) {
         prev.set('size', value)
       }
@@ -29,9 +29,9 @@ export const handleSizeChange = (setSearchParams: SetURLSearchParams) => {
 }
 
 export const handlePageChange = (setSearchParams: SetURLSearchParams) => {
-  return (event: MouseEvent): void => {
+  return (event: MouseEvent<HTMLButtonElement>): void => {
     setSearchParams((prev: URLSearchParams) => {
-      const value = event.currentTarget.getAttribute('value')
+      const value = event.currentTarget.value
       if (null !== value) {
         prev.set('page', value)
       }

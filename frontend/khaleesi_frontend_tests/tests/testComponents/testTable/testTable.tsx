@@ -90,9 +90,9 @@ describe('Helper functions.', () => {
     }
     const event = {
       currentTarget: {
-        getAttribute: () => 13
+        value: 13
       }
-    } as unknown as ChangeEvent
+    } as unknown as ChangeEvent<HTMLSelectElement>
     // Execute test & assert result.
     handleSizeChange(setSearchParams)(event)
   })
@@ -106,9 +106,9 @@ describe('Helper functions.', () => {
     }
     const event = {
       currentTarget: {
-        getAttribute: () => 13
+        value: 13
       }
-    } as unknown as MouseEvent
+    } as unknown as MouseEvent<HTMLButtonElement>
     // Execute test & assert result.
     handlePageChange(setSearchParams)(event)
   })

@@ -20,7 +20,7 @@ export function Paginator(
   const maxPage = Math.ceil(total / size)
 
   return <div className="khaleesi-table-pagination">
-    <select defaultValue={size} onChange={handleSizeChange}>
+    <select defaultValue={size} onChange={handleSizeChange} name="size">
       { [...sizes].map(value => <option value={value} key={value}>{ value }</option>) }
     </select>
     <div>{firstIndex} - {lastIndex} / {total}</div>
