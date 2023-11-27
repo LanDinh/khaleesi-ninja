@@ -59,7 +59,7 @@ if [[ "${installed}" == "true" ]]; then
     echo -e "${yellow}Rolling out the new container...${clear_color}"
     kubectl -n "khaleesi-ninja-${environment}" rollout restart deployment "${site}-${app}"
 
-    wait_output=$(kubectl -n "khaleesi-ninja-${environment}" wait pod -l site="${site}",name="${app}",type="${type}" --for condition=ready --timeout 1m 2>&1 > /dev/null) || true
+    wait_output=$(kubectl -n "khaleesi-ninja-${environment}" wait pod -l site="${site}",app="${app}",type="${type}" --for condition=ready --timeout 1m 2>&1 > /dev/null) || true
     if [[ -n "${wait_output}" ]]; then
       grep -oE "[a-z]+-[a-z]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+" <<< "${wait_output}" | while read -r failed; do
         echo -e "${red}Pod ${failed} failed to start!${clear_color}"
