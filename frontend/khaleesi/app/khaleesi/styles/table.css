@@ -1,7 +1,13 @@
-.khaleesi-table {
+.khaleesi-table-main {
   /* Table */
-  border-collapse: collapse;
+  border-spacing: 0;
+
+  /* Color */
+  border-radius: var(--spacing);
   border: 1px solid var(--background-dark-color);
+
+  /* Size & Positioning */
+  width: 100%;
 }
 
 .khaleesi-table th,
@@ -27,6 +33,26 @@
   background-color: var(--theme-dark-color);
 }
 
+.khaleesi-table thead tr:first-child th:first-child {
+  /* Color */
+  border-top-left-radius: var(--spacing);
+}
+
+.khaleesi-table thead tr:first-child th:last-child {
+  /* Color */
+  border-top-right-radius: var(--spacing);
+}
+
+.khaleesi-table tfoot tr:last-child th:first-child {
+  /* Color */
+  border-bottom-left-radius: var(--spacing);
+}
+
+.khaleesi-table tfoot tr:last-child th:last-child {
+  /* Color */
+  border-bottom-right-radius: var(--spacing);
+}
+
 .khaleesi-table-pagination {
   /* Flex */
   display: flex;
@@ -40,6 +66,7 @@
   /* Color */
   background-color: var(--theme-light-color);
   color: var(--background-dark-color);
+
   /* Size & Positioning */
   padding: calc(var(--spacing)/2);
   height: calc(var(--font-size-text) + var(--spacing));

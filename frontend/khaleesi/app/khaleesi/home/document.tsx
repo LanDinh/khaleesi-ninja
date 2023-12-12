@@ -19,6 +19,8 @@ import rootStyles from '../styles/root.css'
 // @ts-ignore: styles have no types
 import navigationStyles from '../styles/navigation.css'
 // @ts-ignore: styles have no types
+import chipStyles from '../styles/chip.css'
+// @ts-ignore: styles have no types
 import tableStyles from '../styles/table.css'
 import {
   homeNavigationData,
@@ -102,6 +104,7 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: rootStyles },
   { rel: 'stylesheet', href: navigationStyles },
   { rel: 'stylesheet', href: tableStyles },
+  { rel: 'stylesheet', href: chipStyles },
 ]
 
 const filterAnonymous = (data: NavigationElementProperties): boolean => {

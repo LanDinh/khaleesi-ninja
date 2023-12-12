@@ -1,0 +1,55 @@
+.khaleesi-chip-container {
+  /* Color */
+  background-color: var(--theme-dark-color);
+  color: var(--background-light-color);
+
+  /* Border */
+  border: var(--background-dark-color);
+  border-radius: var(--spacing);
+
+  /* Size & Positioning */
+  display: flex;
+  gap: var(--spacing);
+  align-items: stretch;
+  padding: var(--spacing);
+}
+
+.khaleesi-chip {
+  /* Color */
+  background-color: var(--theme-light-color);
+  color: var(--background-dark-color);
+
+  /* Border */
+  border-radius: calc(2 * var(--spacing));
+
+  /* Size & Positioning */
+  display: inline-flex;
+  gap: var(--spacing);
+  flex-grow: 0;
+  padding: var(--spacing);
+}
+
+.khaleesi-chip button {
+  /* Color */
+  background-color: var(--theme-light-color);
+  color: var(--background-dark-color);
+
+  /* Size & Positioning */
+  padding: calc(var(--spacing)/2);
+  height: calc(var(--font-size-text) + var(--spacing));
+}
+
+.khaleesi-chip button:hover {
+  /* Color */
+  background-color: var(--theme-dark-color);
+  color: var(--background-light-color);
+}
+
+.khaleesi-chip-container input {
+  /* Border */
+  border: none;
+
+  /* Size & Positioning */
+  flex-grow: 1;
+  padding: var(--spacing);
+}

@@ -73,15 +73,25 @@ button {
   padding: 0;
 }
 
+input {
+   /* Color */
+   background-color: var(--background-light-color);
+   color: var(--background-dark-color);
+
+   /* Border */
+   border: var(--theme-dark-color);
+   border-radius: var(--spacing);
+ }
+
 #khaleesi-app {
   /* Grid. */
   display              : grid;
-  grid-template-columns: var(--outer-size) auto;
+  grid-template-columns: var(--outer-size) auto var(--outer-size);
   grid-template-rows   : var(--outer-size) var(--outer-size) auto;
   grid-template-areas  :
-    "navigation title"
-    "empty      breadcrumbs"
-    "empty      content";
+    "navigation title       title"
+    ".          breadcrumbs ."
+    ".          content     .";
 
   /* Size & Positioning. */
   height: 100%;
