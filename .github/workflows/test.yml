@@ -142,7 +142,7 @@ jobs:
       - name: "Download image"
         uses: actions/download-artifact@v4
         with:
-          name: khaleesi_base_backend-${{ matrix.image }}.${{ env.base-image-version }}
+          name: khaleesi_base_backend-construction.${{ env.base-image-version }}
       - name: "Get cached backend data"
         if: matrix.app.type == 'micro'
         uses: "./.github/actions/get-cached-backend-data"
