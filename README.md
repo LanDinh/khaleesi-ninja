@@ -135,6 +135,7 @@ Upgrade the versions in
 
 The `python` version is referenced in
 
+* `.github/actions/prepare-backend-build/action.yml`
 * `.github/workflows/test.yml`
 * `backend/Dockerfile-base`
 

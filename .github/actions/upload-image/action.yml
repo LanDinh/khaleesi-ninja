@@ -18,8 +18,7 @@ runs:
       run: docker save -o "/tmp/${{ env.KHALEESI_CLEAN_IMAGE }}" ${{ inputs.image }}
       shell: bash
     - name: "Upload image as artifact"
-      uses:
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.KHALEESI_CLEAN_IMAGE }}
-          path: /tmp/${{ env.KHALEESI_CLEAN_IMAGE }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.KHALEESI_CLEAN_IMAGE }}
+        path: /tmp/${{ env.KHALEESI_CLEAN_IMAGE }}
