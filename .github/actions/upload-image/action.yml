@@ -1,0 +1,25 @@
+name: "Cache an image"
+description: "Cache an image"
+inputs:
+  image:
+    description: "Single image to be cached"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: "Clean image name for artifact upload"
+      run: |
+        KHALEESI_CLEAN_IMAGE="${{ inputs.image }}
+        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE//\//_}
+        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE/:/.}
+        echo "KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE}" >> $GITHUB_ENV
+      shell:
+    - name: "Save docker image to local file system"
+      run: docker save -o "/tmp/${{ env.KHALEESI_CLEAN_IMAGE }}" ${{ inputs.image }}
+      shell: bash
+    - name: "Upload image as artifact"
+      uses:
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.KHALEESI_CLEAN_IMAGE }}
+          path: /tmp/${{ env.KHALEESI_CLEAN_IMAGE }}

@@ -1,0 +1,34 @@
+name: "Get cached data"
+description: "Get dependency cache, built protos, and base images"
+inputs:
+  site:
+    description: "The name of the site"
+    required: true
+  app:
+    description: "The name of the app"
+    required: true
+  base-image-version:
+    description: "The version of the base images to be fetched"
+    required: false
+    default: "1.0.0"
+runs:
+  using: "composite"
+  steps:
+    - uses: "actions/setup-python@v4"
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+    - shell: "bash"
+      run: pip install -r ./backend/${{ inputs.site }}/${{ inputs.app }}/requirements-app.txt
+    - uses: "actions/download-artifact@v4"
+      with:
+        name: "protos-python"
+        path: "backend/khaleesi/proto/"
+    - name: "Download construction base"
+      uses: "./.github/actions/download-image"
+      with:
+        image: khaleesi/base/backend-construction:${{ inputs.base-image-version }}
+    - name: "Download image base"
+      uses: "./.github/actions/download-image"
+      with:
+        image: khaleesi/base/backend-image:${{ inputs.base-image-version }}

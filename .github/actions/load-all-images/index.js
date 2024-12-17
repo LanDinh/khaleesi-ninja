@@ -1,7 +1,7 @@
 // noinspection JSUnresolvedFunction,JSUnresolvedVariable,NpmUsedModulesInstalled
 
 import * as core from '@actions/core'
-import * as loadImage from '../load-image/action.js'
+import * as loadImage from '../download-image/action.js'
 
 async function runAction() {
   const apps = JSON.parse(core.getInput('apps'))

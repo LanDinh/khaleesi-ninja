@@ -85,17 +85,10 @@ jobs:
           cache: "pip"
       - name: "Build image"
         run: ./scripts/util/build-backend-base.sh ${{ env.base-image-version }} ${{ matrix.image }}
-      - name: "Cache image"
-        uses: "./.github/actions/cache-image"
+      - name: "Upload image as artifact"
+        uses: "./.github/actions/upload-image"
         with:
           image: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
-      - name: "Copy image for upload"
-        run: cp /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }} /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}.${{ env.base-image-version }}
-      - name: "Upload image"
-        uses: actions/upload-artifact@v4
-        with:
-          name: khaleesi_base_backend-${{ matrix.image }}.${{ env.base-image-version }}
-          path: /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}.${{ env.base-image-version }}
 
   # Verify the helm templates.
   test-helm:
@@ -139,10 +132,6 @@ jobs:
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
-      - name: "Download image"
-        uses: actions/download-artifact@v4
-        with:
-          name: khaleesi_base_backend-construction.${{ env.base-image-version }}
       - name: "Get cached backend data"
         if: matrix.app.type == 'micro'
         uses: "./.github/actions/get-cached-backend-data"
@@ -159,12 +148,12 @@ jobs:
         run: ./scripts/build.sh ${{ matrix.app.site }} ${{ matrix.app.name }} ${{ matrix.app.type }} ${{ matrix.app.version }} ${{ matrix.app.deploy }} development
       - name: "Build the production container image"
         run: ./scripts/build.sh ${{ matrix.app.site }} ${{ matrix.app.name }} ${{ matrix.app.type }} ${{ matrix.app.version }} ${{ matrix.app.deploy }} production
-      - name: "Cache development image"
-        uses: "./.github/actions/cache-image"
+      - name: "Upload development image"
+        uses: "./.github/actions/upload-image"
         with:
           image: khaleesi-ninja/${{ matrix.app.site }}/${{ matrix.app.name }}:latest-development
-      - name: "Cache production image"
-        uses: "./.github/actions/cache-image"
+      - name: "Upload production image"
+        uses: "./.github/actions/upload-image"
         with:
           image: khaleesi-ninja/${{ matrix.app.site }}/${{ matrix.app.name }}:latest-production
 

@@ -1,0 +1,28 @@
+name: "Cache an image"
+description: "Cache an image"
+inputs:
+  image:
+    description: "Single image to be cached"
+    required: true
+  commit:
+    description: "Reference for saving the cache."
+    required: true
+    default: ${{ github.sha }}
+runs:
+  using: "composite"
+  steps:
+    - name: "Clean image name for artifact download"
+      run: |
+        KHALEESI_CLEAN_IMAGE="${{ inputs.image }}
+        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE//\//_}
+        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE/:/.}
+        echo "KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE}" >> $GITHUB_ENV
+    - name: "Download image from artifacts"
+      uses:
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.KHALEESI_CLEAN_IMAGE }}
+          path: /tmp/${{ env.KHALEESI_CLEAN_IMAGE }}
+    - name: "Load image into docker"
+      run: docker load -i "/tmp/${{ env.KHALEESI_CLEAN_IMAGE }}"
+
