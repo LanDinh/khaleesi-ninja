@@ -132,7 +132,7 @@ jobs:
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
-      - name: "Get cached backend data"
+      - name: "Prepare backend build"
         if: matrix.app.type == 'micro'
         uses: "./.github/actions/prepare-backend-build"
         with:
@@ -167,8 +167,8 @@ jobs:
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
-      - name: "Load image"
-        uses: "./.github/actions/load-image"
+      - name: "Download image"
+        uses: "./.github/actions/download-image"
         with:
           image: khaleesi-ninja/${{ matrix.app.site }}/${{ matrix.app.name }}:latest-development
       - name: "Execute the container test"
