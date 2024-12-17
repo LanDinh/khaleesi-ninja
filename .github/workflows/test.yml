@@ -56,12 +56,12 @@ jobs:
       - name: "Generate protos"
         run: "./scripts/generate_protos.sh"
       - name: "Upload python protos"
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@v4"
         with:
           name: "protos-python"
           path: "backend/khaleesi/proto/"
       - name: "Upload typescript protos"
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@v4"
         with:
           name: "protos-typescript"
           path: "frontend/khaleesi/app/khaleesi/proto/"
@@ -89,6 +89,11 @@ jobs:
         uses: "./.github/actions/cache-image"
         with:
           image: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+      - name: "Upload image"
+        uses: actions/upload-artifact@v4
+        with:
+          name: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+          path: /tmp/khaleesi/${{ commit }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
 
   # Verify the helm templates.
   test-helm:
@@ -130,6 +135,10 @@ jobs:
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
+      - name: "Download image"
+        uses: actions/download-artifact@v4
+        with:
+          name: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
       - name: "Get cached backend data"
         if: matrix.app.type == 'micro'
         uses: "./.github/actions/get-cached-backend-data"
@@ -138,7 +147,7 @@ jobs:
           app: ${{ matrix.app.name }}
       - name: "Download typescript protos"
         if: matrix.app.type == 'frontend'
-        uses: "actions/download-artifact@v3"
+        uses: "actions/download-artifact@v4"
         with:
           name: "protos-typescript"
           path: frontend/${{ matrix.app.site }}/app/khaleesi/proto/
@@ -192,8 +201,6 @@ jobs:
         uses: "actions/checkout@v3"
       - name: "Start minikube"
         uses: "medyagh/setup-minikube@latest"
-      - name: "Configure minikube"
-        run: "eval $(minikube docker-env)"
       - name: "Setup helm"
         uses: "azure/setup-helm@v3"
         with:
