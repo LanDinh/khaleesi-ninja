@@ -48,10 +48,10 @@ Other infrastructure consists of:
 
 ![kube-prometheus badge](https://img.shields.io/badge/kube--prometheus-latest-informational)
 
-| App Type | General                                                                                                                                                                                                                                    | Infrastructure                                                               | Development                                                                                                                                                                                                                          |
-|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Frontend | ![typescript badge](https://img.shields.io/badge/typescript-v5.2-informational) <br /> ![react badge](https://img.shields.io/badge/react-v18.2-informational) <br /> ![remix badge](https://img.shields.io/badge/remix-v2.2-informational) |                                                                              | ![jest badge](https://img.shields.io/badge/jest-v29.7-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational)                                                                                |
-| Micro    | ![python badge](https://img.shields.io/badge/python-v3.13-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.68-informational) <br /> ![django badge](https://img.shields.io/badge/django-v5.1-informational)     | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.18-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v3.3-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v1.13-informational) |
+| App Type | General                                                                                                                                                                                                                                            | Infrastructure                                                               | Development                                                                                                                                                                                                                          |
+|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Frontend | ![typescript badge](https://img.shields.io/badge/typescript-v5.7-informational) <br /> ![react badge](https://img.shields.io/badge/react-v18.2-informational) <br /> ![react-router badge](https://img.shields.io/badge/remix-v2.15-informational) |                                                                              | ![jest badge](https://img.shields.io/badge/jest-v29.7-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational)                                                                                |
+| Micro    | ![python badge](https://img.shields.io/badge/python-v3.13-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.68-informational) <br /> ![django badge](https://img.shields.io/badge/django-v5.1-informational)            | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.18-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v3.3-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v1.13-informational) |
 
 ### Structure
 
@@ -108,6 +108,16 @@ Execute the tests by running `./scripts/local/test.sh`
   
 ### Upgrading dependencies
 
+#### Infrastructure
+
+##### Testing infrastructure
+
+The `minikube` and `k8s` versions are defined in `.github/workflows/test.yml` 
+
+##### Kubegres
+
+The `kubegres` version is defined in `scripts/operations/setup_cluster.sh`.
+
 #### Frontend
 
 ##### Node
@@ -131,10 +141,6 @@ The `python` version is referenced in
 
 * `.github/workflows/test.yml`
 * `backend/Dockerfile-base`
-
-##### Kubegres
-
-The kubegres version is defined in `scripts/operations/setup_cluster.sh`.
 
 ##### General backend dependencies
 
