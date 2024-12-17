@@ -11,6 +11,8 @@ magenta='\033[0;35m'
 green='\033[0;32m'
 clear_color='\033[0m'
 
+kubegres_version='v1.18'
+
 
 if [[ "${CI:-false}" == "true" ]]; then
   export TERM=xterm-color
@@ -25,7 +27,7 @@ helm upgrade --install ingress-nginx ingress-nginx \
 
 
 echo -e "${magenta}Deploying kubegres...${clear_color}"
-kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/v1.17/kubegres.yaml
+kubectl apply -f https://raw.githubusercontent.com/reactive-tech/kubegres/${kubegres_version}/kubegres.yaml
 
 echo -e "${magenta}Deploying kube-prometheus...${clear_color}"
 helm upgrade --install kube-prometheus kube-prometheus-stack \

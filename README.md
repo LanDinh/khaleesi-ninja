@@ -40,9 +40,9 @@ You might want to make yourself familiar with the technologies used.
 
 The general deployment is done with:
 
-![helm badge](https://img.shields.io/badge/helm-v3.8-informational)
-![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.28-informational)
-![docker badge](https://img.shields.io/badge/docker-v24.0-informational)
+![docker badge](https://img.shields.io/badge/docker-v27.3-informational)
+![kubernetes badge](https://img.shields.io/badge/kubernetes-v1.30-informational)
+![helm badge](https://img.shields.io/badge/helm-v3.16-informational)
 
 Other infrastructure consists of:
 
@@ -51,7 +51,7 @@ Other infrastructure consists of:
 | App Type | General                                                                                                                                                                                                                                    | Infrastructure                                                               | Development                                                                                                                                                                                                                         |
 |----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Frontend | ![typescript badge](https://img.shields.io/badge/typescript-v5.2-informational) <br /> ![react badge](https://img.shields.io/badge/react-v18.2-informational) <br /> ![remix badge](https://img.shields.io/badge/remix-v2.2-informational) |                                                                              | ![jest badge](https://img.shields.io/badge/jest-v29.7-informational) <br /> ![eslint badge](https://img.shields.io/badge/eslint-latest-informational)                                                                               |
-| Micro    | ![python badge](https://img.shields.io/badge/python-v3.12-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.59-informational) <br /> ![django badge](https://img.shields.io/badge/django-v4.2-informational)    | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.17-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v3.0-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v1.7-informational) |
+| Micro    | ![python badge](https://img.shields.io/badge/python-v3.12-informational) <br /> ![grpcio badge](https://img.shields.io/badge/grpcio-v1.59-informational) <br /> ![django badge](https://img.shields.io/badge/django-v4.2-informational)    | ![kubegres badge](https://img.shields.io/badge/kubegres-v1.18-informational) | ![grpcui badge](https://img.shields.io/badge/grpcui-latest-informational) <br /> ![pylint badge](https://img.shields.io/badge/pylint-v3.0-informational) <br /> ![mypy badge](https://img.shields.io/badge/mypy-v1.7-informational) |
 
 ### Structure
 
