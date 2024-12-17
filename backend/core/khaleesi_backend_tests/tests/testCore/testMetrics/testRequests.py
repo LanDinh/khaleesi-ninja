@@ -58,8 +58,8 @@ class RequestsMetricTestMixin(CounterMetricTestMixin):
         with self.subTest(user = userLabel, status = status, test = label):
           # Prepare data.
           superGetValue.reset_mock()
-          request = self._getRequestMetadata(user = userType, **requestAttributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
-          peer    = self._getRequestMetadata(user = userType, **requestAttributes)  # type: ignore[arg-type]  # pylint: disable=line-too-long
+          request = self._getRequestMetadata(user = userType, **requestAttributes)  # pylint: disable=line-too-long
+          peer    = self._getRequestMetadata(user = userType, **requestAttributes)  # pylint: disable=line-too-long
           peer.grpcCaller.service = calleeService
           peer.grpcCaller.method  = calleeMethod
           # Execute test.
