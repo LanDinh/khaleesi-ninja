@@ -1,9 +1,9 @@
-coverage==7.3.2
-django-stubs==4.2.6
-grpc-stubs==1.53.0.3
-mypy==1.7.0
-pylint==3.0.2
-pylint-django==2.5.5
-pylint-protobuf==0.21.0
+coverage==7.6.9
+django-stubs==5.1.1
+grpc-stubs==1.53.0.5
+mypy==1.13.0
+pylint==3.3.2
+pylint-django==2.6.1
+pylint-protobuf==0.22.0
 tblib==3.0.0
-types-protobuf==4.24.0.4
+types-protobuf==5.29.1.20241207

@@ -1,8 +1,8 @@
-Django==4.2.7
-grpc-interceptor==0.15.3
-grpcio==1.59.0
-grpcio-health-checking==1.59.0
-grpcio-reflection==1.59.0
-prometheus-client==0.18.0
-protobuf==4.25.0
-psycopg2==2.9.9
+Django==5.1.4
+grpc-interceptor==0.15.4
+grpcio==1.68.1
+grpcio-health-checking==1.68.1
+grpcio-reflection==1.68.1
+prometheus-client==0.21.1
+protobuf==5.29.1
+psycopg2==2.9.10
