@@ -44,4 +44,4 @@ probe:
 # gRPC.
 grpcui:
   enabled: false
-  version: "v1.2.0"
+  version: "latest"
