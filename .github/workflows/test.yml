@@ -134,6 +134,8 @@ jobs:
     strategy:
       matrix:
         app: ${{ fromJson(needs.matrix.outputs.all-apps) }}
+    env:
+      base-image-version: "1.0.0"
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v3"
