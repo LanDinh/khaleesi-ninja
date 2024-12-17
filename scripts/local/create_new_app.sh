@@ -102,7 +102,7 @@ create_frontend() {
   fi
 
   echo -e "${yellow}Creating react project...${clear_color}"
-  npx create-remix "${project_folder}" --template "${template_folder}/frontend_template" --no-install --typescript
+  npx create-remix "${project_folder}" --template "${template_folder}/frontend_template" --no-install --no-git-init --typescript
 
   echo -e "${yellow}Removing unnecessary files...${clear_color}"
   rm "${project_folder}/package.json"

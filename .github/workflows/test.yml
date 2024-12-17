@@ -89,11 +89,13 @@ jobs:
         uses: "./.github/actions/cache-image"
         with:
           image: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+      - name: "Copy image for upload"
+        run: cp /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }} /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}.${{ env.base-image-version }}
       - name: "Upload image"
         uses: actions/upload-artifact@v4
         with:
           name: khaleesi_base_backend-${{ matrix.image }}.${{ env.base-image-version }}
-          path: /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+          path: /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}.${{ env.base-image-version }}
 
   # Verify the helm templates.
   test-helm:
