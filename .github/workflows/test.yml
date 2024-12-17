@@ -92,7 +92,7 @@ jobs:
       - name: "Upload image"
         uses: actions/upload-artifact@v4
         with:
-          name: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+          name: khaleesi_base_backend-${{ matrix.image }}.${{ env.base-image-version }}
           path: /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
 
   # Verify the helm templates.
@@ -138,7 +138,7 @@ jobs:
       - name: "Download image"
         uses: actions/download-artifact@v4
         with:
-          name: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+          name: khaleesi_base_backend-${{ matrix.image }}.${{ env.base-image-version }}
       - name: "Get cached backend data"
         if: matrix.app.type == 'micro'
         uses: "./.github/actions/get-cached-backend-data"
