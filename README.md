@@ -110,10 +110,6 @@ Execute the tests by running `./scripts/local/test.sh`
 
 #### Infrastructure
 
-##### Testing infrastructure
-
-The `minikube` and `k8s` versions are defined in `.github/workflows/test.yml` 
-
 ##### Kubegres
 
 The `kubegres` version is defined in `scripts/operations/setup_cluster.sh`.

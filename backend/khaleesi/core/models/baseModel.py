@@ -35,7 +35,7 @@ class Model(models.Model, Generic[Grpc]):
 
   khaleesiVersion = models.IntegerField(default = 0)
 
-  objects: Manager[Model] = Manager()  # type: ignore[type-arg]
+  objects: Manager[Model] = Manager()  # type: ignore[assignment,type-arg]
 
   def khaleesiSave(
       self, *,
