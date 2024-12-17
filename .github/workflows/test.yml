@@ -134,7 +134,7 @@ jobs:
         uses: "actions/checkout@v3"
       - name: "Get cached backend data"
         if: matrix.app.type == 'micro'
-        uses: "./.github/actions/get-cached-backend-data"
+        uses: "./.github/actions/prepare-backend-build"
         with:
           site: ${{ matrix.app.site }}
           app: ${{ matrix.app.name }}
