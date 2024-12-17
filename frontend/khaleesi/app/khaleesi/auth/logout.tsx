@@ -16,8 +16,8 @@ export const meta: MetaFunction = () => {
   const appContext = useContext(AppContext)  // eslint-disable-line react-hooks/rules-of-hooks
 
   return [
-    { title: `Login | ${appContext.title}` },
-    { name: 'description', content: 'Identify yourself!' },
+    { title: `Logout | ${appContext.title}` },
+    { name: 'description', content: 'Logout.' },
   ]
 }
 

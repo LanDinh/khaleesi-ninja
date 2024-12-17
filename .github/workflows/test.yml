@@ -192,10 +192,8 @@ jobs:
         uses: "actions/checkout@v3"
       - name: "Start minikube"
         uses: "medyagh/setup-minikube@latest"
-        with:
-          minikube version: "v1.34.0"
-          kubernetes version: "v1.30.5"
-          github token: ${{ secrets.GITHUB_TOKEN }}
+      - name: "Configure minikube"
+        run: "eval $(minikube docker-env)"
       - name: "Setup helm"
         uses: "azure/setup-helm@v3"
         with:
