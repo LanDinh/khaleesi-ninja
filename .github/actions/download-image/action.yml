@@ -22,7 +22,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: ${{ env.KHALEESI_CLEAN_IMAGE }}
-        path: /tmp/${{ env.KHALEESI_CLEAN_IMAGE }}
+        path: /tmp
     - name: "Load image into docker"
       run: docker load -i "/tmp/${{ env.KHALEESI_CLEAN_IMAGE }}"
       shell: bash

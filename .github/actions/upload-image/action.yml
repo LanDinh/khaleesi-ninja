@@ -22,3 +22,4 @@ runs:
       with:
         name: ${{ env.KHALEESI_CLEAN_IMAGE }}
         path: /tmp/${{ env.KHALEESI_CLEAN_IMAGE }}
+        retention-days: 2
