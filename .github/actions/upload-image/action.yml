@@ -9,9 +9,9 @@ runs:
   steps:
     - name: "Clean image name for artifact upload"
       run: |
-        KHALEESI_CLEAN_IMAGE="${{ inputs.image }}
-        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE//\//_}
-        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE/:/.}
+        KHALEESI_CLEAN_IMAGE="${{ inputs.image }}"
+        KHALEESI_CLEAN_IMAGE="${KHALEESI_CLEAN_IMAGE//\//_}"
+        KHALEESI_CLEAN_IMAGE="${KHALEESI_CLEAN_IMAGE/:/.}"
         echo "KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE}" >> $GITHUB_ENV
       shell:
     - name: "Save docker image to local file system"

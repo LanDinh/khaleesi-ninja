@@ -13,9 +13,9 @@ runs:
   steps:
     - name: "Clean image name for artifact download"
       run: |
-        KHALEESI_CLEAN_IMAGE="${{ inputs.image }}
-        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE//\//_}
-        KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE/:/.}
+        KHALEESI_CLEAN_IMAGE="${{ inputs.image }}"
+        KHALEESI_CLEAN_IMAGE="${KHALEESI_CLEAN_IMAGE//\//_}"
+        KHALEESI_CLEAN_IMAGE="${KHALEESI_CLEAN_IMAGE/:/.}"
         echo "KHALEESI_CLEAN_IMAGE=${KHALEESI_CLEAN_IMAGE}" >> $GITHUB_ENV
     - name: "Download image from artifacts"
       uses: actions/download-artifact@v4
