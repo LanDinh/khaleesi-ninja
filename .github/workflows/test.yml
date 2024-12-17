@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
-          path: /tmp/khaleesi/${{ commit }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
+          path: /tmp/khaleesi/${{ github.sha }}/images/khaleesi/base/backend-${{ matrix.image }}:${{ env.base-image-version }}
 
   # Verify the helm templates.
   test-helm:
