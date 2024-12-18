@@ -212,6 +212,8 @@ jobs:
           merge-multiple: true
       - name: "Load all images into minikube"
         run: ls -1 /tmp/khaleesi-ninja_*_*.latest-${{ matrix.environment.containerMode }} | xargs --no-run-if-empty -L 1 minikube image load
+      - name: "DEBUG"
+        run: ls -1 /tmp
       - name: "Wait for the environment to be ready"
         run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m
       - name: "Spin up the environment"
