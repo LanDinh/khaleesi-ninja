@@ -205,7 +205,7 @@ jobs:
       - name: "Set up the environment"
         run: ./scripts/operations/setup_environment.sh ${{ matrix.environment.name }}
       - name: "Download all images"
-        uses: "./.github/actions/download-image"
+        uses: "actions/download-artifact@v4"
         with:
           pattern: khaleesi-ninja_*_*.latest-${{ matrix.environment.containerMode }}
           path: /tmp
