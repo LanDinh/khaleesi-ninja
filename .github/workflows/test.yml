@@ -207,11 +207,11 @@ jobs:
       - name: "Download all images"
         uses: "actions/download-artifact@v4"
         with:
-          pattern: khaleesi-ninja_*_*.latest-${{ matrix.environment.containerMode }}
+          pattern: khaleesi-ninja_*.latest-${{ matrix.environment.containerMode }}
           path: /tmp
           merge-multiple: true
       - name: "Load all images into minikube"
-        run: ls -1 /tmp/khaleesi-ninja_*_*.latest-${{ matrix.environment.containerMode }} | xargs --no-run-if-empty -L 1 minikube image load
+        run: ls -1 /tmp/khaleesi-ninja_*.latest-${{ matrix.environment.containerMode }} | xargs --no-run-if-empty -L 1 minikube image load
       - name: "DEBUG"
         run: ls -1 /tmp
       - name: "Wait for the environment to be ready"
