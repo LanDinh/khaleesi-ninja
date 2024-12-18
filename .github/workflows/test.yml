@@ -207,13 +207,11 @@ jobs:
       - name: "Download all images"
         uses: "actions/download-artifact@v4"
         with:
-          pattern: khaleesi-ninja_*.latest-${{ matrix.environment.containerMode }}
+          pattern: khaleesi-ninja_*_*.latest-${{ matrix.environment.container_mode }}
           path: /tmp
           merge-multiple: true
       - name: "Load all images into minikube"
-        run: ls -1 /tmp/khaleesi-ninja_*.latest-${{ matrix.environment.containerMode }} | xargs --no-run-if-empty -L 1 minikube image load
-      - name: "DEBUG"
-        run: ls -1 /tmp
+        run: ls -1 /tmp/khaleesi-ninja_*_*.latest-${{ matrix.environment.container_mode }} | xargs --no-run-if-empty -L 1 minikube image load
       - name: "Wait for the environment to be ready"
         run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m
       - name: "Spin up the environment"
