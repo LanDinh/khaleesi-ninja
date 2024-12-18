@@ -204,11 +204,14 @@ jobs:
         run: "./scripts/operations/setup_cluster.sh"
       - name: "Set up the environment"
         run: ./scripts/operations/setup_environment.sh ${{ matrix.environment.name }}
-      - name: "Load all images"
-        uses: "./.github/actions/load-all-images"
+      - name: "Download all images"
+        uses: "./.github/actions/download-image"
         with:
-          apps: ${{ needs.matrix.outputs.deploy-apps }}
-          containerMode: ${{ matrix.environment.container_mode }}
+          pattern: khaleesi-ninja_*_*.latest-${{ matrix.environment.containerMode }}
+          path: /tmp
+          merge-multiple: true
+      - name: "Load all images into minikube"
+        run: ls -1 /tmp/khaleesi-ninja_*_*.latest-${{ matrix.environment.containerMode }} | xargs --no-run-if-empty -L 1 minikube image load
       - name: "Wait for the environment to be ready"
         run: kubectl -n "khaleesi-ninja-${{ matrix.environment.name }}" wait pod -l job!=true --for condition=ready --timeout 5m
       - name: "Spin up the environment"
