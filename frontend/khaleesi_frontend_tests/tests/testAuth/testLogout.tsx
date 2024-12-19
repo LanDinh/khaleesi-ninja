@@ -39,7 +39,7 @@ const buildActionArguments = (): ActionFunctionArgs => {
 
 test('Rendering the logout form.', () => {
   // Prepare data.
-  let RemixStub = createTestingStub(LogoutRoute)
+  const RemixStub = createTestingStub(LogoutRoute)
   // Execute test.
   render(<RemixStub />)
   // Assert result.

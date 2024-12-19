@@ -45,7 +45,7 @@ const buildActionArguments = (user: string | Blob): ActionFunctionArgs => {
 
 test('Rendering the login form.', () => {
   // Prepare data.
-  let RemixStub = createTestingStub(LoginRoute)
+  const RemixStub = createTestingStub(LoginRoute)
   // Execute test.
   render(<RemixStub />)
   // Assert result.

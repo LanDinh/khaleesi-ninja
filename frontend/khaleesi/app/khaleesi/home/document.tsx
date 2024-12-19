@@ -14,14 +14,10 @@ import { Navigation } from '../navigation/navigation'
 import type { NavigationElementProperties } from '../navigation/navigationElement'
 import { Content } from './content'
 import { ErrorPage } from './error'
-// @ts-ignore: styles have no types
-import rootStyles from '../styles/root.css?url'
-// @ts-ignore: styles have no types
-import navigationStyles from '../styles/navigation.css?url'
-// @ts-ignore: styles have no types
-import chipStyles from '../styles/chip.css?url'
-// @ts-ignore: styles have no types
-import tableStyles from '../styles/table.css?url'
+import rootStyles from '../styles/root.css?url'  // eslint-disable-line import/no-unresolved
+import navigationStyles from '../styles/navigation.css?url'  // eslint-disable-line import/no-unresolved, max-len
+import chipStyles from '../styles/chip.css?url'  // eslint-disable-line import/no-unresolved
+import tableStyles from '../styles/table.css?url'  // eslint-disable-line import/no-unresolved
 import {
   homeNavigationData,
   topNavigationData,

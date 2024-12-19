@@ -18,7 +18,7 @@ const originalWarning = console.warn.bind(console.warn)
 jest.mock('../../../app/khaleesi/components/table/paginator')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
-  useSearchParams: (): any[] => ([ { has: () => false }, jest.fn() ]),
+  useSearchParams: (): any[] => ([ { has: () => false }, jest.fn() ]),  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
 }))
 
 beforeAll(() => {
@@ -40,7 +40,7 @@ test('Table renders as expected.', () => {
   const mockPaginator = Paginator as jest.MockedFunction<typeof Paginator>
   mockPaginator.mockImplementation(() => <></>)
 
-  let RemixStub = createTestingStub(() => <Table<Data>
+  const RemixStub = createTestingStub(() => <Table<Data>
     columns={columns}
     rowId={rowId}
     data={data}

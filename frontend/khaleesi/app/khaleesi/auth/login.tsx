@@ -22,7 +22,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export const action = async ({ request }: ActionFunctionArgs): Promise<any> => {
+export const action = async ({ request }: ActionFunctionArgs): Promise<any> => {  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
   const session = new Session()
   await session.init(request)
   const form = await request.formData()

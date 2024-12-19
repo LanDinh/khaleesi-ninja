@@ -27,7 +27,7 @@ test('ErrorPage renders route errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(true)
   jest.spyOn(hooks, 'useRouteError').mockReturnValue({ status: 1337, data: { message: 'FooBar' } })
-  let RemixStub = createTestingStub(ErrorPage)
+  const RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -41,7 +41,7 @@ test('ErrorPage renders unknown errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(false)
   jest.spyOn(hooks, 'useRouteError').mockReturnValue(Error('message'))
-  let RemixStub = createTestingStub(ErrorPage)
+  const RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -54,7 +54,7 @@ test('ErrorPage renders unknown non-errors.', (): void => {
   // Prepare data.
   jest.spyOn(hooks, 'isRouteErrorResponse').mockReturnValue(false)
   jest.spyOn(hooks, 'useRouteError').mockReturnValue({ message: 'message' })
-  let RemixStub = createTestingStub(ErrorPage)
+  const RemixStub = createTestingStub(ErrorPage)
   // Execute test.
   render(<RemixStub />)
   // Assert result.

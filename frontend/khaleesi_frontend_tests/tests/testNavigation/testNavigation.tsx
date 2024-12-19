@@ -58,7 +58,7 @@ test('Navigation menu renders without errors.', () => {
     params  : {},
     data    : null,
     handle  : {
-      breadcrumb: (element: NavigationElementProperties): JSX.Element => <div>TEST</div>
+      breadcrumb: (element: NavigationElementProperties): JSX.Element => <div>TEST</div>  // eslint-disable-line @typescript-eslint/no-unused-vars, max-len
     }
   }
   jest.spyOn(router, 'useMatches').mockReturnValue([ match ])
@@ -66,7 +66,7 @@ test('Navigation menu renders without errors.', () => {
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
   mockElement.mockImplementation(() => <></>)
-  let RemixStub = createTestingStub(
+  const RemixStub = createTestingStub(
     () => <Navigation
       top={navigationData('top')}
       middle={navigationData('middle')}
@@ -91,8 +91,8 @@ test('NavigationMenu closes when link is clicked.', () => {
   const mockMenuIcon = MenuIcon as jest.MockedFunction<typeof MenuIcon>
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
-  mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)
-  let RemixStub = createTestingStub(
+  mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)  // eslint-disable-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions, max-len
+  const RemixStub = createTestingStub(
     () => <Navigation
       top={navigationData('top')}
       middle={navigationData('middle')}
@@ -113,8 +113,8 @@ test('NavigationMenu closes when clicking outside the menu.', () => {
   const mockMenuIcon = MenuIcon as jest.MockedFunction<typeof MenuIcon>
   mockMenuIcon.mockImplementation(() => <></>)
   const mockElement = NavigationMenuElement as jest.MockedFunction<typeof NavigationMenuElement>
-  mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)
-  let RemixStub = createTestingStub(
+  mockElement.mockImplementation(({ onClick }) => <div onClick={onClick}>TEST</div>)  // eslint-disable-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions, max-len
+  const RemixStub = createTestingStub(
     () => <Navigation
       top={navigationData('top')}
       middle={navigationData('middle')}

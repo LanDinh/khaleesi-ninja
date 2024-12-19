@@ -62,7 +62,7 @@ test('App gets rendered without errors.', () => {
   mockContent.mockImplementation(() => <></>)
   const mockBreadCrumbs = BreadCrumbs as jest.MockedFunction<typeof BreadCrumbs>
   mockBreadCrumbs.mockImplementation(() => <></>)
-  let RemixStub = createTestingStub(() => <App title="Test App" />)
+  const RemixStub = createTestingStub(() => <App title="Test App" />)
   // Execute test.
   render(<RemixStub />)
   // Assert result.
@@ -79,7 +79,7 @@ test('ErrorBoundary gets rendered without errors.', () => {
   mockContent.mockImplementation(() => <></>)
   const mockBreadCrumbs = BreadCrumbs as jest.MockedFunction<typeof BreadCrumbs>
   mockBreadCrumbs.mockImplementation(() => <></>)
-  let RemixStub = createTestingStub(() => <ErrorBoundary title="Test App" />)
+  const RemixStub = createTestingStub(() => <ErrorBoundary title="Test App" />)
   // Execute test.
   render(<RemixStub />)
   // Assert result.

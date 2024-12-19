@@ -21,9 +21,9 @@ export class Client<Type extends $protobuf.rpc.Service> {
     const Channel = makeGenericClientConstructor({}, serviceName)
     const channel = new Channel(serviceUrl, credentials.createInsecure())
 
-    // @ts-ignore
+    // @ts-expect-error any
     this.stub = khaleesi[site][app][stubName].create(
-      (method: any, requestData: any, callback: any) => channel.makeUnaryRequest(
+      (method: any, requestData: any, callback: any) => channel.makeUnaryRequest(  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
         `/${serviceName}/${method.name}`,
           arg => arg,
           arg => arg,
@@ -35,7 +35,7 @@ export class Client<Type extends $protobuf.rpc.Service> {
 }
 
 export const Singleton = <Value>(site: string, app: string, valueFactory: () => Value): Value => {
-  const g = global as any
+  const g = global as any  // eslint-disable-line @typescript-eslint/no-explicit-any
   g.__singletons ??= {}
   g.__singletons['grpc'] ??= {}
   g.__singletons['grpc'][site] ??= valueFactory()

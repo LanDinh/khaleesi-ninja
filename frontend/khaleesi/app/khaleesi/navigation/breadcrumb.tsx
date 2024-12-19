@@ -11,7 +11,7 @@ export function breadcrumb(
     breadcrumb: (): JSX.Element => <NavigationElement element={element} />,
   }
 }
-export type RouteMatch = UIMatch<any, { breadcrumb?: (match?: RouteMatch) => JSX.Element }>
+export type RouteMatch = UIMatch<any, { breadcrumb?: (match?: RouteMatch) => JSX.Element }>  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
 
 export function BreadCrumbs(): JSX.Element {
   const rawMatches: RouteMatch[] = useMatches() as RouteMatch[]

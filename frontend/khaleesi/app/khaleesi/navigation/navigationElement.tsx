@@ -27,9 +27,9 @@ export function NavigationMenuElement({
   onClick: () => void,
 }): JSX.Element {
   let icon = <div>Icon missing!</div>
-  if (commonIconLookup.hasOwnProperty(element.label)) {
+  if (commonIconLookup.hasOwnProperty(element.label)) {  // eslint-disable-line no-prototype-builtins, max-len
     icon = commonIconLookup[element.label]
-  } else if (iconLookup.hasOwnProperty(element.label)) {
+  } else if (iconLookup.hasOwnProperty(element.label)) {  // eslint-disable-line no-prototype-builtins, max-len
     icon = iconLookup[element.label]
   }
   return <div className="khaleesi-navigation-item">

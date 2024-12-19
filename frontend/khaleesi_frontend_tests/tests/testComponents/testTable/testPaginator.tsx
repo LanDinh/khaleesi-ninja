@@ -23,7 +23,7 @@ describe('Rendering.', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -57,7 +57,7 @@ describe('Rendering.', () => {
     const size = 25
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -87,7 +87,7 @@ describe('Rendering.', () => {
     const size = 25
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -110,7 +110,7 @@ describe('Rendering.', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -146,7 +146,7 @@ describe('Size changing', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -170,7 +170,7 @@ describe('Page navigation', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -192,7 +192,7 @@ describe('Page navigation', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -214,7 +214,7 @@ describe('Page navigation', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}
@@ -236,7 +236,7 @@ describe('Page navigation', () => {
     const size = 5
     const handleSizeChange = jest.fn()
     const handlePageChange = jest.fn()
-    let RemixStub = createTestingStub(() => <Paginator
+    const RemixStub = createTestingStub(() => <Paginator
       total={total}
       page={page}
       size={size}

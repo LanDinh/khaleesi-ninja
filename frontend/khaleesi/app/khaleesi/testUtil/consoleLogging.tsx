@@ -1,10 +1,10 @@
-type ConsoleFunction = (data: any[]) => void
+type ConsoleFunction = (data: any[]) => void  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
 
 export function suppressConsoleFunction(
   errorNames     : string[],
   originalConsole: ConsoleFunction,
 ): ConsoleFunction {
-  return (message: any[]): void => {
+  return (message: any[]): void => {  // eslint-disable-line @typescript-eslint/no-explicit-any
     let passed = true
     for (const errorName of errorNames) {
       if (message.toString().includes(errorName)) {
@@ -12,7 +12,9 @@ export function suppressConsoleFunction(
         break
       }
     }
-    passed && originalConsole(message)
+    if(passed) {
+      originalConsole(message)
+    }
   }
 }
 

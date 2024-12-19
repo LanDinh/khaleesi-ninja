@@ -25,7 +25,7 @@ test('NavigationElement renders without error.', () => {
     label: 'TEST',
     icon: <div>Icon</div>,
   }
-  let RemixStub = createTestingStub(
+  const RemixStub = createTestingStub(
     () => <NavigationElement element={navigationElementProperties} />,
   )
   // Execute test.
@@ -42,7 +42,7 @@ test('NavigationMenuElement renders without error for common icon.', () => {
     label: 'Home',
     icon: <div>Icon</div>,
   }
-  let RemixStub = createTestingStub(
+  const RemixStub = createTestingStub(
     () => <NavigationMenuElement element={navigationElementProperties} onClick={(): void => {}} />,
   )
   // Execute test.
@@ -59,7 +59,7 @@ test('NavigationMenuElement renders without error for app specific icon.', () =>
     label: 'Test',
     icon: <div>Icon</div>,
   }
-  let RemixStub = createTestingStub(
+  const RemixStub = createTestingStub(
     () => <NavigationMenuElement element={navigationElementProperties} onClick={(): void => {}} />,
   )
   // Execute test.
@@ -76,7 +76,7 @@ test('NavigationMenuElement renders without error for missing icon.', () => {
     label: 'Missing Label',
     icon: <div>Icon</div>,
   }
-  let RemixStub = createTestingStub(
+  const RemixStub = createTestingStub(
     () => <NavigationMenuElement element={navigationElementProperties} onClick={(): void => {}} />,
   )
   // Execute test.

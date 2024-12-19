@@ -68,8 +68,10 @@ export function Navigation(
     document.getElementById('khaleesi-navigation')!.toggleAttribute('open')
   }, [ open ])
 
-  return <details id="khaleesi-navigation">
-    <div id="khaleesi-navigation-background" onClick={closeMenu}/>
+  return <details id="khaleesi-navigation"> {
+    // eslint-disable-next-line max-len
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+   }<div id="khaleesi-navigation-background" onClick={closeMenu}/>
     <summary id="khaleesi-navigation-button" className="khaleesi-navigation-icon">
       <MenuIcon />
     </summary>
