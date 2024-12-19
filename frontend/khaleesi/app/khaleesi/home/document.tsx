@@ -15,13 +15,13 @@ import type { NavigationElementProperties } from '../navigation/navigationElemen
 import { Content } from './content'
 import { ErrorPage } from './error'
 // @ts-ignore: styles have no types
-import rootStyles from '../styles/root.css'
+import rootStyles from '../styles/root.css?url'
 // @ts-ignore: styles have no types
-import navigationStyles from '../styles/navigation.css'
+import navigationStyles from '../styles/navigation.css?url'
 // @ts-ignore: styles have no types
-import chipStyles from '../styles/chip.css'
+import chipStyles from '../styles/chip.css?url'
 // @ts-ignore: styles have no types
-import tableStyles from '../styles/table.css'
+import tableStyles from '../styles/table.css?url'
 import {
   homeNavigationData,
   topNavigationData,

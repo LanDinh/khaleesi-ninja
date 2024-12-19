@@ -70,7 +70,6 @@ button {
   /* Border */
   border: none;
   border-radius: var(--spacing);
-  padding: 0;
 }
 
 input {

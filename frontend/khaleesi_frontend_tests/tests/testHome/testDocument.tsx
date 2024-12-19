@@ -34,7 +34,7 @@ jest.mock('../../app/khaleesi/auth/session.server', () => ({
 
 beforeAll(() => {
   window.scrollTo = jest.fn()
-  console.error = suppressConsoleFunction('validateDOMNesting', originalError)
+  console.error = suppressConsoleFunction(['validateDOMNesting'], originalError)
   console.warn = suppressReactRouterFutureWarnings(originalWarning)
 })
 afterAll(() => {

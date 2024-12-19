@@ -15,8 +15,7 @@ WORKDIR /code
 COPY ./package.json /code/
 COPY ./package-lock.json /code/
 COPY ./tsconfig.json /code/
-COPY ./remix.config.js /code/
-COPY ./remix.env.d.ts /code/
+COPY vite.config.ts /code/
 RUN sed -i "s/\${SITE}/${SITE}/" "/code/package.json"
 RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package.json"
 RUN sed -i "s/\${SITE}/${SITE}/" "/code/package-lock.json"
@@ -50,7 +49,6 @@ LABEL environment=development
 
 # Arguments & environment.
 ARG site
-ENV PORT=8000
 ENV SITE=${site}
 
 # Data.
@@ -69,7 +67,6 @@ FROM base AS production
 
 # Arguments & environment.
 ARG site
-ENV PORT=8000
 ENV SITE=${site}
 
 # Data.
