@@ -1,7 +1,18 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Paginator } from '../../../app/khaleesi/components/table/paginator'
+import { suppressReactRouterFutureWarnings } from '../../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../../app/khaleesi/testUtil/remixStub'
+
+
+const originalWarning = console.warn.bind(console.warn)
+
+beforeAll(() => {
+  console.warn = suppressReactRouterFutureWarnings(originalWarning)
+})
+afterAll(() => {
+  console.warn = originalWarning
+})
 
 
 describe('Rendering.', () => {

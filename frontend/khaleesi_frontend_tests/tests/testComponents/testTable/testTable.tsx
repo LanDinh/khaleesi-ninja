@@ -7,16 +7,27 @@ import {
   handlePageChange,
 } from '../../../app/khaleesi/components/table/table'
 import { Paginator } from '../../../app/khaleesi/components/table/paginator'
+import { suppressReactRouterFutureWarnings } from '../../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../../app/khaleesi/testUtil/remixStub'
 import type { ChangeEvent, MouseEvent } from 'react'
 import type { SetURLSearchParams, URLSearchParamsInit } from 'react-router-dom'
 
+
+const originalWarning = console.warn.bind(console.warn)
 
 jest.mock('../../../app/khaleesi/components/table/paginator')
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useSearchParams: (): any[] => ([ { has: () => false }, jest.fn() ]),
 }))
+
+beforeAll(() => {
+  console.warn = suppressReactRouterFutureWarnings(originalWarning)
+})
+afterAll(() => {
+  console.warn = originalWarning
+  jest.clearAllMocks()
+})
 
 
 test('Table renders as expected.', () => {

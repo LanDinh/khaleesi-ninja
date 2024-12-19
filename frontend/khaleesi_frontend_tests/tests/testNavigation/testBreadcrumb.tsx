@@ -10,6 +10,9 @@ jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),
 }))
+afterAll(() => {
+  jest.clearAllMocks()
+})
 
 
 test('BreadCrumbs render without errors.', () => {

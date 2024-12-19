@@ -2,8 +2,11 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import * as hooks from '@remix-run/react'
 import { ErrorPage } from '../../app/khaleesi/home/error'
+import { suppressReactRouterFutureWarnings } from '../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
+
+const originalWarning = console.warn.bind(console.warn)
 
 jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
@@ -11,7 +14,11 @@ jest.mock('@remix-run/react', () => ({
   isRouteErrorResponse: jest.fn(),
 }))
 
+beforeAll(() => {
+  console.warn = suppressReactRouterFutureWarnings(originalWarning)
+})
 afterAll(() => {
+  console.warn = originalWarning
   jest.clearAllMocks()
 })
 

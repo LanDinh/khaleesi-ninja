@@ -5,11 +5,16 @@ import { App, ErrorBoundary, links, loader } from '../../app/khaleesi/home/docum
 import { Navigation } from '../../app/khaleesi/navigation/navigation'
 import { BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
 import { Content } from '../../app/khaleesi/home/content'
-import { suppressConsoleFunction } from '../../app/khaleesi/testUtil/consoleLogging'
+import {
+  suppressConsoleFunction,
+  suppressReactRouterFutureWarnings,
+} from '../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
 const originalError = console.error.bind(console.error)
+const originalWarning = console.warn.bind(console.warn)
+
 jest.mock('../../app/khaleesi/navigation/navigation')
 jest.mock('../../app/khaleesi/home/content')
 jest.mock('../../app/khaleesi/navigation/breadcrumb')
@@ -30,9 +35,11 @@ jest.mock('../../app/khaleesi/auth/session.server', () => ({
 beforeAll(() => {
   window.scrollTo = jest.fn()
   console.error = suppressConsoleFunction('validateDOMNesting', originalError)
+  console.warn = suppressReactRouterFutureWarnings(originalWarning)
 })
 afterAll(() => {
   console.error = originalError
+  console.warn = originalWarning
   jest.clearAllMocks()
 })
 
@@ -83,6 +90,6 @@ test('ErrorBoundary gets rendered without errors.', () => {
 
 test('links contain all links.', () => {
   // Execute test & assert result.
-  // Font, rootStyles, navigationStyles.
-  expect(links().length).toBe(4)
+  // Font, rootStyles, navigationStyles, tableStyles, chipStyles.
+  expect(links().length).toBe(5)
 })

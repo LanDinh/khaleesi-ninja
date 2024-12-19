@@ -18,6 +18,9 @@ jest.mock('@remix-run/node', () => ({
   redirect: jest.fn(),
   json: jest.fn((json) => ({ json: jest.fn(() => json) })),
 }))
+afterAll(() => {
+  jest.clearAllMocks()
+})
 
 
 const REMIX_SESSION_MOCK = {

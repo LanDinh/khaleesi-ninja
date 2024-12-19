@@ -9,8 +9,11 @@ import type {
 import {
   NavigationMenuElement,
 } from '../../app/khaleesi/navigation/navigationElement'
+import { suppressReactRouterFutureWarnings } from '../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
+
+const originalWarning = console.warn.bind(console.warn)
 
 jest.mock('../../app/khaleesi/home/icon')
 jest.mock('../../app/khaleesi/navigation/navigationElement')
@@ -18,6 +21,14 @@ jest.mock('@remix-run/react', () => ({
   ...jest.requireActual('@remix-run/react'),
   useMatches: jest.fn(),
 }))
+
+beforeAll(() => {
+  console.warn = suppressReactRouterFutureWarnings(originalWarning)
+})
+afterAll(() => {
+  console.warn = originalWarning
+  jest.clearAllMocks()
+})
 
 
 const navigationDataElement = (name: string): NavigationElementProperties => {

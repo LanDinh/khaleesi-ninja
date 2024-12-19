@@ -2,7 +2,7 @@
 ################################################################################
 #                                     Base                                     #
 ################################################################################
-FROM khaleesi/base/backend-construction:1.0.0 as base
+FROM khaleesi/base/backend-construction:1.0.0 AS base
 
 # Arguments & environment.
 ARG site
@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/root/.cache/pip,from=pip_cache ../../.venv/bin/pi
 ################################################################################
 #                               Development Base                               #
 ################################################################################
-FROM base as development-base
+FROM base AS development-base
 
 # Arguments & environment.
 ARG site
@@ -47,7 +47,7 @@ COPY ./khaleesi/ /code/backend/${SITE}/${APP}/khaleesi/
 ################################################################################
 #                              Development Image                               #
 ################################################################################
-FROM khaleesi/base/backend-image:1.0.0 as development
+FROM khaleesi/base/backend-image:1.0.0 AS development
 
 # Arguments & environment.
 ARG site
@@ -74,7 +74,7 @@ CMD ["run"]
 ################################################################################
 #                               Production Base                                #
 ################################################################################
-FROM base as production-base
+FROM base AS production-base
 
 # Arguments & environment.
 ARG site
@@ -96,7 +96,7 @@ RUN rm -r tests
 ################################################################################
 #                               Production Image                               #
 ################################################################################
-FROM khaleesi/base/backend-image:1.0.0 as production
+FROM khaleesi/base/backend-image:1.0.0 AS production
 
 # Arguments & environment.
 ARG site

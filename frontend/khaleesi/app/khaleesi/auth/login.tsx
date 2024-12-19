@@ -1,5 +1,4 @@
 import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
-import { json } from '@remix-run/node'
 import { Form } from '@remix-run/react'
 import { useContext } from 'react'
 import { AppContext } from '../home/document'
@@ -29,7 +28,7 @@ export const action = async ({ request }: ActionFunctionArgs): Promise<TypedResp
   const user = form.get('user')
 
   if ('string' !== typeof user) {
-    return json({ fieldErrors: { user: 'wrong type' }, formError: null }, { status: 400 })
+    return Response.json({ fieldErrors: { user: 'wrong type' }, formError: null }, { status: 400 })
   }
 
   return session.create(user, '/')

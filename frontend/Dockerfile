@@ -2,7 +2,7 @@
 ################################################################################
 #                                     Base                                     #
 ################################################################################
-FROM node:22.12.0-slim as base
+FROM node:22.12.0-slim AS base
 
 # Arguments & environment.
 ARG site
@@ -45,7 +45,7 @@ COPY execute_develop.sh /code/execute.sh
 ################################################################################
 #                              Development Image                               #
 ################################################################################
-FROM node:22.12.0-slim as development
+FROM node:22.12.0-slim AS development
 LABEL environment=development
 
 # Arguments & environment.

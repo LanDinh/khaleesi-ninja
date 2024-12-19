@@ -4,7 +4,18 @@ import {
   NavigationElement,
   NavigationMenuElement,
 } from '../../app/khaleesi/navigation/navigationElement'
+import { suppressReactRouterFutureWarnings } from '../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
+
+
+const originalWarning = console.warn.bind(console.warn)
+
+beforeAll(() => {
+  console.warn = suppressReactRouterFutureWarnings(originalWarning)
+})
+afterAll(() => {
+  console.warn = originalWarning
+})
 
 
 test('NavigationElement renders without error.', () => {
