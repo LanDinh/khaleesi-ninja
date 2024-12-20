@@ -21,7 +21,6 @@ export default defineConfig({
     // assetsBuildDirectory: 'public/build',
     // serverBuildPath: 'build/index.js',
     // publicPath: 'build/',
-    serverModuleFormat: 'cjs',
     future: {
       v3_fetcherPersist: true,
       v3_relativeSplatPath: true,
