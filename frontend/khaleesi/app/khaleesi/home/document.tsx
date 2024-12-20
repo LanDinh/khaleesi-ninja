@@ -23,7 +23,6 @@ import {
   topNavigationData,
   bottomNavigationData,
 } from '../navigation/commonNavigationData'
-import { Session } from '../auth/session.server'
 
 
 export const handle = {
@@ -46,6 +45,7 @@ type LoaderType = {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderType> => {
+  const { Session } = await import('../auth/session.server')
   const session = new Session()
   await session.init(request)
   return {

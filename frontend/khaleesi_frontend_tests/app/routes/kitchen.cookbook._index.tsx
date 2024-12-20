@@ -1,6 +1,5 @@
 import type { MetaFunction } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { SAWYER } from '../khaleesi/grpc/sawmill.server'
 import type { khaleesi } from '../khaleesi/proto/proto'
 
 export const meta: MetaFunction = () => {
@@ -11,6 +10,7 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader(): Promise<khaleesi.core.sawmill.EventsList> {
+  const { SAWYER } = await import('../khaleesi/grpc/sawmill.server')
   return SAWYER.getEvents()
 }
 

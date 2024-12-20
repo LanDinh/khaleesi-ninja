@@ -5,7 +5,6 @@ import { useContext } from 'react'
 import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'
 import { loginNavigationData } from '../navigation/commonNavigationData'
-import { Session } from './session.server'
 
 
 export const handle = {
@@ -23,6 +22,7 @@ export const meta: MetaFunction = () => {
 }
 
 export const action = async ({ request }: ActionFunctionArgs): Promise<any> => {  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
+  const { Session } = await import('./session.server')
   const session = new Session()
   await session.init(request)
   const form = await request.formData()

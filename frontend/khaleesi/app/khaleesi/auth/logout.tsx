@@ -4,7 +4,6 @@ import { useContext } from 'react'
 import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'
 import { logoutNavigationData } from '../navigation/commonNavigationData'
-import { Session } from './session.server'
 
 
 export const handle = {
@@ -22,6 +21,7 @@ export const meta: MetaFunction = () => {
 }
 
 export const action = async ({ request }: ActionFunctionArgs): Promise<TypedResponse<any>> => {  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
+  const { Session } = await import('./session.server')
   const session = new Session()
   await session.init(request)
   return session.destroy('/')
