@@ -15,7 +15,7 @@ WORKDIR /code
 COPY ./package.json /code/
 COPY ./package-lock.json /code/
 COPY ./tsconfig.json /code/
-COPY vite.config.ts /code/
+COPY vite.config.mts /code/
 RUN sed -i "s/\${SITE}/${SITE}/" "/code/package.json"
 RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package.json"
 RUN sed -i "s/\${SITE}/${SITE}/" "/code/package-lock.json"
