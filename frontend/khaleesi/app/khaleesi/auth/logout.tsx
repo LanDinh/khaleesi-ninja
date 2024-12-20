@@ -20,7 +20,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export const action = async ({ request }: ActionFunctionArgs): Promise<TypedResponse<any>> => {  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
+export async function action({ request }: ActionFunctionArgs) {
   const { Session } = await import('./session.server')
   const session = new Session()
   await session.init(request)

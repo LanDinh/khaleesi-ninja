@@ -44,7 +44,7 @@ type LoaderType = {
   bottom : NavigationElementProperties[],
 }
 
-export const loader = async ({ request }: LoaderFunctionArgs): Promise<LoaderType> => {
+export async function loader({ request }: LoaderFunctionArgs) {
   const { Session } = await import('../auth/session.server')
   const session = new Session()
   await session.init(request)
