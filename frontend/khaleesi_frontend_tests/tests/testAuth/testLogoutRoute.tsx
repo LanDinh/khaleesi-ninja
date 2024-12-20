@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { render, screen } from '@testing-library/react'
-import { LogoutRoute, action } from '../../app/khaleesi/auth/logout'
+import LogoutRoute, { action } from '../../app/khaleesi/auth/logoutRoute'
 import { suppressReactRouterFutureWarnings } from '../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 

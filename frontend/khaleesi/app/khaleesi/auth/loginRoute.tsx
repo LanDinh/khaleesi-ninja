@@ -1,5 +1,56 @@
-import { meta, handle, action, LoginRoute } from './login'
+import type { MetaFunction, ActionFunctionArgs } from '@remix-run/node'
+import { data } from '@remix-run/node'
+import { Form } from '@remix-run/react'
+import { useContext } from 'react'
+import { AppContext } from '../home/document'
+import { breadcrumb } from '../navigation/breadcrumb'
+import { loginNavigationData } from '../navigation/commonNavigationData'
+import { Session } from './session.server'
 
 
-export default LoginRoute
-export { meta, handle, action }
+export const handle = {
+  ...breadcrumb(loginNavigationData),
+}
+
+
+export const meta: MetaFunction = () => {
+  const appContext = useContext(AppContext)  // eslint-disable-line react-hooks/rules-of-hooks
+
+  return [
+    { title: `Login | ${appContext.title}` },
+    { name: 'description', content: 'Identify yourself!' },
+  ]
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const session = new Session()
+  await session.init(request)
+  const form = await request.formData()
+  const user = form.get('user')
+
+  if ('string' !== typeof user) {
+    return data({ fieldErrors: { user: 'wrong type' }, formError: null }, { status: 400 })
+  }
+
+  return session.create(user, '/')
+}
+
+
+export default function LoginRoute(): JSX.Element {
+  return (
+    <div>
+      <h1>Login</h1>
+      <section><Form method="post">
+        <label>
+          <input type="radio" name="user" value="user" defaultChecked />
+          user
+        </label>
+        <label>
+          <input type="radio" name="user" value="admin" />
+          admin
+        </label>
+        <button type="submit" className="button" name="action">Login</button>
+      </Form></section>
+    </div>
+  )
+}

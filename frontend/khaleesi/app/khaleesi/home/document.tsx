@@ -29,7 +29,6 @@ export const handle = {
   ...breadcrumb(homeNavigationData),
 }
 
-
 export type AppContextType = {
   title     : string,
 }
@@ -37,22 +36,10 @@ export const AppContext: Context<AppContextType> = createContext({
   title     : 'Change your title!',
 })
 
-
 type LoaderType = {
   top    : NavigationElementProperties[],
   middle : NavigationElementProperties[],
   bottom : NavigationElementProperties[],
-}
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  const { Session } = await import('../auth/session.server')
-  const session = new Session()
-  await session.init(request)
-  return {
-    top    : topNavigationData.filter((data) => session.hasPermission(data.permission)),
-    middle : navigationData.filter((data) => session.hasPermission(data.permission)),
-    bottom : bottomNavigationData.filter((data) => session.hasPermission(data.permission)),
-  }
 }
 
 function Document({
