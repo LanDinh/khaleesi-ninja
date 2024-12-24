@@ -1,5 +1,5 @@
 import { createContext, type Context, type PropsWithChildren } from 'react'
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/node'
+import type { LinksFunction } from '@remix-run/node'
 import {
   Meta,
   Links as RemixLinks,

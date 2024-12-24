@@ -1,5 +1,5 @@
-import type { MetaFunction, ActionFunctionArgs } from '@remix-run/node'
 import { Form } from '@remix-run/react'
+import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
 import { useContext } from 'react'
 import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'
@@ -21,7 +21,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs): Promise<TypedResponse<never>> {
   const session = new Session()
   await session.init(request)
   return session.destroy('/')

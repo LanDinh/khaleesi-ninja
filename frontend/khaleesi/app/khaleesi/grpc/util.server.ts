@@ -1,6 +1,6 @@
 import { makeGenericClientConstructor, credentials } from '@grpc/grpc-js'
 import type * as $protobuf from 'protobufjs'
-import proto from '../proto/proto'
+import { khaleesi } from '../proto/proto'
 
 
 export class Client<Type extends $protobuf.rpc.Service> {
@@ -22,7 +22,7 @@ export class Client<Type extends $protobuf.rpc.Service> {
     const channel = new Channel(serviceUrl, credentials.createInsecure())
 
     // @ts-expect-error any
-    this.stub = proto.khaleesi[site][app][stubName].create(
+    this.stub = khaleesi[site][app][stubName].create(
       (method: any, requestData: any, callback: any) => channel.makeUnaryRequest(  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
         `/${serviceName}/${method.name}`,
           arg => arg,
