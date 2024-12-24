@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom'
 import { render } from '@testing-library/react'
 import * as reactMock from '@remix-run/react'
-import { App, ErrorBoundary, links, loader } from '../../app/khaleesi/home/document'
+import { App, ErrorBoundary, links } from '../../app/khaleesi/home/document'
 import { Navigation } from '../../app/khaleesi/navigation/navigation'
 import { BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
 import { Content } from '../../app/khaleesi/home/content'
@@ -41,15 +41,6 @@ afterAll(() => {
   console.error = originalError
   console.warn = originalWarning
   jest.clearAllMocks()
-})
-
-
-test('Navigation data gets filtered according to permissions.', async () => {
-  // Prepare data.
-  // Execute test.
-  await loader({ request: new Request('http://example.com'), params: {}, context: {} })
-  // Assert result.
-  expect(hasPermissionMock).toHaveBeenCalledTimes(3)
 })
 
 
