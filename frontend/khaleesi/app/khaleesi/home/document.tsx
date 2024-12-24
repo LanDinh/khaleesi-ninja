@@ -7,7 +7,7 @@ import {
   ScrollRestoration,
   Outlet,
   useLoaderData,
-} from '@remix-run/react'
+} from 'react-router'
 import { navigationData } from '../../navigationData'
 import { breadcrumb, BreadCrumbs } from '../navigation/breadcrumb'
 import { Navigation } from '../navigation/navigation'

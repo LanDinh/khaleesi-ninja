@@ -1,5 +1,5 @@
-import { useMatches } from '@remix-run/react'
-import type { UIMatch } from '@remix-run/react'
+import { useMatches } from 'react-router'
+import type { UIMatch } from 'react-router'
 import type { NavigationElementProperties } from './navigationElement'
 import { NavigationElement } from './navigationElement'
 

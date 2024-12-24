@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
-import * as router from '@remix-run/react'
+import * as router from 'react-router'
 import { Navigation } from '../../app/khaleesi/navigation/navigation'
 import { MenuIcon } from '../../app/khaleesi/home/icon'
 import type {
@@ -17,8 +17,8 @@ const originalWarning = console.warn.bind(console.warn)
 
 jest.mock('../../app/khaleesi/home/icon')
 jest.mock('../../app/khaleesi/navigation/navigationElement')
-jest.mock('@remix-run/react', () => ({
-  ...jest.requireActual('@remix-run/react'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   useMatches: jest.fn(),
 }))
 

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render } from '@testing-library/react'
-import * as reactMock from '@remix-run/react'
+import * as reactMock from 'react-router'
 import { App, ErrorBoundary, links } from '../../app/khaleesi/home/document'
 import { Navigation } from '../../app/khaleesi/navigation/navigation'
 import { BreadCrumbs } from '../../app/khaleesi/navigation/breadcrumb'
@@ -19,8 +19,8 @@ jest.mock('../../app/khaleesi/navigation/navigation')
 jest.mock('../../app/khaleesi/home/content')
 jest.mock('../../app/khaleesi/navigation/breadcrumb')
 jest.mock('@remix-run/node')
-jest.mock('@remix-run/react', () => ({
-  ...jest.requireActual('@remix-run/react'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   useLoaderData: jest.fn(),
 }))
 

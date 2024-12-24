@@ -16,8 +16,8 @@ import type { SetURLSearchParams, URLSearchParamsInit } from 'react-router-dom'
 const originalWarning = console.warn.bind(console.warn)
 
 jest.mock('../../../app/khaleesi/components/table/paginator')
-jest.mock('@remix-run/react', () => ({
-  ...jest.requireActual('@remix-run/react'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   useSearchParams: (): any[] => ([ { has: () => false }, jest.fn() ]),  // eslint-disable-line @typescript-eslint/no-explicit-any, max-len
 }))
 

@@ -1,5 +1,5 @@
 import type { ChangeEvent, MouseEvent } from 'react'
-import { useSearchParams } from '@remix-run/react'
+import { useSearchParams } from 'react-router'
 import { Paginator } from './paginator'
 import type { TableColumn, DataMapper } from './types'
 import type { SetURLSearchParams } from 'react-router-dom'

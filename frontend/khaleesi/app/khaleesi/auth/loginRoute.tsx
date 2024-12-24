@@ -1,7 +1,7 @@
 import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
 import { data } from '@remix-run/node'
-import { Form } from '@remix-run/react'
 import type { UNSAFE_DataWithResponseInit } from '@remix-run/router'
+import { Form } from 'react-router'
 import { useContext } from 'react'
 import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'

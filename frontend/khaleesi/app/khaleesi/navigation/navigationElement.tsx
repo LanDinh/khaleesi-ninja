@@ -1,4 +1,4 @@
-import { Link, NavLink } from '@remix-run/react'
+import { Link, NavLink } from 'react-router'
 import { iconLookup as commonIconLookup } from './commonNavigationData'
 import { iconLookup } from '../../navigationData'
 

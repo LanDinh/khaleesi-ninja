@@ -1,5 +1,5 @@
 import type { MetaFunction } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData } from 'react-router'
 import type { khaleesi } from '../khaleesi/proto/proto'
 
 export const meta: MetaFunction = () => {
