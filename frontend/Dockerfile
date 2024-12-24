@@ -49,6 +49,7 @@ LABEL environment=development
 
 # Arguments & environment.
 ARG site
+ENV PORT=8000
 ENV SITE=${site}
 
 # Data.
@@ -67,6 +68,7 @@ FROM base AS production
 
 # Arguments & environment.
 ARG site
+ENV PORT=8000
 ENV SITE=${site}
 
 # Data.

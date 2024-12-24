@@ -25,10 +25,9 @@ export const meta: MetaFunction = () => {
 
 export async function action(
     { request }: ActionFunctionArgs,
-): Promise<
-    TypedResponse<{ message: string }>
-    | UNSAFE_DataWithResponseInit<{ fieldErrors: { user: string | null }, formError: string | null }>
-> {
+): Promise<TypedResponse<{ message: string }> | UNSAFE_DataWithResponseInit<{
+    fieldErrors: { user: string | null }, formError: string | null
+}>> {
   const session = new Session()
   await session.init(request)
   const form = await request.formData()
