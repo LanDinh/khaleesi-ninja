@@ -12,25 +12,20 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.12.4",
-    "@react-router/dev": "^7.1.1",
     "@react-router/node": "^7.1.1",
-    "@remix-run/node": "^2.15.1",
-    "@remix-run/react": "^2.15.1",
-    "@remix-run/serve": "^2.15.1",
     "google-protobuf": "^3.21.4",
     "isbot": "^5.1.18",
     "protobufjs": "^7.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router": "^7.0.2"
+    "react-router": "^7.1.1",
+    "react-router-dom": "^7.1.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
     "@babel/preset-typescript": "^7.26.0",
-    "@remix-run/dev": "^2.15.1",
-    "@remix-run/route-config": "^2.15.1",
-    "@remix-run/testing": "^2.15.1",
+    "@react-router/dev": "^7.1.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/google-protobuf": "^3.15.12",
@@ -48,6 +43,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "react-test-renderer": "^18.2.0",
     "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "vite": "^5.1.0"
   },
