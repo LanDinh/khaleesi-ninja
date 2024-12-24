@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "target": "ES2019",
     "strict": true,
-    "allowJs": true,
+    "allowJs": false,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "paths": {
