@@ -1,5 +1,6 @@
 # Frontend
 /frontend/node_modules/*
+/frontend/.react-router/*
 /frontend/khaleesi/app/khaleesi/proto/*
 
 # Backend

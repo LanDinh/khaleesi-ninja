@@ -1,5 +1,5 @@
-import type { RouteConfig } from '@remix-run/route-config'
-import { route } from '@remix-run/route-config'
+import type { RouteConfig } from '@react-router/dev'
+import { route } from '@react-router/dev'
 import { routes } from './khaleesi/routes'
 
 export default [

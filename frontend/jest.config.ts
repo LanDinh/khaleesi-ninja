@@ -1,5 +1,6 @@
-// noinspection JSUnresolvedReference
-module.exports = {
+import type { Config } from 'jest'
+
+export default {
   preset: 'ts-jest',
   testEnvironment: './app/khaleesi/testUtil/attachFetchApi.ts',
   transform: {
@@ -18,4 +19,4 @@ module.exports = {
     '^@web3-storage/multipart-parser$': require.resolve('@web3-storage/multipart-parser'),
   },
   testMatch: [ "**/tests/**/test*.ts?(x)" ]
-}
+} satisfies Config

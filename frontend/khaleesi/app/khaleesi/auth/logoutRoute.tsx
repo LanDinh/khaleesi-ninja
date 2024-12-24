@@ -1,4 +1,4 @@
-import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
+import type { MetaFunction, ActionFunctionArgs, UNSAFE_DataWithResponseInit } from 'react-router'
 import { Form } from 'react-router'
 import { useContext } from 'react'
 import { AppContext } from '../home/document'
@@ -21,7 +21,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function action({ request }: ActionFunctionArgs): Promise<TypedResponse<never>> {
+export async function action({ request }: ActionFunctionArgs): Promise<Response | UNSAFE_DataWithResponseInit<{ message: string }>> {
   const session = new Session()
   await session.init(request)
   return session.destroy('/')

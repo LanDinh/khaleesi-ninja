@@ -1,7 +1,5 @@
-import type { MetaFunction, ActionFunctionArgs, TypedResponse } from '@remix-run/node'
-import { data } from '@remix-run/node'
-import type { UNSAFE_DataWithResponseInit } from '@remix-run/router'
-import { Form } from 'react-router'
+import { Form, data } from 'react-router'
+import type { MetaFunction, ActionFunctionArgs, UNSAFE_DataWithResponseInit } from 'react-router'
 import { useContext } from 'react'
 import { AppContext } from '../home/document'
 import { breadcrumb } from '../navigation/breadcrumb'
@@ -25,9 +23,13 @@ export const meta: MetaFunction = () => {
 
 export async function action(
     { request }: ActionFunctionArgs,
-): Promise<TypedResponse<{ message: string }> | UNSAFE_DataWithResponseInit<{
-    fieldErrors: { user: string | null }, formError: string | null
-}>> {
+): Promise<Response
+    | UNSAFE_DataWithResponseInit<{ message: string }>
+    | UNSAFE_DataWithResponseInit<{
+        fieldErrors: { user: string | null },
+        formError: string | null,
+    }>
+> {
   const session = new Session()
   await session.init(request)
   const form = await request.formData()

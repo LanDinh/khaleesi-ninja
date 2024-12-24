@@ -1,5 +1,5 @@
-import type { RouteConfig } from '@remix-run/route-config'
-import { route } from '@remix-run/route-config'
+import type { RouteConfig } from '@react-router/dev/routes'
+import { route } from '@react-router/dev/routes'
 
 export const routes = [
   route('/login', 'khaleesi/auth/loginRoute.tsx'),

@@ -18,11 +18,7 @@ const originalWarning = console.warn.bind(console.warn)
 jest.mock('../../app/khaleesi/navigation/navigation')
 jest.mock('../../app/khaleesi/home/content')
 jest.mock('../../app/khaleesi/navigation/breadcrumb')
-jest.mock('@remix-run/node')
-jest.mock('react-router', () => ({
-  ...jest.requireActual('react-router'),
-  useLoaderData: jest.fn(),
-}))
+jest.mock('react-router')
 
 const hasPermissionMock = jest.fn()
 jest.mock('../../app/khaleesi/auth/session.server', () => ({

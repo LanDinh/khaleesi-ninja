@@ -15,7 +15,7 @@ WORKDIR /code
 COPY ./package.json /code/
 COPY ./package-lock.json /code/
 COPY ./tsconfig.json /code/
-COPY vite.config.mts /code/
+COPY ./vite.config.mts /code/
 RUN sed -i "s/\${SITE}/${SITE}/" "/code/package.json"
 RUN sed -i "s/\${KHALEESI_VERSION}/${KHALEESI_VERSION}/" "/code/package.json"
 RUN sed -i "s/\${SITE}/${SITE}/" "/code/package-lock.json"
@@ -38,7 +38,7 @@ ENV SITE=${site}
 
 # Data.
 COPY ./.eslintrc.js /code/
-COPY ./jest.config.js /code/
+COPY ./jest.config.ts /code/
 COPY execute_develop.sh /code/execute.sh
 
 ################################################################################

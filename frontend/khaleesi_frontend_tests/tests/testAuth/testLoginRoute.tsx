@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom'
-import type { ActionFunctionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from 'react-router'
 import { render, screen } from '@testing-library/react'
 import LoginRoute, { action } from '../../app/khaleesi/auth/loginRoute'
 import { suppressReactRouterFutureWarnings } from '../../app/khaleesi/testUtil/consoleLogging'
 import { createTestingStub } from '../../app/khaleesi/testUtil/remixStub'
 
 
-jest.mock('@remix-run/node', () => ({
+jest.mock('react-router', () => ({
   json: jest.fn(),
 }))
 const originalWarning = console.warn.bind(console.warn)

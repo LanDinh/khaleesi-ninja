@@ -1,11 +1,10 @@
+import type { UNSAFE_DataWithResponseInit, Session as RemixSession } from 'react-router'
 import {
   createCookieSessionStorage,
   redirectDocument,
   redirect,
-  json,
-  type Session as RemixSession,
-  type TypedResponse,
-} from '@remix-run/node'
+  data,
+} from 'react-router'
 
 
 const sessionSecret = 'shouldBeSetByBackend'
@@ -46,9 +45,9 @@ export class Session {
   async create(
     sessionId : string,
     redirectTo: string,
-  ): Promise<TypedResponse<never | { message: string }>> {
+  ): Promise<Response | UNSAFE_DataWithResponseInit<{ message: string }>> {
     if (!this.initialized) {
-      return json({ message: 'No session available yet!' })
+      return data({ message: 'No session available yet!' })
     }
     this.remixSession!.set('sessionId', sessionId)
     this.remixSession!.set('permission', sessionId)
@@ -58,7 +57,9 @@ export class Session {
     )
   }
 
-  async destroy(redirectTo: string): Promise<TypedResponse<never>> {
+  async destroy(
+      redirectTo: string,
+  ): Promise<Response | UNSAFE_DataWithResponseInit<{ message: string }>> {
     if (this.initialized) {
       this.initialized   = false
       this.authenticated = false
@@ -91,7 +92,7 @@ export class Session {
       if (!this.authenticated) {
         throw redirect('/login')
       }
-      throw json({ message: 'Permission denied.' }, { status: 403 })
+      throw data({ message: 'Permission denied.' }, { status: 403 })
     }
   }
 }

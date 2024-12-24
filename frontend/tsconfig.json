@@ -1,7 +1,8 @@
 {
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    ".react-router/types/**/*"
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2019"],
@@ -22,8 +23,8 @@
     "preserveSymlinks": true,
     "downlevelIteration": true,
     "skipLibCheck": true,  // Type checks are broken https://github.com/remix-run/remix/issues/6244
-    "types": ["@remix-run/node", "vite/client"],
-
+    "types": ["@react-router/node", "vite/client"],
+    "rootDirs": [".", "./.react-router/types"],
     // Remix takes care of building everything in `remix build`.
     "noEmit": true
   }

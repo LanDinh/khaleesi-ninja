@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node'
+import type { MetaFunction } from 'react-router'
 import { useContext } from 'react'
 import { AppContext } from '../khaleesi/home/document'
 

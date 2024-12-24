@@ -3,15 +3,16 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "remix vite:build",
-    "dev": "remix vite:dev",
-    "start": "remix-serve ./build/server/index.js",
-    "typecheck": "tsc",
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc",
     "lint": "npx eslint --ext .ts --ext .tsx . --max-warnings=0",
     "test": "jest"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.12.4",
+    "@react-router/dev": "^7.1.1",
     "@remix-run/node": "^2.15.1",
     "@remix-run/react": "^2.15.1",
     "@remix-run/serve": "^2.15.1",

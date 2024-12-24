@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { loader } from '../../app/khaleesi/home/document.server'
 
 
-jest.mock('@remix-run/node')
+jest.mock('react-router')
 
 const hasPermissionMock = jest.fn()
 jest.mock('../../app/khaleesi/auth/session.server', () => ({

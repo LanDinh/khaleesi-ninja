@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom'
-import * as nodeMock from '@remix-run/node'
+import * as nodeMock from 'react-router'
 import { Session } from '../../app/khaleesi/auth/session.server'
 
 
 // Need to mock everything instead of using jest.requireActual because of errors...
-jest.mock('@remix-run/node', () => ({
+jest.mock('react-router', () => ({
   createCookieSessionStorage: jest.fn(() => ({
     getSession    : jest.fn(() => ({
       set: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock('@remix-run/node', () => ({
   })),
   redirectDocument: jest.fn(),
   redirect: jest.fn(),
-  json: jest.fn((json) => ({ json: jest.fn(() => json) })),
+  data: jest.fn((data) => ({ data: jest.fn(() => data) })),
 }))
 afterAll(() => {
   jest.clearAllMocks()
@@ -146,7 +146,7 @@ test('Initialize user session.', async () => {
 test('Create user session without initializing.', async () => {
   // Prepare data.
   const session = new Session()
-  const jsonSpy = jest.spyOn(nodeMock, 'json')
+  const jsonSpy = jest.spyOn(nodeMock, 'data')
   // Execute test.
   await session.create('id', 'redirect')
   // Assert result.
